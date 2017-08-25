@@ -12,6 +12,7 @@ import Narrative
 import Components exposing (..)
 import Dict exposing (Dict)
 import List.Zipper as Zipper exposing (Zipper)
+import Map exposing (..)
 
 
 {- This is the kernel of the whole app.  It glues everything together and handles some logic such as choosing the correct narrative to display.
@@ -156,11 +157,18 @@ view model =
             , storyLine =
                 model.storyLine
             }
+
+        testMap =
+            textarea []
+                [ text <| Map.draw ]
     in
-        if not model.loaded then
-            div [ class "Loading" ] [ text "Loading..." ]
-        else
-            Theme.Layout.view displayState
+        div []
+            [ testMap
+            , if not model.loaded then
+                div [ class "Loading" ] [ text "Loading..." ]
+              else
+                Theme.Layout.view displayState
+            ]
 
 
 port loaded : (Bool -> msg) -> Sub msg
