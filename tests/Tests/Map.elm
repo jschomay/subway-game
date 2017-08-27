@@ -3,7 +3,6 @@ module Tests.Map exposing (all)
 import Map exposing (..)
 import ElmTest.Extra exposing (..)
 import Expect
-import Fuzz exposing (..)
 
 
 {-
@@ -44,14 +43,14 @@ all =
         [ describe "connectingTrains"
             [ test "mid-line" <|
                 \() ->
-                    Expect.equal (connectingTrains Map.map Central) <|
+                    Expect.equal (connectingTrains Map.fullMap Central) <|
                         [ Train Green InComing
                         , Train Yellow OutGoing
                         , Train Green OutGoing
                         ]
             , test "mid-line 2" <|
                 \() ->
-                    Expect.equal (connectingTrains Map.map Market) <|
+                    Expect.equal (connectingTrains Map.fullMap Market) <|
                         [ Train Yellow InComing
                         , Train Red InComing
                         , Train Yellow OutGoing
@@ -59,16 +58,30 @@ all =
                         ]
             , test "terminal 1" <|
                 \() ->
-                    Expect.equal (connectingTrains Map.map EastEnd) <|
+                    Expect.equal (connectingTrains Map.fullMap EastEnd) <|
                         [ Train Green InComing
                         , Train Yellow InComing
                         , Train Red InComing
                         ]
             , test "terminal 2" <|
                 \() ->
-                    Expect.equal (connectingTrains Map.map WestEnd) <|
+                    Expect.equal (connectingTrains Map.fullMap WestEnd) <|
                         [ Train Green OutGoing
                         , Train Red OutGoing
                         ]
+            ]
+        , describe "nextStop"
+            [ test "incoming" <|
+                \() ->
+                    Expect.equal (Just Central) <|
+                        nextStop fullMap (Train Yellow InComing) Market
+            , test "outgoing" <|
+                \() ->
+                    Expect.equal (Just EastEnd) <|
+                        nextStop fullMap (Train Yellow OutGoing) Market
+            , test "end of line" <|
+                \() ->
+                    Expect.equal Nothing <|
+                        nextStop fullMap (Train Yellow InComing) Central
             ]
         ]
