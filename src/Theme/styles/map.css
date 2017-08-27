@@ -1,0 +1,44 @@
+.station {
+  color: #444;
+  width: 400px;
+  border: 5px solid #444;
+  border-radius: 1.3em 1.3em 0 0;
+  font-family: sans-serif;
+  margin: 3em;
+  overflow: hidden;
+}
+
+.station__name {
+  text-align: center;
+  text-transform: uppercase;
+  font-weight: bold;
+  font-size: 1.5em;
+  background: #444;
+  color: white;
+}
+.station__connections {
+
+}
+
+.connection {
+  display: flex;
+  align-items: center;
+  padding: 0.5em 1em;
+}
+.connection__number {
+  background: white;
+  border: 3px solid;
+  border-radius: 50%;
+  width: 2em;
+  height: 2em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1em;
+  font-weight: bold;
+  margin-right: 0.5em;
+}
+.connection__direction {
+  font-size: 1.0em;
+  font-weight: bold;
+}

@@ -13,6 +13,7 @@ import Components exposing (..)
 import Dict exposing (Dict)
 import List.Zipper as Zipper exposing (Zipper)
 import Map exposing (..)
+import Color
 
 
 {- This is the kernel of the whole app.  It glues everything together and handles some logic such as choosing the correct narrative to display.
@@ -161,13 +162,66 @@ view model =
         testMap =
             textarea []
                 [ text <| Map.draw ]
+
+        stationView { name, connections } =
+            div [ class "station" ]
+                [ h2 [ class "station__name" ] [ text <| name ++ " station" ]
+                , connectionsView connections
+                ]
+
+        connectionsView connections =
+            let
+                toColor color =
+                    Color.toRgb color
+                        |> \{ red, green, blue } -> "rgb(" ++ toString red ++ "," ++ toString green ++ "," ++ toString blue ++ ")"
+
+                connectionView info =
+                    li [ class "connection" ]
+                        [ div
+                            [ class "connection__number"
+                            , style [ ( "color", toColor info.color ), ( "borderColor", toColor info.color ) ]
+                            ]
+                            [ text <| toString info.number ]
+                        , div [ class "connection__direction" ] [ text <| "Towards " ++ (stationInfo info.direction |> .name) ++ " station" ]
+                        ]
+            in
+                ul [ class "station__connections" ]
+                    (connections
+                        |> List.sortBy .number
+                        |> List.map connectionView
+                    )
     in
         div []
             [ testMap
-            , if not model.loaded then
-                div [ class "Loading" ] [ text "Loading..." ]
-              else
-                Theme.Layout.view displayState
+            , pre [ style [ ( "fontFamily", "monospace" ) ] ] [ text """
+                                         red line
+                         / ----------------------------- o EastEnd
+                       / / --------------------------- / |
+                     / /           yellow line           |
+                   / /                                   |
+            Market o                                     |
+                   | \\                   / ------------- /
+                   |   \\               /    green line
+        red line   |     \\           /
+         ---------/        \\       /
+       /                     \\ --- o Central
+       |                           |
+       |                           |
+       |                           |
+       |         green line        |
+       o ------------------------- /
+    WestEnd
+
+
+   red line - WestEnd, Market, EastEnd
+   green line - WestEnd, Central, EastEnd
+   yellow line - Central, Market, EastEnd
+""" ]
+            , div [] <| List.map (Map.stationInfo >> stationView) Map.stations
+              -- , if not model.loaded then
+              --     div [ class "Loading" ] [ text "Loading..." ]
+              --   else
+              --     Theme.Layout.view displayState
             ]
 
 
