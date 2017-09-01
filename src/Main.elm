@@ -5,14 +5,18 @@ import Manifest
 import Rules
 import Html exposing (..)
 import Html.Attributes exposing (..)
+import Html.Events exposing (..)
 import Tuple
-import Theme.Layout
+
+
+-- import Theme.Layout
+
 import ClientTypes exposing (..)
 import Narrative
 import Components exposing (..)
 import Dict exposing (Dict)
 import List.Zipper as Zipper exposing (Zipper)
-import Map exposing (..)
+import Subway
 import Color
 
 
@@ -21,13 +25,29 @@ import Color
 -}
 
 
+main : Program Never Model ClientTypes.Msg
+main =
+    Html.program
+        { init = init
+        , view = view
+        , update = update
+        , subscriptions = subscriptions
+        }
+
+
 type alias Model =
     { engineModel : Engine.Model
     , loaded : Bool
     , storyLine : List StorySnippet
     , narrativeContent : Dict String (Zipper String)
-    , endingCountDown : Int
+    , location : Location
     }
+
+
+type Location
+    = OnPlatform Subway.Station
+    | OnTrain Subway.Train Subway.Station
+    | InStation Subway.Station
 
 
 init : ( Model, Cmd ClientTypes.Msg )
@@ -46,7 +66,7 @@ init =
           , loaded = False
           , storyLine = [ Narrative.startingNarrative ]
           , narrativeContent = Dict.map (curry getNarrative) Rules.rules
-          , endingCountDown = 0
+          , location = OnPlatform Subway.Central
           }
         , Cmd.none
         )
@@ -95,29 +115,11 @@ update msg model =
                         maybeMatchedRuleId
                             |> Maybe.map (\id -> Dict.update id updateNarrativeContent model.narrativeContent)
                             |> Maybe.withDefault model.narrativeContent
-
-                    {- This part about the `endingCountDown` and `checkEnd` is a hack to make the player interact with the wolf three times before ending the story, which currently is not possible in the rules matching system.  It also demonstrates how to mix state from the client's model to effect the story.
-                       I have plans in the next release of the engine to include a "quality-based system" that would allow you to do logic like this as part of the normal rules.
-                    -}
-                    updatedEndingCountDown =
-                        case maybeMatchedRuleId of
-                            Just "Little Red Riding Hood's demise" ->
-                                model.endingCountDown + 1
-
-                            _ ->
-                                model.endingCountDown
-
-                    checkEnd =
-                        if updatedEndingCountDown == 3 then
-                            Engine.changeWorld [ endStory "The End" ]
-                        else
-                            identity
                 in
                     ( { model
-                        | engineModel = newEngineModel |> checkEnd
+                        | engineModel = newEngineModel
                         , storyLine = narrativeForThisInteraction :: model.storyLine
                         , narrativeContent = updatedContent
-                        , endingCountDown = updatedEndingCountDown
                       }
                     , Cmd.none
                     )
@@ -126,6 +128,64 @@ update msg model =
                 ( { model | loaded = True }
                 , Cmd.none
                 )
+
+            BoardTrain train ->
+                let
+                    leavingStation =
+                        case model.location of
+                            OnTrain train station ->
+                                station
+
+                            OnPlatform station ->
+                                station
+
+                            InStation station ->
+                                station
+                in
+                    ( { model | location = OnTrain train leavingStation }
+                    , Cmd.none
+                    )
+
+            ExitTrain ->
+                let
+                    station =
+                        case model.location of
+                            OnTrain train station ->
+                                station
+
+                            OnPlatform station ->
+                                station
+
+                            InStation station ->
+                                station
+                in
+                    ( { model | location = OnPlatform station }
+                    , Cmd.none
+                    )
+
+            ArriveAtStation ->
+                let
+                    location =
+                        case model.location of
+                            OnTrain train previousStation ->
+                                Subway.nextStop Subway.fullMap train previousStation
+                                    |> Maybe.withDefault previousStation
+                                    |> OnTrain train
+
+                            x ->
+                                x
+                in
+                    ( { model | location = location }
+                    , Cmd.none
+                    )
+
+
+port loaded : (Bool -> msg) -> Sub msg
+
+
+subscriptions : Model -> Sub ClientTypes.Msg
+subscriptions model =
+    loaded <| always Loaded
 
 
 view :
@@ -159,41 +219,76 @@ view model =
                 model.storyLine
             }
 
-        testMap =
-            textarea []
-                [ text <| Map.draw ]
+        graphViz =
+            textarea [] [ text <| Subway.draw ]
+    in
+        div []
+            [ mapView
+            , gameView model
+            ]
 
-        stationView { name, connections } =
-            div [ class "station" ]
-                [ h2 [ class "station__name" ] [ text <| name ++ " station" ]
-                , connectionsView connections
+
+gameView : Model -> Html Msg
+gameView model =
+    case model.location of
+        InStation station ->
+            text "In the station..."
+
+        OnPlatform station ->
+            div [] <| [ stationView <| Subway.stationInfo station ]
+
+        OnTrain train station ->
+            let
+                nextStop =
+                    Subway.nextStop Subway.fullMap train station
+            in
+                div [] <| [ trainView { nextStop = nextStop, trainInfo = Subway.trainInfo train } ]
+
+
+stationView : Subway.StationInfo Msg -> Html Msg
+stationView { name, connections } =
+    let
+        connectionView connection =
+            li [ class "connection", onClick <| connection.msg BoardTrain ]
+                [ div
+                    [ class "connection__number"
+                    , style [ ( "color", toColor connection.color ), ( "borderColor", toColor connection.color ) ]
+                    ]
+                    [ text <| toString connection.number ]
+                , div [ class "connection__direction" ] [ text <| "Towards " ++ (Subway.stationInfo connection.direction |> .name) ++ " station" ]
                 ]
 
         connectionsView connections =
-            let
-                toColor color =
-                    Color.toRgb color
-                        |> \{ red, green, blue } -> "rgb(" ++ toString red ++ "," ++ toString green ++ "," ++ toString blue ++ ")"
-
-                connectionView info =
-                    li [ class "connection" ]
-                        [ div
-                            [ class "connection__number"
-                            , style [ ( "color", toColor info.color ), ( "borderColor", toColor info.color ) ]
-                            ]
-                            [ text <| toString info.number ]
-                        , div [ class "connection__direction" ] [ text <| "Towards " ++ (stationInfo info.direction |> .name) ++ " station" ]
-                        ]
-            in
-                ul [ class "station__connections" ]
-                    (connections
-                        |> List.sortBy .number
-                        |> List.map connectionView
-                    )
+            ul [ class "station__connections" ]
+                (connections
+                    |> List.sortBy .number
+                    |> List.map connectionView
+                )
     in
-        div []
-            [ testMap
-            , pre [ style [ ( "fontFamily", "monospace" ) ] ] [ text """
+        div [ class "station" ]
+            [ h2 [ class "station__name" ] [ text <| name ++ " station" ]
+            , connectionsView connections
+            ]
+
+
+trainView : { trainInfo : Subway.TrainInfo Msg, nextStop : Maybe Subway.Station } -> Html Msg
+trainView { trainInfo, nextStop } =
+    let
+        display =
+            nextStop
+                |> Maybe.map (Subway.stationInfo >> .name >> (++) " - next stop ")
+                |> Maybe.withDefault " - end of the line"
+    in
+        div [] <|
+            [ h3 [] [ text <| trainInfo.name ++ display ]
+            , button [ onClick <| ArriveAtStation ] [ text "Continue" ]
+            , button [ onClick <| ExitTrain ] [ text "Get off" ]
+            ]
+
+
+mapView : Html Msg
+mapView =
+    pre [ style [ ( "fontFamily", "monospace" ) ] ] [ text """
                                          red line
                          / ----------------------------- o EastEnd
                        / / --------------------------- / |
@@ -217,27 +312,9 @@ view model =
    green line - WestEnd, Central, EastEnd
    yellow line - Central, Market, EastEnd
 """ ]
-            , div [] <| List.map (Map.stationInfo >> stationView) Map.stations
-              -- , if not model.loaded then
-              --     div [ class "Loading" ] [ text "Loading..." ]
-              --   else
-              --     Theme.Layout.view displayState
-            ]
 
 
-port loaded : (Bool -> msg) -> Sub msg
-
-
-subscriptions : Model -> Sub ClientTypes.Msg
-subscriptions model =
-    loaded <| always Loaded
-
-
-main : Program Never Model ClientTypes.Msg
-main =
-    Html.program
-        { init = init
-        , view = view
-        , update = update
-        , subscriptions = subscriptions
-        }
+toColor : Color.Color -> String
+toColor color =
+    Color.toRgb color
+        |> \{ red, green, blue } -> "rgb(" ++ toString red ++ "," ++ toString green ++ "," ++ toString blue ++ ")"

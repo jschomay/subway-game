@@ -1,4 +1,4 @@
-module Map exposing (..)
+module Subway exposing (..)
 
 import Color exposing (..)
 import Graph exposing (..)
@@ -20,19 +20,19 @@ type Line
 
 
 type alias LineInfo =
-    { line : Line, number : Int, color : Color, stops : List Station }
+    { line : Line, name : String, number : Int, color : Color, stops : List Station }
 
 
 type Train
     = Train Line Direction
 
 
-type alias TrainInfo =
-    { number : Int, color : Color, direction : Station }
+type alias TrainInfo msg =
+    { number : Int, name : String, color : Color, direction : Station, msg : (Train -> msg) -> msg }
 
 
-type alias StationInfo =
-    { name : String, connections : List TrainInfo }
+type alias StationInfo msg =
+    { name : String, connections : List (TrainInfo msg) }
 
 
 type Station
@@ -91,7 +91,7 @@ stationId station =
             4
 
 
-stationInfo : Station -> StationInfo
+stationInfo : Station -> StationInfo msg
 stationInfo station =
     (case station of
         Central ->
@@ -109,7 +109,7 @@ stationInfo station =
         |> \name -> { name = name, connections = connectingTrains fullMap station |> List.map trainInfo }
 
 
-trainInfo : Train -> TrainInfo
+trainInfo : Train -> TrainInfo msg
 trainInfo train =
     let
         lastStop stops direction =
@@ -121,7 +121,7 @@ trainInfo train =
                     List.head stops |> Maybe.withDefault Central
 
         toInfo lineInfo direction =
-            { number = lineInfo.number, color = lineInfo.color, direction = lastStop lineInfo.stops direction }
+            { number = lineInfo.number, name = lineInfo.name, color = lineInfo.color, direction = lastStop lineInfo.stops direction, msg = \msg -> msg train }
     in
         case train of
             Train Red direction ->
@@ -153,6 +153,7 @@ redLine : LineInfo
 redLine =
     { line = Red
     , number = 1
+    , name = "Red line"
     , color = red
     , stops = [ WestEnd, Market, EastEnd ]
     }
@@ -162,6 +163,7 @@ greenLine : LineInfo
 greenLine =
     { line = Green
     , number = 2
+    , name = "Green line"
     , color = green
     , stops = [ WestEnd, Central, EastEnd ]
     }
@@ -171,6 +173,7 @@ yellowLine : LineInfo
 yellowLine =
     { line = Yellow
     , number = 3
+    , name = "Yellow line"
     , color = yellow
     , stops = [ Central, Market, EastEnd ]
     }

@@ -1,6 +1,6 @@
-module Tests.Map exposing (all)
+module Tests.Subway exposing (all)
 
-import Map exposing (..)
+import Subway exposing (..)
 import ElmTest.Extra exposing (..)
 import Expect
 
@@ -39,18 +39,18 @@ import Expect
 
 all : ElmTest.Extra.Test
 all =
-    describe "Map"
+    describe "Subway"
         [ describe "connectingTrains"
             [ test "mid-line" <|
                 \() ->
-                    Expect.equal (connectingTrains Map.fullMap Central) <|
+                    Expect.equal (connectingTrains Subway.fullMap Central) <|
                         [ Train Green InComing
                         , Train Yellow OutGoing
                         , Train Green OutGoing
                         ]
             , test "mid-line 2" <|
                 \() ->
-                    Expect.equal (connectingTrains Map.fullMap Market) <|
+                    Expect.equal (connectingTrains Subway.fullMap Market) <|
                         [ Train Yellow InComing
                         , Train Red InComing
                         , Train Yellow OutGoing
@@ -58,14 +58,14 @@ all =
                         ]
             , test "terminal 1" <|
                 \() ->
-                    Expect.equal (connectingTrains Map.fullMap EastEnd) <|
+                    Expect.equal (connectingTrains Subway.fullMap EastEnd) <|
                         [ Train Green InComing
                         , Train Yellow InComing
                         , Train Red InComing
                         ]
             , test "terminal 2" <|
                 \() ->
-                    Expect.equal (connectingTrains Map.fullMap WestEnd) <|
+                    Expect.equal (connectingTrains Subway.fullMap WestEnd) <|
                         [ Train Green OutGoing
                         , Train Red OutGoing
                         ]
