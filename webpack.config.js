@@ -35,11 +35,11 @@ var commonConfig = {
     loaders: [
       {
         test: /\.(eot|ttf|woff|woff2|svg)$/,
-        loader: 'file-loader'
+        loader: 'file-loader?name=fonts/[name].[ext]'
       },
       {
         test: /\.(jpg|png)$/,
-        loader: 'file-loader?name=[path][name].[ext]'
+        loader: 'file-loader?name=img/[name].[ext]'
       }
     ]
   },
@@ -123,6 +123,10 @@ if ( TARGET_ENV === 'production' ) {
         {
           from: 'src/img/',
           to:   'img/'
+        },
+        {
+          from: 'src/fonts/',
+          to:   'fonts/'
         },
         {
           from: 'src/favicon.ico'

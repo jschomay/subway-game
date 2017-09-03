@@ -1,8 +1,8 @@
 /* Train */
 @font-face {
   font-family: subway;
-  src: url(http://localhost:8080/fonts/subway.ttf);
-  src: url(http://localhost:8080/fonts/subway.woff);
+  src: url(../../fonts/subway.ttf);
+  src: url(../../fonts/subway.woff);
 }
 
 .train {
@@ -13,7 +13,7 @@
   min-height: 100vh;
   align-items: flex-start;
   justify-content: space-around;
-  background: black url(https://pixabay.com/get/ef3cb10a29f71c22d2524518a33219c8b66ae3d019b5154690f6c77d/tunnel-690513_1280.jpg) no-repeat top center;
+  background: black url(../../img/train.jpg) no-repeat top center;
   background-size: 100% auto;
   background-attachment: fixed;
 }
@@ -85,7 +85,7 @@
   min-height: 100vh;
   align-items: flex-start;
   justify-content: space-around;
-  background: black url(https://pixabay.com/get/ec33b80d2ef01c22d2524518a33219c8b66ae3d019b5154797f8c87b/subway-569264_1280.jpg) no-repeat top center;
+  background: black url(../../img/platform.jpg) no-repeat top center;
   background-size: 100% auto;
   background-attachment: fixed;
 }
