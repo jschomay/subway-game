@@ -6,6 +6,7 @@ import Subway
 type Msg
     = Interact String
     | Loaded
+    | ToggleMap
     | BoardTrain Subway.Train
     | ArriveAtStation
     | ExitTrain

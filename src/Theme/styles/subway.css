@@ -1,0 +1,78 @@
+.platform {
+  display: flex;
+  padding: 3em;
+  font-family: sans-serif;
+  min-height: 100vh;
+  align-items: flex-start;
+  justify-content: space-around;
+  background: black url(https://pixabay.com/get/ec33b80d2ef01c22d2524518a33219c8b66ae3d019b5154797f8c87b/subway-569264_1280.jpg) no-repeat top center;
+  background-size: 100% auto;
+  background-attachment: fixed;
+}
+
+.platform__story {
+  padding: 4em 6em;
+  color: white;
+  background: rgba(0,0,0,0.8);
+  margin-right: 3em;
+  max-width: 700px;
+  flex: 1 1 auto;
+  align-self: stretch;
+}
+
+.platform__platform_info {
+  margin-top: 5em;
+  flex: 0 0 auto;
+  width: 330px;
+}
+
+.platform_info {
+  position: fixed;
+  width: 330px;
+}
+
+.platform_info {
+  border: 0.3em solid #333;
+  background: white;
+  border-radius: 1.1em 1.1em 0 0;
+}
+
+.platform_info__name {
+  text-align: center;
+  text-transform: uppercase;
+  font-weight: normal;
+  font-size: 2em;
+  padding: 0.2em 0.7em;
+  background: #333;
+  color: white;
+}
+.platform_info__connections {
+  padding: 0.4em 0em;
+}
+
+.connection {
+  display: flex;
+  align-items: center;
+  padding: 0.8em 1em;
+}
+.connection__number {
+  background: white;
+  border: 3px solid;
+  border-radius: 50%;
+  width: 2em;
+  height: 2em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1em;
+  font-weight: bold;
+  margin-right: 0.5em;
+  cursor: pointer;
+}
+.connection__direction {
+  font-size: 1.0em;
+  font-weight: bold;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+

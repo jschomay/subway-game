@@ -1,0 +1,42 @@
+.game {
+  font-family: sans-serif;
+  position: relative;
+}
+
+.map_toggle {
+  position: fixed;
+  display: block;
+  bottom: 1em;
+  left: 1em;
+  padding: 1em;
+  background: #333;
+  cursor: pointer;
+  font-size: 1em;
+  color: white;
+  text-transform: uppercase;
+}
+
+.map {
+  display: block;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  left: 0;
+}
+
+.map__image {
+  display: block;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  left: 0;
+  margin: auto;
+  width: 750px;
+  height: 650px;
+  background: #aaaaaa;
+  border: 2em solid #e2e2e2;
+  box-shadow: 0 0 100px 0px black;
+  padding: 1em;
+}
