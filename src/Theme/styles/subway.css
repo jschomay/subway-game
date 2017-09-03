@@ -1,7 +1,87 @@
+/* Train */
+@font-face {
+  font-family: subway;
+  src: url(http://localhost:8080/fonts/subway.ttf);
+  src: url(http://localhost:8080/fonts/subway.woff);
+}
+
+.train {
+  display: flex;
+  padding: 3em;
+  align-items: flex-start;
+  justify-content: space-around;
+  min-height: 100vh;
+  align-items: flex-start;
+  justify-content: space-around;
+  background: black url(https://pixabay.com/get/ef3cb10a29f71c22d2524518a33219c8b66ae3d019b5154690f6c77d/tunnel-690513_1280.jpg) no-repeat top center;
+  background-size: 100% auto;
+  background-attachment: fixed;
+}
+
+.train__story {
+  max-width: 700px;
+  flex: 1 1 auto;
+  margin-top: 5em;
+}
+
+.train__ticker {
+  color: #ffc000;
+  position: fixed;
+  text-transform: uppercase;
+  font-family: subway;
+  font-weight: normal;
+  font-size: 2.0em;
+  padding: 0.7em 0.7em;
+  text-align: center;
+  top: 0;
+  right: 0;
+  left: 0;
+  background: black;
+}
+
+.train__train_info {
+  width: 200px;
+  margin-top: 10em;
+}
+
+.train_info {
+  position: fixed;
+}
+
+.train_info__exit_button {
+  outline: 0;
+  word-break: break-all;
+  background: #249a3f;
+  background-image: linear-gradient(to bottom, #249a3f, #175f27);
+  border-radius: 28px;
+  box-shadow: 0px 0px 20px 0px black;
+  color: #333;
+  display: block;
+  width: 100px;
+  height: 100px;
+  font-size: 0.8em;
+  font-weight: bold;
+  text-transform: uppercase;
+  border-radius: 1em;
+  border: none;
+  cursor: pointer;
+  margin-bottom: 5em;
+}
+
+.train_info__exit_button:hover {
+  background: #34d95a;
+  color: #555;
+  background-image: linear-gradient(to bottom, #34d95a, #269e40);
+  box-shadow: 0px 0px 20px 0px #249a3f;
+;
+}
+
+
+/* Platform */
+
 .platform {
   display: flex;
   padding: 3em;
-  font-family: sans-serif;
   min-height: 100vh;
   align-items: flex-start;
   justify-content: space-around;
@@ -11,13 +91,9 @@
 }
 
 .platform__story {
-  padding: 4em 6em;
-  color: white;
-  background: rgba(0,0,0,0.8);
   margin-right: 3em;
   max-width: 700px;
   flex: 1 1 auto;
-  align-self: stretch;
 }
 
 .platform__platform_info {
@@ -41,7 +117,7 @@
   text-align: center;
   text-transform: uppercase;
   font-weight: normal;
-  font-size: 2em;
+  font-size: 2.5em;
   padding: 0.2em 0.7em;
   background: #333;
   color: white;

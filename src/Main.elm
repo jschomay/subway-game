@@ -67,7 +67,7 @@ init =
           , loaded = False
           , storyLine = [ Narrative.startingNarrative ]
           , narrativeContent = Dict.map (curry getNarrative) Rules.rules
-          , location = OnPlatform Subway.Central
+          , location = OnTrain (Subway.Train Subway.Red Subway.OutGoing) Subway.Market
           , showMap = False
           }
         , Cmd.none
@@ -248,11 +248,10 @@ gameView model =
             platformView <| Subway.stationInfo station
 
         OnTrain train station ->
-            let
-                nextStop =
-                    Subway.nextStop Subway.fullMap train station
-            in
-                trainView { nextStop = nextStop, trainInfo = Subway.trainInfo train }
+            trainView
+                { nextStop = Subway.nextStop Subway.fullMap train station
+                , trainInfo = Subway.trainInfo train
+                }
 
 
 platformView : Subway.StationInfo Msg -> Html Msg
@@ -325,10 +324,15 @@ trainView { trainInfo, nextStop } =
                 |> Maybe.map (Subway.stationInfo >> .name >> (++) " - next stop ")
                 |> Maybe.withDefault " - end of the line"
     in
-        div [] <|
-            [ h3 [] [ text <| trainInfo.name ++ display ]
-            , button [ onClick <| ArriveAtStation ] [ text "Continue" ]
-            , button [ onClick <| ExitTrain ] [ text "Get off" ]
+        div [ class "train" ] <|
+            [ div [ class "train__story" ] [ storyView ]
+            , h3 [ class "train__ticker" ] [ text <| trainInfo.name ++ display ]
+            , div [ class "train__train_info" ]
+                [ div [ class "train_info" ]
+                    [ button [ class "train_info__exit_button", onClick <| ExitTrain ] [ text "Exit train" ]
+                    , button [ onClick <| ArriveAtStation ] [ text "Continue" ]
+                    ]
+                ]
             ]
 
 

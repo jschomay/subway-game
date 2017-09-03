@@ -62,12 +62,6 @@ img {
   background-color: white;
 }
 
-.game {
-  background: #555;
-  width: 100%;
-  height: 100%;
-}
-
 .GamePage {
   margin: auto;
   display: flex;

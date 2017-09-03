@@ -1,6 +1,9 @@
 .game {
   font-family: sans-serif;
   position: relative;
+  background: black;
+  width: 100vw;
+  height: 100vh;
 }
 
 .map_toggle {
