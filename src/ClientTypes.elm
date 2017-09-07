@@ -1,15 +1,18 @@
 module ClientTypes exposing (..)
 
 import Subway
+import Time exposing (Time)
 
 
 type Msg
     = Interact String
     | Loaded
+    | Delay Time Msg
     | ToggleMap
     | BoardTrain Subway.Train
-    | ArriveAtStation
     | ExitTrain
+    | ArriveAtPlatform Subway.Station
+    | LeavePlatform
 
 
 type alias StorySnippet =

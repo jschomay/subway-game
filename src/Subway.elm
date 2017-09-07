@@ -1,4 +1,19 @@
-module Subway exposing (..)
+module Subway
+    exposing
+        ( Line(..)
+        , LineInfo
+        , Direction(..)
+        , Train
+        , Map
+        , Station(..)
+        , TrainInfo
+        , StationInfo
+        , trainInfo
+        , stationInfo
+        , fullMap
+        , nextStop
+        , draw
+        )
 
 import Color exposing (..)
 import Graph exposing (..)
@@ -121,7 +136,12 @@ trainInfo train =
                     List.head stops |> Maybe.withDefault Central
 
         toInfo lineInfo direction =
-            { number = lineInfo.number, name = lineInfo.name, color = lineInfo.color, direction = lastStop lineInfo.stops direction, msg = \msg -> msg train }
+            { number = lineInfo.number
+            , name = lineInfo.name
+            , color = lineInfo.color
+            , direction = lastStop lineInfo.stops direction
+            , msg = \msg -> msg train
+            }
     in
         case train of
             Train Red direction ->
@@ -132,6 +152,16 @@ trainInfo train =
 
             Train Green direction ->
                 toInfo greenLine direction
+
+
+stopTrain : Train -> Train
+stopTrain (Train line direction) =
+    Train line direction
+
+
+startTrain : Train -> Train
+startTrain (Train line direction) =
+    Train line direction
 
 
 addStation : Station -> Node Station
@@ -235,7 +265,7 @@ connectingTrains (Map map) station =
             lines
                 |> IntDict.values
                 |> List.concat
-                |> List.map (flip Train direction)
+                |> List.map (\line -> Train line direction)
 
         toConnections : NodeContext Station (List Line) -> List Train
         toConnections context =

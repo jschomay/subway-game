@@ -7,6 +7,9 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Tuple
+import Process
+import Task
+import Time exposing (Time)
 
 
 -- import Theme.Layout
@@ -45,9 +48,14 @@ type alias Model =
     }
 
 
+type TrainStatus
+    = Stopped
+    | Moving
+
+
 type Location
     = OnPlatform Subway.Station
-    | OnTrain Subway.Train Subway.Station
+    | OnTrain Subway.Train Subway.Station TrainStatus
     | InStation Subway.Station
 
 
@@ -67,11 +75,21 @@ init =
           , loaded = False
           , storyLine = [ Narrative.startingNarrative ]
           , narrativeContent = Dict.map (curry getNarrative) Rules.rules
-          , location = OnTrain (Subway.Train Subway.Red Subway.OutGoing) Subway.Market
+          , location = OnPlatform Subway.WestEnd
           , showMap = False
           }
         , Cmd.none
         )
+
+
+transitDuration : Time
+transitDuration =
+    12 * 1000
+
+
+platformDuration : Time
+platformDuration =
+    5 * 1000
 
 
 findEntity : String -> Entity
@@ -131,60 +149,76 @@ update msg model =
                 , Cmd.none
                 )
 
+            Delay duration msg ->
+                ( model
+                , Task.perform (always msg) <| Process.sleep duration
+                )
+
             ToggleMap ->
                 ( { model | showMap = not model.showMap }
                 , Cmd.none
                 )
 
             BoardTrain train ->
-                let
-                    leavingStation =
-                        case model.location of
-                            OnTrain train station ->
-                                station
+                case model.location of
+                    OnPlatform station ->
+                        let
+                            cmd =
+                                case Subway.nextStop Subway.fullMap train station of
+                                    Nothing ->
+                                        Cmd.none
 
-                            OnPlatform station ->
-                                station
+                                    Just station ->
+                                        delay 0 <| LeavePlatform
+                        in
+                            ( { model | location = OnTrain train station Stopped }
+                            , cmd
+                            )
 
-                            InStation station ->
-                                station
-                in
-                    ( { model | location = OnTrain train leavingStation }
-                    , Cmd.none
-                    )
+                    _ ->
+                        ( model, Cmd.none )
 
             ExitTrain ->
+                case model.location of
+                    OnTrain train station Stopped ->
+                        ( { model | location = OnPlatform station }
+                        , Cmd.none
+                        )
+
+                    _ ->
+                        ( model, Cmd.none )
+
+            ArriveAtPlatform station ->
                 let
-                    station =
+                    newLocation =
                         case model.location of
-                            OnTrain train station ->
-                                station
+                            OnTrain train arrivingFrom Moving ->
+                                OnTrain train station Stopped
 
-                            OnPlatform station ->
-                                station
-
-                            InStation station ->
-                                station
+                            other ->
+                                other
                 in
-                    ( { model | location = OnPlatform station }
-                    , Cmd.none
+                    ( { model | location = newLocation }
+                    , delay platformDuration LeavePlatform
                     )
 
-            ArriveAtStation ->
-                let
-                    location =
-                        case model.location of
-                            OnTrain train previousStation ->
-                                Subway.nextStop Subway.fullMap train previousStation
-                                    |> Maybe.withDefault previousStation
-                                    |> OnTrain train
+            LeavePlatform ->
+                case model.location of
+                    OnTrain train station Stopped ->
+                        case Subway.nextStop Subway.fullMap train station of
+                            Nothing ->
+                                ( model, Cmd.none )
 
-                            x ->
-                                x
-                in
-                    ( { model | location = location }
-                    , Cmd.none
-                    )
+                            Just next ->
+                                ( { model | location = OnTrain train station Moving }, delay transitDuration <| ArriveAtPlatform next )
+
+                    _ ->
+                        ( model, Cmd.none )
+
+
+delay : Time -> Msg -> Cmd Msg
+delay duration msg =
+    Task.perform (always msg) <| Process.sleep duration
 
 
 port loaded : (Bool -> msg) -> Sub msg
@@ -192,7 +226,10 @@ port loaded : (Bool -> msg) -> Sub msg
 
 subscriptions : Model -> Sub ClientTypes.Msg
 subscriptions model =
-    loaded <| always Loaded
+    Sub.batch
+        [ loaded <| always Loaded
+          -- , AnimationFrame.times Tick
+        ]
 
 
 view :
@@ -247,11 +284,12 @@ gameView model =
         OnPlatform station ->
             platformView <| Subway.stationInfo station
 
-        OnTrain train station ->
+        OnTrain train station status ->
             trainView
-                { nextStop = Subway.nextStop Subway.fullMap train station
-                , trainInfo = Subway.trainInfo train
-                }
+                (Subway.trainInfo train)
+                (Subway.stationInfo station)
+                (Maybe.map Subway.stationInfo <| Subway.nextStop Subway.fullMap train station)
+                status
 
 
 platformView : Subway.StationInfo Msg -> Html Msg
@@ -289,20 +327,20 @@ storyView : Html Msg
 storyView =
     ul [ class "story" ]
         [ li [] [ text """
-        The hydraulic sounds of the clunky engine dissipates slowly, and all that remains to be heard is the quiet humming and flickering of the fluorescent lights above.
-        """ ]
+  The hydraulic sounds of the clunky engine dissipates slowly, and all that remains to be heard is the quiet humming and flickering of the fluorescent lights above.
+  """ ]
         , li [] [ text """
-        Steve exits the subway car frantically, searching for a subway engineer or an overhead map back to his stop, Imperial Ave. He searches for any workers on the platform, shouting for help. Steve realizes that he is alone in the dimly lit ghost station. He searches for a way out, but to no avail, he finds no escalator or stairs. He wanders down the end of the tracks and finally finds an old map behind a shattered laminated case. Etched in the plastic case is an inscription with
-        """ ]
+  Steve exits the subway car frantically, searching for a subway engineer or an overhead map back to his stop, Imperial Ave. He searches for any workers on the platform, shouting for help. Steve realizes that he is alone in the dimly lit ghost station. He searches for a way out, but to no avail, he finds no escalator or stairs. He wanders down the end of the tracks and finally finds an old map behind a shattered laminated case. Etched in the plastic case is an inscription with
+  """ ]
         , li [] [ text """
-        sharp angular letters that read: "UR STUCK". Steve looks at the inscription with one raised eyebrow, and as if in agreement, nods and says to himself with a wry chuckle, "in more ways than one."
-        """ ]
+  sharp angular letters that read: "UR STUCK". Steve looks at the inscription with one raised eyebrow, and as if in agreement, nods and says to himself with a wry chuckle, "in more ways than one."
+  """ ]
         , li [] [ text """
-        As he waits, he thinks that he hears faint sounds of jeering laughter in the dark distant tunnels, as if a television or radio was left on in the dark expanse of the tunnels. The pitter patter of tiny feet lull Steve into an even deeper state of dread. "It's just mice," he tells himself. A bead of sweat perspires from his neck, rolling all the way down his collar onto his scuffed up black wing tips. As Steve looks down at the droplet, he is startled by the sound of the oncoming Y line, rushing past his nose without any warning. Time seemed to slow down and speed up at that instant. Steve shrugs, and thinks aloud: "God damn, I need another coffee. I am seriously out of the loop today." He looks around in his subway car, and notices it is empty. Hopping on reluctantly, he sits on a seat nearest to the door, setting down his briefcase with a sigh of brief relief. As the doors close and the subway car begins to move into the tunnels,
-        Steve briefly glimpses a yellow shape dart out from the opposite tunnel tracks.
-        """ ]
+  As he waits, he thinks that he hears faint sounds of jeering laughter in the dark distant tunnels, as if a television or radio was left on in the dark expanse of the tunnels. The pitter patter of tiny feet lull Steve into an even deeper state of dread. "It's just mice," he tells himself. A bead of sweat perspires from his neck, rolling all the way down his collar onto his scuffed up black wing tips. As Steve looks down at the droplet, he is startled by the sound of the oncoming Y line, rushing past his nose without any warning. Time seemed to slow down and speed up at that instant. Steve shrugs, and thinks aloud: "God damn, I need another coffee. I am seriously out of the loop today." He looks around in his subway car, and notices it is empty. Hopping on reluctantly, he sits on a seat nearest to the door, setting down his briefcase with a sigh of brief relief. As the doors close and the subway car begins to move into the tunnels,
+  Steve briefly glimpses a yellow shape dart out from the opposite tunnel tracks.
+  """ ]
         , li [] [ text """
-        "I'm really losin' it," he says as he laughs nervously to himself. As the car moves into the dark depths of the tunnel, he closes his eyes, shakes his head, and clenches his fists. "Just a few stops left..." he says three times to himself, recalling an image of Dorothy from his favorite childhood film, 'The Wizard of Oz.'
+  "I'm really losin' it," he says as he laughs nervously to himself. As the car moves into the dark depths of the tunnel, he closes his eyes, shakes his head, and clenches his fists. "Just a few stops left..." he says three times to himself, recalling an image of Dorothy from his favorite childhood film, 'The Wizard of Oz.'
 
         """ ]
         , li [] [ text """
@@ -316,22 +354,54 @@ storyView =
         ]
 
 
-trainView : { trainInfo : Subway.TrainInfo Msg, nextStop : Maybe Subway.Station } -> Html Msg
-trainView { trainInfo, nextStop } =
+trainView : Subway.TrainInfo Msg -> Subway.StationInfo Msg -> Maybe (Subway.StationInfo Msg) -> TrainStatus -> Html Msg
+trainView trainInfo currentStation nextStation status =
     let
-        display =
-            nextStop
-                |> Maybe.map (Subway.stationInfo >> .name >> (++) " - next stop ")
-                |> Maybe.withDefault " - end of the line"
+        nextStop =
+            case ( status, nextStation ) of
+                ( Moving, Just next ) ->
+                    "Next stop: " ++ next.name
+
+                ( Moving, Nothing ) ->
+                    "Out of service"
+
+                ( Stopped, Just next ) ->
+                    "Arriving at: " ++ currentStation.name
+
+                ( Stopped, Nothing ) ->
+                    "End of the line: " ++ currentStation.name
+
+        info =
+            trainInfo.name ++ " towards " ++ (Subway.stationInfo trainInfo.direction |> .name)
+
+        buttonClasses =
+            classList
+                [ ( "exit_button", True )
+                , ( "exit_button--active", stopped )
+                ]
+
+        stopped =
+            case status of
+                Moving ->
+                    False
+
+                Stopped ->
+                    True
+
+        action =
+            if stopped then
+                [ onClick ExitTrain ]
+            else
+                []
     in
         div [ class "train" ] <|
             [ div [ class "train__story" ] [ storyView ]
-            , h3 [ class "train__ticker" ] [ text <| trainInfo.name ++ display ]
-            , div [ class "train__train_info" ]
-                [ div [ class "train_info" ]
-                    [ button [ class "train_info__exit_button", onClick <| ExitTrain ] [ text "Exit train" ]
-                    , button [ onClick <| ArriveAtStation ] [ text "Continue" ]
-                    ]
+            , div [ class "train__ticker" ]
+                [ h4 [ class "train__info" ] [ text info ]
+                , h3 [ class "train__next_stop" ] [ text nextStop ]
+                ]
+            , div [ class "train__exit_button" ]
+                [ button (buttonClasses :: action) [ text "Exit train" ]
                 ]
             ]
 
@@ -340,28 +410,26 @@ mapView : Html Msg
 mapView =
     div [ onClick ToggleMap, class "map" ]
         [ pre [ class "map__image", style [ ( "fontFamily", "monospace" ) ] ] [ text """
-                                         red line
-                         / ----------------------------- o EastEnd
-                       / / --------------------------- / |
-                     / /           yellow line           |
-                   / /                                   |
-            Market o                                     |
-                   | \\                   / ------------- /
-                   |   \\               /    green line
-        red line   |     \\           /
-         ---------/        \\       /
-       /                     \\ --- o Central
-       |                           |
-       |                           |
-       |                           |
-       |         green line        |
-       o ------------------------- /
-    WestEnd
-
-
-   red line - WestEnd, Market, EastEnd
-   green line - WestEnd, Central, EastEnd
-   yellow line - Central, Market, EastEnd
+  red line
+                                   / ----------------------------- o EastEnd
+                                 / / --------------------------- / |
+                               / /           yellow line           |
+                             / /                                   |
+                      Market o                                     |
+                             | \\                   / ------------- /
+                             |   \\               /    green line
+                  red line   |     \\           /
+                    ---------/        \\       /
+                  /                     \\ --- o Central
+                  |                           |
+                  |                           |
+                  |                           |
+                  |         green line        |
+                  o ------------------------- /
+                  WestEnd
+red line - WestEnd, Market, EastEnd
+green line - WestEnd, Central, EastEnd
+yellow line - Central, Market, EastEnd
 """ ]
         ]
 
