@@ -5,16 +5,71 @@ import ElmTest.Extra exposing (..)
 import Expect
 
 
+type Line
+    = Red
+    | Blue
+    | Green
+
+
+type Station
+    = Central
+    | Market
+    | WestEnd
+    | EastEnd
+
+
+stationToId : Station -> Int
+stationToId station =
+    case station of
+        Central ->
+            1
+
+        Market ->
+            2
+
+        EastEnd ->
+            3
+
+        WestEnd ->
+            4
+
+
+stations : List Station
+stations =
+    [ Central, Market, WestEnd, EastEnd ]
+
+
+redLine : ( Line, List Station )
+redLine =
+    ( Red, [ WestEnd, Market, EastEnd ] )
+
+
+greenLine : ( Line, List Station )
+greenLine =
+    ( Green, [ WestEnd, Central, EastEnd ] )
+
+
+blueLine : ( Line, List Station )
+blueLine =
+    ( Blue, [ Central, Market, EastEnd ] )
+
+
+map : Map Station Line
+map =
+    Subway.init stationToId stations [ redLine, greenLine, blueLine ]
+
+
+
 {-
 
                                          red line
                          / ----------------------------- o EastEnd
                        / / --------------------------- / |
-                     / /           yellow line           |
+                     / /           blue line             |
                    / /                                   |
             Market o                                     |
                    | \                   / ------------- /
-                   |   \               /    green line
+                   |   \  blue line    /    green line
         red line   |     \           /
          ---------/        \       /
        /                     \ --- o Central
@@ -28,61 +83,94 @@ import Expect
 
    red line - WestEnd, Market, EastEnd
    green line - WestEnd, Central, EastEnd
-   yellow line - Central, Market, EastEnd
+   blue line - Central, Market, EastEnd
 
 
 
 
 
 -}
--- TODO, after limiting exports these tests need to be refactored to only deal with exposed methods (trainInfo for example)
 
 
 all : ElmTest.Extra.Test
 all =
     describe "Subway"
-        [ describe "connectingTrains"
-            [ test "mid-line" <|
+        [ describe "init"
+            [ test "correctly builds graph" <|
                 \() ->
-                    Expect.equal (connectingTrains Subway.fullMap Central) <|
-                        [ Train Green InComing True
-                        , Train Yellow OutGoing True
-                        , Train Green OutGoing True
+                    let
+                        x =
+                            Debug.log (Subway.graphViz map ++ "\n") "Copy and paste into http://viz-js.com/"
+                    in
+                        Expect.equal (Subway.graphViz map) """digraph G {
+  rankdir=LR
+  graph [nodesep=0.3, mindist=4]
+  node [shape=box, style=rounded]
+  edge [penwidth=2]
+
+  "Central" -> "Market" [label=<<FONT COLOR="Blue">EastEnd</FONT>>]
+  "Central" -> "EastEnd" [label=<<FONT COLOR="Green">EastEnd</FONT>>]
+  "Central" -> "WestEnd" [label=<<FONT COLOR="Green">WestEnd</FONT>>]
+  "Market" -> "Central" [label=<<FONT COLOR="Blue">Central</FONT>>]
+  "Market" -> "EastEnd" [label=<<FONT COLOR="Blue">EastEnd</FONT><BR/><FONT COLOR="Red">EastEnd</FONT>>]
+  "Market" -> "WestEnd" [label=<<FONT COLOR="Red">WestEnd</FONT>>]
+  "EastEnd" -> "Central" [label=<<FONT COLOR="Green">WestEnd</FONT>>]
+  "EastEnd" -> "Market" [label=<<FONT COLOR="Blue">Central</FONT><BR/><FONT COLOR="Red">WestEnd</FONT>>]
+  "WestEnd" -> "Central" [label=<<FONT COLOR="Green">EastEnd</FONT>>]
+  "WestEnd" -> "Market" [label=<<FONT COLOR="Red">EastEnd</FONT>>]
+
+  "Central"
+  "Market"
+  "EastEnd"
+  "WestEnd"
+}"""
+            ]
+        , describe "connectingTrains"
+            [ test "Central" <|
+                \() ->
+                    Expect.equal (connections map (stationToId Central)) <|
+                        [ ( Blue, EastEnd )
+                        , ( Green, EastEnd )
+                        , ( Green, WestEnd )
                         ]
-            , test "mid-line 2" <|
+            , test "Market" <|
                 \() ->
-                    Expect.equal (connectingTrains Subway.fullMap Market) <|
-                        [ Train Yellow InComing True
-                        , Train Red InComing True
-                        , Train Yellow OutGoing True
-                        , Train Red OutGoing True
+                    Expect.equal (connections map (stationToId Market)) <|
+                        [ ( Blue, Central )
+                        , ( Blue, EastEnd )
+                        , ( Red, EastEnd )
+                        , ( Red, WestEnd )
                         ]
-            , test "terminal 1" <|
+            , test "EastEnd" <|
                 \() ->
-                    Expect.equal (connectingTrains Subway.fullMap EastEnd) <|
-                        [ Train Green InComing True
-                        , Train Yellow InComing True
-                        , Train Red InComing True
+                    Expect.equal (connections map (stationToId EastEnd)) <|
+                        [ ( Green, WestEnd )
+                        , ( Blue, Central )
+                        , ( Red, WestEnd )
                         ]
-            , test "terminal 2" <|
+            , test "WestEnd" <|
                 \() ->
-                    Expect.equal (connectingTrains Subway.fullMap WestEnd) <|
-                        [ Train Green OutGoing True
-                        , Train Red OutGoing True
+                    Expect.equal (connections map (stationToId WestEnd)) <|
+                        [ ( Green, EastEnd )
+                        , ( Red, EastEnd )
                         ]
             ]
         , describe "nextStop"
-            [ test "incoming" <|
+            [ test "midline" <|
                 \() ->
                     Expect.equal (Just Central) <|
-                        nextStop fullMap (Train Yellow InComing True) Market
-            , test "outgoing" <|
+                        nextStop map ( Blue, Central ) (stationToId Market)
+            , test "midline2" <|
                 \() ->
-                    Expect.equal (Just EastEnd) <|
-                        nextStop fullMap (Train Yellow OutGoing True) Market
+                    Expect.equal (Just Market) <|
+                        nextStop map ( Blue, Central ) (stationToId EastEnd)
             , test "end of line" <|
                 \() ->
                     Expect.equal Nothing <|
-                        nextStop fullMap (Train Yellow InComing True) Central
+                        nextStop map ( Blue, Central ) (stationToId Central)
+            , test "invalid" <|
+                \() ->
+                    Expect.equal Nothing <|
+                        nextStop map ( Blue, Central ) (stationToId WestEnd)
             ]
         ]

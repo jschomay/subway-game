@@ -1,7 +1,7 @@
 module ClientTypes exposing (..)
 
-import Subway
 import Time exposing (Time)
+import City exposing (..)
 
 
 type Msg
@@ -9,10 +9,21 @@ type Msg
     | Loaded
     | Delay Time Msg
     | ToggleMap
-    | BoardTrain Subway.Train
+    | BoardTrain ( City.Line, City.Station )
     | ExitTrain
-    | ArriveAtPlatform Subway.Station
+    | ArriveAtPlatform City.Station
     | LeavePlatform
+
+
+type TrainStatus
+    = Stopped
+    | Moving
+
+
+type Location
+    = OnPlatform City.Station
+    | OnTrain ( City.Line, City.Station ) City.Station TrainStatus
+    | InStation City.Station
 
 
 type alias StorySnippet =

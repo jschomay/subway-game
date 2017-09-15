@@ -21,6 +21,7 @@ import Dict exposing (Dict)
 import List.Zipper as Zipper exposing (Zipper)
 import Subway
 import Color
+import City exposing (..)
 
 
 {- This is the kernel of the whole app.  It glues everything together and handles some logic such as choosing the correct narrative to display.
@@ -48,17 +49,6 @@ type alias Model =
     }
 
 
-type TrainStatus
-    = Stopped
-    | Moving
-
-
-type Location
-    = OnPlatform Subway.Station
-    | OnTrain Subway.Train Subway.Station TrainStatus
-    | InStation Subway.Station
-
-
 init : ( Model, Cmd ClientTypes.Msg )
 init =
     let
@@ -75,7 +65,7 @@ init =
           , loaded = False
           , storyLine = [ Narrative.startingNarrative ]
           , narrativeContent = Dict.map (curry getNarrative) Rules.rules
-          , location = OnPlatform Subway.WestEnd
+          , location = OnPlatform WestEnd
           , showMap = False
           }
         , Cmd.none
@@ -164,7 +154,7 @@ update msg model =
                     OnPlatform station ->
                         let
                             cmd =
-                                case Subway.nextStop Subway.fullMap train station of
+                                case Subway.nextStop City.map train (stationInfo station |> .id) of
                                     Nothing ->
                                         Cmd.none
 
@@ -205,7 +195,7 @@ update msg model =
             LeavePlatform ->
                 case model.location of
                     OnTrain train station Stopped ->
-                        case Subway.nextStop Subway.fullMap train station of
+                        case Subway.nextStop City.map train (stationInfo station |> .id) of
                             Nothing ->
                                 ( model, Cmd.none )
 
@@ -263,8 +253,8 @@ view model =
                 model.storyLine
             }
 
-        graphViz =
-            textarea [] [ text <| Subway.draw ]
+        -- graphViz =
+        --     Debug.log (Subway.graphViz City.map ++ "\n") "Copy and paste in http://viz-js.com/"
     in
         div [ class "game" ]
             [ gameView model
@@ -282,33 +272,38 @@ gameView model =
             text "In the station..."
 
         OnPlatform station ->
-            platformView <| Subway.stationInfo station
+            platformView station (Subway.connections City.map (stationInfo station |> .id))
 
-        OnTrain train station status ->
+        OnTrain (( line, end ) as train) currentStation status ->
             trainView
-                (Subway.trainInfo train)
-                (Subway.stationInfo station)
-                (Maybe.map Subway.stationInfo <| Subway.nextStop Subway.fullMap train station)
+                line
+                end
+                currentStation
+                (Subway.nextStop City.map train (stationInfo currentStation |> .id))
                 status
 
 
-platformView : Subway.StationInfo Msg -> Html Msg
-platformView { name, connections } =
+platformView : Station -> List ( Line, Station ) -> Html Msg
+platformView station connections =
     let
-        connectionView connection =
-            li [ class "connection", onClick <| connection.msg BoardTrain ]
-                [ div
-                    [ class "connection__number"
-                    , style [ ( "color", toColor connection.color ), ( "borderColor", toColor connection.color ) ]
+        connectionView (( line, end ) as connection) =
+            let
+                lineInfo =
+                    City.lineInfo line
+            in
+                li [ class "connection", onClick <| BoardTrain connection ]
+                    [ div
+                        [ class "connection__number"
+                        , style [ ( "color", toColor lineInfo.color ), ( "borderColor", toColor lineInfo.color ) ]
+                        ]
+                        [ text <| toString lineInfo.number ]
+                    , div [ class "connection__direction" ] [ text (stationInfo end |> .name) ]
                     ]
-                    [ text <| toString connection.number ]
-                , div [ class "connection__direction" ] [ text (Subway.stationInfo connection.direction |> .name) ]
-                ]
 
         connectionsView connections =
             ul [ class "platform_info__connections" ]
                 (connections
-                    |> List.sortBy .number
+                    |> List.sortBy (\( line, _ ) -> lineInfo line |> .number)
                     |> List.map connectionView
                 )
     in
@@ -316,7 +311,7 @@ platformView { name, connections } =
             [ div [ class "platform__story" ] [ storyView ]
             , div [ class "platform__platform_info" ]
                 [ div [ class "platform_info" ]
-                    [ h2 [ class "platform_info__name" ] [ text name ]
+                    [ h2 [ class "platform_info__name" ] [ text (stationInfo station |> .name) ]
                     , connectionsView connections
                     ]
                 ]
@@ -354,25 +349,25 @@ storyView =
         ]
 
 
-trainView : Subway.TrainInfo Msg -> Subway.StationInfo Msg -> Maybe (Subway.StationInfo Msg) -> TrainStatus -> Html Msg
-trainView trainInfo currentStation nextStation status =
+trainView : Line -> Station -> Station -> Maybe Station -> TrainStatus -> Html Msg
+trainView line end currentStation nextStation status =
     let
         nextStop =
             case ( status, nextStation ) of
                 ( Moving, Just next ) ->
-                    "Next stop: " ++ next.name
+                    "Next stop: " ++ (stationInfo next |> .name)
 
                 ( Moving, Nothing ) ->
                     "Out of service"
 
                 ( Stopped, Just next ) ->
-                    "Arriving at: " ++ currentStation.name
+                    "Arriving at: " ++ (stationInfo currentStation |> .name)
 
                 ( Stopped, Nothing ) ->
-                    "End of the line: " ++ currentStation.name
+                    "End of the line: " ++ (stationInfo currentStation |> .name)
 
         info =
-            trainInfo.name ++ " towards " ++ (Subway.stationInfo trainInfo.direction |> .name)
+            (lineInfo line |> .name) ++ " towards " ++ (stationInfo end |> .name)
 
         buttonClasses =
             classList

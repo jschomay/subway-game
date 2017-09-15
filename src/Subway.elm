@@ -1,238 +1,60 @@
 module Subway
     exposing
-        ( Line(..)
-        , LineInfo
-        , Direction(..)
-        , Train
-        , Map
-        , Station(..)
-        , TrainInfo
-        , StationInfo
-        , trainInfo
-        , stationInfo
-        , fullMap
+        ( Map
+        , init
+        , connections
         , nextStop
-        , draw
+        , graphViz
         )
 
-import Color exposing (..)
 import Graph exposing (..)
 import Graph.GraphViz as Graph exposing (..)
 import IntDict
 import List.Extra as List
-import Tuple
 
 
-type Direction
-    = InComing
-    | OutGoing
+type Map station line
+    = Map (Graph station (List ( line, station )))
 
 
-type Line
-    = Red
-    | Yellow
-    | Green
-
-
-type alias LineInfo =
-    { line : Line, name : String, number : Int, color : Color, stops : List Station }
-
-
-type Train
-    = Train Line Direction
-
-
-type alias TrainInfo msg =
-    { number : Int, name : String, color : Color, direction : Station, msg : (Train -> msg) -> msg }
-
-
-type alias StationInfo msg =
-    { name : String, connections : List (TrainInfo msg) }
-
-
-type Station
-    = Central
-    | Market
-    | EastEnd
-    | WestEnd
-
-
-type Map
-    = Map (Graph Station (List Line))
-
-
-
-{-
-
-                                         red line
-                         / ----------------------------- o EastEnd
-                       / / --------------------------- / |
-                     / /           yellow line           |
-                   / /                                   |
-            Market o                                     |
-                   | \                   / ------------- /
-                   |   \               /    green line
-        red line   |     \           /
-         ---------/        \       /
-       /                     \ --- o Central
-       |                           |
-       |                           |
-       |                           |
-       |         green line        |
-       o ------------------------- /
-    WestEnd
-
-
-   red line - WestEnd, Market, EastEnd
-   green line - WestEnd, Central, EastEnd
-   yellow line - Central, Market, EastEnd
-
--}
-
-
-stationId : Station -> Int
-stationId station =
-    case station of
-        Central ->
-            1
-
-        Market ->
-            2
-
-        EastEnd ->
-            3
-
-        WestEnd ->
-            4
-
-
-stationInfo : Station -> StationInfo msg
-stationInfo station =
-    (case station of
-        Central ->
-            "Central"
-
-        Market ->
-            "Market"
-
-        EastEnd ->
-            "East End"
-
-        WestEnd ->
-            "West End"
-    )
-        |> \name -> { name = name, connections = connectingTrains fullMap station |> List.map trainInfo }
-
-
-trainInfo : Train -> TrainInfo msg
-trainInfo train =
+init :
+    (station -> Int)
+    -> List station
+    -> List ( line, List station )
+    -> Map station line
+init stationToId stations lines =
     let
-        lastStop stops direction =
-            case direction of
-                OutGoing ->
-                    List.last stops |> Maybe.withDefault Central
+        toNode station =
+            Node (stationToId station) station
 
-                InComing ->
-                    List.head stops |> Maybe.withDefault Central
+        toEdge from to line direction =
+            Edge (stationToId from) (stationToId to) ( line, direction )
 
-        toInfo lineInfo direction =
-            { number = lineInfo.number
-            , name = lineInfo.name
-            , color = lineInfo.color
-            , direction = lastStop lineInfo.stops direction
-            , msg = \msg -> msg train
-            }
-    in
-        case train of
-            Train Red direction ->
-                toInfo redLine direction
+        buildEdges ( line, stops ) =
+            case List.last stops of
+                Nothing ->
+                    []
 
-            Train Yellow direction ->
-                toInfo yellowLine direction
+                Just finalStop ->
+                    let
+                        makeEdge currentStop ( previousStop, acc ) =
+                            case previousStop of
+                                Nothing ->
+                                    ( Just currentStop, acc )
 
-            Train Green direction ->
-                toInfo greenLine direction
+                                Just previousStop ->
+                                    ( Just currentStop, (toEdge previousStop currentStop line finalStop) :: acc )
+                    in
+                        List.foldl makeEdge ( Nothing, [] ) stops
+                            |> Tuple.second
 
-
-stopTrain : Train -> Train
-stopTrain (Train line direction) =
-    Train line direction
-
-
-startTrain : Train -> Train
-startTrain (Train line direction) =
-    Train line direction
-
-
-addStation : Station -> Node Station
-addStation station =
-    Node (stationId station) station
-
-
-addLine : Station -> Station -> Line -> Edge Line
-addLine from to line =
-    Edge (stationId from) (stationId to) line
-
-
-stations : List Station
-stations =
-    [ Central, Market, EastEnd, WestEnd ]
-
-
-redLine : LineInfo
-redLine =
-    { line = Red
-    , number = 1
-    , name = "Red line"
-    , color = red
-    , stops = [ WestEnd, Market, EastEnd ]
-    }
-
-
-greenLine : LineInfo
-greenLine =
-    { line = Green
-    , number = 2
-    , name = "Green line"
-    , color = green
-    , stops = [ WestEnd, Central, EastEnd ]
-    }
-
-
-yellowLine : LineInfo
-yellowLine =
-    { line = Yellow
-    , number = 3
-    , name = "Yellow line"
-    , color = yellow
-    , stops = [ Central, Market, EastEnd ]
-    }
-
-
-fullMap : Map
-fullMap =
-    map stations [ redLine, greenLine, yellowLine ]
-
-
-map : List Station -> List LineInfo -> Map
-map stations lines =
-    let
-        toEdges : LineInfo -> List (Edge Line)
-        toEdges { line, stops } =
-            let
-                makeEdge stop ( lastStop, acc ) =
-                    case lastStop of
-                        Nothing ->
-                            ( Just stop, acc )
-
-                        Just lastStop ->
-                            ( Just stop, (addLine lastStop stop line) :: acc )
-            in
-                List.foldl makeEdge ( Nothing, [] ) stops
-                    |> Tuple.second
+        goBothDirections ( line, stops ) =
+            [ ( line, stops ), ( line, List.reverse stops ) ]
 
         mergedLines =
-            List.concatMap toEdges lines
+            lines
+                |> List.concatMap goBothDirections
+                |> List.concatMap buildEdges
                 |> List.sortWith ordEdge
                 |> List.groupWhile eqEdge
                 |> List.concatMap (List.foldl mergeEdges [])
@@ -254,56 +76,48 @@ map stations lines =
                 existing :: _ ->
                     [ { existing | label = new.label :: existing.label } ]
     in
-        Map <| Graph.fromNodesAndEdges (List.map addStation stations) mergedLines
+        Map <| Graph.fromNodesAndEdges (List.map toNode stations) mergedLines
 
 
-connectingTrains : Map -> Station -> List Train
-connectingTrains (Map map) station =
+connections : Map station line -> Int -> List ( line, station )
+connections (Map map) stationId =
     let
-        toTrains : Direction -> IntDict.IntDict (List Line) -> List Train
-        toTrains direction lines =
+        toTrains lines =
             lines
                 |> IntDict.values
                 |> List.concat
-                |> List.map (\line -> Train line direction)
 
-        toConnections : NodeContext Station (List Line) -> List Train
         toConnections context =
-            toTrains InComing context.incoming ++ toTrains OutGoing context.outgoing
+            toTrains context.outgoing
     in
-        Graph.get (stationId station) map
+        Graph.get stationId map
             |> Maybe.map toConnections
             |> Maybe.withDefault []
 
 
-nextStop : Map -> Train -> Station -> Maybe Station
-nextStop (Map map) (Train line direction) previousStation =
+nextStop : Map station line -> ( line, station ) -> Int -> Maybe station
+nextStop (Map graph) connection currentStationId =
     let
-        findNextStop : NodeContext Station (List Line) -> Maybe Station
         findNextStop context =
-            (if direction == InComing then
-                context.incoming
-             else
-                context.outgoing
-            )
+            context.outgoing
                 |> IntDict.foldl
                     (\to lines acc ->
-                        if List.member line lines then
+                        if List.member connection lines then
                             Just to
                         else
                             acc
                     )
                     Nothing
-                |> Maybe.andThen (flip Graph.get map)
+                |> Maybe.andThen (flip Graph.get graph)
                 |> Maybe.map (.node >> .label)
     in
-        Graph.get (stationId previousStation) map
-            |> Maybe.andThen findNextStop
+        Graph.get currentStationId graph |> Maybe.andThen findNextStop
 
 
-draw : String
-draw =
+graphViz : Map station line -> String
+graphViz (Map graph) =
     let
+        -- use dot, very loopy
         graphStyles =
             { defaultStyles
                 | rankdir = Graph.LR
@@ -312,13 +126,31 @@ draw =
                 , edge = "penwidth=2"
             }
 
-        (Map map_) =
-            fullMap
+        -- use dot, more angular, collapses some lines
+        graphStyles2 =
+            { defaultStyles
+                | rankdir = Graph.LR
+                , graph = "nodesep=0.5, splines=false"
+                , node = "shape=box, style=rounded"
+                , edge = "penwidth=2, weight=1"
+            }
+
+        -- use circo style, most clear, hard to tell which labels go to which lines
+        graphStyles3 =
+            { defaultStyles
+                | rankdir = Graph.LR
+                , graph = "nodesep=0.3, mindist=4"
+                , node = "shape=box, style=rounded"
+                , edge = "penwidth=2"
+            }
+
+        colorized ( color, end ) =
+            "<FONT COLOR=\"" ++ Basics.toString color ++ "\">" ++ Basics.toString end ++ "</FONT>"
     in
-        map_
+        graph
             |> Graph.mapEdges
                 (\e ->
-                    { attrs = "label=\"" ++ (String.join "\n" <| List.map Basics.toString e) ++ "\"" }
+                    { attrs = "label=<" ++ (String.join "<BR/>" <| List.map colorized e) ++ ">" }
                 )
             |> Graph.mapNodes (\n -> { text = Basics.toString n, attrs = "" })
-            |> Graph.outputWithStylesWithOverrides graphStyles
+            |> Graph.outputWithStylesWithOverrides graphStyles3
