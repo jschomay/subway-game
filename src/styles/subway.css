@@ -1,8 +1,8 @@
 /* Train */
 @font-face {
   font-family: subway;
-  src: url(../../fonts/subway.ttf);
-  src: url(../../fonts/subway.woff);
+  src: url(../fonts/subway.ttf);
+  src: url(../fonts/subway.woff);
 }
 
 .train {
@@ -13,7 +13,7 @@
   min-height: 100vh;
   align-items: flex-start;
   justify-content: space-around;
-  background: black url(../../img/train.jpg) no-repeat top center;
+  background: black url(../img/train.jpg) no-repeat top center;
   background-size: 100% auto;
   background-attachment: fixed;
 }
@@ -93,7 +93,7 @@
   min-height: 100vh;
   align-items: flex-start;
   justify-content: space-around;
-  background: black url(../../img/platform.jpg) no-repeat top center;
+  background: black url(../img/platform.jpg) no-repeat top center;
   background-size: 100% auto;
   background-attachment: fixed;
 }

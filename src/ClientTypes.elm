@@ -6,6 +6,7 @@ import City exposing (..)
 
 type Msg
     = Interact String
+    | Narrate Location
     | Loaded
     | Delay Time Msg
     | ToggleMap
@@ -24,10 +25,3 @@ type Location
     = OnPlatform City.Station
     | OnTrain ( City.Line, City.Station ) City.Station TrainStatus
     | InStation City.Station
-
-
-type alias StorySnippet =
-    { interactableName : String
-    , interactableCssSelector : String
-    , narrative : String
-    }

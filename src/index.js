@@ -1,9 +1,7 @@
-require( './Theme/styles/reset.css' );
-require( './Theme/styles/main.css' );
-require( './Theme/styles/story.css' );
-require( './Theme/styles/subway.css' );
-require( './Theme/styles/game.css' );
-require( './Theme/styles/github-markdown.css' );
+require( './styles/reset.css' );
+require( './styles/story.css' );
+require( './styles/subway.css' );
+require( './styles/game.css' );
 
 // inject bundled Elm app
 var Elm = require( './Main' );

@@ -6,16 +6,12 @@ import Rules
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
+import Html.Keyed
 import Tuple
 import Process
 import Task
 import Time exposing (Time)
-
-
--- import Theme.Layout
-
 import ClientTypes exposing (..)
-import Narrative
 import Components exposing (..)
 import Dict exposing (Dict)
 import List.Zipper as Zipper exposing (Zipper)
@@ -42,7 +38,7 @@ main =
 type alias Model =
     { engineModel : Engine.Model
     , loaded : Bool
-    , storyLine : List StorySnippet
+    , storyLine : List String
     , narrativeContent : Dict String (Zipper String)
     , location : Location
     , showMap : Bool
@@ -63,23 +59,28 @@ init =
     in
         ( { engineModel = engineModel
           , loaded = False
-          , storyLine = [ Narrative.startingNarrative ]
+          , storyLine = []
           , narrativeContent = Dict.map (curry getNarrative) Rules.rules
           , location = OnPlatform WestEnd
           , showMap = False
           }
-        , Cmd.none
+        , delay 0 <| Narrate <| OnPlatform WestEnd
         )
 
 
-transitDuration : Time
-transitDuration =
-    12 * 1000
+transitDelay : Time
+transitDelay =
+    7 * 1000
 
 
-platformDuration : Time
-platformDuration =
+platformDelay : Time
+platformDelay =
     5 * 1000
+
+
+storyDelay : Time
+storyDelay =
+    4 * 1000
 
 
 findEntity : String -> Entity
@@ -90,6 +91,40 @@ findEntity id =
         |> Maybe.withDefault (entity id)
 
 
+updateStory : String -> Model -> Model
+updateStory interactableId model =
+    let
+        ( newEngineModel, maybeMatchedRuleId ) =
+            Engine.update interactableId model.engineModel
+
+        {- If the engine found a matching rule, look up the narrative content component for that rule if possible.  The description from the display info component for the entity that was interacted with is used as a default. -}
+        narrativeForThisInteraction =
+            maybeMatchedRuleId
+                |> Maybe.andThen (\id -> Dict.get id model.narrativeContent)
+                |> Maybe.map Zipper.current
+
+        {- If a rule matched, attempt to move to the next associated narrative content for next time. -}
+        updateNarrativeContent : Maybe (Zipper String) -> Maybe (Zipper String)
+        updateNarrativeContent =
+            Maybe.andThen (\narrative -> Zipper.next narrative)
+
+        updatedContent =
+            maybeMatchedRuleId
+                |> Maybe.map (\id -> Dict.update id updateNarrativeContent model.narrativeContent)
+                |> Maybe.withDefault model.narrativeContent
+    in
+        { model
+            | engineModel = newEngineModel
+            , storyLine = Maybe.map (\snippet -> snippet :: model.storyLine) narrativeForThisInteraction |> Maybe.withDefault model.storyLine
+            , narrativeContent = updatedContent
+        }
+
+
+noop : Model -> ( Model, Cmd Msg )
+noop model =
+    ( model, Cmd.none )
+
+
 update :
     ClientTypes.Msg
     -> Model
@@ -97,42 +132,28 @@ update :
 update msg model =
     if Engine.getEnding model.engineModel /= Nothing then
         -- no-op if story has ended
-        ( model, Cmd.none )
+        noop model
     else
         case msg of
             Interact interactableId ->
-                let
-                    ( newEngineModel, maybeMatchedRuleId ) =
-                        Engine.update interactableId model.engineModel
+                ( updateStory interactableId model
+                , Cmd.none
+                )
 
-                    {- If the engine found a matching rule, look up the narrative content component for that rule if possible.  The description from the display info component for the entity that was interacted with is used as a default. -}
-                    narrativeForThisInteraction =
-                        { interactableName = findEntity interactableId |> getDisplayInfo |> .name
-                        , interactableCssSelector = findEntity interactableId |> getClassName
-                        , narrative =
-                            maybeMatchedRuleId
-                                |> Maybe.andThen (\id -> Dict.get id model.narrativeContent)
-                                |> Maybe.map Zipper.current
-                                |> Maybe.withDefault (findEntity interactableId |> getDisplayInfo |> .description)
-                        }
+            Narrate previousLocation ->
+                case ( model.location, previousLocation ) of
+                    ( OnTrain _ _ _, OnTrain _ _ _ ) ->
+                        ( updateStory "train" model
+                        , delay storyDelay <| Narrate model.location
+                        )
 
-                    {- If a rule matched, attempt to move to the next associated narrative content for next time. -}
-                    updateNarrativeContent : Maybe (Zipper String) -> Maybe (Zipper String)
-                    updateNarrativeContent =
-                        Maybe.map (\narrative -> Zipper.next narrative |> Maybe.withDefault narrative)
+                    ( OnPlatform _, OnPlatform _ ) ->
+                        ( updateStory "platform" model
+                        , delay storyDelay <| Narrate model.location
+                        )
 
-                    updatedContent =
-                        maybeMatchedRuleId
-                            |> Maybe.map (\id -> Dict.update id updateNarrativeContent model.narrativeContent)
-                            |> Maybe.withDefault model.narrativeContent
-                in
-                    ( { model
-                        | engineModel = newEngineModel
-                        , storyLine = narrativeForThisInteraction :: model.storyLine
-                        , narrativeContent = updatedContent
-                      }
-                    , Cmd.none
-                    )
+                    _ ->
+                        noop model
 
             Loaded ->
                 ( { model | loaded = True }
@@ -160,23 +181,32 @@ update msg model =
 
                                     Just station ->
                                         delay 0 <| LeavePlatform
+
+                            location =
+                                OnTrain train station Stopped
                         in
-                            ( { model | location = OnTrain train station Stopped }
-                            , cmd
+                            ( { model
+                                | location = location
+                                , storyLine = []
+                              }
+                            , Cmd.batch [ cmd, delay 0 <| Narrate location ]
                             )
 
                     _ ->
-                        ( model, Cmd.none )
+                        noop model
 
             ExitTrain ->
                 case model.location of
                     OnTrain train station Stopped ->
-                        ( { model | location = OnPlatform station }
-                        , Cmd.none
+                        ( { model
+                            | location = OnPlatform station
+                            , storyLine = []
+                          }
+                        , delay 0 <| Narrate <| OnPlatform station
                         )
 
                     _ ->
-                        ( model, Cmd.none )
+                        noop model
 
             ArriveAtPlatform station ->
                 let
@@ -189,7 +219,7 @@ update msg model =
                                 other
                 in
                     ( { model | location = newLocation }
-                    , delay platformDuration LeavePlatform
+                    , delay platformDelay LeavePlatform
                     )
 
             LeavePlatform ->
@@ -197,13 +227,13 @@ update msg model =
                     OnTrain train station Stopped ->
                         case Subway.nextStop City.map train (stationInfo station |> .id) of
                             Nothing ->
-                                ( model, Cmd.none )
+                                noop model
 
                             Just next ->
-                                ( { model | location = OnTrain train station Moving }, delay transitDuration <| ArriveAtPlatform next )
+                                ( { model | location = OnTrain train station Moving }, delay transitDelay <| ArriveAtPlatform next )
 
                     _ ->
-                        ( model, Cmd.none )
+                        noop model
 
 
 delay : Time -> Msg -> Cmd Msg
@@ -272,7 +302,7 @@ gameView model =
             text "In the station..."
 
         OnPlatform station ->
-            platformView station (Subway.connections City.map (stationInfo station |> .id))
+            platformView station (Subway.connections City.map (stationInfo station |> .id)) model.storyLine
 
         OnTrain (( line, end ) as train) currentStation status ->
             trainView
@@ -281,10 +311,11 @@ gameView model =
                 currentStation
                 (Subway.nextStop City.map train (stationInfo currentStation |> .id))
                 status
+                model.storyLine
 
 
-platformView : Station -> List ( Line, Station ) -> Html Msg
-platformView station connections =
+platformView : Station -> List ( Line, Station ) -> List String -> Html Msg
+platformView station connections storyLine =
     let
         connectionView (( line, end ) as connection) =
             let
@@ -308,7 +339,7 @@ platformView station connections =
                 )
     in
         div [ class "platform" ]
-            [ div [ class "platform__story" ] [ storyView ]
+            [ div [ class "platform__story" ] [ storyView storyLine ]
             , div [ class "platform__platform_info" ]
                 [ div [ class "platform_info" ]
                     [ h2 [ class "platform_info__name" ] [ text (stationInfo station |> .name) ]
@@ -318,39 +349,16 @@ platformView station connections =
             ]
 
 
-storyView : Html Msg
-storyView =
-    ul [ class "story" ]
-        [ li [] [ text """
-  The hydraulic sounds of the clunky engine dissipates slowly, and all that remains to be heard is the quiet humming and flickering of the fluorescent lights above.
-  """ ]
-        , li [] [ text """
-  Steve exits the subway car frantically, searching for a subway engineer or an overhead map back to his stop, Imperial Ave. He searches for any workers on the platform, shouting for help. Steve realizes that he is alone in the dimly lit ghost station. He searches for a way out, but to no avail, he finds no escalator or stairs. He wanders down the end of the tracks and finally finds an old map behind a shattered laminated case. Etched in the plastic case is an inscription with
-  """ ]
-        , li [] [ text """
-  sharp angular letters that read: "UR STUCK". Steve looks at the inscription with one raised eyebrow, and as if in agreement, nods and says to himself with a wry chuckle, "in more ways than one."
-  """ ]
-        , li [] [ text """
-  As he waits, he thinks that he hears faint sounds of jeering laughter in the dark distant tunnels, as if a television or radio was left on in the dark expanse of the tunnels. The pitter patter of tiny feet lull Steve into an even deeper state of dread. "It's just mice," he tells himself. A bead of sweat perspires from his neck, rolling all the way down his collar onto his scuffed up black wing tips. As Steve looks down at the droplet, he is startled by the sound of the oncoming Y line, rushing past his nose without any warning. Time seemed to slow down and speed up at that instant. Steve shrugs, and thinks aloud: "God damn, I need another coffee. I am seriously out of the loop today." He looks around in his subway car, and notices it is empty. Hopping on reluctantly, he sits on a seat nearest to the door, setting down his briefcase with a sigh of brief relief. As the doors close and the subway car begins to move into the tunnels,
-  Steve briefly glimpses a yellow shape dart out from the opposite tunnel tracks.
-  """ ]
-        , li [] [ text """
-  "I'm really losin' it," he says as he laughs nervously to himself. As the car moves into the dark depths of the tunnel, he closes his eyes, shakes his head, and clenches his fists. "Just a few stops left..." he says three times to himself, recalling an image of Dorothy from his favorite childhood film, 'The Wizard of Oz.'
-
-        """ ]
-        , li [] [ text """
-        As the first stop approaches, Steve squints, unable to recognize the platform. The automated subway speakers click loudly, attempting to name the stop. All Steve hears is a garbled collection of robotic syllables and a few missed words, as if listening to a scratched CD or busted tape cassette.
-
-        """ ]
-        , li [] [ text """
-        There are no signs hanging above the platform. There is no graffiti or advertisements on the white dusty walls, nor are there any people on the platform. Steve feels another pang of dread jab him in the gut. "Where the hell am I going?" he shouts aloud. He waits again for the next stop. As the subway slows, Steve's lurking horrors manifest themselves on the platform: staring out the window, Steve sees nothing but a replica of the last stop. Bewildered, he sits quietly. His
-        mind races: fight or flight instincts kick in. As the doors close shut, Steve feels the walls of the station close in on him; his palms are clammy and he feels faint. "Calm down! It's only your imagination, Horowitz," he shouts at his reflection in the gritty glass window. "I really hope this is a shitty stress dream." Two more stops go by: all Steve sees before him are copies of copies of copies of the same ghost platform. "Fuuuuck."
-        """ ]
-        ]
+storyView : List String -> Html Msg
+storyView storyLine =
+    Html.Keyed.ul [ class "StoryLine" ] <|
+        List.indexedMap
+            (\i narrative -> ( toString (List.length storyLine - i), li [ class "StoryLine__Item u-fade-in" ] [ text <| narrative ] ))
+            storyLine
 
 
-trainView : Line -> Station -> Station -> Maybe Station -> TrainStatus -> Html Msg
-trainView line end currentStation nextStation status =
+trainView : Line -> Station -> Station -> Maybe Station -> TrainStatus -> List String -> Html Msg
+trainView line end currentStation nextStation status storyLine =
     let
         nextStop =
             case ( status, nextStation ) of
@@ -390,7 +398,7 @@ trainView line end currentStation nextStation status =
                 []
     in
         div [ class "train" ] <|
-            [ div [ class "train__story" ] [ storyView ]
+            [ div [ class "train__story" ] [ storyView storyLine ]
             , div [ class "train__ticker" ]
                 [ h4 [ class "train__info" ] [ text info ]
                 , h3 [ class "train__next_stop" ] [ text nextStop ]
