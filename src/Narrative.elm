@@ -13,29 +13,47 @@ module Narrative exposing (..)
 meetSteve : List String
 meetSteve =
     [ """
-This is steve...
+Monday, 6:03AM
+
+West Mulberry metro station
 """
     , """
-Steve is not in control of his life.
+A crowd of people wait on the platform for the 6:05 Red Line to arrive, heading into town.
 """
     , """
-He needs a shock to the system...
+One man in the crowd wears a rumpled business suit.  He paces anxiously up and down the platform.  His face is ashen, his hair thinning, even though he is only in his early 30's.
+
+This is Steve.
 """
-    , """
-He needs to take the train to work now.
-"""
+    , "(click on the Red Line towards Twin Brooks)"
     ]
 
 
 onATrain : List String
 onATrain =
     [ """
-When he rides the train his mind races.
+Steve takes the train every day to get to work.
 """
     , """
-He worries non-stop.
+He works at a top notch financial institution downtown.  His boss, Jason, works him hard.  He keeps promising Steve a promotion if he does a good job.
+
+Steve does his best to please Jason, working over-time and even giving up some weekends.
 """
     , """
-But he can't forget to get off at the right stop
+It's been 3 years now, and Steve still hasn't gotten a promotion.
 """
     ]
+
+
+
+{-
+
+   Tuesday, 6:02AM
+
+   Steve is here, just like yesterday.
+
+
+
+   Steve's mind runs in circles, worrying about his boss and his career.
+
+-}

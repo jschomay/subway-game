@@ -18,6 +18,7 @@ import List.Zipper as Zipper exposing (Zipper)
 import Subway
 import Color
 import City exposing (..)
+import Markdown
 
 
 {- This is the kernel of the whole app.  It glues everything together and handles some logic such as choosing the correct narrative to display.
@@ -56,21 +57,24 @@ init =
                 }
                 (Dict.map (curry getRuleData) Rules.rules)
                 |> Engine.changeWorld Rules.startingState
+
+        startingPlace =
+            OnPlatform WestMulberry
     in
         ( { engineModel = engineModel
           , loaded = False
           , storyLine = []
           , narrativeContent = Dict.map (curry getNarrative) Rules.rules
-          , location = OnPlatform WestEnd
+          , location = startingPlace
           , showMap = False
           }
-        , delay 0 <| Narrate <| OnPlatform WestEnd
+        , delay 0 <| Narrate startingPlace
         )
 
 
 transitDelay : Time
 transitDelay =
-    7 * 1000
+    12 * 1000
 
 
 platformDelay : Time
@@ -80,7 +84,7 @@ platformDelay =
 
 storyDelay : Time
 storyDelay =
-    4 * 1000
+    7 * 1000
 
 
 findEntity : String -> Entity
@@ -353,7 +357,7 @@ storyView : List String -> Html Msg
 storyView storyLine =
     Html.Keyed.ul [ class "StoryLine" ] <|
         List.indexedMap
-            (\i narrative -> ( toString (List.length storyLine - i), li [ class "StoryLine__Item u-fade-in" ] [ text <| narrative ] ))
+            (\i narrative -> ( toString (List.length storyLine - i), li [ class "StoryLine__Item u-fade-in" ] [ Markdown.toHtml [] narrative ] ))
             storyLine
 
 
@@ -413,26 +417,29 @@ mapView : Html Msg
 mapView =
     div [ onClick ToggleMap, class "map" ]
         [ pre [ class "map__image", style [ ( "fontFamily", "monospace" ) ] ] [ text """
-  red line
-                                   / ----------------------------- o EastEnd
-                                 / / --------------------------- / |
-                               / /           yellow line           |
-                             / /                                   |
-                      Market o                                     |
-                             | \\                   / ------------- /
-                             |   \\               /    green line
-                  red line   |     \\           /
-                    ---------/        \\       /
-                  /                     \\ --- o Central
-                  |                           |
-                  |                           |
-                  |                           |
-                  |         green line        |
-                  o ------------------------- /
-                  WestEnd
-red line - WestEnd, Market, EastEnd
-green line - WestEnd, Central, EastEnd
-yellow line - Central, Market, EastEnd
+
+  Red Line:
+
+        WestMulberry
+             |
+             |
+        EastMulberry
+             |
+             |
+        ChurchStreet
+             |
+             |
+        MetroCenter
+             |
+             |
+        FederalTriangle
+             |
+             |
+        SpringHill
+             |
+             |
+        TwinBrooks
+
 """ ]
         ]
 
