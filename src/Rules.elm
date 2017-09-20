@@ -10,7 +10,7 @@ import Narrative
 -}
 startingState : List Engine.ChangeWorldCommand
 startingState =
-    [ moveTo "train"
+    [ moveTo "platform"
     , loadScene "meetSteve"
     ]
 
@@ -33,7 +33,7 @@ rules =
     Dict.fromList <|
         []
             ++ -- train
-               [ rule "train thoughts"
+               [ rule "meet steve (train)"
                     { interaction = with "train"
                     , conditions =
                         [ currentSceneIs "meetSteve"
@@ -41,10 +41,10 @@ rules =
                     , changes =
                         []
                     }
-                    Narrative.onATrain
+                    Narrative.meetSteveTrain
                ]
             ++ -- platform
-               [ rule "platform thoughts"
+               [ rule "meet steve (platform)"
                     { interaction = with "platform"
                     , conditions =
                         [ currentSceneIs "meetSteve"
@@ -52,5 +52,5 @@ rules =
                     , changes =
                         []
                     }
-                    Narrative.meetSteve
+                    Narrative.meetStevePlatform
                ]

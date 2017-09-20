@@ -10,50 +10,73 @@ module Narrative exposing (..)
 -}
 
 
-meetSteve : List String
-meetSteve =
+meetStevePlatform : List String
+meetStevePlatform =
     [ """
-Monday, 6:03AM
+Monday, 6:03 AM - East Mulberry metro station
 
-West Mulberry metro station
-"""
-    , """
 A crowd of people wait on the platform for the 6:05 Red Line to arrive, heading into town.
-"""
-    , """
+
 One man in the crowd wears a rumpled business suit.  He paces anxiously up and down the platform.  His face is ashen, his hair thinning, even though he is only in his early 30's.
 
 This is Steve.
+
+Steve works downtown at the Federal Triangle stop.
+
+<span style="font-style: italic; font-size: 0.7em;">
+(click on the Map below to see a map of the Red Line stops)
+</span>
+
+<span style="font-style: italic; font-size: 0.7em;">
+(click on one of the Red Line directions to the right to take the train)
+</span>
 """
-    , "(click on the Red Line towards Twin Brooks)"
+    , """
+Tuesday, 6:02 AM
+
+Down in the metro each day looks like every other.  The same crowds, the same sounds, the same artificial lights.
+
+The only difference is that Steve has a different color tie today.
+"""
+    , """
+Wed ... Steve seems more anxious than usual...
+"""
+    , """
+Thur ... looks like Steve has been up all night
+"""
+    , """
+Friday ... Steve looks like shit
+"""
     ]
 
 
-onATrain : List String
-onATrain =
+meetSteveTrain : List String
+meetSteveTrain =
     [ """
-Steve takes the train every day to get to work.
-"""
-    , """
-He works at a top notch financial institution downtown.  His boss, Jason, works him hard.  He keeps promising Steve a promotion if he does a good job.
+Steve takes this train every day to get to work.
+
+He works at a top financial institution downtown.  Jason, his boss, works him hard.  He keeps promising Steve a promotion if he does a good job.
 
 Steve does his best to please Jason, working over-time and even giving up some weekends.
+
+It's been 3 years now, and Steve still hasn't gotten a promotion.  He keeps telling himself he just has to work harder.
+
+<span style="font-style: italic; font-size: 0.7em;">
+(click on the Exit button when stopped at the Federal Triangle station to leave the train)
+</span>
 """
     , """
-It's been 3 years now, and Steve still hasn't gotten a promotion.
+Although the train car is full of other commuters, Steve is lost in his own mind.
+
+He worries constantly about work.  His mother left another voicemail this morning, nagging him to make plans to visit over Thanksgiving, but there just isn't enough time in the day to make plans.  He promises himself to call her tonight though he doesn't know what he will say.  Besides, he isn't sure yet if Jason will need him to put in some hours over the holiday.
+"""
+    , """
+Wed ... assignment - presentation on Friday before vips leave town, not enought time, but this could be the opportunity to show Jason his value
+"""
+    , """
+Thur ... progress, tired
+"""
+    , """
+Friday ... so tired...
 """
     ]
-
-
-
-{-
-
-   Tuesday, 6:02AM
-
-   Steve is here, just like yesterday.
-
-
-
-   Steve's mind runs in circles, worrying about his boss and his career.
-
--}

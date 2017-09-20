@@ -1,4 +1,4 @@
-module ClientTypes exposing (..)
+module Types exposing (..)
 
 import Time exposing (Time)
 import City exposing (..)
@@ -6,7 +6,6 @@ import City exposing (..)
 
 type Msg
     = Interact String
-    | Narrate Location
     | Loaded
     | Delay Time Msg
     | ToggleMap

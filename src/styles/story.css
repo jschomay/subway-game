@@ -10,17 +10,8 @@
 
 .StoryLine__Item {
   margin-bottom: 2em;
-  opacity: 0.3;
   padding: 20px 10px;
   position: relative;
-}
-
-.StoryLine__Item:first-of-type {
-  padding: 50px 0;
-  font-size: 140%;
-  line-height: 140%;
-  margin: 40px 0 80px 0;
-  opacity: 1;
 }
 
 .u-fade-in {

@@ -11,7 +11,7 @@ import Tuple
 import Process
 import Task
 import Time exposing (Time)
-import ClientTypes exposing (..)
+import Types exposing (..)
 import Components exposing (..)
 import Dict exposing (Dict)
 import List.Zipper as Zipper exposing (Zipper)
@@ -26,7 +26,7 @@ import Markdown
 -}
 
 
-main : Program Never Model ClientTypes.Msg
+main : Program Never Model Msg
 main =
     Html.program
         { init = init
@@ -46,7 +46,7 @@ type alias Model =
     }
 
 
-init : ( Model, Cmd ClientTypes.Msg )
+init : ( Model, Cmd Msg )
 init =
     let
         engineModel =
@@ -59,7 +59,7 @@ init =
                 |> Engine.changeWorld Rules.startingState
 
         startingPlace =
-            OnPlatform WestMulberry
+            OnPlatform EastMulberry
     in
         ( { engineModel = engineModel
           , loaded = False
@@ -68,7 +68,8 @@ init =
           , location = startingPlace
           , showMap = False
           }
-        , delay 0 <| Narrate startingPlace
+            |> updateStory "platform"
+        , Cmd.none
         )
 
 
@@ -79,12 +80,7 @@ transitDelay =
 
 platformDelay : Time
 platformDelay =
-    5 * 1000
-
-
-storyDelay : Time
-storyDelay =
-    7 * 1000
+    6 * 1000
 
 
 findEntity : String -> Entity
@@ -130,9 +126,9 @@ noop model =
 
 
 update :
-    ClientTypes.Msg
+    Msg
     -> Model
-    -> ( Model, Cmd ClientTypes.Msg )
+    -> ( Model, Cmd Msg )
 update msg model =
     if Engine.getEnding model.engineModel /= Nothing then
         -- no-op if story has ended
@@ -143,21 +139,6 @@ update msg model =
                 ( updateStory interactableId model
                 , Cmd.none
                 )
-
-            Narrate previousLocation ->
-                case ( model.location, previousLocation ) of
-                    ( OnTrain _ _ _, OnTrain _ _ _ ) ->
-                        ( updateStory "train" model
-                        , delay storyDelay <| Narrate model.location
-                        )
-
-                    ( OnPlatform _, OnPlatform _ ) ->
-                        ( updateStory "platform" model
-                        , delay storyDelay <| Narrate model.location
-                        )
-
-                    _ ->
-                        noop model
 
             Loaded ->
                 ( { model | loaded = True }
@@ -193,7 +174,8 @@ update msg model =
                                 | location = location
                                 , storyLine = []
                               }
-                            , Cmd.batch [ cmd, delay 0 <| Narrate location ]
+                                |> updateStory "train"
+                            , cmd
                             )
 
                     _ ->
@@ -206,7 +188,8 @@ update msg model =
                             | location = OnPlatform station
                             , storyLine = []
                           }
-                        , delay 0 <| Narrate <| OnPlatform station
+                            |> updateStory "platform"
+                        , Cmd.none
                         )
 
                     _ ->
@@ -248,7 +231,7 @@ delay duration msg =
 port loaded : (Bool -> msg) -> Sub msg
 
 
-subscriptions : Model -> Sub ClientTypes.Msg
+subscriptions : Model -> Sub Msg
 subscriptions model =
     Sub.batch
         [ loaded <| always Loaded
@@ -258,7 +241,7 @@ subscriptions model =
 
 view :
     Model
-    -> Html ClientTypes.Msg
+    -> Html Msg
 view model =
     let
         currentLocation =
