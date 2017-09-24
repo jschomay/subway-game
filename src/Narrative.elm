@@ -13,7 +13,7 @@ module Narrative exposing (..)
 meetStevePlatform : List String
 meetStevePlatform =
     [ """
-Monday, 6:03 AM - East Mulberry metro station
+Monday, 6:03 AM - West Mulberry metro station
 
 A crowd of people wait on the platform for the 6:05 Red Line to arrive, heading into town.
 
@@ -21,14 +21,12 @@ One man in the crowd wears a rumpled business suit.  He paces anxiously up and d
 
 This is Steve.
 
-Steve works downtown at the Federal Triangle stop.
-
 <span style="font-style: italic; font-size: 0.7em;">
 (click on the Map below to see a map of the Red Line stops)
 </span>
 
 <span style="font-style: italic; font-size: 0.7em;">
-(click on one of the Red Line directions to the right to take the train)
+(click on the Red Line towards Spring Hill to take the train)
 </span>
 """
     , """
@@ -39,13 +37,21 @@ Down in the metro each day looks like every other.  The same crowds, the same so
 The only difference is that Steve has a different color tie today.
 """
     , """
-Wed ... Steve seems more anxious than usual...
+Wednesday, 6:01 AM
+
+Steve seems more anxious today.  Something is bothering him.  More than usual.
 """
     , """
-Thur ... looks like Steve has been up all night
+Thursday, 6:04 AM
+
+Steve looks like he has been up all night working on the presentation.
 """
     , """
-Friday ... Steve looks like shit
+Friday, 6:05 AM
+
+Steve looks like shit.  He rushes onto the platform just as the train is leaving.
+
+As it pulls away he curses out loud.  Other commuters look at him and move away.  He waits impatiently for the next train to arrive.
 """
     ]
 
@@ -60,23 +66,63 @@ He works at a top financial institution downtown.  Jason, his boss, works him ha
 Steve does his best to please Jason, working over-time and even giving up some weekends.
 
 It's been 3 years now, and Steve still hasn't gotten a promotion.  He keeps telling himself he just has to work harder.
-
-<span style="font-style: italic; font-size: 0.7em;">
-(click on the Exit button when stopped at the Federal Triangle station to leave the train)
-</span>
 """
     , """
 Although the train car is full of other commuters, Steve is lost in his own mind.
 
-He worries constantly about work.  His mother left another voicemail this morning, nagging him to make plans to visit over Thanksgiving, but there just isn't enough time in the day to make plans.  He promises himself to call her tonight though he doesn't know what he will say.  Besides, he isn't sure yet if Jason will need him to put in some hours over the holiday.
+He worries constantly about work.  His mother left another voicemail this morning, nagging him to make plans to visit over Thanksgiving, but there just isn't enough time in the day to make plans.  He promises himself to call her tonight though he doesn't know what he will say.
+
+Besides, he isn't sure yet if Jason will need him to put in some hours over the holiday.
 """
     , """
-Wed ... assignment - presentation on Friday before vips leave town, not enought time, but this could be the opportunity to show Jason his value
+As the train hurtles through the subterranean tunnels Steve replays his conversation with Jason the day before.
+
+Jason told him that some important investors are arriving on Friday, and he wants Steve to give them a presentation.  Of course, Steve said yes.  It will be a great opportunity to impress Jason.  He might even get that promotion.  It won't be easy though, under normal circumstances he would ask for a week to prepare.  Jason only gave him two days notice.
 """
     , """
-Thur ... progress, tired
+Steve's mind races over his progress.  He got a lot done, but there's so much more to do before tomorrow.  He doesn't even notice the ticket inspector coming down the train.
+
+"Tickets please."
+
+Maybe Jason will let him leave early to finish it up.  But if he asks, Jason might think --
+
+"Tickets!"
+
+The inspector glares at Steve, startling him from his thoughts.  He shows his commuter pass for the Red Line and the inspector grumbles and moves on.
 """
     , """
-Friday ... so tired...
+Steve plops into his seat, sweating.  He didn't sleep a wink.  He is so tired.
+
+He didn't finish gathering all of the numbers.  He'll have to wing that part.  Hopefully they won't notice.
+
+So tired...
+
+How can he possibly make a good impression being so tired...
+
+He'll just have to...  He'll just...
 """
     ]
+
+
+gotToGetBackTrain : List String
+gotToGetBackTrain =
+    [ """
+You find yourself slouched over in an empty train car.
+
+A man in train operator overalls shakes your shoulder, "Hey Buddy.  It's the end of the line, you've got to get off."
+
+End of the line?  Oh no, you fell asleep!  You missed your stop!  Your presentation!
+"""
+    , """
+Three stops.  There's still time to get in before Jason finds out you're late.
+"""
+    ]
+
+
+gotToGetBackPlatform : List String
+gotToGetBackPlatform =
+    [ """
+How could you have let yourself fall asleep?!  Today of all days.  Jason will kill you.
+
+Ok, don't panic.  You just have to get back to the Metro Center stop.  Then you can give your presentation and everything will be fine.
+""" ]

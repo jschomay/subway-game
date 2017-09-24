@@ -42,6 +42,15 @@ rules =
                         []
                     }
                     Narrative.meetSteveTrain
+               , rule "going back to metro center"
+                    { interaction = with "train"
+                    , conditions =
+                        [ currentSceneIs "getBackToMetroCenter"
+                        ]
+                    , changes =
+                        []
+                    }
+                    Narrative.gotToGetBackTrain
                ]
             ++ -- platform
                [ rule "meet steve (platform)"
@@ -53,4 +62,13 @@ rules =
                         []
                     }
                     Narrative.meetStevePlatform
+               , rule "got to get back"
+                    { interaction = with "platform"
+                    , conditions =
+                        [ currentSceneIs "getBackToMetroCenter"
+                        ]
+                    , changes =
+                        []
+                    }
+                    Narrative.gotToGetBackPlatform
                ]

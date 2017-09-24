@@ -22,7 +22,14 @@ import Markdown
 
 
 {- This is the kernel of the whole app.  It glues everything together and handles some logic such as choosing the correct narrative to display.
-   You shouldn't need to change anything in this file, unless you want some kind of different behavior.
+    You shouldn't need to change anything in this file, unless you want some kind of different behavior.
+
+    TODO
+    - for intro section, figure out if the intro should advance by timing, or by user action
+      - if by timing, how to indicate time left/give enough time?
+      - if by action, what action?  Does the action need to be validated?  What about getting off at the right station?
+      - if by action, does that affect the tone of voice used (switching from 3rd person to 1st/2nd?)
+   - insert title cards/blank screen at appropriate points in intro
 -}
 
 
@@ -36,12 +43,22 @@ main =
         }
 
 
+type Day
+    = Monday
+    | Tuesday
+    | Wednesday
+    | Thursday
+    | Friday
+
+
 type alias Model =
     { engineModel : Engine.Model
     , loaded : Bool
-    , storyLine : List String
+    , storyLine : String
     , narrativeContent : Dict String (Zipper String)
     , location : Location
+    , isIntro : Bool
+    , day : Day
     , showMap : Bool
     }
 
@@ -59,13 +76,15 @@ init =
                 |> Engine.changeWorld Rules.startingState
 
         startingPlace =
-            OnPlatform EastMulberry
+            OnPlatform WestMulberry
     in
         ( { engineModel = engineModel
           , loaded = False
-          , storyLine = []
+          , storyLine = ""
           , narrativeContent = Dict.map (curry getNarrative) Rules.rules
           , location = startingPlace
+          , isIntro = True
+          , day = Monday
           , showMap = False
           }
             |> updateStory "platform"
@@ -75,12 +94,14 @@ init =
 
 transitDelay : Time
 transitDelay =
-    12 * 1000
+    -- 12 * 1000
+    1 * 1000
 
 
 platformDelay : Time
 platformDelay =
-    6 * 1000
+    -- 6 * 1000
+    1 * 1000
 
 
 findEntity : String -> Entity
@@ -97,13 +118,11 @@ updateStory interactableId model =
         ( newEngineModel, maybeMatchedRuleId ) =
             Engine.update interactableId model.engineModel
 
-        {- If the engine found a matching rule, look up the narrative content component for that rule if possible.  The description from the display info component for the entity that was interacted with is used as a default. -}
         narrativeForThisInteraction =
             maybeMatchedRuleId
                 |> Maybe.andThen (\id -> Dict.get id model.narrativeContent)
                 |> Maybe.map Zipper.current
 
-        {- If a rule matched, attempt to move to the next associated narrative content for next time. -}
         updateNarrativeContent : Maybe (Zipper String) -> Maybe (Zipper String)
         updateNarrativeContent =
             Maybe.andThen (\narrative -> Zipper.next narrative)
@@ -115,14 +134,83 @@ updateStory interactableId model =
     in
         { model
             | engineModel = newEngineModel
-            , storyLine = Maybe.map (\snippet -> snippet :: model.storyLine) narrativeForThisInteraction |> Maybe.withDefault model.storyLine
+            , storyLine = narrativeForThisInteraction |> Maybe.withDefault "..."
             , narrativeContent = updatedContent
         }
+
+
+nextDay : Day -> Day
+nextDay day =
+    case day of
+        Monday ->
+            Tuesday
+
+        Tuesday ->
+            Wednesday
+
+        Wednesday ->
+            Thursday
+
+        Thursday ->
+            Friday
+
+        Friday ->
+            Friday
 
 
 noop : Model -> ( Model, Cmd Msg )
 noop model =
     ( model, Cmd.none )
+
+
+setEngineScene : String -> Engine.Model -> Engine.Model
+setEngineScene scene model =
+    Engine.changeWorld [ Engine.loadScene scene ] model
+
+
+setEngineLocation : Station -> Engine.Model -> Engine.Model
+setEngineLocation station model =
+    Engine.changeWorld [ Engine.moveTo ((stationInfo >> .name) station) ] model
+
+
+{-| Used when you need to manually change the location (or other Model field) outside of the normal subway mechanics.
+   Or when you need to manually change the scene based on data outside of the Engine.Model
+
+   ** Don't forget to call `updateStory` to get the right narrative based on your changes, but NOT if it was already called!
+   ** Don't forget to call `setEngineLocation` if you change the `Location` to keep the Engine.Model locaiton in sync
+-}
+storyOverrides : Msg -> ( Model, Cmd Msg ) -> ( Model, Cmd Msg )
+storyOverrides msg ( model, cmd ) =
+    -- TODO maybe move this somewhere else and find a better data driven way of representing it?
+    case ( Engine.getCurrentScene model.engineModel, msg ) of
+        ( "meetSteve", ArriveAtPlatform MetroCenter ) ->
+            ( { model
+                | location = OnPlatform WestMulberry
+                , engineModel = setEngineLocation WestMulberry model.engineModel
+                , day = nextDay model.day
+              }
+                |> updateStory "platform"
+            , cmd
+            )
+
+        ( "meetSteve", ArriveAtPlatform ChurchStreet ) ->
+            if model.day == Friday then
+                ( { model
+                    | location = OnTrain ( Red, TwinBrooks ) TwinBrooks Stopped
+                    , engineModel =
+                        model.engineModel
+                            |> setEngineLocation TwinBrooks
+                            |> setEngineScene "getBackToMetroCenter"
+                    , isIntro = False
+                  }
+                    |> updateStory "train"
+                , cmd
+                )
+            else
+                ( model, cmd )
+
+        _ ->
+            ( model, cmd )
 
 
 update :
@@ -172,7 +260,6 @@ update msg model =
                         in
                             ( { model
                                 | location = location
-                                , storyLine = []
                               }
                                 |> updateStory "train"
                             , cmd
@@ -186,7 +273,6 @@ update msg model =
                     OnTrain train station Stopped ->
                         ( { model
                             | location = OnPlatform station
-                            , storyLine = []
                           }
                             |> updateStory "platform"
                         , Cmd.none
@@ -205,9 +291,13 @@ update msg model =
                             other ->
                                 other
                 in
-                    ( { model | location = newLocation }
+                    ( { model
+                        | location = newLocation
+                        , engineModel = setEngineLocation station model.engineModel
+                      }
                     , delay platformDelay LeavePlatform
                     )
+                        |> storyOverrides msg
 
             LeavePlatform ->
                 case model.location of
@@ -243,43 +333,14 @@ view :
     Model
     -> Html Msg
 view model =
-    let
-        currentLocation =
-            Engine.getCurrentLocation model.engineModel |> findEntity
-
-        displayState =
-            { currentLocation = currentLocation
-            , itemsInCurrentLocation =
-                Engine.getItemsInCurrentLocation model.engineModel
-                    |> List.map findEntity
-            , charactersInCurrentLocation =
-                Engine.getCharactersInCurrentLocation model.engineModel
-                    |> List.map findEntity
-            , exits =
-                getExits currentLocation
-                    |> List.map
-                        (\( direction, id ) ->
-                            ( direction, findEntity id )
-                        )
-            , itemsInInventory =
-                Engine.getItemsInInventory model.engineModel
-                    |> List.map findEntity
-            , ending =
-                Engine.getEnding model.engineModel
-            , storyLine =
-                model.storyLine
-            }
-
-        -- graphViz =
-        --     Debug.log (Subway.graphViz City.map ++ "\n") "Copy and paste in http://viz-js.com/"
-    in
-        div [ class "game" ]
-            [ gameView model
-            , if model.showMap then
-                mapView
-              else
-                div [ onClick ToggleMap, class "map_toggle" ] [ text "Map" ]
-            ]
+    -- Debug.log (Subway.graphViz City.map ++ "\n") "Copy and paste in http://viz-js.com/" |> \_ ->
+    div [ class "game" ]
+        [ gameView model
+        , if model.showMap then
+            mapView
+          else
+            div [ onClick ToggleMap, class "map_toggle" ] [ text "Map" ]
+        ]
 
 
 gameView : Model -> Html Msg
@@ -289,7 +350,9 @@ gameView model =
             text "In the station..."
 
         OnPlatform station ->
-            platformView station (Subway.connections City.map (stationInfo station |> .id)) model.storyLine
+            platformView station
+                (Subway.connections City.map (stationInfo station |> .id))
+                model.storyLine
 
         OnTrain (( line, end ) as train) currentStation status ->
             trainView
@@ -298,10 +361,11 @@ gameView model =
                 currentStation
                 (Subway.nextStop City.map train (stationInfo currentStation |> .id))
                 status
+                model.isIntro
                 model.storyLine
 
 
-platformView : Station -> List ( Line, Station ) -> List String -> Html Msg
+platformView : Station -> List ( Line, Station ) -> String -> Html Msg
 platformView station connections storyLine =
     let
         connectionView (( line, end ) as connection) =
@@ -336,16 +400,13 @@ platformView station connections storyLine =
             ]
 
 
-storyView : List String -> Html Msg
+storyView : String -> Html Msg
 storyView storyLine =
-    Html.Keyed.ul [ class "StoryLine" ] <|
-        List.indexedMap
-            (\i narrative -> ( toString (List.length storyLine - i), li [ class "StoryLine__Item u-fade-in" ] [ Markdown.toHtml [] narrative ] ))
-            storyLine
+    Html.Keyed.node "div" [ class "StoryLine" ] [ ( storyLine, Markdown.toHtml [ class "StoryLine__Item u-fade-in" ] storyLine ) ]
 
 
-trainView : Line -> Station -> Station -> Maybe Station -> TrainStatus -> List String -> Html Msg
-trainView line end currentStation nextStation status storyLine =
+trainView : Line -> Station -> Station -> Maybe Station -> TrainStatus -> Bool -> String -> Html Msg
+trainView line end currentStation nextStation status isIntro storyLine =
     let
         nextStop =
             case ( status, nextStation ) of
@@ -383,6 +444,15 @@ trainView line end currentStation nextStation status storyLine =
                 [ onClick ExitTrain ]
             else
                 []
+
+        exitButton =
+            if isIntro then
+                []
+            else
+                [ div [ class "train__exit_button" ]
+                    [ button (buttonClasses :: action) [ text "Exit train" ]
+                    ]
+                ]
     in
         div [ class "train" ] <|
             [ div [ class "train__story" ] [ storyView storyLine ]
@@ -390,10 +460,8 @@ trainView line end currentStation nextStation status storyLine =
                 [ h4 [ class "train__info" ] [ text info ]
                 , h3 [ class "train__next_stop" ] [ text nextStop ]
                 ]
-            , div [ class "train__exit_button" ]
-                [ button (buttonClasses :: action) [ text "Exit train" ]
-                ]
             ]
+                ++ exitButton
 
 
 mapView : Html Msg
