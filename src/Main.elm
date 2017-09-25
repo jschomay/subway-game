@@ -29,7 +29,7 @@ import Markdown
       - if by timing, how to indicate time left/give enough time?
       - if by action, what action?  Does the action need to be validated?  What about getting off at the right station?
       - if by action, does that affect the tone of voice used (switching from 3rd person to 1st/2nd?)
-   - insert title cards/blank screen at appropriate points in intro
+   - add OutOfOrder TrainStatus to stop train before arriving at Metro Center, then add yellow line
 -}
 
 
@@ -58,6 +58,7 @@ type alias Model =
     , narrativeContent : Dict String (Zipper String)
     , location : Location
     , isIntro : Bool
+    , titleCard : Maybe String
     , day : Day
     , showMap : Bool
     }
@@ -84,12 +85,19 @@ init =
           , narrativeContent = Dict.map (curry getNarrative) Rules.rules
           , location = startingPlace
           , isIntro = True
+          , titleCard = Just "Monday 6:03 AM"
           , day = Monday
           , showMap = False
           }
             |> updateStory "platform"
-        , Cmd.none
+        , delay titleCardDelay RemoveTitleCard
         )
+
+
+titleCardDelay : Time
+titleCardDelay =
+    -- 5 * 1000
+    1 * 1000
 
 
 transitDelay : Time
@@ -139,23 +147,33 @@ updateStory interactableId model =
         }
 
 
-nextDay : Day -> Day
+nextDay : Day -> { titleCard : String, day : Day }
 nextDay day =
     case day of
         Monday ->
-            Tuesday
+            { titleCard = "Tuesday, 6:02 AM"
+            , day = Tuesday
+            }
 
         Tuesday ->
-            Wednesday
+            { titleCard = "Wednesday, 6:01 AM"
+            , day = Wednesday
+            }
 
         Wednesday ->
-            Thursday
+            { titleCard = "Thursday, 6:04 AM"
+            , day = Thursday
+            }
 
         Thursday ->
-            Friday
+            { titleCard = "Friday, 6:05 AM"
+            , day = Friday
+            }
 
         Friday ->
-            Friday
+            { titleCard = "Friday"
+            , day = Friday
+            }
 
 
 noop : Model -> ( Model, Cmd Msg )
@@ -176,24 +194,28 @@ setEngineLocation station model =
 {-| Used when you need to manually change the location (or other Model field) outside of the normal subway mechanics.
    Or when you need to manually change the scene based on data outside of the Engine.Model
 
-   ** Don't forget to call `updateStory` to get the right narrative based on your changes, but NOT if it was already called!
+   ** Don't forget to call `updateStory` to get the right narrative based on your changes, but NOT if it was already called for that Msg!
    ** Don't forget to call `setEngineLocation` if you change the `Location` to keep the Engine.Model locaiton in sync
+   ** Dont' forget to batch in the cmd if unless you know you want to cancel it
 -}
 storyOverrides : Msg -> ( Model, Cmd Msg ) -> ( Model, Cmd Msg )
 storyOverrides msg ( model, cmd ) =
     -- TODO maybe move this somewhere else and find a better data driven way of representing it?
     case ( Engine.getCurrentScene model.engineModel, msg ) of
         ( "meetSteve", ArriveAtPlatform MetroCenter ) ->
+            -- jump to next day
             ( { model
                 | location = OnPlatform WestMulberry
                 , engineModel = setEngineLocation WestMulberry model.engineModel
-                , day = nextDay model.day
+                , day = nextDay model.day |> .day
+                , titleCard = Just <| .titleCard <| nextDay model.day
               }
                 |> updateStory "platform"
-            , cmd
+            , delay titleCardDelay RemoveTitleCard
             )
 
         ( "meetSteve", ArriveAtPlatform ChurchStreet ) ->
+            -- fall asleep
             if model.day == Friday then
                 ( { model
                     | location = OnTrain ( Red, TwinBrooks ) TwinBrooks Stopped
@@ -202,9 +224,10 @@ storyOverrides msg ( model, cmd ) =
                             |> setEngineLocation TwinBrooks
                             |> setEngineScene "getBackToMetroCenter"
                     , isIntro = False
+                    , titleCard = Just ""
                   }
                     |> updateStory "train"
-                , cmd
+                , delay 4000 RemoveTitleCard
                 )
             else
                 ( model, cmd )
@@ -236,6 +259,11 @@ update msg model =
             Delay duration msg ->
                 ( model
                 , Task.perform (always msg) <| Process.sleep duration
+                )
+
+            RemoveTitleCard ->
+                ( { model | titleCard = Nothing }
+                , Cmd.none
                 )
 
             ToggleMap ->
@@ -325,44 +353,53 @@ subscriptions : Model -> Sub Msg
 subscriptions model =
     Sub.batch
         [ loaded <| always Loaded
-          -- , AnimationFrame.times Tick
         ]
 
 
-view :
-    Model
-    -> Html Msg
+view : Model -> Html Msg
 view model =
     -- Debug.log (Subway.graphViz City.map ++ "\n") "Copy and paste in http://viz-js.com/" |> \_ ->
     div [ class "game" ]
-        [ gameView model
+        [ case model.titleCard of
+            Nothing ->
+                gameView model
+
+            Just title ->
+                titleCardView title
+        ]
+
+
+titleCardView : String -> Html Msg
+titleCardView title =
+    div [ class "titlecard" ] [ text title ]
+
+
+gameView : Model -> Html Msg
+gameView model =
+    div []
+        [ case model.location of
+            InStation station ->
+                text "In the station..."
+
+            OnPlatform station ->
+                platformView station
+                    (Subway.connections City.map (stationInfo station |> .id))
+                    model.storyLine
+
+            OnTrain (( line, end ) as train) currentStation status ->
+                trainView
+                    line
+                    end
+                    currentStation
+                    (Subway.nextStop City.map train (stationInfo currentStation |> .id))
+                    status
+                    model.isIntro
+                    model.storyLine
         , if model.showMap then
             mapView
           else
             div [ onClick ToggleMap, class "map_toggle" ] [ text "Map" ]
         ]
-
-
-gameView : Model -> Html Msg
-gameView model =
-    case model.location of
-        InStation station ->
-            text "In the station..."
-
-        OnPlatform station ->
-            platformView station
-                (Subway.connections City.map (stationInfo station |> .id))
-                model.storyLine
-
-        OnTrain (( line, end ) as train) currentStation status ->
-            trainView
-                line
-                end
-                currentStation
-                (Subway.nextStop City.map train (stationInfo currentStation |> .id))
-                status
-                model.isIntro
-                model.storyLine
 
 
 platformView : Station -> List ( Line, Station ) -> String -> Html Msg

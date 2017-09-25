@@ -13,6 +13,7 @@ type Msg
     | ExitTrain
     | ArriveAtPlatform City.Station
     | LeavePlatform
+    | RemoveTitleCard
 
 
 type TrainStatus

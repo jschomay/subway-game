@@ -13,9 +13,7 @@ module Narrative exposing (..)
 meetStevePlatform : List String
 meetStevePlatform =
     [ """
-Monday, 6:03 AM - West Mulberry metro station
-
-A crowd of people wait on the platform for the 6:05 Red Line to arrive, heading into town.
+A crowd of people wait at the West Mulberry metro station for the 6:05 Red Line to Twin Brooks to arrive.
 
 One man in the crowd wears a rumpled business suit.  He paces anxiously up and down the platform.  His face is ashen, his hair thinning, even though he is only in his early 30's.
 
@@ -30,25 +28,17 @@ This is Steve.
 </span>
 """
     , """
-Tuesday, 6:02 AM
-
 Down in the metro each day looks like every other.  The same crowds, the same sounds, the same artificial lights.
 
 The only difference is that Steve has a different color tie today.
 """
     , """
-Wednesday, 6:01 AM
-
 Steve seems more anxious today.  Something is bothering him.  More than usual.
 """
     , """
-Thursday, 6:04 AM
-
 Steve looks like he has been up all night working on the presentation.
 """
     , """
-Friday, 6:05 AM
-
 Steve looks like shit.  He rushes onto the platform just as the train is leaving.
 
 As it pulls away he curses out loud.  Other commuters look at him and move away.  He waits impatiently for the next train to arrive.
