@@ -15,9 +15,9 @@ meetStevePlatform =
     [ """
 A crowd of people wait at the West Mulberry metro station for the 6:05 Red Line to Twin Brooks to arrive.
 
-One man in the crowd wears a rumpled business suit.  He paces anxiously up and down the platform.  His face is ashen, his hair thinning, even though he is only in his early 30's.
+At the center of the platform a man with well combed hair and a simple business suit stands just behind the yellow safety line.  While the other people on the platform pace around, this man stands still.  This is Steve.
 
-This is Steve.
+The train arrives at the station.  It slows down and comes to a stop with the door directly in front of Steve.  It opens and he steps on.
 
 <span style="font-style: italic; font-size: 0.7em;">
 (click on the Map below to see a map of the Red Line stops)
@@ -33,15 +33,17 @@ Down in the metro each day looks like every other.  The same crowds, the same so
 The only difference is that Steve has a different color tie today.
 """
     , """
-Steve seems more anxious today.  Something is bothering him.  More than usual.
+Steve seems more anxious today.  Something is bothering him.  His yellow tie is slightly askew.
 """
     , """
 Steve looks like he has been up all night working on the presentation.
+
+When the train arrives, Steve notices he has to take two steps to his right to get to the door.
 """
     , """
-Steve looks like shit.  He rushes onto the platform just as the train is leaving.
+Steve looks like shit.  He rushes onto the platform just as the train is leaving, missing it.
 
-As it pulls away he curses out loud.  Other commuters look at him and move away.  He waits impatiently for the next train to arrive.
+As it pulls away Steve takes a deep breath and tries to calm down.  He finds his spot behind the yellow line and waits for the next one.  He wishes he had time for another cup of coffee.
 """
     ]
 
@@ -49,25 +51,27 @@ As it pulls away he curses out loud.  Other commuters look at him and move away.
 meetSteveTrain : List String
 meetSteveTrain =
     [ """
-Steve takes this train every day to get to work.
+Steve takes this train every day to get to work.  He gets off at the Metro Center stop.
 
 He works at a top financial institution downtown.  Jason, his boss, works him hard.  He keeps promising Steve a promotion if he does a good job.
 
 Steve does his best to please Jason, working over-time and even giving up some weekends.
 
 It's been 3 years now, and Steve still hasn't gotten a promotion.  He keeps telling himself he just has to work harder.
+
+His stop is coming up.
 """
     , """
-Although the train car is full of other commuters, Steve is lost in his own mind.
+Steve glares at young teenager seated across from him, scratching his name into the Plexiglas window.
 
-He worries constantly about work.  His mother left another voicemail this morning, nagging him to make plans to visit over Thanksgiving, but there just isn't enough time in the day to make plans.  He promises himself to call her tonight though he doesn't know what he will say.
+Some people think that Steve is an push-over.  But that's not exactly the case.  He is just a guy who believes in the rules.  He knows the rules were created to keep everything running smoothly.  Steve believes that if he follows the rules, he'll eventually win.
 
-Besides, he isn't sure yet if Jason will need him to put in some hours over the holiday.
+He's seen others pass him up by cheating, but he knows they'll get their due.  If everyone stopped following the rules, the world would be chaos.
 """
     , """
 As the train hurtles through the subterranean tunnels Steve replays his conversation with Jason the day before.
 
-Jason told him that some important investors are arriving on Friday, and he wants Steve to give them a presentation.  Of course, Steve said yes.  It will be a great opportunity to impress Jason.  He might even get that promotion.  It won't be easy though, under normal circumstances he would ask for a week to prepare.  Jason only gave him two days notice.
+Jason told him that some important investors are arriving on Friday, and he wants Steve to give them a presentation.  Of course, Steve said yes.  The investors are important people.  It will be a great opportunity to impress Jason.  He might even get that promotion.  It won't be easy though, under normal circumstances he would ask for a week to prepare.  Jason only gave him two days.
 """
     , """
 Steve's mind races over his progress.  He got a lot done, but there's so much more to do before tomorrow.  He doesn't even notice the ticket inspector coming down the train.
@@ -78,10 +82,10 @@ Maybe Jason will let him leave early to finish it up.  But if he asks, Jason mig
 
 "Tickets!"
 
-The inspector glares at Steve, startling him from his thoughts.  He shows his commuter pass for the Red Line and the inspector grumbles and moves on.
+The inspector startles Steve from his thoughts.  Steve shows his commuter pass for the Red Line and the inspector grumbles and moves on.
 """
     , """
-Steve plops into his seat, sweating.  He didn't sleep a wink.  He is so tired.
+Steve plops into his seat.  The lack of sleep is catching up to him.  He is so tired.
 
 He didn't finish gathering all of the numbers.  He'll have to wing that part.  Hopefully they won't notice.
 
