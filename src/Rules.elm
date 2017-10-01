@@ -71,4 +71,14 @@ rules =
                         []
                     }
                     Narrative.gotToGetBackPlatform
+               , rule "stopped at Federal Triangle"
+                    { interaction = with "platform"
+                    , conditions =
+                        [ currentSceneIs "getBackToMetroCenter"
+                        , currentLocationIs "Federal Triangle"
+                        ]
+                    , changes =
+                        []
+                    }
+                    Narrative.stoppedAtFederalTrianglePlatform
                ]

@@ -19,6 +19,7 @@ type Msg
 type TrainStatus
     = Stopped
     | Moving
+    | OutOfService
 
 
 type Location

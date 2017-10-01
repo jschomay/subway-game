@@ -22,14 +22,7 @@ import Markdown
 
 
 {- This is the kernel of the whole app.  It glues everything together and handles some logic such as choosing the correct narrative to display.
-    You shouldn't need to change anything in this file, unless you want some kind of different behavior.
-
-    TODO
-    - for intro section, figure out if the intro should advance by timing, or by user action
-      - if by timing, how to indicate time left/give enough time?
-      - if by action, what action?  Does the action need to be validated?  What about getting off at the right station?
-      - if by action, does that affect the tone of voice used (switching from 3rd person to 1st/2nd?)
-   - add OutOfOrder TrainStatus to stop train before arriving at Metro Center, then add yellow line
+   You shouldn't need to change anything in this file, unless you want some kind of different behavior.
 -}
 
 
@@ -56,6 +49,8 @@ type alias Model =
     , loaded : Bool
     , storyLine : String
     , narrativeContent : Dict String (Zipper String)
+    , map : Subway.Map City.Station City.Line
+    , mapImage : String
     , location : Location
     , isIntro : Bool
     , titleCard : Maybe String
@@ -83,6 +78,8 @@ init =
           , loaded = False
           , storyLine = ""
           , narrativeContent = Dict.map (curry getNarrative) Rules.rules
+          , map = City.map [ City.redLine ]
+          , mapImage = City.mapImage City.RedMap
           , location = startingPlace
           , isIntro = True
           , titleCard = Just "Monday 6:03 AM"
@@ -96,20 +93,29 @@ init =
 
 titleCardDelay : Time
 titleCardDelay =
-    -- 5 * 1000
-    1 * 1000
+    3 * 1000
+
+
+
+-- 1 * 1000
 
 
 transitDelay : Time
 transitDelay =
-    -- 12 * 1000
-    1 * 1000
+    8 * 1000
+
+
+
+-- 1 * 1000
 
 
 platformDelay : Time
 platformDelay =
-    -- 6 * 1000
-    1 * 1000
+    3 * 1000
+
+
+
+-- 1 * 1000
 
 
 findEntity : String -> Entity
@@ -191,12 +197,12 @@ setEngineLocation station model =
     Engine.changeWorld [ Engine.moveTo ((stationInfo >> .name) station) ] model
 
 
-{-| Used when you need to manually change the location (or other Model field) outside of the normal subway mechanics.
-   Or when you need to manually change the scene based on data outside of the Engine.Model
+{-| Use when you need to manually change the Model outside of the normal subway mechanics.
+   Or when you need to manually change the EngineModel based on data outside of the Engine.Model
 
    ** Don't forget to call `updateStory` to get the right narrative based on your changes, but NOT if it was already called for that Msg!
-   ** Don't forget to call `setEngineLocation` if you change the `Location` to keep the Engine.Model locaiton in sync
-   ** Dont' forget to batch in the cmd if unless you know you want to cancel it
+   ** Don't forget to call `setEngineLocation` if you change the `Location` to keep the Engine.Model location in sync
+   ** Dont' forget to pass through or batch in the cmd if unless you know you want to cancel it
 -}
 storyOverrides : Msg -> ( Model, Cmd Msg ) -> ( Model, Cmd Msg )
 storyOverrides msg ( model, cmd ) =
@@ -215,7 +221,7 @@ storyOverrides msg ( model, cmd ) =
             )
 
         ( "meetSteve", ArriveAtPlatform ChurchStreet ) ->
-            -- fall asleep
+            -- fall asleep, end intro
             if model.day == Friday then
                 ( { model
                     | location = OnTrain ( Red, TwinBrooks ) TwinBrooks Stopped
@@ -231,6 +237,16 @@ storyOverrides msg ( model, cmd ) =
                 )
             else
                 ( model, cmd )
+
+        ( "getBackToMetroCenter", ArriveAtPlatform FederalTriangle ) ->
+            -- stop the train and add yellow line
+            ( { model
+                | location = OnTrain ( Red, WestMulberry ) FederalTriangle OutOfService
+                , map = City.map [ City.redLine, City.yellowLine ]
+              }
+                |> updateStory "platform"
+            , Cmd.none
+            )
 
         _ ->
             ( model, cmd )
@@ -276,7 +292,7 @@ update msg model =
                     OnPlatform station ->
                         let
                             cmd =
-                                case Subway.nextStop City.map train (stationInfo station |> .id) of
+                                case Subway.nextStop model.map train (stationInfo station |> .id) of
                                     Nothing ->
                                         Cmd.none
 
@@ -299,12 +315,10 @@ update msg model =
             ExitTrain ->
                 case model.location of
                     OnTrain train station Stopped ->
-                        ( { model
-                            | location = OnPlatform station
-                          }
-                            |> updateStory "platform"
-                        , Cmd.none
-                        )
+                        ( { model | location = OnPlatform station } |> updateStory "platform", Cmd.none )
+
+                    OnTrain train station OutOfService ->
+                        ( { model | location = OnPlatform station } |> updateStory "platform", Cmd.none )
 
                     _ ->
                         noop model
@@ -330,7 +344,7 @@ update msg model =
             LeavePlatform ->
                 case model.location of
                     OnTrain train station Stopped ->
-                        case Subway.nextStop City.map train (stationInfo station |> .id) of
+                        case Subway.nextStop model.map train (stationInfo station |> .id) of
                             Nothing ->
                                 noop model
 
@@ -358,7 +372,7 @@ subscriptions model =
 
 view : Model -> Html Msg
 view model =
-    -- Debug.log (Subway.graphViz City.map ++ "\n") "Copy and paste in http://viz-js.com/" |> \_ ->
+    -- Debug.log (Subway.graphViz City.mapRedYellow ++ "\n") "Copy and paste in http://viz-js.com/" |> \_ ->
     div [ class "game" ]
         [ case model.titleCard of
             Nothing ->
@@ -383,7 +397,7 @@ gameView model =
 
             OnPlatform station ->
                 platformView station
-                    (Subway.connections City.map (stationInfo station |> .id))
+                    (Subway.connections model.map (stationInfo station |> .id))
                     model.storyLine
 
             OnTrain (( line, end ) as train) currentStation status ->
@@ -391,12 +405,12 @@ gameView model =
                     line
                     end
                     currentStation
-                    (Subway.nextStop City.map train (stationInfo currentStation |> .id))
+                    (Subway.nextStop model.map train (stationInfo currentStation |> .id))
                     status
                     model.isIntro
                     model.storyLine
         , if model.showMap then
-            mapView
+            mapView model.mapImage
           else
             div [ onClick ToggleMap, class "map_toggle" ] [ text "Map" ]
         ]
@@ -459,6 +473,12 @@ trainView line end currentStation nextStation status isIntro storyLine =
                 ( Stopped, Nothing ) ->
                     "End of the line: " ++ (stationInfo currentStation |> .name)
 
+                ( OutOfService, Just next ) ->
+                    "Out of service: " ++ (stationInfo currentStation |> .name)
+
+                ( OutOfService, Nothing ) ->
+                    "Out of service"
+
         info =
             (lineInfo line |> .name) ++ " towards " ++ (stationInfo end |> .name)
 
@@ -473,7 +493,7 @@ trainView line end currentStation nextStation status isIntro storyLine =
                 Moving ->
                     False
 
-                Stopped ->
+                _ ->
                     True
 
         action =
@@ -501,34 +521,11 @@ trainView line end currentStation nextStation status isIntro storyLine =
                 ++ exitButton
 
 
-mapView : Html Msg
-mapView =
+mapView : String -> Html Msg
+mapView mapImage =
     div [ onClick ToggleMap, class "map" ]
-        [ pre [ class "map__image", style [ ( "fontFamily", "monospace" ) ] ] [ text """
-
-  Red Line:
-
-        WestMulberry
-             |
-             |
-        EastMulberry
-             |
-             |
-        ChurchStreet
-             |
-             |
-        MetroCenter
-             |
-             |
-        FederalTriangle
-             |
-             |
-        SpringHill
-             |
-             |
-        TwinBrooks
-
-""" ]
+        [ pre [ class "map__image", style [ ( "fontFamily", "monospace" ) ] ]
+            [ text <| mapImage ]
         ]
 
 

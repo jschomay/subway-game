@@ -110,6 +110,9 @@ End of the line?  Oh no, you fell asleep!  You missed your stop!  Your presentat
     , """
 Three stops.  There's still time to get in before Jason finds out you're late.
 """
+    , """
+There's no time to waste.  You need to get to the Metro Center right away!
+"""
     ]
 
 
@@ -119,4 +122,31 @@ gotToGetBackPlatform =
 How could you have let yourself fall asleep?!  Today of all days.  Jason will kill you.
 
 Ok, don't panic.  You just have to get back to the Metro Center stop.  Then you can give your presentation and everything will be fine.
-""" ]
+"""
+    , """
+You got off at the wrong stop!  You need to get to the Metro Center stop, and quick.
+"""
+    , """
+What are you thinking, this isn't the Metro Center stop.  Check your map and try again.
+"""
+    , """
+You really want to lose before it even begins, don't you?
+"""
+    ]
+
+
+stoppedAtFederalTrianglePlatform : List String
+stoppedAtFederalTrianglePlatform =
+    [ """
+Wait, what's happening, why is the train stopped?
+
+The loudspeakers comes on, "Attention riders, there is a delay at the next station.  Please exit the train."
+
+Oh no.  This isn't good.  This isn't good at all.
+"""
+    , """
+This is terrible.  You need to find another way to the Metro Center.
+
+--------- end of prototype story ----------------
+"""
+    ]

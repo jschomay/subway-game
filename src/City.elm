@@ -6,6 +6,7 @@ import Color exposing (..)
 
 type Line
     = Red
+    | Yellow
 
 
 type Station
@@ -18,6 +19,11 @@ type Station
     | CapitolHeights
     | EastMulberry
     | WestMulberry
+
+
+type MapImage
+    = RedMap
+    | RedYellowMap
 
 
 type alias StationInfo =
@@ -91,19 +97,11 @@ lineInfo line =
             , color = red
             }
 
-
-stations : List Station
-stations =
-    [ MetroCenter
-    , FederalTriangle
-    , MacArthursPark
-    , ChurchStreet
-    , SpringHill
-    , TwinBrooks
-    , CapitolHeights
-    , EastMulberry
-    , WestMulberry
-    ]
+        Yellow ->
+            { number = 2
+            , name = "Yellow Line"
+            , color = yellow
+            }
 
 
 redLine : ( Line, List Station )
@@ -120,6 +118,79 @@ redLine =
     )
 
 
-map : Map Station Line
-map =
-    Subway.init (stationInfo >> .id) stations [ redLine ]
+yellowLine : ( Line, List Station )
+yellowLine =
+    ( Yellow
+    , [ MetroCenter
+      , FederalTriangle
+      , CapitolHeights
+      , MacArthursPark
+      ]
+    )
+
+
+map : List ( Line, List Station ) -> Map Station Line
+map lines =
+    Subway.init (stationInfo >> .id) (List.concatMap Tuple.second lines) lines
+
+
+mapImage : MapImage -> String
+mapImage map =
+    case map of
+        RedMap ->
+            """
+
+  Red Line:
+
+        WestMulberry
+             |
+             |
+        EastMulberry
+             |
+             |
+        ChurchStreet
+             |
+             |
+        MetroCenter
+             |
+             |
+        FederalTriangle
+             |
+             |
+        SpringHill
+             |
+             |
+        TwinBrooks
+
+"""
+
+        RedYellowMap ->
+            """
+
+   Red Line:         Yellow Line:
+
+         WestMulberr       MetroCenter
+              |                 |
+              |                 |
+         EastMulberr       FederalTriangle
+              |                 |
+              |                 |
+         ChurchStree       CapitolHeights
+              |                 |
+              |                 |
+         MetroCenter       MacArthursPark
+              |
+              |
+         FederalTria
+              |
+              |
+         SpringHill
+              |
+              |
+         TwinBrooks
+
+"""
+
+
+
+-- TODO, undo linking the map to the mapimage because the game might want them to be out of sync, this means
