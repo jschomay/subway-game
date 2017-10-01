@@ -86,36 +86,27 @@ init =
           , day = Monday
           , showMap = False
           }
-            |> updateStory "platform"
+            |> updateStory "nextDay"
         , delay titleCardDelay RemoveTitleCard
         )
 
 
 titleCardDelay : Time
 titleCardDelay =
-    3 * 1000
-
-
-
--- 1 * 1000
+    --3
+    1 * 1000
 
 
 transitDelay : Time
 transitDelay =
-    8 * 1000
-
-
-
--- 1 * 1000
+    -- 8
+    1 * 1000
 
 
 platformDelay : Time
 platformDelay =
-    3 * 1000
-
-
-
--- 1 * 1000
+    --3
+    1 * 1000
 
 
 findEntity : String -> Entity
@@ -187,36 +178,49 @@ noop model =
     ( model, Cmd.none )
 
 
-setEngineScene : String -> Engine.Model -> Engine.Model
-setEngineScene scene model =
-    Engine.changeWorld [ Engine.loadScene scene ] model
+changeTrainStatus : TrainStatus -> Location -> Location
+changeTrainStatus newStatus location =
+    case location of
+        OnTrain train station status ->
+            OnTrain train station newStatus
+
+        other ->
+            other
 
 
-setEngineLocation : Station -> Engine.Model -> Engine.Model
-setEngineLocation station model =
-    Engine.changeWorld [ Engine.moveTo ((stationInfo >> .name) station) ] model
+changeTrainStation : Station -> Location -> Location
+changeTrainStation newStation location =
+    case location of
+        OnTrain train station status ->
+            OnTrain train newStation status
+
+        other ->
+            other
 
 
 {-| Use when you need to manually change the Model outside of the normal subway mechanics.
-   Or when you need to manually change the EngineModel based on data outside of the Engine.Model
 
-   ** Don't forget to call `updateStory` to get the right narrative based on your changes, but NOT if it was already called for that Msg!
-   ** Don't forget to call `setEngineLocation` if you change the `Location` to keep the Engine.Model location in sync
+   Tip: use the event name as a discrete string for updateStory, then you can set the scene, location, etc of the EngineModel via the usual Engine rules instead of with Engine.changeWorld
+
+   ** Remember the EngineModel is parallel to the Model, so make sure to keep any changes in sync!  (Like setting the same location)
+
+   TODO a thought - what if the current station gets stored in the EngineModel location so it is not duplicated in the Model's Location?  Instead just store the location status (platform, train, etc), but get the location from the EngineModel (would mean storing the id instead of the station name)
+
+   ** Don't forget to call `updateStory` to get the right narrative based on your changes, but be careful not to call it twice (if it was already called in `update`)
+
    ** Dont' forget to pass through or batch in the cmd if unless you know you want to cancel it
 -}
-storyOverrides : Msg -> ( Model, Cmd Msg ) -> ( Model, Cmd Msg )
-storyOverrides msg ( model, cmd ) =
-    -- TODO maybe move this somewhere else and find a better data driven way of representing it?
+scriptedEvents : Msg -> ( Model, Cmd Msg ) -> ( Model, Cmd Msg )
+scriptedEvents msg ( model, cmd ) =
     case ( Engine.getCurrentScene model.engineModel, msg ) of
         ( "meetSteve", ArriveAtPlatform MetroCenter ) ->
             -- jump to next day
             ( { model
                 | location = OnPlatform WestMulberry
-                , engineModel = setEngineLocation WestMulberry model.engineModel
                 , day = nextDay model.day |> .day
                 , titleCard = Just <| .titleCard <| nextDay model.day
               }
-                |> updateStory "platform"
+                |> updateStory "nextDay"
             , delay titleCardDelay RemoveTitleCard
             )
 
@@ -224,32 +228,35 @@ storyOverrides msg ( model, cmd ) =
             -- fall asleep, end intro
             if model.day == Friday then
                 ( { model
-                    | location = OnTrain ( Red, TwinBrooks ) TwinBrooks Stopped
-                    , engineModel =
-                        model.engineModel
-                            |> setEngineLocation TwinBrooks
-                            |> setEngineScene "getBackToMetroCenter"
+                    | location =
+                        model.location
+                            |> changeTrainStation TwinBrooks
+                            |> changeTrainStatus Stopped
                     , isIntro = False
                     , titleCard = Just ""
                   }
-                    |> updateStory "train"
+                    |> updateStory "fallAsleep"
                 , delay 4000 RemoveTitleCard
                 )
             else
                 ( model, cmd )
 
-        ( "getBackToMetroCenter", ArriveAtPlatform FederalTriangle ) ->
-            -- stop the train and add yellow line
+        ( "overslept", ArriveAtPlatform FederalTriangle ) ->
+            -- stop the train before Metro Center and add yellow line
             ( { model
-                | location = OnTrain ( Red, WestMulberry ) FederalTriangle OutOfService
+                | location = changeTrainStatus OutOfService model.location
                 , map = City.map [ City.redLine, City.yellowLine ]
               }
-                |> updateStory "platform"
+                |> updateStory "outOfService"
             , Cmd.none
             )
 
         _ ->
             ( model, cmd )
+
+
+
+-- TODO make add a function to respond to ruleId's to update the Model (like changing the mapImage when the map is added to the user's inventory
 
 
 update :
@@ -278,7 +285,10 @@ update msg model =
                 )
 
             RemoveTitleCard ->
-                ( { model | titleCard = Nothing }
+                ( { model
+                    | titleCard = Nothing
+                    , showMap = False
+                  }
                 , Cmd.none
                 )
 
@@ -302,12 +312,7 @@ update msg model =
                             location =
                                 OnTrain train station Stopped
                         in
-                            ( { model
-                                | location = location
-                              }
-                                |> updateStory "train"
-                            , cmd
-                            )
+                            ( { model | location = location } |> updateStory "train", cmd )
 
                     _ ->
                         noop model
@@ -328,18 +333,24 @@ update msg model =
                     newLocation =
                         case model.location of
                             OnTrain train arrivingFrom Moving ->
-                                OnTrain train station Stopped
+                                model.location
+                                    |> changeTrainStatus Stopped
+                                    |> changeTrainStation station
 
                             other ->
                                 other
                 in
                     ( { model
                         | location = newLocation
-                        , engineModel = setEngineLocation station model.engineModel
+                        , engineModel =
+                            -- this is the only place there should be an Engine.changeWorld call to set the location
+                            Engine.changeWorld
+                                [ Engine.moveTo (station |> stationInfo |> .id |> toString) ]
+                                model.engineModel
                       }
                     , delay platformDelay LeavePlatform
                     )
-                        |> storyOverrides msg
+                        |> scriptedEvents msg
 
             LeavePlatform ->
                 case model.location of
@@ -349,7 +360,9 @@ update msg model =
                                 noop model
 
                             Just next ->
-                                ( { model | location = OnTrain train station Moving }, delay transitDelay <| ArriveAtPlatform next )
+                                ( { model | location = changeTrainStatus Moving model.location }
+                                , delay transitDelay <| ArriveAtPlatform next
+                                )
 
                     _ ->
                         noop model

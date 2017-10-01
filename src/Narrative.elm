@@ -10,8 +10,8 @@ module Narrative exposing (..)
 -}
 
 
-meetStevePlatform : List String
-meetStevePlatform =
+introPlatform : List String
+introPlatform =
     [ """
 A crowd of people wait at the West Mulberry metro station for the 6:05 Red Line to Twin Brooks to arrive.
 
@@ -48,8 +48,8 @@ As it pulls away Steve takes a deep breath and tries to calm down.  He finds his
     ]
 
 
-meetSteveTrain : List String
-meetSteveTrain =
+introTrain : List String
+introTrain =
     [ """
 Steve takes this train every day to get to work.  He gets off at the Metro Center stop.
 
@@ -98,22 +98,15 @@ He'll just have to...  He'll just...
     ]
 
 
-gotToGetBackTrain : List String
-gotToGetBackTrain =
+fellAsleep : List String
+fellAsleep =
     [ """
 You find yourself slouched over in an empty train car.
 
 A man in train operator overalls shakes your shoulder, "Hey Buddy.  It's the end of the line, you've got to get off."
 
 End of the line?  Oh no, you fell asleep!  You missed your stop!  Your presentation!
-"""
-    , """
-Three stops.  There's still time to get in before Jason finds out you're late.
-"""
-    , """
-There's no time to waste.  You need to get to the Metro Center right away!
-"""
-    ]
+""" ]
 
 
 gotToGetBackPlatform : List String
@@ -124,19 +117,24 @@ How could you have let yourself fall asleep?!  Today of all days.  Jason will ki
 Ok, don't panic.  You just have to get back to the Metro Center stop.  Then you can give your presentation and everything will be fine.
 """
     , """
-You got off at the wrong stop!  You need to get to the Metro Center stop, and quick.
-"""
-    , """
-What are you thinking, this isn't the Metro Center stop.  Check your map and try again.
-"""
-    , """
-You really want to lose before it even begins, don't you?
+You have to find a way to the Metro Center stop before it is too late!
 """
     ]
 
 
-stoppedAtFederalTrianglePlatform : List String
-stoppedAtFederalTrianglePlatform =
+gotToGetBackTrain : List String
+gotToGetBackTrain =
+    [ """
+Three stops.  There's still time to get back.
+"""
+    , """
+There's no time to waste.  You need to get to the Metro Center right away!
+"""
+    ]
+
+
+outOfService : List String
+outOfService =
     [ """
 Wait, what's happening, why is the train stopped?
 
@@ -144,9 +142,24 @@ The loudspeakers comes on, "Attention riders, there is a delay at the next stati
 
 Oh no.  This isn't good.  This isn't good at all.
 """
-    , """
-This is terrible.  You need to find another way to the Metro Center.
+    ]
 
---------- end of prototype story ----------------
+
+findANewWayPlatform : List String
+findANewWayPlatform =
+    [ """
+This can't be happening.  There has to be a different way to get to your stop.
+
+...
+
+---------- End of prototype -----------
+"""
+    ]
+
+
+findANewWayTrain : List String
+findANewWayTrain =
+    [ """
+---------- End of prototype -----------
 """
     ]

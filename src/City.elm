@@ -169,7 +169,7 @@ mapImage map =
 
    Red Line:         Yellow Line:
 
-         WestMulberr       MetroCenter
+         WestMulberry       MetroCenter
               |                 |
               |                 |
          EastMulberr       FederalTriangle
@@ -190,7 +190,3 @@ mapImage map =
          TwinBrooks
 
 """
-
-
-
--- TODO, undo linking the map to the mapimage because the game might want them to be out of sync, this means
