@@ -47,7 +47,7 @@ type Day
 type alias Model =
     { engineModel : Engine.Model
     , loaded : Bool
-    , storyLine : String
+    , storyLine : Maybe String
     , narrativeContent : Dict String (Zipper String)
     , map : Subway.Map City.Station City.Line
     , mapImage : String
@@ -76,7 +76,7 @@ init =
     in
         ( { engineModel = engineModel
           , loaded = False
-          , storyLine = ""
+          , storyLine = Nothing
           , narrativeContent = Dict.map (curry getNarrative) Rules.rules
           , map = City.map [ City.redLine ]
           , mapImage = City.mapImage City.RedMap
@@ -139,7 +139,7 @@ updateStory interactableId model =
     in
         { model
             | engineModel = newEngineModel
-            , storyLine = narrativeForThisInteraction |> Maybe.withDefault "..."
+            , storyLine = narrativeForThisInteraction
             , narrativeContent = updatedContent
         }
 
@@ -429,7 +429,7 @@ gameView model =
             ]
 
 
-platformView : Station -> List ( Line, Station ) -> String -> Html Msg
+platformView : Station -> List ( Line, Station ) -> Maybe String -> Html Msg
 platformView station connections storyLine =
     let
         connectionView (( line, end ) as connection) =
@@ -452,16 +452,24 @@ platformView station connections storyLine =
                     |> List.sortBy (\( line, _ ) -> lineInfo line |> .number)
                     |> List.map connectionView
                 )
+
+        storyEl =
+            case storyLine of
+                Just story ->
+                    [ div [ class "platform__story" ] [ storyView story ] ]
+
+                Nothing ->
+                    []
     in
-        div [ class "platform" ]
-            [ div [ class "platform__story" ] [ storyView storyLine ]
-            , div [ class "platform__platform_info" ]
-                [ div [ class "platform_info" ]
-                    [ h2 [ class "platform_info__name" ] [ text (stationInfo station |> .name) ]
-                    , connectionsView connections
-                    ]
-                ]
-            ]
+        div [ class "platform" ] <|
+            storyEl
+                ++ [ div [ class "platform__platform_info" ]
+                        [ div [ class "platform_info" ]
+                            [ h2 [ class "platform_info__name" ] [ text (stationInfo station |> .name) ]
+                            , connectionsView connections
+                            ]
+                        ]
+                   ]
 
 
 storyView : String -> Html Msg
@@ -469,7 +477,7 @@ storyView storyLine =
     Html.Keyed.node "div" [ class "StoryLine" ] [ ( storyLine, Markdown.toHtml [ class "StoryLine__Item u-fade-in" ] storyLine ) ]
 
 
-trainView : Line -> Station -> Station -> Maybe Station -> TrainStatus -> Bool -> String -> Html Msg
+trainView : Line -> Station -> Station -> Maybe Station -> TrainStatus -> Bool -> Maybe String -> Html Msg
 trainView line end currentStation nextStation status isIntro storyLine =
     let
         nextStop =
@@ -523,14 +531,22 @@ trainView line end currentStation nextStation status isIntro storyLine =
                     [ button (buttonClasses :: action) [ text "Exit train" ]
                     ]
                 ]
+
+        storyEl =
+            case storyLine of
+                Just storyLine ->
+                    [ div [ class "train__story" ] [ storyView storyLine ] ]
+
+                Nothing ->
+                    []
     in
-        div [ class "train" ] <|
-            [ div [ class "train__story" ] [ storyView storyLine ]
-            , div [ class "train__ticker" ]
-                [ h4 [ class "train__info" ] [ text info ]
-                , h3 [ class "train__next_stop" ] [ text nextStop ]
-                ]
-            ]
+        div [ class "platform" ] <|
+            storyEl
+                ++ [ div [ class "train__ticker" ]
+                        [ h4 [ class "train__info" ] [ text info ]
+                        , h3 [ class "train__next_stop" ] [ text nextStop ]
+                        ]
+                   ]
                 ++ exitButton
 
 
