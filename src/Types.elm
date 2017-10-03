@@ -23,6 +23,6 @@ type TrainStatus
 
 
 type Location
-    = OnPlatform City.Station
-    | OnTrain ( City.Line, City.Station ) City.Station TrainStatus
-    | InStation City.Station
+    = OnPlatform
+    | OnTrain ( City.Line, City.Station ) TrainStatus
+    | InStation

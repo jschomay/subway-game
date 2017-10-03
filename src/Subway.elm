@@ -2,6 +2,7 @@ module Subway
     exposing
         ( Map
         , init
+        , getStation
         , connections
         , nextStop
         , graphViz
@@ -77,6 +78,12 @@ init stationToId stations lines =
                     [ { existing | label = new.label :: existing.label } ]
     in
         Map <| Graph.fromNodesAndEdges (List.map toNode stations) mergedLines
+
+
+getStation : Map station line -> Int -> Maybe station
+getStation (Map map) id =
+    Graph.get id map
+        |> Maybe.map (.node >> .label)
 
 
 connections : Map station line -> Int -> List ( line, station )

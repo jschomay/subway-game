@@ -72,7 +72,7 @@ init =
                 |> Engine.changeWorld Rules.startingState
 
         startingPlace =
-            OnPlatform WestMulberry
+            OnPlatform
     in
         ( { engineModel = engineModel
           , loaded = False
@@ -179,20 +179,10 @@ noop model =
 
 
 changeTrainStatus : TrainStatus -> Location -> Location
-changeTrainStatus newStatus location =
-    case location of
-        OnTrain train station status ->
-            OnTrain train station newStatus
-
-        other ->
-            other
-
-
-changeTrainStation : Station -> Location -> Location
-changeTrainStation newStation location =
-    case location of
-        OnTrain train station status ->
-            OnTrain train newStation status
+changeTrainStatus newStatus status =
+    case status of
+        OnTrain train status ->
+            OnTrain train newStatus
 
         other ->
             other
@@ -201,10 +191,6 @@ changeTrainStation newStation location =
 {-| Use when you need to manually change the Model outside of the normal subway mechanics.
 
    Tip: use the event name as a discrete string for updateStory, then you can set the scene, location, etc of the EngineModel via the usual Engine rules instead of with Engine.changeWorld
-
-   ** Remember the EngineModel is parallel to the Model, so make sure to keep any changes in sync!  (Like setting the same location)
-
-   TODO a thought - what if the current station gets stored in the EngineModel location so it is not duplicated in the Model's Location?  Instead just store the location status (platform, train, etc), but get the location from the EngineModel (would mean storing the id instead of the station name)
 
    ** Don't forget to call `updateStory` to get the right narrative based on your changes, but be careful not to call it twice (if it was already called in `update`)
 
@@ -216,7 +202,7 @@ scriptedEvents msg ( model, cmd ) =
         ( "meetSteve", ArriveAtPlatform MetroCenter ) ->
             -- jump to next day
             ( { model
-                | location = OnPlatform WestMulberry
+                | location = OnPlatform
                 , day = nextDay model.day |> .day
                 , titleCard = Just <| .titleCard <| nextDay model.day
               }
@@ -228,10 +214,7 @@ scriptedEvents msg ( model, cmd ) =
             -- fall asleep, end intro
             if model.day == Friday then
                 ( { model
-                    | location =
-                        model.location
-                            |> changeTrainStation TwinBrooks
-                            |> changeTrainStatus Stopped
+                    | location = changeTrainStatus Stopped model.location
                     , isIntro = False
                     , titleCard = Just ""
                   }
@@ -255,8 +238,13 @@ scriptedEvents msg ( model, cmd ) =
             ( model, cmd )
 
 
-
--- TODO make add a function to respond to ruleId's to update the Model (like changing the mapImage when the map is added to the user's inventory
+getCurrentStation : Model -> Station
+getCurrentStation model =
+    Engine.getCurrentLocation model.engineModel
+        |> String.toInt
+        |> Result.toMaybe
+        |> Maybe.andThen (Subway.getStation model.map)
+        |> Maybe.withDefault WestMulberry
 
 
 update :
@@ -299,43 +287,46 @@ update msg model =
 
             BoardTrain train ->
                 case model.location of
-                    OnPlatform station ->
+                    OnPlatform ->
                         let
+                            currentStation =
+                                getCurrentStation model
+
                             cmd =
-                                case Subway.nextStop model.map train (stationInfo station |> .id) of
+                                case Subway.nextStop model.map train (stationInfo currentStation |> .id) of
                                     Nothing ->
                                         Cmd.none
 
                                     Just station ->
                                         delay 0 <| LeavePlatform
-
-                            location =
-                                OnTrain train station Stopped
                         in
-                            ( { model | location = location } |> updateStory "train", cmd )
+                            ( { model | location = OnTrain train Stopped } |> updateStory "train", cmd )
 
                     _ ->
                         noop model
 
             ExitTrain ->
-                case model.location of
-                    OnTrain train station Stopped ->
-                        ( { model | location = OnPlatform station } |> updateStory "platform", Cmd.none )
+                let
+                    currentStation =
+                        getCurrentStation model
+                in
+                    case model.location of
+                        OnTrain train Stopped ->
+                            ( { model | location = OnPlatform } |> updateStory "platform", Cmd.none )
 
-                    OnTrain train station OutOfService ->
-                        ( { model | location = OnPlatform station } |> updateStory "platform", Cmd.none )
+                        OnTrain train OutOfService ->
+                            ( { model | location = OnPlatform } |> updateStory "platform", Cmd.none )
 
-                    _ ->
-                        noop model
+                        _ ->
+                            noop model
 
-            ArriveAtPlatform station ->
+            ArriveAtPlatform newStation ->
                 let
                     newLocation =
                         case model.location of
-                            OnTrain train arrivingFrom Moving ->
+                            OnTrain train Moving ->
                                 model.location
                                     |> changeTrainStatus Stopped
-                                    |> changeTrainStation station
 
                             other ->
                                 other
@@ -345,7 +336,7 @@ update msg model =
                         , engineModel =
                             -- this is the only place there should be an Engine.changeWorld call to set the location
                             Engine.changeWorld
-                                [ Engine.moveTo (station |> stationInfo |> .id |> toString) ]
+                                [ Engine.moveTo (newStation |> stationInfo |> .id |> toString) ]
                                 model.engineModel
                       }
                     , delay platformDelay LeavePlatform
@@ -353,19 +344,23 @@ update msg model =
                         |> scriptedEvents msg
 
             LeavePlatform ->
-                case model.location of
-                    OnTrain train station Stopped ->
-                        case Subway.nextStop model.map train (stationInfo station |> .id) of
-                            Nothing ->
-                                noop model
+                let
+                    currentStation =
+                        getCurrentStation model
+                in
+                    case model.location of
+                        OnTrain train Stopped ->
+                            case Subway.nextStop model.map train (stationInfo currentStation |> .id) of
+                                Nothing ->
+                                    noop model
 
-                            Just next ->
-                                ( { model | location = changeTrainStatus Moving model.location }
-                                , delay transitDelay <| ArriveAtPlatform next
-                                )
+                                Just next ->
+                                    ( { model | location = changeTrainStatus Moving model.location }
+                                    , delay transitDelay <| ArriveAtPlatform next
+                                    )
 
-                    _ ->
-                        noop model
+                        _ ->
+                            noop model
 
 
 delay : Time -> Msg -> Cmd Msg
@@ -403,30 +398,35 @@ titleCardView title =
 
 gameView : Model -> Html Msg
 gameView model =
-    div []
-        [ case model.location of
-            InStation station ->
-                text "In the station..."
+    let
+        currentStation =
+            getCurrentStation model
+    in
+        div []
+            [ case model.location of
+                InStation ->
+                    text "In the station..."
 
-            OnPlatform station ->
-                platformView station
-                    (Subway.connections model.map (stationInfo station |> .id))
-                    model.storyLine
+                OnPlatform ->
+                    platformView
+                        currentStation
+                        (Subway.connections model.map (stationInfo currentStation |> .id))
+                        model.storyLine
 
-            OnTrain (( line, end ) as train) currentStation status ->
-                trainView
-                    line
-                    end
-                    currentStation
-                    (Subway.nextStop model.map train (stationInfo currentStation |> .id))
-                    status
-                    model.isIntro
-                    model.storyLine
-        , if model.showMap then
-            mapView model.mapImage
-          else
-            div [ onClick ToggleMap, class "map_toggle" ] [ text "Map" ]
-        ]
+                OnTrain (( line, end ) as train) status ->
+                    trainView
+                        line
+                        end
+                        currentStation
+                        (Subway.nextStop model.map train (stationInfo currentStation |> .id))
+                        status
+                        model.isIntro
+                        model.storyLine
+            , if model.showMap then
+                mapView model.mapImage
+              else
+                div [ onClick ToggleMap, class "map_toggle" ] [ text "Map" ]
+            ]
 
 
 platformView : Station -> List ( Line, Station ) -> String -> Html Msg
