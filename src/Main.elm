@@ -199,8 +199,33 @@ changeTrainStatus newStatus status =
 scriptedEvents : Msg -> ( Model, Cmd Msg ) -> ( Model, Cmd Msg )
 scriptedEvents msg ( model, cmd ) =
     case ( Engine.getCurrentScene model.engineModel, msg ) of
+        ( "meetSteve", Continue ) ->
+            case ( model.isIntro, model.day, model.location ) of
+                ( True, _, OnPlatform ) ->
+                    -- board train to work (via the Msg)
+                    ( model
+                    , delay 0 <| BoardTrain ( City.Red, City.TwinBrooks )
+                    )
+
+                ( True, Friday, OnTrain _ _ ) ->
+                    noop model
+
+                ( True, _, OnTrain _ _ ) ->
+                    -- jump to next day
+                    ( { model
+                        | location = OnPlatform
+                        , day = nextDay model.day |> .day
+                        , titleCard = Just <| .titleCard <| nextDay model.day
+                      }
+                        |> updateStory "nextDay"
+                    , delay titleCardDelay RemoveTitleCard
+                    )
+
+                _ ->
+                    noop model
+
         ( "meetSteve", ArriveAtPlatform MetroCenter ) ->
-            -- jump to next day
+            -- jump to next day (save as above)
             ( { model
                 | location = OnPlatform
                 , day = nextDay model.day |> .day
@@ -247,11 +272,14 @@ getCurrentStation model =
         |> Maybe.withDefault WestMulberry
 
 
-update :
-    Msg
-    -> Model
-    -> ( Model, Cmd Msg )
+update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
+    update_ msg model
+        |> scriptedEvents msg
+
+
+update_ : Msg -> Model -> ( Model, Cmd Msg )
+update_ msg model =
     if Engine.getEnding model.engineModel /= Nothing then
         -- no-op if story has ended
         noop model
@@ -271,6 +299,10 @@ update msg model =
                 ( model
                 , Task.perform (always msg) <| Process.sleep duration
                 )
+
+            Continue ->
+                -- use scriptedEvents to respond to Continue's
+                noop model
 
             RemoveTitleCard ->
                 ( { model
@@ -321,27 +353,21 @@ update msg model =
                             noop model
 
             ArriveAtPlatform newStation ->
-                let
-                    newLocation =
-                        case model.location of
-                            OnTrain train Moving ->
-                                model.location
-                                    |> changeTrainStatus Stopped
+                case model.location of
+                    OnTrain train Moving ->
+                        ( { model
+                            | location = model.location |> changeTrainStatus Stopped
+                            , engineModel =
+                                -- this is the only place there should be an Engine.changeWorld call to set the location
+                                Engine.changeWorld
+                                    [ Engine.moveTo (newStation |> stationInfo |> .id |> toString) ]
+                                    model.engineModel
+                          }
+                        , delay platformDelay LeavePlatform
+                        )
 
-                            other ->
-                                other
-                in
-                    ( { model
-                        | location = newLocation
-                        , engineModel =
-                            -- this is the only place there should be an Engine.changeWorld call to set the location
-                            Engine.changeWorld
-                                [ Engine.moveTo (newStation |> stationInfo |> .id |> toString) ]
-                                model.engineModel
-                      }
-                    , delay platformDelay LeavePlatform
-                    )
-                        |> scriptedEvents msg
+                    _ ->
+                        noop model
 
             LeavePlatform ->
                 let
@@ -412,6 +438,7 @@ gameView model =
                         currentStation
                         (Subway.connections model.map (stationInfo currentStation |> .id))
                         model.storyLine
+                        model.isIntro
 
                 OnTrain (( line, end ) as train) status ->
                     trainView
@@ -429,8 +456,8 @@ gameView model =
             ]
 
 
-platformView : Station -> List ( Line, Station ) -> Maybe String -> Html Msg
-platformView station connections storyLine =
+platformView : Station -> List ( Line, Station ) -> Maybe String -> Bool -> Html Msg
+platformView station connections storyLine isIntro =
     let
         connectionView (( line, end ) as connection) =
             let
@@ -456,7 +483,7 @@ platformView station connections storyLine =
         storyEl =
             case storyLine of
                 Just story ->
-                    [ div [ class "platform__story" ] [ storyView story ] ]
+                    [ div [ class "platform__story" ] [ storyView story isIntro ] ]
 
                 Nothing ->
                     []
@@ -472,9 +499,19 @@ platformView station connections storyLine =
                    ]
 
 
-storyView : String -> Html Msg
-storyView storyLine =
-    Html.Keyed.node "div" [ class "StoryLine" ] [ ( storyLine, Markdown.toHtml [ class "StoryLine__Item u-fade-in" ] storyLine ) ]
+storyView : String -> Bool -> Html Msg
+storyView storyLine showContinue =
+    Html.Keyed.node "div"
+        [ class "StoryLine" ]
+        [ ( storyLine
+          , div [ class "StoryLine__content" ] <|
+                [ Markdown.toHtml [] storyLine ]
+                    ++ if showContinue then
+                        [ span [ class "StoryLine__continue", onClick Continue ] [ text "Continue..." ] ]
+                       else
+                        []
+          )
+        ]
 
 
 trainView : Line -> Station -> Station -> Maybe Station -> TrainStatus -> Bool -> Maybe String -> Html Msg
@@ -535,7 +572,7 @@ trainView line end currentStation nextStation status isIntro storyLine =
         storyEl =
             case storyLine of
                 Just storyLine ->
-                    [ div [ class "train__story" ] [ storyView storyLine ] ]
+                    [ div [ class "train__story" ] [ storyView storyLine isIntro ] ]
 
                 Nothing ->
                     []

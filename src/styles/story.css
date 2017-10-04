@@ -1,5 +1,5 @@
 .StoryLine {
-  padding: 4em 6em;
+  padding: 3em;
   color: white;
   background: rgba(0,0,0,0.8);
   font-size: 1.2em;
@@ -8,17 +8,22 @@
 
 }
 
-.StoryLine__Item {
-  margin-bottom: 2em;
-  padding: 20px 10px;
-  position: relative;
-}
-
-.u-fade-in {
+.StoryLine__content {
   max-height: 0;
   overflow: hidden;
   animation: fadeIn 1s linear forwards,
   slideDown 3s ease-out forwards;
+}
+
+.StoryLine__continue {
+  text-decoration: underline;
+  text-transform: uppercase;
+  user-select: none;
+  font-style: italic;
+  cursor: pointer;
+  padding-top: 2em;
+  text-align: center;
+  display: block;
 }
 
 @keyframes fadeIn {

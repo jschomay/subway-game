@@ -14,6 +14,7 @@ type Msg
     | ArriveAtPlatform City.Station
     | LeavePlatform
     | RemoveTitleCard
+    | Continue
 
 
 type TrainStatus

@@ -35,6 +35,7 @@
   right: 0;
   left: 0;
   background: black;
+  user-select: none;
 }
 
 .train__next_stop {
@@ -53,10 +54,8 @@
 }
 
 .exit_button {
+  user-select: none;
   position: fixed;
-}
-
-.exit_button {
   outline: 0;
   word-break: break-all;
   background: #249a3f;
@@ -111,6 +110,7 @@
 }
 
 .platform_info {
+  user-select: none;
   position: fixed;
   width: 330px;
 }

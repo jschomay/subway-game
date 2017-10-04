@@ -18,14 +18,6 @@ A crowd of people wait at the West Mulberry metro station for the 6:05 Red Line 
 At the center of the platform a man with well combed hair and a simple business suit stands just behind the yellow safety line.  While the other people on the platform pace around, this man stands still.  This is Steve.
 
 The train arrives at the station.  It slows down and comes to a stop with the door directly in front of Steve.  It opens and he steps on.
-
-<span style="font-style: italic; font-size: 0.7em;">
-(click on the Map below to see a map of the Red Line stops)
-</span>
-
-<span style="font-style: italic; font-size: 0.7em;">
-(click on the Red Line towards Spring Hill to take the train)
-</span>
 """
     , """
 Down in the metro each day looks like every other.  The same crowds, the same sounds, the same artificial lights.
