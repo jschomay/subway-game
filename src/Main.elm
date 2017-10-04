@@ -52,6 +52,7 @@ type alias Model =
     , map : Subway.Map City.Station City.Line
     , mapImage : String
     , location : Location
+    , safeToExit : Bool
     , isIntro : Bool
     , titleCard : Maybe String
     , day : Day
@@ -81,6 +82,7 @@ init =
           , map = City.map [ City.redLine ]
           , mapImage = City.mapImage City.RedMap
           , location = startingPlace
+          , safeToExit = False
           , isIntro = True
           , titleCard = Just "Monday 6:03 AM"
           , day = Monday
@@ -107,6 +109,11 @@ platformDelay : Time
 platformDelay =
     --3
     1 * 1000
+
+
+doorDelay : Time
+doorDelay =
+    0.5 * 1000
 
 
 findEntity : String -> Entity
@@ -241,6 +248,7 @@ scriptedEvents msg ( model, cmd ) =
                 ( { model
                     | location = changeTrainStatus Stopped model.location
                     , isIntro = False
+                    , safeToExit = True
                     , titleCard = Just ""
                   }
                     |> updateStory "fallAsleep"
@@ -253,6 +261,7 @@ scriptedEvents msg ( model, cmd ) =
             -- stop the train before Metro Center and add yellow line
             ( { model
                 | location = changeTrainStatus OutOfService model.location
+                , safeToExit = True
                 , map = City.map [ City.redLine, City.yellowLine ]
               }
                 |> updateStory "outOfService"
@@ -332,7 +341,13 @@ update_ msg model =
                                     Just station ->
                                         delay 0 <| LeavePlatform
                         in
-                            ( { model | location = OnTrain train Stopped } |> updateStory "train", cmd )
+                            ( { model
+                                | location = OnTrain train Stopped
+                                , safeToExit = False
+                              }
+                                |> updateStory "train"
+                            , cmd
+                            )
 
                     _ ->
                         noop model
@@ -363,11 +378,17 @@ update_ msg model =
                                     [ Engine.moveTo (newStation |> stationInfo |> .id |> toString) ]
                                     model.engineModel
                           }
-                        , delay platformDelay LeavePlatform
+                        , Cmd.batch
+                            [ delay platformDelay LeavePlatform
+                            , delay doorDelay SafeToExit
+                            ]
                         )
 
                     _ ->
                         noop model
+
+            SafeToExit ->
+                ( { model | safeToExit = True }, Cmd.none )
 
             LeavePlatform ->
                 let
@@ -381,7 +402,10 @@ update_ msg model =
                                     noop model
 
                                 Just next ->
-                                    ( { model | location = changeTrainStatus Moving model.location }
+                                    ( { model
+                                        | location = changeTrainStatus Moving model.location
+                                        , safeToExit = False
+                                      }
                                     , delay transitDelay <| ArriveAtPlatform next
                                     )
 
@@ -447,6 +471,7 @@ gameView model =
                         currentStation
                         (Subway.nextStop model.map train (stationInfo currentStation |> .id))
                         status
+                        model.safeToExit
                         model.isIntro
                         model.storyLine
             , if model.showMap then
@@ -514,8 +539,8 @@ storyView storyLine showContinue =
         ]
 
 
-trainView : Line -> Station -> Station -> Maybe Station -> TrainStatus -> Bool -> Maybe String -> Html Msg
-trainView line end currentStation nextStation status isIntro storyLine =
+trainView : Line -> Station -> Station -> Maybe Station -> TrainStatus -> Bool -> Bool -> Maybe String -> Html Msg
+trainView line end currentStation nextStation status isStopped isIntro storyLine =
     let
         nextStop =
             case ( status, nextStation ) of
@@ -543,19 +568,11 @@ trainView line end currentStation nextStation status isIntro storyLine =
         buttonClasses =
             classList
                 [ ( "exit_button", True )
-                , ( "exit_button--active", stopped )
+                , ( "exit_button--active", isStopped )
                 ]
 
-        stopped =
-            case status of
-                Moving ->
-                    False
-
-                _ ->
-                    True
-
         action =
-            if stopped then
+            if isStopped then
                 [ onClick ExitTrain ]
             else
                 []

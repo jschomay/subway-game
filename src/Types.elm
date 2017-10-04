@@ -12,6 +12,7 @@ type Msg
     | BoardTrain ( City.Line, City.Station )
     | ExitTrain
     | ArriveAtPlatform City.Station
+    | SafeToExit
     | LeavePlatform
     | RemoveTitleCard
     | Continue
