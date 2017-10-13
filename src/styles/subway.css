@@ -103,42 +103,102 @@
   flex: 1 1 auto;
 }
 
-.platform__platform_info {
-  margin-top: 5em;
-  flex: 0 0 auto;
-  width: 330px;
-}
-
-.platform_info {
-  user-select: none;
-  position: fixed;
-  width: 330px;
-}
-
-.platform_info {
-  border: 0.3em solid #333;
-  background: white;
-  border-radius: 1.1em 1.1em 0 0;
-}
-
-.platform_info__name {
+.platform__name {
   text-align: center;
   text-transform: uppercase;
   font-weight: normal;
   font-size: 2.5em;
-  padding: 0.2em 0.7em;
-  background: #333;
+  padding: 0.4em 0.7em;
+  background: #222;
   color: white;
+  margin-bottom: 2em;
 }
-.platform_info__connections {
-  padding: 0.4em 0em;
+
+.platform__exit {
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-transform: uppercase;
+  font-weight: normal;
+  font-size: 1.5em;
+  border: 0.2em solid black;
+  padding: 0.3em;
+  color: #111;
+  background: white;
+  margin-bottom: 2em;
+}
+
+.platform__train {
+  cursor: pointer;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  text-transform: uppercase;
+  font-weight: normal;
+  font-size: 1.0em;
+  border: 0.2em solid #222;
+  padding: 0.3em;
+  color: #111;
+  background: white;
+  margin-bottom: 2em;
+}
+
+.platform__line {
+  cursor: pointer;
+  background: white;
+  border: 3px solid;
+  border-radius: 50%;
+  width: 1em;
+  height: 1em;
+  padding: 0.5em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8em;
+  font-weight: normal;
+  margin-left: 0.5em;
+  margin-right: 0.5em;
+}
+
+/* ConnectingHalls */
+
+.connecting_halls {
+  display: flex;
+  padding: 3em;
+  min-height: 100vh;
+  align-items: center;
+  justify-content: center;
+  background: black url(../img/tile.jpg) repeat;
+  background-attachment: fixed;
+}
+
+
+/* Connections */
+
+.connections {
+  background: white;
+  user-select: none;
+  position: fixed;
+  padding: 0 1em;
+  width: 330px;
+  border: 0.2em solid #333;
+  background: white;
+  border-radius: 1.1em;
 }
 
 .connection {
   display: flex;
   align-items: center;
-  padding: 0.8em 1em;
+  padding: 0.8em 0em;
+  cursor: pointer;
+  border-bottom: 1px solid #222;
 }
+
+.connection:last-of-type {
+  border-bottom: none;
+}
+
 .connection__number {
   background: white;
   border: 3px solid;
@@ -154,9 +214,18 @@
   cursor: pointer;
 }
 .connection__direction {
+  cursor: pointer;
   font-size: 1.0em;
   font-weight: bold;
   text-transform: uppercase;
+  flex: 1 0 auto;
+}
+
+.connection__arrow {
   cursor: pointer;
+  font-size: 1.4em;
+  font-weight: bold;
+  text-transform: uppercase;
+  margin-right: 0.5em;
 }
 

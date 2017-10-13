@@ -4,16 +4,23 @@ import Time exposing (Time)
 import City exposing (..)
 
 
+type alias Train =
+    -- line and direction
+    ( City.Line, City.Station )
+
+
 type Msg
     = Interact String
     | Loaded
     | Delay Time Msg
     | ToggleMap
-    | BoardTrain ( City.Line, City.Station )
+    | BoardTrain
+    | EnterPlatform Train
+    | ExitPlatform
     | ExitTrain
-    | ArriveAtPlatform City.Station
+    | ArriveAtStation City.Station
     | SafeToExit
-    | LeavePlatform
+    | LeaveStation
     | RemoveTitleCard
     | Continue
 
@@ -25,6 +32,7 @@ type TrainStatus
 
 
 type Location
-    = OnPlatform
-    | OnTrain ( City.Line, City.Station ) TrainStatus
+    = OnPlatform Train
+    | OnTrain Train TrainStatus
     | InStation
+    | InConnectingHalls
