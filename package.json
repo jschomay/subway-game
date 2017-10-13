@@ -11,6 +11,7 @@
   "scripts": {
     "start": "webpack-dev-server --hot --inline --content-base src/",
     "build": "rimraf dist && webpack",
+    "deploy": "npm run build && gh-pages -d dist && rimraf dist",
     "watch": "webpack --watch",
     "postinstall": "rm -rf ./elm-stuff && node_modules/elm/binwrappers/elm-package install -y"
   },
@@ -24,6 +25,7 @@
     "elm-webpack-loader": "^4.1.1",
     "extract-text-webpack-plugin": "^1.0.1",
     "file-loader": "^0.8.5",
+    "gh-pages": "^1.0.0",
     "html-webpack-plugin": "^2.17.0",
     "json-loader": "^0.5.4",
     "lodash.assign": "^3.2.0",
