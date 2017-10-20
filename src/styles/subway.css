@@ -1,120 +1,15 @@
-/* Train */
-@font-face {
-  font-family: subway;
-  src: url(../fonts/subway.ttf);
-  src: url(../fonts/subway.woff);
-}
+/* Station */
 
-.train {
-  display: flex;
-  padding: 3em;
-  align-items: flex-start;
-  justify-content: space-around;
+.station {
   min-height: 100vh;
-  align-items: flex-start;
-  justify-content: space-around;
-  background: black url(../img/train.jpg) no-repeat top center;
-  background-size: 100% auto;
-  background-attachment: fixed;
+  width: 100%;
+  position: absolute;
 }
 
-.train__story {
-  max-width: 700px;
-  flex: 1 1 auto;
-  margin-top: 5em;
+.station__story {
 }
 
-.train__ticker {
-  color: #ffc000;
-  position: fixed;
-  text-transform: uppercase;
-  font-family: subway;
-  padding: 0.7em 0.7em;
-  text-align: center;
-  top: 0;
-  right: 0;
-  left: 0;
-  background: black;
-  user-select: none;
-}
-
-.train__next_stop {
-  font-weight: normal;
-  font-size: 2.0em;
-}
-
-.train__info {
-  font-weight: normal;
-  font-size: 1.3em;
-}
-
-.train__exit_button {
-  width: 200px;
-  margin-top: 10em;
-}
-
-.exit_button {
-  user-select: none;
-  position: fixed;
-  outline: 0;
-  word-break: break-all;
-  background: #249a3f;
-  background-image: linear-gradient(to bottom, #249a3f, #175f27);
-  border-radius: 28px;
-  box-shadow: 0px 0px 20px 0px black;
-  color: #333;
-  display: block;
-  width: 100px;
-  height: 100px;
-  font-size: 0.8em;
-  font-weight: bold;
-  text-transform: uppercase;
-  border-radius: 1em;
-  border: none;
-  margin-bottom: 5em;
-}
-
-.exit_button--active {
-  background: #34d95a;
-  color: #555;
-  background-image: linear-gradient(to bottom, #34d95a, #269e40);
-  box-shadow: 0px 0px 20px 0px #249a3f;
-  cursor: pointer;
-;
-}
-
-
-/* Platform */
-
-.platform {
-  display: flex;
-  padding: 3em;
-  min-height: 100vh;
-  align-items: flex-start;
-  justify-content: space-around;
-  background: black url(../img/platform.jpg) no-repeat top center;
-  background-size: 100% auto;
-  background-attachment: fixed;
-}
-
-.platform__story {
-  margin-right: 3em;
-  max-width: 700px;
-  flex: 1 1 auto;
-}
-
-.platform__name {
-  text-align: center;
-  text-transform: uppercase;
-  font-weight: normal;
-  font-size: 2.5em;
-  padding: 0.4em 0.7em;
-  background: #222;
-  color: white;
-  margin-bottom: 2em;
-}
-
-.platform__exit {
+.station__connections {
   cursor: pointer;
   display: inline-flex;
   align-items: center;
@@ -122,29 +17,35 @@
   text-transform: uppercase;
   font-weight: normal;
   font-size: 1.5em;
-  border: 0.2em solid black;
+  border: 0.1em solid black;
   padding: 0.3em;
   color: #111;
   background: white;
-  margin-bottom: 2em;
+  position: absolute;
+  right: 1em;
 }
-
-.platform__train {
-  cursor: pointer;
-  display: inline-flex;
+.station__top {
+  background: black url(../img/tile.jpg);
+  background-size: 40%;
+  display: flex;
   justify-content: center;
   align-items: center;
-  text-transform: uppercase;
-  font-weight: normal;
-  font-size: 1.0em;
-  border: 0.2em solid #222;
-  padding: 0.3em;
-  color: #111;
-  background: white;
-  margin-bottom: 2em;
+  padding: 1.5em;
 }
 
-.platform__line {
+.station__name {
+  display: inline-block;
+  text-align: center;
+  text-transform: uppercase;
+  font-weight: normal;
+  font-size: 2em;
+  padding: 0.4em 0.7em;
+  color: #222;
+  background: #eee;
+  border: 0.1em solid #222;
+}
+
+.station__line {
   cursor: pointer;
   background: white;
   border: 3px solid;
@@ -171,8 +72,18 @@
   justify-content: center;
   background: black url(../img/tile.jpg) repeat;
   background-attachment: fixed;
+  width: 100%;
+  position: absolute;
 }
 
+.connecting_halls__station_name {
+  text-align: center;
+  text-transform: uppercase;
+  font-weight: normal;
+  font-size: 2em;
+  padding: 0.4em;
+  border-bottom: 1px solid #222;
+}
 
 /* Connections */
 

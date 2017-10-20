@@ -1,5 +1,6 @@
 require( './styles/reset.css' );
 require( './styles/story.css' );
+require( './styles/train.css' );
 require( './styles/subway.css' );
 require( './styles/game.css' );
 

@@ -21,6 +21,7 @@ import Color
 import City exposing (..)
 import Markdown
 import FNV
+import Views.Train
 
 
 {- This is the kernel of the whole app.  It glues everything together and handles some logic such as choosing the correct narrative to display.
@@ -54,7 +55,6 @@ type alias Model =
     , map : Subway.Map City.Station City.Line
     , mapImage : String
     , location : Location
-    , safeToExit : Bool
     , isIntro : Bool
     , titleCard : Maybe String
     , day : Day
@@ -80,8 +80,7 @@ init =
           , narrativeContent = Dict.map (curry getNarrative) Rules.rules
           , map = City.map [ City.redLine ]
           , mapImage = City.mapImage City.RedMap
-          , location = OnPlatform ( Red, TwinBrooks )
-          , safeToExit = False
+          , location = InStation
           , isIntro = True
           , titleCard = Just "Monday 6:03 AM"
           , day = Monday
@@ -94,25 +93,17 @@ init =
 
 titleCardDelay : Time
 titleCardDelay =
-    --3
     1 * 1000
 
 
 transitDelay : Time
 transitDelay =
-    -- 8
-    1 * 1000
+    7 * 1000
 
 
 platformDelay : Time
 platformDelay =
-    --3
-    1 * 1000
-
-
-doorDelay : Time
-doorDelay =
-    0.5 * 1000
+    5 * 1000
 
 
 findEntity : String -> Entity
@@ -207,10 +198,10 @@ scriptedEvents msg ( model, cmd ) =
     case ( Engine.getCurrentScene model.engineModel, msg ) of
         ( "meetSteve", Continue ) ->
             case ( model.isIntro, model.day, model.location ) of
-                ( True, _, OnPlatform _ ) ->
+                ( True, _, InStation ) ->
                     -- board train to work (via the Msg)
-                    ( model
-                    , delay 0 <| BoardTrain
+                    ( { model | location = InConnectingHalls }
+                    , delay 0 <| BoardTrain ( Red, TwinBrooks )
                     )
 
                 ( True, Friday, OnTrain _ _ ) ->
@@ -219,7 +210,7 @@ scriptedEvents msg ( model, cmd ) =
                 ( True, _, OnTrain train _ ) ->
                     -- jump to next day
                     ( { model
-                        | location = OnPlatform ( Red, TwinBrooks )
+                        | location = InStation
                         , day = nextDay model.day |> .day
                         , titleCard = Just <| .titleCard <| nextDay model.day
                       }
@@ -233,7 +224,7 @@ scriptedEvents msg ( model, cmd ) =
         ( "meetSteve", ArriveAtStation MetroCenter ) ->
             -- jump to next day (save as above)
             ( { model
-                | location = OnPlatform ( Red, TwinBrooks )
+                | location = InStation
                 , day = nextDay model.day |> .day
                 , titleCard = Just <| .titleCard <| nextDay model.day
               }
@@ -247,7 +238,6 @@ scriptedEvents msg ( model, cmd ) =
                 ( { model
                     | location = changeTrainStatus Stopped model.location
                     , isIntro = False
-                    , safeToExit = True
                     , titleCard = Just ""
                   }
                     |> updateStory "fallAsleep"
@@ -260,7 +250,6 @@ scriptedEvents msg ( model, cmd ) =
             -- stop the train before Metro Center and add yellow line
             ( { model
                 | location = changeTrainStatus OutOfService model.location
-                , safeToExit = True
                 , map = City.map [ City.redLine, City.yellowLine ]
               }
                 |> updateStory "outOfService"
@@ -325,9 +314,21 @@ update_ msg model =
                 , Cmd.none
                 )
 
-            BoardTrain ->
+            PassTurnStyle ->
+                let
+                    currentStation =
+                        getCurrentStation model
+                in
+                    case model.location of
+                        InStation ->
+                            ( { model | location = InConnectingHalls }, Cmd.none )
+
+                        _ ->
+                            noop model
+
+            BoardTrain train ->
                 case model.location of
-                    OnPlatform train ->
+                    InConnectingHalls ->
                         let
                             currentStation =
                                 getCurrentStation model
@@ -342,7 +343,6 @@ update_ msg model =
                         in
                             ( { model
                                 | location = OnTrain train Stopped
-                                , safeToExit = False
                               }
                                 |> updateStory "train"
                             , cmd
@@ -358,34 +358,10 @@ update_ msg model =
                 in
                     case model.location of
                         OnTrain train Stopped ->
-                            ( { model | location = OnPlatform train } |> updateStory "platform", Cmd.none )
+                            ( { model | location = InStation } |> updateStory "platform", Cmd.none )
 
                         OnTrain train OutOfService ->
-                            ( { model | location = OnPlatform train } |> updateStory "platform", Cmd.none )
-
-                        _ ->
-                            noop model
-
-            EnterPlatform train ->
-                let
-                    currentStation =
-                        getCurrentStation model
-                in
-                    case model.location of
-                        InConnectingHalls ->
-                            ( { model | location = OnPlatform train }, Cmd.none )
-
-                        _ ->
-                            noop model
-
-            ExitPlatform ->
-                let
-                    currentStation =
-                        getCurrentStation model
-                in
-                    case model.location of
-                        OnPlatform _ ->
-                            ( { model | location = InConnectingHalls }, Cmd.none )
+                            ( { model | location = InStation } |> updateStory "platform", Cmd.none )
 
                         _ ->
                             noop model
@@ -403,15 +379,11 @@ update_ msg model =
                           }
                         , Cmd.batch
                             [ delay platformDelay LeaveStation
-                            , delay doorDelay SafeToExit
                             ]
                         )
 
                     _ ->
                         noop model
-
-            SafeToExit ->
-                ( { model | safeToExit = True }, Cmd.none )
 
             LeaveStation ->
                 let
@@ -427,7 +399,6 @@ update_ msg model =
                                 Just next ->
                                     ( { model
                                         | location = changeTrainStatus Moving model.location
-                                        , safeToExit = False
                                       }
                                     , delay transitDelay <| ArriveAtStation next
                                     )
@@ -454,14 +425,11 @@ subscriptions model =
 view : Model -> Html Msg
 view model =
     -- Debug.log (Subway.graphViz City.mapRedYellow ++ "\n") "Copy and paste in http://viz-js.com/" |> \_ ->
-    div [ class "game" ]
-        [ case model.titleCard of
-            Nothing ->
-                gameView model
-
-            Just title ->
-                titleCardView title
-        ]
+    div [ class "game" ] <|
+        List.filterMap identity
+            [ Just <| gameView model
+            , Maybe.map titleCardView model.titleCard
+            ]
 
 
 titleCardView : String -> Html Msg
@@ -478,26 +446,28 @@ gameView model =
         div []
             [ case model.location of
                 InStation ->
-                    text "In the station..."
-
-                OnPlatform train ->
-                    platformView
+                    stationView
                         currentStation
-                        train
                         (Subway.connections model.map (stationInfo currentStation |> .id))
-                        (Subway.nextStop model.map train (stationInfo currentStation |> .id))
                         model.storyLine
                         model.isIntro
 
                 OnTrain (( line, end ) as train) status ->
-                    trainView
+                    Views.Train.view
                         line
                         end
                         currentStation
                         (Subway.nextStop model.map train (stationInfo currentStation |> .id))
                         status
-                        model.safeToExit
+                        (case model.location of
+                            OnTrain _ Moving ->
+                                False
+
+                            _ ->
+                                True
+                        )
                         model.isIntro
+                        (model.day == Friday)
                         model.storyLine
 
                 InConnectingHalls ->
@@ -511,30 +481,11 @@ gameView model =
             ]
 
 
-platformView : Station -> Train -> List ( Line, Station ) -> Maybe Station -> Maybe String -> Bool -> Html Msg
-platformView station (( line, direction ) as train) connections nextStop storyLine isIntro =
+stationView : Station -> List ( Line, Station ) -> Maybe String -> Bool -> Html Msg
+stationView currentStation connections storyLine isIntro =
     let
-        storyEl =
-            case storyLine of
-                Just story ->
-                    [ div [ class "platform__story" ] [ storyView story isIntro ] ]
-
-                Nothing ->
-                    []
-
-        lineView =
-            let
-                lineInfo =
-                    City.lineInfo line
-            in
-                div [ class "platform__train", onClick BoardTrain ]
-                    [ div
-                        [ class "connection__number"
-                        , style [ ( "color", toColor lineInfo.color ), ( "borderColor", toColor lineInfo.color ) ]
-                        ]
-                        [ text <| toString lineInfo.number ]
-                    , div [ class "connection__direction" ] [ text <| "towards " ++ (stationInfo direction |> .name) ]
-                    ]
+        story storyLine =
+            div [ class "station__story" ] [ storyView storyLine isIntro ]
 
         connectionView (( line, end ) as connection) =
             let
@@ -542,7 +493,7 @@ platformView station (( line, direction ) as train) connections nextStop storyLi
                     City.lineInfo line
             in
                 div
-                    [ class "platform__line"
+                    [ class "station__line"
                     , style [ ( "color", toColor lineInfo.color ), ( "borderColor", toColor lineInfo.color ) ]
                     ]
                     [ text <| toString lineInfo.number ]
@@ -551,62 +502,57 @@ platformView station (( line, direction ) as train) connections nextStop storyLi
             lineInfo line |> .number
 
         exitView =
-            div [ class "platform__exit", onClick ExitPlatform ] <|
-                text "Exit & connections"
-                    :: (connections
-                            |> List.Extra.uniqueBy lineNumber
-                            |> List.sortBy lineNumber
-                            |> List.map connectionView
-                       )
-                    ++ [ arrowView station train ]
+            div [ class "station__connections", onClick PassTurnStyle ] <|
+                (connections
+                    |> List.Extra.uniqueBy lineNumber
+                    |> List.sortBy lineNumber
+                    |> List.map connectionView
+                )
+                    ++ [ arrowView 0 ]
     in
-        div [ class "platform" ] <|
-            storyEl
-                ++ [ div [ class "platform__platform_info" ] <|
-                        [ h2 [ class "platform__name" ] [ text (stationInfo station |> .name) ]
-                        , exitView
+        div [ class "station" ] <|
+            List.filterMap identity
+                [ Just <|
+                    div [ class "station__top" ] <|
+                        [ h2 [ class "station__name" ] [ text (stationInfo currentStation |> .name) ]
                         ]
-                            ++ case nextStop of
-                                Nothing ->
+                            ++ (if isIntro then
                                     []
+                                else
+                                    [ exitView ]
+                               )
+                , Maybe.map story storyLine
+                ]
 
-                                Just _ ->
-                                    [ lineView ]
-                   ]
 
-
-arrowView : Station -> ( Line, Station ) -> Html Msg
-arrowView station ( line, end ) =
-    let
-        lineName =
-            City.lineInfo line |> .name
-
-        endName =
-            City.stationInfo end |> .name
-
-        stationName =
-            City.stationInfo station |> .name
-
-        direction =
-            -- 45% from -90 to +90 (90 = up)
-            (FNV.hashString (stationName ++ lineName ++ endName) % 5) * 45 - 180
-    in
-        div
-            [ class "connection__arrow"
-            , style [ ( "transform", "rotate(" ++ toString direction ++ "deg)" ) ]
-            ]
-            [ text "→" ]
+arrowView : Int -> Html Msg
+arrowView direction =
+    div
+        [ class "connection__arrow"
+        , style [ ( "transform", "rotate(" ++ toString direction ++ "deg)" ) ]
+        ]
+        [ text "→" ]
 
 
 connectingHallsView : Station -> List ( Line, Station ) -> Html Msg
 connectingHallsView station connections =
     let
-        connectionView (( line, end ) as connection) =
+        stationName =
+            City.stationInfo station |> .name
+
+        connectionView (( line, end ) as train) =
             let
                 lineInfo =
                     City.lineInfo line
+
+                endName =
+                    City.stationInfo end |> .name
+
+                direction =
+                    -- 45% from -90 to +90 (90 = up)
+                    (FNV.hashString (stationName ++ lineInfo.name ++ endName) % 5) * 45 - 180
             in
-                li [ class "connection", onClick <| EnterPlatform connection ]
+                li [ class "connection", onClick <| BoardTrain train ]
                     [ div
                         [ class "connection__number"
                         , style [ ( "color", toColor lineInfo.color ), ( "borderColor", toColor lineInfo.color ) ]
@@ -614,15 +560,16 @@ connectingHallsView station connections =
                         [ text <| toString lineInfo.number ]
                     , div [ class "connection__direction" ]
                         [ text (stationInfo end |> .name) ]
-                    , arrowView station connection
+                    , arrowView direction
                     ]
     in
         div [ class "connecting_halls" ]
-            [ ul [ class "connections" ]
-                (connections
-                    |> List.sortBy (\( line, _ ) -> lineInfo line |> .number)
-                    |> List.map connectionView
-                )
+            [ ul [ class "connections" ] <|
+                h2 [ class "connecting_halls__station_name" ] [ text stationName ]
+                    :: (connections
+                            |> List.sortBy (\( line, _ ) -> lineInfo line |> .number)
+                            |> List.map connectionView
+                       )
             ]
 
 
@@ -639,71 +586,6 @@ storyView storyLine showContinue =
                         []
           )
         ]
-
-
-trainView : Line -> Station -> Station -> Maybe Station -> TrainStatus -> Bool -> Bool -> Maybe String -> Html Msg
-trainView line end currentStation nextStation status isStopped isIntro storyLine =
-    let
-        nextStop =
-            case ( status, nextStation ) of
-                ( Moving, Just next ) ->
-                    "Next stop: " ++ (stationInfo next |> .name)
-
-                ( Moving, Nothing ) ->
-                    "Out of service"
-
-                ( Stopped, Just next ) ->
-                    "Arriving at: " ++ (stationInfo currentStation |> .name)
-
-                ( Stopped, Nothing ) ->
-                    "End of the line: " ++ (stationInfo currentStation |> .name)
-
-                ( OutOfService, Just next ) ->
-                    "Out of service: " ++ (stationInfo currentStation |> .name)
-
-                ( OutOfService, Nothing ) ->
-                    "Out of service"
-
-        info =
-            (lineInfo line |> .name) ++ " towards " ++ (stationInfo end |> .name)
-
-        buttonClasses =
-            classList
-                [ ( "exit_button", True )
-                , ( "exit_button--active", isStopped )
-                ]
-
-        action =
-            if isStopped then
-                [ onClick ExitTrain ]
-            else
-                []
-
-        exitButton =
-            if isIntro then
-                []
-            else
-                [ div [ class "train__exit_button" ]
-                    [ button (buttonClasses :: action) [ text "Exit train" ]
-                    ]
-                ]
-
-        storyEl =
-            case storyLine of
-                Just storyLine ->
-                    [ div [ class "train__story" ] [ storyView storyLine isIntro ] ]
-
-                Nothing ->
-                    []
-    in
-        div [ class "platform" ] <|
-            storyEl
-                ++ [ div [ class "train__ticker" ]
-                        [ h4 [ class "train__info" ] [ text info ]
-                        , h3 [ class "train__next_stop" ] [ text nextStop ]
-                        ]
-                   ]
-                ++ exitButton
 
 
 mapView : String -> Html Msg

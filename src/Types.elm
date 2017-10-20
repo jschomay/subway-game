@@ -6,7 +6,7 @@ import City exposing (..)
 
 type alias Train =
     -- line and direction
-    ( City.Line, City.Station )
+    ( Line, Station )
 
 
 type Msg
@@ -14,12 +14,10 @@ type Msg
     | Loaded
     | Delay Time Msg
     | ToggleMap
-    | BoardTrain
-    | EnterPlatform Train
-    | ExitPlatform
+    | PassTurnStyle
+    | BoardTrain Train
     | ExitTrain
-    | ArriveAtStation City.Station
-    | SafeToExit
+    | ArriveAtStation Station
     | LeaveStation
     | RemoveTitleCard
     | Continue
@@ -32,7 +30,6 @@ type TrainStatus
 
 
 type Location
-    = OnPlatform Train
-    | OnTrain Train TrainStatus
+    = OnTrain Train TrainStatus
     | InStation
     | InConnectingHalls

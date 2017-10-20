@@ -9,6 +9,8 @@
 }
 
 .StoryLine__content {
+  max-width: 800px;
+  margin: auto;
   max-height: 0;
   overflow: hidden;
   animation: fadeIn 1s linear forwards,
