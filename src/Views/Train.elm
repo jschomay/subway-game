@@ -1,12 +1,12 @@
 module Views.Train exposing (view)
 
-import Types exposing (..)
 import City exposing (..)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Html.Keyed
 import Markdown
+import Types exposing (..)
 
 
 view : Line -> Station -> Station -> Maybe Station -> TrainStatus -> Bool -> Bool -> Bool -> Maybe String -> Html Msg
@@ -55,6 +55,7 @@ view line end currentStation nextStation status isStopped isIntro isFriday story
         action =
             if isStopped then
                 [ onClick ExitTrain ]
+
             else
                 []
 
@@ -76,6 +77,7 @@ view line end currentStation nextStation status isStopped isIntro isFriday story
                     ]
                         ++ (if isIntro then
                                 []
+
                             else
                                 [ button (buttonClasses :: action) [ text "Exit train" ]
                                 ]
@@ -89,13 +91,13 @@ view line end currentStation nextStation status isStopped isIntro isFriday story
         story storyLine =
             div [ class "train__story" ] [ storyView storyLine <| isIntro && not isFriday ]
     in
-        div [ class "train" ] <|
-            List.filterMap identity
-                [ Just backgroundTunnel
-                , Just backgroundStation
-                , Just foreground
-                , Maybe.map story storyLine
-                ]
+    div [ class "train" ] <|
+        List.filterMap identity
+            [ Just backgroundTunnel
+            , Just backgroundStation
+            , Just foreground
+            , Maybe.map story storyLine
+            ]
 
 
 storyView : String -> Bool -> Html Msg
@@ -105,9 +107,11 @@ storyView storyLine showContinue =
         [ ( storyLine
           , div [ class "StoryLine__content" ] <|
                 [ Markdown.toHtml [] storyLine ]
-                    ++ if showContinue then
-                        [ span [ class "StoryLine__continue", onClick Continue ] [ text "Continue..." ] ]
-                       else
-                        []
+                    ++ (if showContinue then
+                            [ span [ class "StoryLine__continue", onClick Continue ] [ text "Continue..." ] ]
+
+                        else
+                            []
+                       )
           )
         ]

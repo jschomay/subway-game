@@ -1,4 +1,4 @@
-module Narrative exposing (..)
+module Narrative exposing (fellAsleep, findANewWayPlatform, findANewWayTrain, gotToGetBackPlatform, gotToGetBackTrain, introPlatform, introTrain, outOfService)
 
 {-| The text that will show when the story first starts, before the player interacts with anythin.
 -}

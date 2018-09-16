@@ -1,8 +1,9 @@
 module Tests.Subway exposing (all)
 
-import Subway exposing (..)
-import ElmTest.Extra exposing (..)
 import Expect
+import Graph
+import Subway exposing (..)
+import Test exposing (..)
 
 
 type Line
@@ -32,6 +33,35 @@ stationToId station =
 
         WestEnd ->
             4
+
+
+stationToName : Station -> String
+stationToName station =
+    case station of
+        Central ->
+            "Central"
+
+        Market ->
+            "Market"
+
+        EastEnd ->
+            "EastEnd"
+
+        WestEnd ->
+            "WestEnd"
+
+
+lineToName : Line -> String
+lineToName line =
+    case line of
+        Red ->
+            "Red"
+
+        Green ->
+            "Green"
+
+        Blue ->
+            "Blue"
 
 
 stations : List Station
@@ -92,38 +122,46 @@ map =
 -}
 
 
-all : ElmTest.Extra.Test
+all : Test
 all =
+    let
+        graphViz =
+            Subway.graphViz
+                stationToName
+                lineToName
+                map
+                ++ "\n"
+
+        logGraphViz =
+            Debug.log graphViz "Copy and paste into http://viz-js.com/"
+    in
     describe "Subway"
         [ describe "init"
             [ test "correctly builds graph" <|
                 \() ->
-                    let
-                        x =
-                            Debug.log (Subway.graphViz map ++ "\n") "Copy and paste into http://viz-js.com/"
-                    in
-                        Expect.equal (Subway.graphViz map) """digraph G {
+                    Expect.equal graphViz """digraph G {
   rankdir=LR
   graph [nodesep=0.3, mindist=4]
   node [shape=box, style=rounded]
   edge [penwidth=2]
 
-  "Central" -> "Market" [label=<<FONT COLOR="Blue">EastEnd</FONT>>]
-  "Central" -> "EastEnd" [label=<<FONT COLOR="Green">EastEnd</FONT>>]
-  "Central" -> "WestEnd" [label=<<FONT COLOR="Green">WestEnd</FONT>>]
-  "Market" -> "Central" [label=<<FONT COLOR="Blue">Central</FONT>>]
-  "Market" -> "EastEnd" [label=<<FONT COLOR="Blue">EastEnd</FONT><BR/><FONT COLOR="Red">EastEnd</FONT>>]
-  "Market" -> "WestEnd" [label=<<FONT COLOR="Red">WestEnd</FONT>>]
-  "EastEnd" -> "Central" [label=<<FONT COLOR="Green">WestEnd</FONT>>]
-  "EastEnd" -> "Market" [label=<<FONT COLOR="Blue">Central</FONT><BR/><FONT COLOR="Red">WestEnd</FONT>>]
-  "WestEnd" -> "Central" [label=<<FONT COLOR="Green">EastEnd</FONT>>]
-  "WestEnd" -> "Market" [label=<<FONT COLOR="Red">EastEnd</FONT>>]
+  1 -> 2 [label="Blue"]
+  1 -> 3 [label="Green"]
+  1 -> 4 [label="Green"]
+  2 -> 1 [label="Blue"]
+  2 -> 3 [label="Blue / Red"]
+  2 -> 4 [label="Red"]
+  3 -> 1 [label="Green"]
+  3 -> 2 [label="Blue / Red"]
+  4 -> 1 [label="Green"]
+  4 -> 2 [label="Red"]
 
-  "Central"
-  "Market"
-  "EastEnd"
-  "WestEnd"
-}"""
+  1 [label="Central"]
+  2 [label="Market"]
+  3 [label="EastEnd"]
+  4 [label="WestEnd"]
+}
+"""
             ]
         , describe "connectingTrains"
             [ test "Central" <|

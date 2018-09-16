@@ -1,7 +1,7 @@
-module Components exposing (..)
+module Components exposing (Component(..), Components, Direction(..), Entity, Exits, addClassName, addComponent, addConnectingLocations, addDisplayInfo, addNarrative, addRuleData, entity, getClassName, getDisplayInfo, getExits, getNarrative, getRuleData)
 
-import Engine
 import Dict exposing (..)
+import Engine
 import List.Zipper as Zipper exposing (Zipper)
 
 
@@ -17,7 +17,7 @@ type alias Components =
 
 
 {-| These are all of the available components.
-You can add your own components and the data that goes with them as needed.  Be sure to implement adders and getters below as well.
+You can add your own components and the data that goes with them as needed. Be sure to implement adders and getters below as well.
 See the functions below for more info on specific components.
 -}
 type Component
@@ -61,7 +61,7 @@ addDisplayInfo name description =
     addComponent "displayInfo" <| DisplayInformation { name = name, description = description }
 
 
-{-| Add classes to your entities to do some custom styling, such as to change a background color or image based on the location, or to show an avatar in the story line when a character is talking.  You can write the styles in the `Theme/styles/story.css` file.
+{-| Add classes to your entities to do some custom styling, such as to change a background color or image based on the location, or to show an avatar in the story line when a character is talking. You can write the styles in the `Theme/styles/story.css` file.
 Note that the string that you specify will appear in different places in the theme, often in a BEM format, so you may need to inspect the DOM to find what you wish to style.
 -}
 addClassName : String -> Entity -> Entity
@@ -69,7 +69,7 @@ addClassName className =
     addComponent "className" <| ClassName className
 
 
-{-| This allows you to specify which locations are adjacent to the current location, and in what direction.  If you use this component, the view will show adjacent locations regardless of what locations have been added via the `addLocation` change world command from the Engine.
+{-| This allows you to specify which locations are adjacent to the current location, and in what direction. If you use this component, the view will show adjacent locations regardless of what locations have been added via the `addLocation` change world command from the Engine.
 You can change the Directions as needed.
 -}
 addConnectingLocations : List ( Direction, String ) -> Entity -> Entity
@@ -78,7 +78,7 @@ addConnectingLocations exits =
 
 
 {-| The Narrative component is intended only for rule entities.
-The narrative that you add to a rule will be shown when that rule matches.  If you give a list of strings, each time the rule matches, it will show the next narrative in the list, which is nice for adding variety and texture to your story.
+The narrative that you add to a rule will be shown when that rule matches. If you give a list of strings, each time the rule matches, it will show the next narrative in the list, which is nice for adding variety and texture to your story.
 -}
 addNarrative : List String -> Entity -> Entity
 addNarrative narrative =

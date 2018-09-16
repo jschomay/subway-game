@@ -1,7 +1,19 @@
-module City exposing (..)
+module City exposing
+    ( Line(..)
+    , LineInfo
+    , MapImage(..)
+    , Station(..)
+    , StationInfo
+    , lineInfo
+    , map
+    , mapImage
+    , redLine
+    , stationInfo
+    , yellowLine
+    )
 
-import Subway exposing (..)
 import Color exposing (..)
+import Subway exposing (..)
 
 
 type Line
@@ -135,8 +147,8 @@ map lines =
 
 
 mapImage : MapImage -> String
-mapImage map =
-    case map of
+mapImage m =
+    case m of
         RedMap ->
             """
 

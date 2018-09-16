@@ -1,27 +1,28 @@
-port module Main exposing (..)
+port module Main exposing (Day(..), Model, arrowView, changeTrainStatus, connectingHallsView, delay, findEntity, gameView, getCurrentStation, init, loaded, main, mapView, nextDay, noop, platformDelay, scriptedEvents, stationView, storyView, subscriptions, titleCardDelay, titleCardView, toColor, transitDelay, update, updateStory, update_, view)
 
+import City exposing (..)
+import Color
+import Components exposing (..)
+import Dict exposing (Dict)
 import Engine exposing (..)
-import Manifest
-import Rules
-import List.Extra
+import FNV
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Html.Keyed
-import Tuple
+import List.Extra
+import List.Zipper as Zipper exposing (Zipper)
+import Manifest
+import Markdown
 import Process
+import Rules
+import Subway
 import Task
 import Time exposing (Time)
+import Tuple
 import Types exposing (..)
-import Components exposing (..)
-import Dict exposing (Dict)
-import List.Zipper as Zipper exposing (Zipper)
-import Subway
-import Color
-import City exposing (..)
-import Markdown
-import FNV
 import Views.Train
+
 
 
 {- This is the kernel of the whole app.  It glues everything together and handles some logic such as choosing the correct narrative to display.
@@ -71,24 +72,24 @@ init =
                 , locations = List.map Tuple.first Manifest.locations
                 , characters = List.map Tuple.first Manifest.characters
                 }
-                (Dict.map (curry getRuleData) Rules.rules)
+                (Dict.map (\a b -> getRuleData ( a, b )) Rules.rules)
                 |> Engine.changeWorld Rules.startingState
     in
-        ( { engineModel = engineModel
-          , loaded = False
-          , storyLine = Nothing
-          , narrativeContent = Dict.map (curry getNarrative) Rules.rules
-          , map = City.map [ City.redLine ]
-          , mapImage = City.mapImage City.RedMap
-          , location = InStation
-          , isIntro = True
-          , titleCard = Just "Monday 6:03 AM"
-          , day = Monday
-          , showMap = False
-          }
-            |> updateStory "nextDay"
-        , delay titleCardDelay RemoveTitleCard
-        )
+    ( { engineModel = engineModel
+      , loaded = False
+      , storyLine = Nothing
+      , narrativeContent = Dict.map (\a b -> getNarrative ( a, b )) Rules.rules
+      , map = City.map [ City.redLine ]
+      , mapImage = City.mapImage City.RedMap
+      , location = InStation
+      , isIntro = True
+      , titleCard = Just "Monday 6:03 AM"
+      , day = Monday
+      , showMap = False
+      }
+        |> updateStory "nextDay"
+    , delay titleCardDelay RemoveTitleCard
+    )
 
 
 titleCardDelay : Time
@@ -134,11 +135,11 @@ updateStory interactableId model =
                 |> Maybe.map (\id -> Dict.update id updateNarrativeContent model.narrativeContent)
                 |> Maybe.withDefault model.narrativeContent
     in
-        { model
-            | engineModel = newEngineModel
-            , storyLine = narrativeForThisInteraction
-            , narrativeContent = updatedContent
-        }
+    { model
+        | engineModel = newEngineModel
+        , storyLine = narrativeForThisInteraction
+        , narrativeContent = updatedContent
+    }
 
 
 nextDay : Day -> { titleCard : String, day : Day }
@@ -187,11 +188,12 @@ changeTrainStatus newStatus status =
 
 {-| Use when you need to manually change the Model outside of the normal subway mechanics.
 
-   Tip: use the event name as a discrete string for updateStory, then you can set the scene, location, etc of the EngineModel via the usual Engine rules instead of with Engine.changeWorld
+Tip: use the event name as a discrete string for updateStory, then you can set the scene, location, etc of the EngineModel via the usual Engine rules instead of with Engine.changeWorld
 
-   ** Don't forget to call `updateStory` to get the right narrative based on your changes, but be careful not to call it twice (if it was already called in `update`)
+\*\* Don't forget to call `updateStory` to get the right narrative based on your changes, but be careful not to call it twice (if it was already called in `update`)
 
-   ** Dont' forget to pass through or batch in the cmd if unless you know you want to cancel it
+\*\* Dont' forget to pass through or batch in the cmd if unless you know you want to cancel it
+
 -}
 scriptedEvents : Msg -> ( Model, Cmd Msg ) -> ( Model, Cmd Msg )
 scriptedEvents msg ( model, cmd ) =
@@ -243,6 +245,7 @@ scriptedEvents msg ( model, cmd ) =
                     |> updateStory "fallAsleep"
                 , delay 4000 RemoveTitleCard
                 )
+
             else
                 ( model, cmd )
 
@@ -280,6 +283,7 @@ update_ msg model =
     if Engine.getEnding model.engineModel /= Nothing then
         -- no-op if story has ended
         noop model
+
     else
         case msg of
             Interact interactableId ->
@@ -319,12 +323,12 @@ update_ msg model =
                     currentStation =
                         getCurrentStation model
                 in
-                    case model.location of
-                        InStation ->
-                            ( { model | location = InConnectingHalls }, Cmd.none )
+                case model.location of
+                    InStation ->
+                        ( { model | location = InConnectingHalls }, Cmd.none )
 
-                        _ ->
-                            noop model
+                    _ ->
+                        noop model
 
             BoardTrain train ->
                 case model.location of
@@ -341,12 +345,12 @@ update_ msg model =
                                     Just station ->
                                         delay 0 <| LeaveStation
                         in
-                            ( { model
-                                | location = OnTrain train Stopped
-                              }
-                                |> updateStory "train"
-                            , cmd
-                            )
+                        ( { model
+                            | location = OnTrain train Stopped
+                          }
+                            |> updateStory "train"
+                        , cmd
+                        )
 
                     _ ->
                         noop model
@@ -356,15 +360,15 @@ update_ msg model =
                     currentStation =
                         getCurrentStation model
                 in
-                    case model.location of
-                        OnTrain train Stopped ->
-                            ( { model | location = InStation } |> updateStory "platform", Cmd.none )
+                case model.location of
+                    OnTrain train Stopped ->
+                        ( { model | location = InStation } |> updateStory "platform", Cmd.none )
 
-                        OnTrain train OutOfService ->
-                            ( { model | location = InStation } |> updateStory "platform", Cmd.none )
+                    OnTrain train OutOfService ->
+                        ( { model | location = InStation } |> updateStory "platform", Cmd.none )
 
-                        _ ->
-                            noop model
+                    _ ->
+                        noop model
 
             ArriveAtStation newStation ->
                 case model.location of
@@ -390,21 +394,21 @@ update_ msg model =
                     currentStation =
                         getCurrentStation model
                 in
-                    case model.location of
-                        OnTrain train Stopped ->
-                            case Subway.nextStop model.map train (stationInfo currentStation |> .id) of
-                                Nothing ->
-                                    noop model
+                case model.location of
+                    OnTrain train Stopped ->
+                        case Subway.nextStop model.map train (stationInfo currentStation |> .id) of
+                            Nothing ->
+                                noop model
 
-                                Just next ->
-                                    ( { model
-                                        | location = changeTrainStatus Moving model.location
-                                      }
-                                    , delay transitDelay <| ArriveAtStation next
-                                    )
+                            Just next ->
+                                ( { model
+                                    | location = changeTrainStatus Moving model.location
+                                  }
+                                , delay transitDelay <| ArriveAtStation next
+                                )
 
-                        _ ->
-                            noop model
+                    _ ->
+                        noop model
 
 
 delay : Time -> Msg -> Cmd Msg
@@ -443,42 +447,43 @@ gameView model =
         currentStation =
             getCurrentStation model
     in
-        div []
-            [ case model.location of
-                InStation ->
-                    stationView
-                        currentStation
-                        (Subway.connections model.map (stationInfo currentStation |> .id))
-                        model.storyLine
-                        model.isIntro
+    div []
+        [ case model.location of
+            InStation ->
+                stationView
+                    currentStation
+                    (Subway.connections model.map (stationInfo currentStation |> .id))
+                    model.storyLine
+                    model.isIntro
 
-                OnTrain (( line, end ) as train) status ->
-                    Views.Train.view
-                        line
-                        end
-                        currentStation
-                        (Subway.nextStop model.map train (stationInfo currentStation |> .id))
-                        status
-                        (case model.location of
-                            OnTrain _ Moving ->
-                                False
+            OnTrain (( line, end ) as train) status ->
+                Views.Train.view
+                    line
+                    end
+                    currentStation
+                    (Subway.nextStop model.map train (stationInfo currentStation |> .id))
+                    status
+                    (case model.location of
+                        OnTrain _ Moving ->
+                            False
 
-                            _ ->
-                                True
-                        )
-                        model.isIntro
-                        (model.day == Friday)
-                        model.storyLine
+                        _ ->
+                            True
+                    )
+                    model.isIntro
+                    (model.day == Friday)
+                    model.storyLine
 
-                InConnectingHalls ->
-                    connectingHallsView
-                        currentStation
-                        (Subway.connections model.map (stationInfo currentStation |> .id))
-            , if model.showMap then
-                mapView model.mapImage
-              else
-                div [ onClick ToggleMap, class "map_toggle" ] [ text "Map" ]
-            ]
+            InConnectingHalls ->
+                connectingHallsView
+                    currentStation
+                    (Subway.connections model.map (stationInfo currentStation |> .id))
+        , if model.showMap then
+            mapView model.mapImage
+
+          else
+            div [ onClick ToggleMap, class "map_toggle" ] [ text "Map" ]
+        ]
 
 
 stationView : Station -> List ( Line, Station ) -> Maybe String -> Bool -> Html Msg
@@ -492,11 +497,12 @@ stationView currentStation connections storyLine isIntro =
                 lineInfo =
                     City.lineInfo line
             in
-                div
-                    [ class "station__line"
-                    , style [ ( "color", toColor lineInfo.color ), ( "borderColor", toColor lineInfo.color ) ]
-                    ]
-                    [ text <| toString lineInfo.number ]
+            div
+                [ class "station__line"
+                , style "color" (toColor lineInfo.color)
+                , style "borderColor" (toColor lineInfo.color)
+                ]
+                [ text <| toString lineInfo.number ]
 
         lineNumber ( line, _ ) =
             lineInfo line |> .number
@@ -510,26 +516,27 @@ stationView currentStation connections storyLine isIntro =
                 )
                     ++ [ arrowView 0 ]
     in
-        div [ class "station" ] <|
-            List.filterMap identity
-                [ Just <|
-                    div [ class "station__top" ] <|
-                        [ h2 [ class "station__name" ] [ text (stationInfo currentStation |> .name) ]
-                        ]
-                            ++ (if isIntro then
-                                    []
-                                else
-                                    [ exitView ]
-                               )
-                , Maybe.map story storyLine
-                ]
+    div [ class "station" ] <|
+        List.filterMap identity
+            [ Just <|
+                div [ class "station__top" ] <|
+                    [ h2 [ class "station__name" ] [ text (stationInfo currentStation |> .name) ]
+                    ]
+                        ++ (if isIntro then
+                                []
+
+                            else
+                                [ exitView ]
+                           )
+            , Maybe.map story storyLine
+            ]
 
 
 arrowView : Int -> Html Msg
 arrowView direction =
     div
         [ class "connection__arrow"
-        , style [ ( "transform", "rotate(" ++ toString direction ++ "deg)" ) ]
+        , style "transform" ("rotate(" ++ toString direction ++ "deg)")
         ]
         [ text "→" ]
 
@@ -550,27 +557,28 @@ connectingHallsView station connections =
 
                 direction =
                     -- 45% from -90 to +90 (90 = up)
-                    (FNV.hashString (stationName ++ lineInfo.name ++ endName) % 5) * 45 - 180
+                    (modBy 5 (FNV.hashString (stationName ++ lineInfo.name ++ endName))) * 45 - 180
             in
-                li [ class "connection", onClick <| BoardTrain train ]
-                    [ div
-                        [ class "connection__number"
-                        , style [ ( "color", toColor lineInfo.color ), ( "borderColor", toColor lineInfo.color ) ]
-                        ]
-                        [ text <| toString lineInfo.number ]
-                    , div [ class "connection__direction" ]
-                        [ text (stationInfo end |> .name) ]
-                    , arrowView direction
+            li [ class "connection", onClick <| BoardTrain train ]
+                [ div
+                    [ class "connection__number"
+                    , style "color" (toColor lineInfo.color)
+                    , style "borderColor" (toColor lineInfo.color)
                     ]
+                    [ text <| toString lineInfo.number ]
+                , div [ class "connection__direction" ]
+                    [ text (stationInfo end |> .name) ]
+                , arrowView direction
+                ]
     in
-        div [ class "connecting_halls" ]
-            [ ul [ class "connections" ] <|
-                h2 [ class "connecting_halls__station_name" ] [ text stationName ]
-                    :: (connections
-                            |> List.sortBy (\( line, _ ) -> lineInfo line |> .number)
-                            |> List.map connectionView
-                       )
-            ]
+    div [ class "connecting_halls" ]
+        [ ul [ class "connections" ] <|
+            h2 [ class "connecting_halls__station_name" ] [ text stationName ]
+                :: (connections
+                        |> List.sortBy (\( line, _ ) -> lineInfo line |> .number)
+                        |> List.map connectionView
+                   )
+        ]
 
 
 storyView : String -> Bool -> Html Msg
@@ -580,10 +588,12 @@ storyView storyLine showContinue =
         [ ( storyLine
           , div [ class "StoryLine__content" ] <|
                 [ Markdown.toHtml [] storyLine ]
-                    ++ if showContinue then
-                        [ span [ class "StoryLine__continue", onClick Continue ] [ text "Continue..." ] ]
-                       else
-                        []
+                    ++ (if showContinue then
+                            [ span [ class "StoryLine__continue", onClick Continue ] [ text "Continue..." ] ]
+
+                        else
+                            []
+                       )
           )
         ]
 
@@ -591,7 +601,7 @@ storyView storyLine showContinue =
 mapView : String -> Html Msg
 mapView mapImage =
     div [ onClick ToggleMap, class "map" ]
-        [ pre [ class "map__image", style [ ( "fontFamily", "monospace" ) ] ]
+        [ pre [ class "map__image", style "fontFamily" "monospace" ]
             [ text <| mapImage ]
         ]
 
@@ -599,4 +609,4 @@ mapView mapImage =
 toColor : Color.Color -> String
 toColor color =
     Color.toRgb color
-        |> \{ red, green, blue } -> "rgb(" ++ toString red ++ "," ++ toString green ++ "," ++ toString blue ++ ")"
+        |> (\{ red, green, blue } -> "rgb(" ++ toString red ++ "," ++ toString green ++ "," ++ toString blue ++ ")")

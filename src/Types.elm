@@ -1,7 +1,7 @@
-module Types exposing (..)
+module Types exposing (Location(..), Msg(..), Train, TrainStatus(..))
 
-import Time exposing (Time)
 import City exposing (..)
+import Time exposing (Time)
 
 
 type alias Train =
