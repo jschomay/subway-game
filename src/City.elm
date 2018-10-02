@@ -4,6 +4,7 @@ module City exposing
     , MapImage(..)
     , Station(..)
     , StationInfo
+    , fullMap
     , lineInfo
     , map
     , mapImage
@@ -139,6 +140,11 @@ yellowLine =
       , MacArthursPark
       ]
     )
+
+
+fullMap : Map Station Line
+fullMap =
+    map [ redLine, yellowLine ]
 
 
 map : List ( Line, List Station ) -> Map Station Line

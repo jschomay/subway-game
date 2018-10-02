@@ -24,8 +24,8 @@ rule id ruleData narrative =
 
 
 station : Station -> String
-station station =
-    station |> stationInfo |> .id |> toString
+station station_ =
+    station_ |> stationInfo |> .id |> String.fromInt
 
 
 {-| All of the rules that govern your story. The first parameter to `rule` is an id for that rule. It must be unique, but generally isn't used directly anywhere else (though it gets returned from `Engine.update`, so you could do some special behavior if a specific rule matches). I like to write a short summary of what the rule is for as the id to help me easily identify them.

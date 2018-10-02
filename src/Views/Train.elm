@@ -5,8 +5,8 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Html.Keyed
+import LocalTypes exposing (..)
 import Markdown
-import Types exposing (..)
 
 
 view : Line -> Station -> Station -> Maybe Station -> TrainStatus -> Bool -> Bool -> Bool -> Maybe String -> Html Msg
@@ -88,8 +88,8 @@ view line end currentStation nextStation status isStopped isIntro isFriday story
                     ]
                 ]
 
-        story storyLine =
-            div [ class "train__story" ] [ storyView storyLine <| isIntro && not isFriday ]
+        story storyLine_ =
+            div [ class "train__story" ] [ storyView storyLine_ <| isIntro && not isFriday ]
     in
     div [ class "train" ] <|
         List.filterMap identity

@@ -5,12 +5,13 @@ require( './styles/subway.css' );
 require( './styles/game.css' );
 
 // inject bundled Elm app
-var Elm = require( './Main' );
-var app = Elm.Main.fullscreen();
+const { Elm } = require('./Main.elm');
+const app = Elm.Main.init({
+  node: document.getElementById('main')
+});
 
 
-// automatically set images to load through webpack manifest loader
-var imagesToLoad = require("json!manifest?config=images!../preload.json");
+var imagesToLoad = require.context('./img/', true, /\.*$/).keys()
 
 
 // start app right away if we don't need to load anything
@@ -32,7 +33,7 @@ function assetLoaded() {
 
 function loadImage(path) {
   var img = new Image();
-  img.src = path;
+  img.src = "img/" + path;
   img.onload = assetLoaded;
   return img;
 }

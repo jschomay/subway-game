@@ -1,26 +1,55 @@
-port module Main exposing (Day(..), Model, arrowView, changeTrainStatus, connectingHallsView, delay, findEntity, gameView, getCurrentStation, init, loaded, main, mapView, nextDay, noop, platformDelay, scriptedEvents, stationView, storyView, subscriptions, titleCardDelay, titleCardView, toColor, transitDelay, update, updateStory, update_, view)
+port module Main exposing
+    ( Day(..)
+    , Model
+    , arrowView
+    , changeTrainStatus
+    , connectingHallsView
+    , delay
+    , findEntity
+    , gameView
+    , getCurrentStation
+    , init
+    , loaded
+    , main
+    , mapView
+    , nextDay
+    , noop
+    , platformDelay
+    , scriptedEvents
+    , stationView
+    , storyView
+    , subscriptions
+    , titleCardDelay
+    , titleCardView
+    , toColor
+    , transitDelay
+    , update
+    , updateStory
+    , update_
+    , view
+    )
 
+import Browser
 import City exposing (..)
 import Color
 import Components exposing (..)
 import Dict exposing (Dict)
 import Engine exposing (..)
-import FNV
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Html.Keyed
 import List.Extra
 import List.Zipper as Zipper exposing (Zipper)
+import LocalTypes exposing (..)
 import Manifest
 import Markdown
+import Murmur3
 import Process
 import Rules
 import Subway
 import Task
-import Time exposing (Time)
 import Tuple
-import Types exposing (..)
 import Views.Train
 
 
@@ -30,11 +59,15 @@ import Views.Train
 -}
 
 
-main : Program Never Model Msg
+type alias Flags =
+    {}
+
+
+main : Program Flags Model Msg
 main =
-    Html.program
-        { init = init
-        , view = view
+    Browser.document
+        { init = always init
+        , view = \model -> { title = "Subway!", body = [ view model ] }
         , update = update
         , subscriptions = subscriptions
         }
@@ -92,17 +125,17 @@ init =
     )
 
 
-titleCardDelay : Time
+titleCardDelay : Float
 titleCardDelay =
     1 * 1000
 
 
-transitDelay : Time
+transitDelay : Float
 transitDelay =
     7 * 1000
 
 
-platformDelay : Time
+platformDelay : Float
 platformDelay =
     5 * 1000
 
@@ -179,7 +212,7 @@ noop model =
 changeTrainStatus : TrainStatus -> Location -> Location
 changeTrainStatus newStatus status =
     case status of
-        OnTrain train status ->
+        OnTrain train _ ->
             OnTrain train newStatus
 
         other ->
@@ -267,7 +300,6 @@ getCurrentStation : Model -> Station
 getCurrentStation model =
     Engine.getCurrentLocation model.engineModel
         |> String.toInt
-        |> Result.toMaybe
         |> Maybe.andThen (Subway.getStation model.map)
         |> Maybe.withDefault WestMulberry
 
@@ -296,9 +328,9 @@ update_ msg model =
                 , Cmd.none
                 )
 
-            Delay duration msg ->
+            Delay duration delayedMsg ->
                 ( model
-                , Task.perform (always msg) <| Process.sleep duration
+                , Task.perform (always delayedMsg) <| Process.sleep duration
                 )
 
             Continue ->
@@ -378,7 +410,7 @@ update_ msg model =
                             , engineModel =
                                 -- this is the only place there should be an Engine.changeWorld call to set the location
                                 Engine.changeWorld
-                                    [ Engine.moveTo (newStation |> stationInfo |> .id |> toString) ]
+                                    [ Engine.moveTo (newStation |> stationInfo |> .id |> String.fromInt) ]
                                     model.engineModel
                           }
                         , Cmd.batch
@@ -411,7 +443,7 @@ update_ msg model =
                         noop model
 
 
-delay : Time -> Msg -> Cmd Msg
+delay : Float -> Msg -> Cmd Msg
 delay duration msg =
     Task.perform (always msg) <| Process.sleep duration
 
@@ -428,7 +460,10 @@ subscriptions model =
 
 view : Model -> Html Msg
 view model =
-    -- Debug.log (Subway.graphViz City.mapRedYellow ++ "\n") "Copy and paste in http://viz-js.com/" |> \_ ->
+    -- let
+    --     showTheMap =
+    --         Debug.log (Subway.graphViz (stationInfo >> .name) (lineInfo >> .name) City.fullMap ++ "\n") "Copy and paste in http://viz-js.com/"
+    -- in
     div [ class "game" ] <|
         List.filterMap identity
             [ Just <| gameView model
@@ -489,8 +524,8 @@ gameView model =
 stationView : Station -> List ( Line, Station ) -> Maybe String -> Bool -> Html Msg
 stationView currentStation connections storyLine isIntro =
     let
-        story storyLine =
-            div [ class "station__story" ] [ storyView storyLine isIntro ]
+        story storyLine_ =
+            div [ class "station__story" ] [ storyView storyLine_ isIntro ]
 
         connectionView (( line, end ) as connection) =
             let
@@ -502,7 +537,7 @@ stationView currentStation connections storyLine isIntro =
                 , style "color" (toColor lineInfo.color)
                 , style "borderColor" (toColor lineInfo.color)
                 ]
-                [ text <| toString lineInfo.number ]
+                [ text <| String.fromInt lineInfo.number ]
 
         lineNumber ( line, _ ) =
             lineInfo line |> .number
@@ -536,7 +571,7 @@ arrowView : Int -> Html Msg
 arrowView direction =
     div
         [ class "connection__arrow"
-        , style "transform" ("rotate(" ++ toString direction ++ "deg)")
+        , style "transform" ("rotate(" ++ String.fromInt direction ++ "deg)")
         ]
         [ text "→" ]
 
@@ -556,8 +591,8 @@ connectingHallsView station connections =
                     City.stationInfo end |> .name
 
                 direction =
-                    -- 45% from -90 to +90 (90 = up)
-                    (modBy 5 (FNV.hashString (stationName ++ lineInfo.name ++ endName))) * 45 - 180
+                    -- 45deg from -90 to +90 (90 = up)
+                    modBy 5 (Murmur3.hashString 1234 (stationName ++ lineInfo.name ++ endName)) * 45 - 180
             in
             li [ class "connection", onClick <| BoardTrain train ]
                 [ div
@@ -565,7 +600,7 @@ connectingHallsView station connections =
                     , style "color" (toColor lineInfo.color)
                     , style "borderColor" (toColor lineInfo.color)
                     ]
-                    [ text <| toString lineInfo.number ]
+                    [ text <| String.fromInt lineInfo.number ]
                 , div [ class "connection__direction" ]
                     [ text (stationInfo end |> .name) ]
                 , arrowView direction
@@ -609,4 +644,4 @@ mapView mapImage =
 toColor : Color.Color -> String
 toColor color =
     Color.toRgb color
-        |> (\{ red, green, blue } -> "rgb(" ++ toString red ++ "," ++ toString green ++ "," ++ toString blue ++ ")")
+        |> (\{ red, green, blue } -> "rgb(" ++ String.fromInt red ++ "," ++ String.fromInt green ++ "," ++ String.fromInt blue ++ ")")

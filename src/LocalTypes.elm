@@ -1,7 +1,11 @@
-module Types exposing (Location(..), Msg(..), Train, TrainStatus(..))
+module LocalTypes exposing
+    ( Location(..)
+    , Msg(..)
+    , Train
+    , TrainStatus(..)
+    )
 
 import City exposing (..)
-import Time exposing (Time)
 
 
 type alias Train =
@@ -12,7 +16,7 @@ type alias Train =
 type Msg
     = Interact String
     | Loaded
-    | Delay Time Msg
+    | Delay Float Msg
     | ToggleMap
     | PassTurnStyle
     | BoardTrain Train
