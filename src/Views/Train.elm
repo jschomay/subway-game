@@ -9,28 +9,12 @@ import LocalTypes exposing (..)
 import Markdown
 
 
-view : Line -> Station -> Station -> Maybe Station -> TrainStatus -> Bool -> Bool -> Bool -> Maybe String -> Html Msg
-view line end currentStation nextStation status isStopped isIntro isFriday storyLine =
+view : Line -> Station -> Station -> TrainStatus -> Bool -> Bool -> Bool -> Maybe String -> Html Msg
+view line end currentStation status isStopped isIntro isFriday storyLine =
     let
         nextStop =
-            case ( status, nextStation ) of
-                ( Moving, Just next ) ->
-                    "Next stop: " ++ (stationInfo next |> .name)
-
-                ( Moving, Nothing ) ->
-                    "Out of service"
-
-                ( Stopped, Just next ) ->
-                    "Arriving at: " ++ (stationInfo currentStation |> .name)
-
-                ( Stopped, Nothing ) ->
-                    "End of the line: " ++ (stationInfo currentStation |> .name)
-
-                ( OutOfService, Just next ) ->
-                    "Out of service: " ++ (stationInfo currentStation |> .name)
-
-                ( OutOfService, Nothing ) ->
-                    "Out of service"
+            -- TODO update for new mechanics (need to know desired station)
+            "Arriving at: " ++ (stationInfo currentStation |> .name)
 
         info =
             (lineInfo line |> .name) ++ " towards " ++ (stationInfo end |> .name)

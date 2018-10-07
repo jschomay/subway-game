@@ -115,8 +115,8 @@ init =
       , map = City.map [ City.redLine ]
       , mapImage = City.mapImage City.RedMap
       , location = InStation
-      , isIntro = True
-      , titleCard = Just "Monday 6:03 AM"
+      , isIntro = False
+      , titleCard = Nothing
       , day = Monday
       , showMap = False
       }
@@ -307,7 +307,11 @@ getCurrentStation model =
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     update_ msg model
-        |> scriptedEvents msg
+
+
+
+-- TODO put back after adjusting train mechanics if needed
+-- |> scriptedEvents msg
 
 
 update_ : Msg -> Model -> ( Model, Cmd Msg )
@@ -370,12 +374,8 @@ update_ msg model =
                                 getCurrentStation model
 
                             cmd =
-                                case Subway.nextStop model.map train (stationInfo currentStation |> .id) of
-                                    Nothing ->
-                                        Cmd.none
-
-                                    Just station ->
-                                        delay 0 <| LeaveStation
+                                -- TODO update for new mechanics of navigation...
+                                delay 0 <| LeaveStation
                         in
                         ( { model
                             | location = OnTrain train Stopped
@@ -427,17 +427,13 @@ update_ msg model =
                         getCurrentStation model
                 in
                 case model.location of
+                    -- TODO needs to be updated with new navigation mechanic
                     OnTrain train Stopped ->
-                        case Subway.nextStop model.map train (stationInfo currentStation |> .id) of
-                            Nothing ->
-                                noop model
-
-                            Just next ->
-                                ( { model
-                                    | location = changeTrainStatus Moving model.location
-                                  }
-                                , delay transitDelay <| ArriveAtStation next
-                                )
+                        ( { model
+                            | location = changeTrainStatus Moving model.location
+                          }
+                        , Cmd.none
+                        )
 
                     _ ->
                         noop model
@@ -481,22 +477,33 @@ gameView model =
     let
         currentStation =
             getCurrentStation model
+
+        stationToId station =
+            stationInfo station |> .id
+
+        lineToId line =
+            lineInfo line |> .number
+
+        config =
+            { stationToId = stationToId
+            , lineToId = lineToId
+            }
     in
     div []
         [ case model.location of
             InStation ->
                 stationView
                     currentStation
-                    (Subway.connections model.map (stationInfo currentStation |> .id))
+                    (Subway.connections config model.map currentStation)
                     model.storyLine
                     model.isIntro
 
             OnTrain (( line, end ) as train) status ->
+                -- TODO update to pass in desired stop
                 Views.Train.view
                     line
                     end
                     currentStation
-                    (Subway.nextStop model.map train (stationInfo currentStation |> .id))
                     status
                     (case model.location of
                         OnTrain _ Moving ->
@@ -512,7 +519,7 @@ gameView model =
             InConnectingHalls ->
                 connectingHallsView
                     currentStation
-                    (Subway.connections model.map (stationInfo currentStation |> .id))
+                    (Subway.connections config model.map currentStation)
         , if model.showMap then
             mapView model.mapImage
 
@@ -521,13 +528,13 @@ gameView model =
         ]
 
 
-stationView : Station -> List ( Line, Station ) -> Maybe String -> Bool -> Html Msg
+stationView : Station -> List Line -> Maybe String -> Bool -> Html Msg
 stationView currentStation connections storyLine isIntro =
     let
         story storyLine_ =
             div [ class "station__story" ] [ storyView storyLine_ isIntro ]
 
-        connectionView (( line, end ) as connection) =
+        connectionView line =
             let
                 lineInfo =
                     City.lineInfo line
@@ -539,7 +546,7 @@ stationView currentStation connections storyLine isIntro =
                 ]
                 [ text <| String.fromInt lineInfo.number ]
 
-        lineNumber ( line, _ ) =
+        lineNumber line =
             lineInfo line |> .number
 
         exitView =
@@ -549,7 +556,8 @@ stationView currentStation connections storyLine isIntro =
                     |> List.sortBy lineNumber
                     |> List.map connectionView
                 )
-                    ++ [ arrowView 0 ]
+
+        -- [ text "To Trains", arrowView 0 ]
     in
     div [ class "station" ] <|
         List.filterMap identity
@@ -576,41 +584,38 @@ arrowView direction =
         [ text "→" ]
 
 
-connectingHallsView : Station -> List ( Line, Station ) -> Html Msg
+connectingHallsView : Station -> List Line -> Html Msg
 connectingHallsView station connections =
     let
         stationName =
             City.stationInfo station |> .name
 
-        connectionView (( line, end ) as train) =
+        connectionView line =
             let
                 lineInfo =
                     City.lineInfo line
 
-                endName =
-                    City.stationInfo end |> .name
-
                 direction =
                     -- 45deg from -90 to +90 (90 = up)
-                    modBy 5 (Murmur3.hashString 1234 (stationName ++ lineInfo.name ++ endName)) * 45 - 180
+                    modBy 5 (Murmur3.hashString 1234 (stationName ++ lineInfo.name)) * 45 - 180
             in
-            li [ class "connection", onClick <| BoardTrain train ]
+            li [ class "connection" ]
                 [ div
                     [ class "connection__number"
                     , style "color" (toColor lineInfo.color)
                     , style "borderColor" (toColor lineInfo.color)
                     ]
                     [ text <| String.fromInt lineInfo.number ]
-                , div [ class "connection__direction" ]
-                    [ text (stationInfo end |> .name) ]
                 , arrowView direction
                 ]
+
+        -- TODO need line map(s) instead of connections
     in
     div [ class "connecting_halls" ]
         [ ul [ class "connections" ] <|
             h2 [ class "connecting_halls__station_name" ] [ text stationName ]
                 :: (connections
-                        |> List.sortBy (\( line, _ ) -> lineInfo line |> .number)
+                        |> List.sortBy (lineInfo >> .number)
                         |> List.map connectionView
                    )
         ]

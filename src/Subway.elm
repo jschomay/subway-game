@@ -4,8 +4,9 @@ module Subway exposing
     , getStation
     , graphViz
     , init
-    , nextStop
     )
+
+-- TODO will need to add `line -> all serviced stations` (maybe with connections at each station?) used to make the line map to choose which station to go to
 
 import Dict
 import Graph exposing (..)
@@ -14,12 +15,15 @@ import IntDict
 import List.Extra as List
 
 
-type Map station line
-    = Map (Graph station (Connection line station))
+type
+    Map stationId lineId
+    -- the edge lables hold all of the "overlapping" lines between 2 stations
+    = Map (Graph stationId (List lineId))
 
 
-type alias Connection line station =
-    List ( line, station )
+type alias StationsAlongLine lineId stationId =
+    -- all of the stations connected by a line
+    ( lineId, List stationId )
 
 
 
@@ -31,51 +35,43 @@ type alias Connection line station =
 init :
     (station -> Int)
     -> List station
-    -> List ( line, List station )
+    -> List (StationsAlongLine line station)
     -> Map station line
 init stationToId stations lines =
     let
+        -- TODO derive stations from lines
         toNode station =
             Node (stationToId station) station
 
-        toEdge : station -> station -> line -> station -> Edge ( line, station )
-        toEdge from to line direction =
-            Edge (stationToId from) (stationToId to) ( line, direction )
+        lineToEdges : StationsAlongLine line station -> List (Edge line)
+        lineToEdges ( line, stops ) =
+            let
+                makeEdge currentStop ( maybePreviousStop, acc ) =
+                    case maybePreviousStop of
+                        Nothing ->
+                            ( Just currentStop, acc )
 
-        buildEdges : ( line, List station ) -> List (Edge ( line, station ))
-        buildEdges ( line, stops ) =
-            case List.last stops of
-                Nothing ->
-                    []
+                        Just previousStop ->
+                            ( Just currentStop, Edge previousStop currentStop line :: acc )
+            in
+            stops
+                |> List.map stationToId
+                |> List.foldl makeEdge ( Nothing, [] )
+                |> Tuple.second
 
-                Just finalStop ->
-                    let
-                        makeEdge currentStop ( maybePreviousStop, acc ) =
-                            case maybePreviousStop of
-                                Nothing ->
-                                    ( Just currentStop, acc )
-
-                                Just previousStop ->
-                                    ( Just currentStop, toEdge previousStop currentStop line finalStop :: acc )
-                    in
-                    List.foldl makeEdge ( Nothing, [] ) stops
-                        |> Tuple.second
-
-        goBothDirections : ( line, List station ) -> List ( line, List station )
-        goBothDirections ( line, stops ) =
-            [ ( line, stops ), ( line, List.reverse stops ) ]
-
-        mergedLines :
-            List ( line, List station )
-            -> List (Edge (Connection line station))
-        mergedLines lines_ =
+        makeEdges :
+            List (StationsAlongLine line station)
+            -> List (Edge (List line))
+        makeEdges lines_ =
             lines_
-                |> List.concatMap goBothDirections
-                |> List.concatMap buildEdges
+                |> List.concatMap lineToEdges
+                -- would be done here, but different lines might connect the same 2 stations, so we need to "merge" overlapping edges
                 |> List.sortWith ordEdge
-                |> List.groupWhile eqEdge
-                |> List.map (\( h, t ) -> h :: t)
-                |> List.concatMap (List.foldl mergeEdges [])
+                -- |> List.groupWhile eqEdge
+                -- groupWhile returns a "non-empty list" which looks like `(a, List a)`, so we need to turn that into a "normal" list
+                -- |> List.map (\( h, t ) -> h :: t)
+                -- |> List.concatMap (List.foldl mergeEdges [])
+                |> List.foldl mergeEdges []
 
         ordEdge a b =
             if a.from == b.from then
@@ -87,19 +83,39 @@ init stationToId stations lines =
         eqEdge a b =
             a.from == b.from && a.to == b.to
 
-        -- mergeEdges :
-        --     Edge (line, station)
-        --     -> List (Edge (line, station))
-        --     -> List (Edge (line, station))
-        mergeEdges new merged =
-            case merged of
+        mergeEdges :
+            Edge line
+            -> List (Edge (List line))
+            -> List (Edge (List line))
+        mergeEdges newEdge acc =
+            -- if the edge connecs the same stations as the previous edge (given they are sorted), throw it out, but append its label (line id) to the label of the previous one (list of line ids)
+            case acc of
                 [] ->
-                    [ { from = new.from, to = new.to, label = [ new.label ] } ]
+                    -- wrap lable in list
+                    [ { from = newEdge.from, to = newEdge.to, label = [ newEdge.label ] } ]
 
-                existing :: _ ->
-                    [ { from = existing.from, to = existing.to, label = new.label :: existing.label } ]
+                prevEdge :: rest ->
+                    if eqEdge prevEdge newEdge then
+                        -- throw out new edge, adjust label of previous edge
+                        { from = prevEdge.from, to = prevEdge.to, label = newEdge.label :: prevEdge.label } :: rest
+
+                    else
+                        -- add new edge and wrap label in list
+                        { from = newEdge.from, to = newEdge.to, label = [ newEdge.label ] } :: acc
+
+        -- TODO remove this version (and calls to it above, plus grouping) if above works
+        -- mergeEdges :
+        --     Edge line
+        --     -> List (Edge (List line))
+        --     -> List (Edge (List line))
+        -- mergeEdges new merged =
+        --     case merged of
+        --         [] ->
+        --             [ { from = new.from, to = new.to, label = [ new.label ] } ]
+        --         existing :: _ ->
+        --             [ { from = existing.from, to = existing.to, label = new.label :: existing.label } ]
     in
-    Map <| Graph.fromNodesAndEdges (List.map toNode stations) <| mergedLines lines
+    Map <| Graph.fromNodesAndEdges (List.map toNode stations) <| makeEdges lines
 
 
 getStation : Map station line -> Int -> Maybe station
@@ -108,40 +124,34 @@ getStation (Map map) id =
         |> Maybe.map (.node >> .label)
 
 
-connections : Map station line -> Int -> List ( line, station )
-connections (Map map) stationId =
+
+{- | Given a map and a station, get all of the lines that stop at that station.
+
+   Also requires some config helpers
+-}
+
+
+connections :
+    { stationToId : station -> Int
+    , lineToId : line -> comparable
+    }
+    -> Map station line
+    -> station
+    -> List line
+connections { stationToId, lineToId } (Map map) station =
     let
         toTrains lines =
             lines
                 |> IntDict.values
                 |> List.concat
+                |> List.uniqueBy lineToId
 
         toConnections context =
-            toTrains context.outgoing
+            toTrains <| IntDict.union context.outgoing context.incoming
     in
-    Graph.get stationId map
+    Graph.get (stationToId station) map
         |> Maybe.map toConnections
         |> Maybe.withDefault []
-
-
-nextStop : Map station line -> ( line, station ) -> Int -> Maybe station
-nextStop (Map graph) connection currentStationId =
-    let
-        findNextStop context =
-            context.outgoing
-                |> IntDict.foldl
-                    (\to lines acc ->
-                        if List.member connection lines then
-                            Just to
-
-                        else
-                            acc
-                    )
-                    Nothing
-                |> Maybe.andThen (\a -> Graph.get a graph)
-                |> Maybe.map (.node >> .label)
-    in
-    Graph.get currentStationId graph |> Maybe.andThen findNextStop
 
 
 graphViz : (station -> String) -> (line -> String) -> Map station line -> String
@@ -176,5 +186,5 @@ graphViz stationToString lineToString (Map graph) =
     in
     Graph.outputWithStylesAndAttributes graphStyles3
         (\n -> Dict.fromList [ ( "label", stationToString n ) ])
-        (\e -> Dict.fromList [ ( "label", String.join " / " <| List.map (Tuple.first >> lineToString) e ) ])
+        (\e -> Dict.fromList [ ( "label", String.join " / " <| List.map lineToString e ) ])
         graph

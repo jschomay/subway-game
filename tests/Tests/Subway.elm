@@ -147,12 +147,7 @@ all =
 
   1 -> 2 [label="Blue"]
   1 -> 3 [label="Green"]
-  1 -> 4 [label="Green"]
-  2 -> 1 [label="Blue"]
   2 -> 3 [label="Blue / Red"]
-  2 -> 4 [label="Red"]
-  3 -> 1 [label="Green"]
-  3 -> 2 [label="Blue / Red"]
   4 -> 1 [label="Green"]
   4 -> 2 [label="Red"]
 
@@ -163,52 +158,26 @@ all =
 }
 """
             ]
-        , describe "connectingTrains"
+        , describe "connectingTrains" <|
+            let
+                config =
+                    { stationToId = stationToId, lineToId = lineToName }
+            in
             [ test "Central" <|
                 \() ->
-                    Expect.equal (connections map (stationToId Central)) <|
-                        [ ( Blue, EastEnd )
-                        , ( Green, EastEnd )
-                        , ( Green, WestEnd )
-                        ]
+                    Expect.equal (connections config map Central) <|
+                        [ Blue, Green ]
             , test "Market" <|
                 \() ->
-                    Expect.equal (connections map (stationToId Market)) <|
-                        [ ( Blue, Central )
-                        , ( Blue, EastEnd )
-                        , ( Red, EastEnd )
-                        , ( Red, WestEnd )
-                        ]
+                    Expect.equal (connections config map Market) <|
+                        [ Blue, Red ]
             , test "EastEnd" <|
                 \() ->
-                    Expect.equal (connections map (stationToId EastEnd)) <|
-                        [ ( Green, WestEnd )
-                        , ( Blue, Central )
-                        , ( Red, WestEnd )
-                        ]
+                    Expect.equal (connections config map EastEnd) <|
+                        [ Green, Blue, Red ]
             , test "WestEnd" <|
                 \() ->
-                    Expect.equal (connections map (stationToId WestEnd)) <|
-                        [ ( Green, EastEnd )
-                        , ( Red, EastEnd )
-                        ]
-            ]
-        , describe "nextStop"
-            [ test "midline" <|
-                \() ->
-                    Expect.equal (Just Central) <|
-                        nextStop map ( Blue, Central ) (stationToId Market)
-            , test "midline2" <|
-                \() ->
-                    Expect.equal (Just Market) <|
-                        nextStop map ( Blue, Central ) (stationToId EastEnd)
-            , test "end of line" <|
-                \() ->
-                    Expect.equal Nothing <|
-                        nextStop map ( Blue, Central ) (stationToId Central)
-            , test "invalid" <|
-                \() ->
-                    Expect.equal Nothing <|
-                        nextStop map ( Blue, Central ) (stationToId WestEnd)
+                    Expect.equal (connections config map WestEnd) <|
+                        [ Green, Red ]
             ]
         ]
