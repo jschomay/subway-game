@@ -64,9 +64,17 @@ lineToName line =
             "Blue"
 
 
-stations : List Station
-stations =
-    [ Central, Market, WestEnd, EastEnd ]
+lineToId : Line -> Int
+lineToId line =
+    case line of
+        Red ->
+            1
+
+        Green ->
+            2
+
+        Blue ->
+            3
 
 
 redLine : ( Line, List Station )
@@ -76,7 +84,7 @@ redLine =
 
 greenLine : ( Line, List Station )
 greenLine =
-    ( Green, [ WestEnd, Central, EastEnd ] )
+    ( Green, [ WestEnd, Central, EastEnd, Market ] )
 
 
 blueLine : ( Line, List Station )
@@ -86,16 +94,16 @@ blueLine =
 
 map : Map Station Line
 map =
-    Subway.init stationToId stations [ redLine, greenLine, blueLine ]
+    Subway.init stationToId [ redLine, greenLine, blueLine ]
 
 
 
 {-
 
-                                         red line
+                                    red / green / blue
                          / ----------------------------- o EastEnd
                        / / --------------------------- / |
-                     / /           blue line             |
+                     / /-----------------------------/   |
                    / /                                   |
             Market o                                     |
                    | \                   / ------------- /
@@ -148,6 +156,7 @@ all =
   1 -> 2 [label="Blue"]
   1 -> 3 [label="Green"]
   2 -> 3 [label="Blue / Red"]
+  3 -> 2 [label="Green"]
   4 -> 1 [label="Green"]
   4 -> 2 [label="Red"]
 
@@ -161,7 +170,7 @@ all =
         , describe "connectingTrains" <|
             let
                 config =
-                    { stationToId = stationToId, lineToId = lineToName }
+                    { stationToId = stationToId, lineToId = lineToId }
             in
             [ test "Central" <|
                 \() ->
@@ -170,7 +179,7 @@ all =
             , test "Market" <|
                 \() ->
                     Expect.equal (connections config map Market) <|
-                        [ Blue, Red ]
+                        [ Blue, Red, Green ]
             , test "EastEnd" <|
                 \() ->
                     Expect.equal (connections config map EastEnd) <|

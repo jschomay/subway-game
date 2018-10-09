@@ -1,12 +1,11 @@
 module Subway exposing
-    ( Map
+    ( Config
+    , Map
     , connections
     , getStation
     , graphViz
     , init
     )
-
--- TODO will need to add `line -> all serviced stations` (maybe with connections at each station?) used to make the line map to choose which station to go to
 
 import Dict
 import Graph exposing (..)
@@ -21,25 +20,26 @@ type
     = Map (Graph stationId (List lineId))
 
 
+type alias Config station line =
+    { stationToId : station -> Int
+    , lineToId : line -> Int
+    }
+
+
 type alias StationsAlongLine lineId stationId =
     -- all of the stations connected by a line
     ( lineId, List stationId )
 
 
-
--- TODO change edges to just have a line (because there's no gurantee that each semgment will have the same terminus
--- then derive all of the stations (and the staring and ending points) from the graph
--- might not even need to make a track go in both directions?
-
-
 init :
     (station -> Int)
-    -> List station
     -> List (StationsAlongLine line station)
     -> Map station line
-init stationToId stations lines =
+init stationToId lines =
     let
-        -- TODO derive stations from lines
+        stations =
+            List.concatMap Tuple.second lines
+
         toNode station =
             Node (stationToId station) station
 
@@ -67,10 +67,6 @@ init stationToId stations lines =
                 |> List.concatMap lineToEdges
                 -- would be done here, but different lines might connect the same 2 stations, so we need to "merge" overlapping edges
                 |> List.sortWith ordEdge
-                -- |> List.groupWhile eqEdge
-                -- groupWhile returns a "non-empty list" which looks like `(a, List a)`, so we need to turn that into a "normal" list
-                -- |> List.map (\( h, t ) -> h :: t)
-                -- |> List.concatMap (List.foldl mergeEdges [])
                 |> List.foldl mergeEdges []
 
         ordEdge a b =
@@ -103,17 +99,7 @@ init stationToId stations lines =
                         -- add new edge and wrap label in list
                         { from = newEdge.from, to = newEdge.to, label = [ newEdge.label ] } :: acc
 
-        -- TODO remove this version (and calls to it above, plus grouping) if above works
-        -- mergeEdges :
-        --     Edge line
-        --     -> List (Edge (List line))
-        --     -> List (Edge (List line))
-        -- mergeEdges new merged =
-        --     case merged of
-        --         [] ->
-        --             [ { from = new.from, to = new.to, label = [ new.label ] } ]
-        --         existing :: _ ->
-        --             [ { from = existing.from, to = existing.to, label = new.label :: existing.label } ]
+        -- TODO use Graph.AcyclicGraph to verify there are no cycles
     in
     Map <| Graph.fromNodesAndEdges (List.map toNode stations) <| makeEdges lines
 
@@ -124,30 +110,23 @@ getStation (Map map) id =
         |> Maybe.map (.node >> .label)
 
 
+{-| Given a map and a station, get all of the lines that stop at that station.
 
-{- | Given a map and a station, get all of the lines that stop at that station.
+Also requires some config helpers.
 
-   Also requires some config helpers
 -}
-
-
 connections :
-    { stationToId : station -> Int
-    , lineToId : line -> comparable
-    }
+    Config station line
     -> Map station line
     -> station
     -> List line
 connections { stationToId, lineToId } (Map map) station =
     let
-        toTrains lines =
-            lines
-                |> IntDict.values
+        toConnections stationContext =
+            (stationContext.outgoing |> IntDict.values)
+                ++ (stationContext.incoming |> IntDict.values)
                 |> List.concat
                 |> List.uniqueBy lineToId
-
-        toConnections context =
-            toTrains <| IntDict.union context.outgoing context.incoming
     in
     Graph.get (stationToId station) map
         |> Maybe.map toConnections
