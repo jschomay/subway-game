@@ -1,33 +1,4 @@
-port module Main exposing
-    ( Day(..)
-    , Model
-    , arrowView
-    , changeTrainStatus
-    , connectingHallsView
-    , delay
-    , findEntity
-    , gameView
-    , getCurrentStation
-    , init
-    , loaded
-    , main
-    , mapView
-    , nextDay
-    , noop
-    , platformDelay
-    , scriptedEvents
-    , stationView
-    , storyView
-    , subscriptions
-    , titleCardDelay
-    , titleCardView
-    , toColor
-    , transitDelay
-    , update
-    , updateStory
-    , update_
-    , view
-    )
+port module Main exposing (main)
 
 import Browser
 import City exposing (..)
@@ -114,7 +85,7 @@ init =
       , narrativeContent = Dict.map (\a b -> getNarrative ( a, b )) Rules.rules
       , map = City.fullMap
       , mapImage = City.mapImage City.RedMap
-      , location = InStation
+      , location = InStation Lobby
       , isIntro = False
       , titleCard = Nothing
       , day = Monday
@@ -233,9 +204,9 @@ scriptedEvents msg ( model, cmd ) =
     case ( Engine.getCurrentScene model.engineModel, msg ) of
         ( "meetSteve", Continue ) ->
             case ( model.isIntro, model.day, model.location ) of
-                ( True, _, InStation ) ->
+                ( True, _, InStation Lobby ) ->
                     -- board train to work (via the Msg)
-                    ( { model | location = InConnectingHalls }
+                    ( { model | location = InStation Hall }
                     , delay 0 <| BoardTrain ( Red, TwinBrooks )
                     )
 
@@ -245,7 +216,7 @@ scriptedEvents msg ( model, cmd ) =
                 ( True, _, OnTrain train _ ) ->
                     -- jump to next day
                     ( { model
-                        | location = InStation
+                        | location = InStation Lobby
                         , day = nextDay model.day |> .day
                         , titleCard = Just <| .titleCard <| nextDay model.day
                       }
@@ -259,7 +230,7 @@ scriptedEvents msg ( model, cmd ) =
         ( "meetSteve", ArriveAtStation MetroCenter ) ->
             -- jump to next day (save as above)
             ( { model
-                | location = InStation
+                | location = InStation Lobby
                 , day = nextDay model.day |> .day
                 , titleCard = Just <| .titleCard <| nextDay model.day
               }
@@ -354,25 +325,13 @@ update_ msg model =
                 , Cmd.none
                 )
 
-            PassTurnStyle ->
-                let
-                    currentStation =
-                        getCurrentStation model
-                in
-                case model.location of
-                    InStation ->
-                        ( { model | location = InConnectingHalls }, Cmd.none )
-
-                    _ ->
-                        noop model
+            Go location ->
+                ( { model | location = location }, Cmd.none )
 
             BoardTrain train ->
                 case model.location of
-                    InConnectingHalls ->
+                    InStation Hall ->
                         let
-                            currentStation =
-                                getCurrentStation model
-
                             cmd =
                                 -- TODO update for new mechanics of navigation...
                                 delay 0 <| LeaveStation
@@ -388,16 +347,12 @@ update_ msg model =
                         noop model
 
             ExitTrain ->
-                let
-                    currentStation =
-                        getCurrentStation model
-                in
                 case model.location of
                     OnTrain train Stopped ->
-                        ( { model | location = InStation } |> updateStory "platform", Cmd.none )
+                        ( { model | location = InStation Lobby } |> updateStory "platform", Cmd.none )
 
                     OnTrain train OutOfService ->
-                        ( { model | location = InStation } |> updateStory "platform", Cmd.none )
+                        ( { model | location = InStation Lobby } |> updateStory "platform", Cmd.none )
 
                     _ ->
                         noop model
@@ -422,10 +377,6 @@ update_ msg model =
                         noop model
 
             LeaveStation ->
-                let
-                    currentStation =
-                        getCurrentStation model
-                in
                 case model.location of
                     -- TODO needs to be updated with new navigation mechanic
                     OnTrain train Stopped ->
@@ -491,12 +442,14 @@ gameView model =
     in
     div []
         [ case model.location of
-            InStation ->
-                stationView
-                    currentStation
-                    (Subway.connections config model.map currentStation)
-                    model.storyLine
-                    model.isIntro
+            InStation Lobby ->
+                lobby currentStation model.storyLine
+
+            InStation Hall ->
+                hall model.map currentStation
+
+            InStation (Platform line) ->
+                platform model.map currentStation line
 
             OnTrain (( line, end ) as train) status ->
                 -- TODO update to pass in desired stop
@@ -515,11 +468,6 @@ gameView model =
                     model.isIntro
                     (model.day == Friday)
                     model.storyLine
-
-            InConnectingHalls ->
-                connectingHallsView
-                    model.map
-                    currentStation
         , if model.showMap then
             mapView model.mapImage
 
@@ -528,28 +476,23 @@ gameView model =
         ]
 
 
-stationView : Station -> List Line -> Maybe String -> Bool -> Html Msg
-stationView currentStation connections storyLine isIntro =
+lobby : Station -> Maybe String -> Html Msg
+lobby currentStation storyLine =
     let
         story storyLine_ =
-            div [ class "station__story" ] [ storyView storyLine_ isIntro ]
+            div [ class "Station__story" ] [ storyView storyLine_ False ]
 
-        exitView =
-            div [ class "station__connections", onClick PassTurnStyle ] <|
-                [ text "To trains", arrowView 0 ]
+        toTrains =
+            div [ class "Station__connections", onClick <| Go (InStation Hall) ] <|
+                [ span [ class "icon icon--train" ] [], arrowView 0 ]
     in
-    div [ class "station" ] <|
+    div [ class "Station Station--lobby" ] <|
         List.filterMap identity
             [ Just <|
-                div [ class "station__top" ] <|
-                    [ h2 [ class "station__name" ] [ text (stationInfo currentStation |> .name) ]
+                div [ class "Station__top" ] <|
+                    [ h2 [ class "Station__name" ] [ text (stationInfo currentStation |> .name) ]
+                    , toTrains
                     ]
-                        ++ (if isIntro then
-                                []
-
-                            else
-                                [ exitView ]
-                           )
             , Maybe.map story storyLine
             ]
 
@@ -557,24 +500,26 @@ stationView currentStation connections storyLine isIntro =
 arrowView : Int -> Html Msg
 arrowView direction =
     div
-        [ class "connection__arrow"
+        [ class "Arrow"
         , style "transform" ("rotate(" ++ String.fromInt direction ++ "deg)")
         ]
         [ text "→" ]
 
 
-connectingHallsView : Subway.Map City.Station City.Line -> Station -> Html Msg
-connectingHallsView map currentStation =
+{-| shows line map for a line
+-}
+platform : Subway.Map City.Station City.Line -> Station -> Line -> Html Msg
+platform map currentStation line =
     let
         lineInfoView lineInfo =
-            div [ class "line_info" ]
+            div [ class "Line_map__info" ]
                 [ lineNumberView lineInfo
                 , text <| .name <| lineInfo
                 ]
 
         lineNumberView lineInfo =
             div
-                [ class "station__line"
+                [ class "Line_map__number"
                 , style "color" (toColor lineInfo.color)
                 , style "borderColor" (toColor lineInfo.color)
                 ]
@@ -582,8 +527,9 @@ connectingHallsView map currentStation =
 
         lineConnectionView lineInfo =
             div
-                [ class "line_map__stop_connection"
-                , style "background" (toColor lineInfo.color)
+                [ class "Stop__connection"
+                , style "border-color" (toColor lineInfo.color)
+                , style "color" (toColor lineInfo.color)
                 ]
                 [ text <| String.fromInt lineInfo.number ]
 
@@ -591,47 +537,84 @@ connectingHallsView map currentStation =
             Subway.connections City.config map station
 
         stopView currentLine station =
-            div [ class "line_map__stop" ] <|
-                [ div [ class "line_map__stop_connections" ] <|
+            div [ class "Stop" ] <|
+                [ div [ class "Stop__connections" ] <|
                     List.map (City.lineInfo >> lineConnectionView) (List.filter ((/=) currentLine) <| connections station)
                 , div
                     [ classList
-                        [ ( "station_dot", True )
-                        , ( "station_dot--current", station == currentStation )
+                        [ ( "Stop__dot", True )
+                        , ( "Stop__dot--current", station == currentStation )
                         ]
                     , style "borderColor" (toColor <| .color <| lineInfo <| currentLine)
                     ]
                     []
                 , div
                     [ classList
-                        [ ( "connection_name", True )
-                        , ( "connection_name--current", station == currentStation )
+                        [ ( "Stop__name", True )
+                        , ( "Stop__name--current", station == currentStation )
                         ]
                     ]
                     [ text <| .name <| stationInfo station ]
                 ]
-
-        lineMap line =
-            div [ class "line_map" ]
-                [ lineInfoView <| City.lineInfo line
-                , div [ class "line_map__stops" ] <|
-                    [ div
-                        [ class "line_map__line"
-                        , style "background" (toColor <| .color <| lineInfo <| line)
-                        ]
-                        []
-                    ]
-                        ++ List.map (stopView line) (City.lineInfo line |> .stations)
-                ]
     in
-    div [ class "connecting_halls" ]
-        [ div [ class "line_maps" ] <| List.map lineMap <| connections currentStation ]
+    div [ class "Station Station--platform" ]
+        [ div
+            [ class "Line_map" ]
+            [ lineInfoView <| City.lineInfo line
+            , div [ class "Line_map__stops" ] <|
+                [ div
+                    [ class "Line_map__line"
+                    , style "background" (toColor <| .color <| lineInfo <| line)
+                    ]
+                    []
+                ]
+                    ++ List.map (stopView line) (City.lineInfo line |> .stations)
+            ]
+        ]
 
 
+{-| shows the lines servicing this station
+-}
+hall : Subway.Map City.Station City.Line -> Station -> Html Msg
+hall map currentStation =
+    let
+        direction lineInfo =
+            -- 45deg from -90 to +90 (90 = up)
+            modBy 5 (Murmur3.hashString 1234 ((City.stationInfo currentStation |> .name) ++ lineInfo.name)) * 45 - 180
 
--- TODO
--- make 2 connecting halls - one with list of lines and arrors (like connections before), one with line map and a back/exit sign
--- in other words, only one line map per screen
+        connectionView line =
+            let
+                lineInfo =
+                    City.lineInfo line
+
+                from =
+                    lineInfo |> .stations |> List.head |> Maybe.map (City.stationInfo >> .name) |> Maybe.withDefault ""
+
+                to =
+                    lineInfo |> .stations |> List.reverse |> List.head |> Maybe.map (City.stationInfo >> .name) |> Maybe.withDefault ""
+            in
+            li
+                [ class "Connection"
+                , onClick <| Go (InStation (Platform line))
+                ]
+                [ div
+                    [ class "Connection__number"
+                    , style "color" (toColor lineInfo.color)
+                    , style "borderColor" (toColor lineInfo.color)
+                    ]
+                    [ text <| String.fromInt lineInfo.number ]
+                , div [ class "Connection__end_points" ] [ text <| String.join " • " [ from, to ] ]
+                , arrowView <| direction lineInfo
+                ]
+
+        connections =
+            Subway.connections City.config map currentStation
+    in
+    div [ class "Station Station--hall" ]
+        [ div [ class "Connections" ] <|
+            div [ class "Connections__title" ] [ text "Connecting trains" ]
+                :: List.map connectionView connections
+        ]
 
 
 storyView : String -> Bool -> Html Msg

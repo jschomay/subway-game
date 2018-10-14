@@ -1,6 +1,7 @@
 module LocalTypes exposing
     ( Location(..)
     , Msg(..)
+    , StationArea(..)
     , Train
     , TrainStatus(..)
     )
@@ -18,7 +19,8 @@ type Msg
     | Loaded
     | Delay Float Msg
     | ToggleMap
-    | PassTurnStyle
+    | Go Location
+      -- TODO remove all the movement msg and use Go location
     | BoardTrain Train
     | ExitTrain
     | ArriveAtStation Station
@@ -33,7 +35,12 @@ type TrainStatus
     | OutOfService
 
 
+type StationArea
+    = Platform Line
+    | Hall
+    | Lobby
+
+
 type Location
     = OnTrain Train TrainStatus
-    | InStation
-    | InConnectingHalls
+    | InStation StationArea

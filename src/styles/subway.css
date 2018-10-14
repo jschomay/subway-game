@@ -1,6 +1,6 @@
 /* Station */
 
-.station {
+.Station {
   min-height: 100vh;
   width: 100%;
   position: absolute;
@@ -8,18 +8,39 @@
   flex-direction: column;
 }
 
-.station__story {
+.Station--hall, .Station--platform {
+  background: black url(../img/tile.jpg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3em;
+}
+
+
+.Station__name {
+  display: inline-block;
+  text-align: center;
+  text-transform: uppercase;
+  font-weight: bold;
+  font-size: 2em;
+  padding: 0.4em 0.7em;
+  color: #222;
+  background: #eee;
+  border: 0.1em solid #222;
+}
+
+.Station__story {
   flex: 1 0 auto;
 }
 
-.station__connections {
+.Station__connections {
   cursor: pointer;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   text-transform: uppercase;
-  font-weight: normal;
-  font-size: 1.5em;
+  font-weight: bold;
+  font-size: 1em;
   border: 0.1em solid black;
   padding: 0.3em;
   color: #111;
@@ -27,7 +48,15 @@
   position: absolute;
   right: 1em;
 }
-.station__top {
+
+.Station__connections .icon {
+  width: 2em;
+  height: 2em;
+  cursor: pointer;
+}
+
+
+.Station__top {
   flex: 0 0 auto;
   background: black url(../img/tile.jpg);
   background-size: 40%;
@@ -37,56 +66,68 @@
   padding: 1.5em;
 }
 
-.station__name {
+/* Connections */
+
+.Connections {
+  background: white;
+  user-select: none;
+  position: fixed;
+  padding: 0 1em;
+  border: 0.2em solid #333;
+  background: white;
+  border-radius: 1.1em;
+}
+
+.Connections__title {
   display: inline-block;
   text-align: center;
   text-transform: uppercase;
-  font-weight: normal;
-  font-size: 2em;
+  font-weight: bold;
+  font-size: 1.5em;
   padding: 0.4em 0.7em;
   color: #222;
-  background: #eee;
-  border: 0.1em solid #222;
 }
 
-.station__line {
+/* Connection */
+
+.Connection {
+  display: flex;
+  align-items: center;
+  padding: 0.9em 0em;
   cursor: pointer;
+  border-bottom: 1px solid #ccc;
+}
+
+.Connection:last-of-type {
+  border-bottom: none;
+}
+
+.Connection__number {
   background: white;
   border: 3px solid;
   border-radius: 50%;
-  width: 1em;
-  height: 1em;
-  padding: 0.5em;
+  width: 2em;
+  height: 2em;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.8em;
-  font-weight: normal;
-  margin-left: 0.5em;
+  font-size: 1em;
+  font-weight: bold;
   margin-right: 0.5em;
+  cursor: pointer;
 }
 
-/* ConnectingHalls */
-
-.connecting_halls {
-  min-height: 100vh;
-  width: 100%;
-  position: absolute;
-  display: flex;
-  flex-direction: column;
-  background: black url(../img/tile.jpg);
-}
-
-.line_maps {
+.Connection__end_points {
+  margin-right: 0.8em;
+  font-weight: bold;
+  cursor: pointer;
   flex: 1 0 auto;
-  display: flex;
-  padding: 3em;
-  justify-content: space-evenly;
 }
 
-/* Connections */
 
-.line_map {
+/* Line map */
+
+.Line_map {
   background: white;
   user-select: none;
   padding: 1em;
@@ -97,7 +138,7 @@
   flex: 0 0 auto;
 }
 
-.line_info {
+.Line_map__info {
   text-transform: uppercase;
   font-weight: bold;
   color: black;
@@ -111,7 +152,7 @@
   padding-bottom: 0.5em;
 }
 
-.line_info__number {
+.Line_map__number {
   background: white;
   border: 3px solid;
   border-radius: 50%;
@@ -120,83 +161,16 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.1em;
+  font-size: 1em;
   font-weight: bold;
-  margin-right: 0.5em;
-  cursor: pointer;
-}
-.connection__direction {
-  cursor: pointer;
-  font-size: 1.0em;
-  font-weight: bold;
-  text-transform: uppercase;
-  flex: 1 0 auto;
-}
-
-.connection__arrow {
-  cursor: pointer;
-  font-size: 1.4em;
-  font-weight: bold;
-  text-transform: uppercase;
   margin-right: 0.5em;
 }
 
-.line_map__stops {
+.Line_map__stops {
   position: relative;
 }
 
-.line_map__stop {
-  display: flex;
-  padding: 0 0.8em;
-  height: 4em;
-  align-items: center;
-  position: relative;
-}
-
-.line_map__stop_connections {
-  width: 4em;
-  text-align: right;
-  display: flex;
-  justify-content: flex-end;
-  margin-right: 0.7em;
-}
-
-.line_map__stop_connection {
-  color: white;
-  border: 3px solid;
-  border-radius: 50%;
-  width: 25px;
-  height: 25px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.7em;
-  font-weight: bold;
-}
-
-.connection_name {
-}
-
-.connection_name--current {
-  font-weight: bold;
-}
-
-.station_dot {
-  width: 20px;
-  height: 20px;
-  margin-right: 1em;
-  border-radius: 50%;
-  border: 3px solid;
-  background: white;
-}
-
-.station_dot--current {
-  width: 26px;
-  height: 26px;
-  margin-left: -3px;
-}
-
-.line_map__line {
+.Line_map__line {
   position: absolute;
   width: 20px;
   left: 88px;
@@ -205,3 +179,77 @@
   border-radius: 20px;
 }
 
+
+/* Stop */
+
+.Stop {
+  display: flex;
+  padding: 0 0.8em;
+  height: 4em;
+  align-items: center;
+  position: relative;
+  cursor: pointer;
+}
+
+.Stop__connections {
+  width: 4em;
+  text-align: right;
+  display: flex;
+  justify-content: flex-end;
+  margin-right: 0.7em;
+  cursor: pointer;
+}
+
+.Stop__connection {
+  color: white;
+  border: 2px solid;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7em;
+  font-weight: bold;
+  cursor: pointer;
+  margin-right: 3px;
+}
+
+.Stop__name {
+  cursor: pointer;
+}
+
+.Stop__name--current {
+  font-weight: bold;
+}
+
+.Stop__dot {
+  width: 20px;
+  height: 20px;
+  margin-right: 1em;
+  border-radius: 50%;
+  border: 3px solid;
+  background: white;
+  cursor: pointer;
+}
+
+.Stop__dot--current {
+  width: 26px;
+  height: 26px;
+  margin-left: -3px;
+}
+
+.Arrow {
+  cursor: pointer;
+  font-size: 1.4em;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+
+.icon {
+}
+
+.icon--train {
+  max-width: 256px;max-height: 256px;background-image: url(data:image/svg+xml;utf8;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iaXNvLTg4NTktMSI/Pgo8IS0tIEdlbmVyYXRvcjogQWRvYmUgSWxsdXN0cmF0b3IgMTYuMC4wLCBTVkcgRXhwb3J0IFBsdWctSW4gLiBTVkcgVmVyc2lvbjogNi4wMCBCdWlsZCAwKSAgLS0+CjwhRE9DVFlQRSBzdmcgUFVCTElDICItLy9XM0MvL0RURCBTVkcgMS4xLy9FTiIgImh0dHA6Ly93d3cudzMub3JnL0dyYXBoaWNzL1NWRy8xLjEvRFREL3N2ZzExLmR0ZCI+CjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0iQ2FwYV8xIiB4PSIwcHgiIHk9IjBweCIgd2lkdGg9IjMycHgiIGhlaWdodD0iMzJweCIgdmlld0JveD0iMCAwIDU4Mi42NzUgNTgyLjY3NSIgc3R5bGU9ImVuYWJsZS1iYWNrZ3JvdW5kOm5ldyAwIDAgNTgyLjY3NSA1ODIuNjc1OyIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+CjxnPgoJPGcgaWQ9IkxheWVyXzFfMjFfIj4KCQk8cGF0aCBkPSJNNTE4LjI4OCw1NDUuN2wtODUuNDI1LTE1NS41NWMyNC4yMjUtMy44MjUsNDIuMDc0LTI1LjUsNDIuMDc0LTQ5LjcyNnYtMjI5LjVDNDc0LjkzNyw0OS43MjUsNDI1LjIxMiwwLDM2NC4wMTIsMCAgICBoLTE0NS4zNWMtNjEuMiwwLTExMi4yLDQ5LjcyNS0xMTIuMiwxMTIuMnYyMjguMjI1YzAsMjUuNSwxNy44NSw0NS45LDQyLjA3NSw0OS43MjZMNjQuMzg3LDU0NS43ICAgIGMtNi4zNzUsMTIuNzUtMi41NSwyOC4wNSwxMC4yLDM0LjQyNWMzLjgyNSwyLjU1LDcuNjUsMi41NSwxMS40NzUsMi41NWM4LjkyNSwwLDE3Ljg1LTUuMSwyMS42NzUtMTIuNzVsNy42NS0xMi43NWgzNTEuOSAgICBsNy42NDksMTIuNzVjNS4xMDEsOC45MjUsMTIuNzUsMTIuNzUsMjEuNjc2LDEyLjc1YzMuODI0LDAsNy42NDktMS4yNzQsMTEuNDc1LTIuNTVDNTIwLjgzNyw1NzMuNzUsNTI0LjY2Myw1NTguNDUsNTE4LjI4OCw1NDUuNyAgICB6IE0zOTguNDM3LDQzMC45NWgtMjE0LjJsMjEuNjc1LTM5LjUyNWgxNzAuODVMMzk4LjQzNyw0MzAuOTV6IE0zOTQuNjEzLDM0NS41MjVjLTIwLjQsMC0zNi45NzYtMTYuNTc1LTM2Ljk3Ni0zNi45NzYgICAgYzAtMjAuNCwxNi41NzUtMzYuOTc1LDM2Ljk3Ni0zNi45NzVjMjAuMzk5LDAsMzYuOTc1LDE2LjU3NSwzNi45NzUsMzYuOTc1QzQzMS41ODcsMzI3LjY3NSw0MTUuMDEyLDM0NS41MjUsMzk0LjYxMywzNDUuNTI1eiAgICAgTTE1MS4wODcsMTI2LjIyNWMwLTM5LjUyNSwzMS44NzUtNzEuNCw3MC4xMjUtNzEuNGgxMzguOTc1YzM4LjI1LDAsNzEuNCwzMS44NzUsNzEuNCw3MS40djYxLjIgICAgYzAsMTQuMDI1LTExLjQ3NSwyNC4yMjUtMjUuNSwyNC4yMjVoLTIyOS41Yy0xNC4wMjUsMC0yNC4yMjUtMTEuNDc1LTI0LjIyNS0yNC4yMjVMMTUxLjA4NywxMjYuMjI1TDE1MS4wODcsMTI2LjIyNXogICAgIE0xODguMDYyLDI3MC4zYzIwLjQsMCwzNi45NzUsMTYuNTc1LDM2Ljk3NSwzNi45NzZjMCwyMC4zOTktMTYuNTc1LDM2Ljk3NS0zNi45NzUsMzYuOTc1cy0zNi45NzUtMTYuNTc1LTM2Ljk3NS0zNi45NzUgICAgQzE1MS4wODcsMjg2Ljg3NSwxNjcuNjYzLDI3MC4zLDE4OC4wNjIsMjcwLjN6IE0xMzUuNzg4LDUxOC45MjVsMjguMDUtNDkuNzI1aDI1NWwyOC4wNSw0OS43MjVIMTM1Ljc4OHoiIGZpbGw9IiMwMDAwMDAiLz4KCTwvZz4KPC9nPgo8Zz4KPC9nPgo8Zz4KPC9nPgo8Zz4KPC9nPgo8Zz4KPC9nPgo8Zz4KPC9nPgo8Zz4KPC9nPgo8Zz4KPC9nPgo8Zz4KPC9nPgo8Zz4KPC9nPgo8Zz4KPC9nPgo8Zz4KPC9nPgo8Zz4KPC9nPgo8Zz4KPC9nPgo8Zz4KPC9nPgo8Zz4KPC9nPgo8L3N2Zz4K)
+}
