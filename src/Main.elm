@@ -112,7 +112,7 @@ init =
       , loaded = False
       , storyLine = Nothing
       , narrativeContent = Dict.map (\a b -> getNarrative ( a, b )) Rules.rules
-      , map = City.map [ City.redLine ]
+      , map = City.fullMap
       , mapImage = City.mapImage City.RedMap
       , location = InStation
       , isIntro = False
@@ -286,7 +286,7 @@ scriptedEvents msg ( model, cmd ) =
             -- stop the train before Metro Center and add yellow line
             ( { model
                 | location = changeTrainStatus OutOfService model.location
-                , map = City.map [ City.redLine, City.yellowLine ]
+                , map = City.map [ Red, Yellow ]
               }
                 |> updateStory "outOfService"
             , Cmd.none
@@ -456,10 +456,10 @@ subscriptions model =
 
 view : Model -> Html Msg
 view model =
-    -- let
-    --     showTheMap =
-    --         Debug.log (Subway.graphViz (stationInfo >> .name) (lineInfo >> .name) City.fullMap ++ "\n") "Copy and paste in http://viz-js.com/"
-    -- in
+    let
+        showTheMap =
+            Debug.log (Subway.graphViz (stationInfo >> .name) (lineInfo >> .name) City.fullMap ++ "\n") "Copy and paste in http://viz-js.com/"
+    in
     div [ class "game" ] <|
         List.filterMap identity
             [ Just <| gameView model
@@ -518,8 +518,8 @@ gameView model =
 
             InConnectingHalls ->
                 connectingHallsView
+                    model.map
                     currentStation
-                    (Subway.connections config model.map currentStation)
         , if model.showMap then
             mapView model.mapImage
 
@@ -534,30 +534,9 @@ stationView currentStation connections storyLine isIntro =
         story storyLine_ =
             div [ class "station__story" ] [ storyView storyLine_ isIntro ]
 
-        connectionView line =
-            let
-                lineInfo =
-                    City.lineInfo line
-            in
-            div
-                [ class "station__line"
-                , style "color" (toColor lineInfo.color)
-                , style "borderColor" (toColor lineInfo.color)
-                ]
-                [ text <| String.fromInt lineInfo.number ]
-
-        lineNumber line =
-            lineInfo line |> .number
-
         exitView =
             div [ class "station__connections", onClick PassTurnStyle ] <|
-                (connections
-                    |> List.Extra.uniqueBy lineNumber
-                    |> List.sortBy lineNumber
-                    |> List.map connectionView
-                )
-
-        -- [ text "To Trains", arrowView 0 ]
+                [ text "To trains", arrowView 0 ]
     in
     div [ class "station" ] <|
         List.filterMap identity
@@ -584,41 +563,75 @@ arrowView direction =
         [ text "→" ]
 
 
-connectingHallsView : Station -> List Line -> Html Msg
-connectingHallsView station connections =
+connectingHallsView : Subway.Map City.Station City.Line -> Station -> Html Msg
+connectingHallsView map currentStation =
     let
-        stationName =
-            City.stationInfo station |> .name
-
-        connectionView line =
-            let
-                lineInfo =
-                    City.lineInfo line
-
-                direction =
-                    -- 45deg from -90 to +90 (90 = up)
-                    modBy 5 (Murmur3.hashString 1234 (stationName ++ lineInfo.name)) * 45 - 180
-            in
-            li [ class "connection" ]
-                [ div
-                    [ class "connection__number"
-                    , style "color" (toColor lineInfo.color)
-                    , style "borderColor" (toColor lineInfo.color)
-                    ]
-                    [ text <| String.fromInt lineInfo.number ]
-                , arrowView direction
+        lineInfoView lineInfo =
+            div [ class "line_info" ]
+                [ lineNumberView lineInfo
+                , text <| .name <| lineInfo
                 ]
 
-        -- TODO need line map(s) instead of connections
+        lineNumberView lineInfo =
+            div
+                [ class "station__line"
+                , style "color" (toColor lineInfo.color)
+                , style "borderColor" (toColor lineInfo.color)
+                ]
+                [ text <| String.fromInt lineInfo.number ]
+
+        lineConnectionView lineInfo =
+            div
+                [ class "line_map__stop_connection"
+                , style "background" (toColor lineInfo.color)
+                ]
+                [ text <| String.fromInt lineInfo.number ]
+
+        connections station =
+            Subway.connections City.config map station
+
+        stopView currentLine station =
+            div [ class "line_map__stop" ] <|
+                [ div [ class "line_map__stop_connections" ] <|
+                    List.map (City.lineInfo >> lineConnectionView) (List.filter ((/=) currentLine) <| connections station)
+                , div
+                    [ classList
+                        [ ( "station_dot", True )
+                        , ( "station_dot--current", station == currentStation )
+                        ]
+                    , style "borderColor" (toColor <| .color <| lineInfo <| currentLine)
+                    ]
+                    []
+                , div
+                    [ classList
+                        [ ( "connection_name", True )
+                        , ( "connection_name--current", station == currentStation )
+                        ]
+                    ]
+                    [ text <| .name <| stationInfo station ]
+                ]
+
+        lineMap line =
+            div [ class "line_map" ]
+                [ lineInfoView <| City.lineInfo line
+                , div [ class "line_map__stops" ] <|
+                    [ div
+                        [ class "line_map__line"
+                        , style "background" (toColor <| .color <| lineInfo <| line)
+                        ]
+                        []
+                    ]
+                        ++ List.map (stopView line) (City.lineInfo line |> .stations)
+                ]
     in
     div [ class "connecting_halls" ]
-        [ ul [ class "connections" ] <|
-            h2 [ class "connecting_halls__station_name" ] [ text stationName ]
-                :: (connections
-                        |> List.sortBy (lineInfo >> .number)
-                        |> List.map connectionView
-                   )
-        ]
+        [ div [ class "line_maps" ] <| List.map lineMap <| connections currentStation ]
+
+
+
+-- TODO
+-- make 2 connecting halls - one with list of lines and arrors (like connections before), one with line map and a back/exit sign
+-- in other words, only one line map per screen
 
 
 storyView : String -> Bool -> Html Msg

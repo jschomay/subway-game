@@ -4,13 +4,12 @@ module City exposing
     , MapImage(..)
     , Station(..)
     , StationInfo
+    , config
     , fullMap
     , lineInfo
     , map
     , mapImage
-    , redLine
     , stationInfo
-    , yellowLine
     )
 
 import Color exposing (..)
@@ -20,6 +19,7 @@ import Subway exposing (..)
 type Line
     = Red
     | Yellow
+    | Green
 
 
 type Station
@@ -32,6 +32,8 @@ type Station
     | CapitolHeights
     | EastMulberry
     | WestMulberry
+    | Burlington
+    | SamualStreet
 
 
 type MapImage
@@ -49,6 +51,7 @@ type alias LineInfo =
     { name : String
     , number : Int
     , color : Color
+    , stations : List Station
     }
 
 
@@ -100,6 +103,16 @@ stationInfo station =
             , name = "West Mulberry"
             }
 
+        Burlington ->
+            { id = 10
+            , name = "Burlington"
+            }
+
+        SamualStreet ->
+            { id = 11
+            , name = "Samual Street"
+            }
+
 
 lineInfo : Line -> LineInfo
 lineInfo line =
@@ -108,48 +121,62 @@ lineInfo line =
             { number = 1
             , name = "Red Line"
             , color = red
+            , stations =
+                [ WestMulberry
+                , EastMulberry
+                , ChurchStreet
+                , MetroCenter
+                , FederalTriangle
+                , SpringHill
+                , TwinBrooks
+                ]
             }
 
         Yellow ->
             { number = 2
             , name = "Yellow Line"
             , color = yellow
+            , stations =
+                [ MetroCenter
+                , FederalTriangle
+                , CapitolHeights
+                , MacArthursPark
+                ]
+            }
+
+        Green ->
+            { number = 3
+            , name = "Green Line"
+            , color = green
+            , stations =
+                [ Burlington
+                , SamualStreet
+                , CapitolHeights
+                , FederalTriangle
+                ]
             }
 
 
-redLine : ( Line, List Station )
-redLine =
-    ( Red
-    , [ WestMulberry
-      , EastMulberry
-      , ChurchStreet
-      , MetroCenter
-      , FederalTriangle
-      , SpringHill
-      , TwinBrooks
-      ]
-    )
+config : Subway.Config Station Line
+config =
+    { stationToId = stationInfo >> .id
+    , lineToId = lineInfo >> .number
+    }
 
 
-yellowLine : ( Line, List Station )
-yellowLine =
-    ( Yellow
-    , [ MetroCenter
-      , FederalTriangle
-      , CapitolHeights
-      , MacArthursPark
-      ]
-    )
+stationsOnLine : Line -> ( Line, List Station )
+stationsOnLine line =
+    ( line, lineInfo line |> .stations )
 
 
 fullMap : Map Station Line
 fullMap =
-    map [ redLine, yellowLine ]
+    [ Red, Yellow, Green ] |> map
 
 
-map : List ( Line, List Station ) -> Map Station Line
+map : List Line -> Map Station Line
 map lines =
-    Subway.init (stationInfo >> .id) (List.concatMap Tuple.second lines) lines
+    Subway.init (stationInfo >> .id) (List.map stationsOnLine lines)
 
 
 mapImage : MapImage -> String

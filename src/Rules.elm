@@ -43,7 +43,7 @@ rules =
                         [ currentSceneIs "meetSteve"
                         ]
                     , changes =
-                        [ moveTo <| station WestMulberry ]
+                        [ moveTo <| station FederalTriangle ]
                     }
                     Narrative.introPlatform
                , rule "fall asleep and miss your stop"

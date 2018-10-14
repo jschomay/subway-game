@@ -4,9 +4,12 @@
   min-height: 100vh;
   width: 100%;
   position: absolute;
+  display: flex;
+  flex-direction: column;
 }
 
 .station__story {
+  flex: 1 0 auto;
 }
 
 .station__connections {
@@ -25,6 +28,7 @@
   right: 1em;
 }
 .station__top {
+  flex: 0 0 auto;
   background: black url(../img/tile.jpg);
   background-size: 40%;
   display: flex;
@@ -65,52 +69,49 @@
 /* ConnectingHalls */
 
 .connecting_halls {
-  display: flex;
-  padding: 3em;
   min-height: 100vh;
-  align-items: center;
-  justify-content: center;
-  background: black url(../img/tile.jpg) repeat;
-  background-attachment: fixed;
   width: 100%;
   position: absolute;
+  display: flex;
+  flex-direction: column;
+  background: black url(../img/tile.jpg);
 }
 
-.connecting_halls__station_name {
-  text-align: center;
-  text-transform: uppercase;
-  font-weight: normal;
-  font-size: 2em;
-  padding: 0.4em;
-  border-bottom: 1px solid #222;
+.line_maps {
+  flex: 1 0 auto;
+  display: flex;
+  padding: 3em;
+  justify-content: space-evenly;
 }
 
 /* Connections */
 
-.connections {
+.line_map {
   background: white;
   user-select: none;
-  position: fixed;
-  padding: 0 1em;
+  padding: 1em;
   width: 330px;
   border: 0.2em solid #333;
   background: white;
   border-radius: 1.1em;
+  flex: 0 0 auto;
 }
 
-.connection {
+.line_info {
+  text-transform: uppercase;
+  font-weight: bold;
+  color: black;
   display: flex;
   align-items: center;
-  padding: 0.8em 0em;
-  cursor: pointer;
-  border-bottom: 1px solid #222;
+  margin-bottom: 1em;
+  font-size: 1.5em;
+  justify-content: center;
+  padding-right: 1em;
+  border-bottom: 1px solid black;
+  padding-bottom: 0.5em;
 }
 
-.connection:last-of-type {
-  border-bottom: none;
-}
-
-.connection__number {
+.line_info__number {
   background: white;
   border: 3px solid;
   border-radius: 50%;
@@ -138,5 +139,69 @@
   font-weight: bold;
   text-transform: uppercase;
   margin-right: 0.5em;
+}
+
+.line_map__stops {
+  position: relative;
+}
+
+.line_map__stop {
+  display: flex;
+  padding: 0 0.8em;
+  height: 4em;
+  align-items: center;
+  position: relative;
+}
+
+.line_map__stop_connections {
+  width: 4em;
+  text-align: right;
+  display: flex;
+  justify-content: flex-end;
+  margin-right: 0.7em;
+}
+
+.line_map__stop_connection {
+  color: white;
+  border: 3px solid;
+  border-radius: 50%;
+  width: 25px;
+  height: 25px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7em;
+  font-weight: bold;
+}
+
+.connection_name {
+}
+
+.connection_name--current {
+  font-weight: bold;
+}
+
+.station_dot {
+  width: 20px;
+  height: 20px;
+  margin-right: 1em;
+  border-radius: 50%;
+  border: 3px solid;
+  background: white;
+}
+
+.station_dot--current {
+  width: 26px;
+  height: 26px;
+  margin-left: -3px;
+}
+
+.line_map__line {
+  position: absolute;
+  width: 20px;
+  left: 88px;
+  top: 22px;
+  bottom: 22px;
+  border-radius: 20px;
 }
 
