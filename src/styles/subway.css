@@ -113,7 +113,7 @@
   justify-content: center;
   font-size: 1em;
   font-weight: bold;
-  margin-right: 0.5em;
+  margin-right: 0.8em;
   cursor: pointer;
 }
 
@@ -246,6 +246,29 @@
   text-transform: uppercase;
 }
 
+
+.Exit {
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-transform: uppercase;
+  font-weight: bold;
+  font-size: 1em;
+  border: 0.1em solid black;
+  padding: 0.4em;
+  color: #111;
+  background: white;
+  position: absolute;
+  left: 2em;
+  top: 2em;
+  background: black;
+  color: white;
+}
+
+.Exit__text {
+  margin-left: 0.5em;
+}
 
 .icon {
 }

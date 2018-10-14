@@ -558,7 +558,8 @@ platform map currentStation line =
                 ]
     in
     div [ class "Station Station--platform" ]
-        [ div
+        [ exitView (Go <| InStation Hall)
+        , div
             [ class "Line_map" ]
             [ lineInfoView <| City.lineInfo line
             , div [ class "Line_map__stops" ] <|
@@ -611,10 +612,16 @@ hall map currentStation =
             Subway.connections City.config map currentStation
     in
     div [ class "Station Station--hall" ]
-        [ div [ class "Connections" ] <|
+        [ exitView (Go <| InStation Lobby)
+        , div [ class "Connections" ] <|
             div [ class "Connections__title" ] [ text "Connecting trains" ]
                 :: List.map connectionView connections
         ]
+
+
+exitView : Msg -> Html Msg
+exitView msg =
+    div [ class "Exit", onClick msg ] [ arrowView -180, div [class "Exit__text"] [text "Exit" ]]
 
 
 storyView : String -> Bool -> Html Msg
