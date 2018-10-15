@@ -38,12 +38,12 @@ rules =
         []
             -- story events
             ++ [ rule "meeting steve (platform)"
-                    { interaction = with "nextDay"
+                    { interaction = with "intro"
                     , conditions =
                         [ currentSceneIs "meetSteve"
                         ]
                     , changes =
-                        [ moveTo <| station FederalTriangle ]
+                        [ moveTo <| station WestMulberry ]
                     }
                     Narrative.introPlatform
                , rule "fall asleep and miss your stop"

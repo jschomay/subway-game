@@ -1,17 +1,6 @@
-module LocalTypes exposing
-    ( Location(..)
-    , Msg(..)
-    , StationArea(..)
-    , Train
-    , TrainStatus(..)
-    )
+module LocalTypes exposing (Location(..), Msg(..), StationArea(..), TrainProps, TrainStatus(..))
 
 import City exposing (..)
-
-
-type alias Train =
-    -- line and direction
-    ( Line, Station )
 
 
 type Msg
@@ -19,20 +8,11 @@ type Msg
     | Loaded
     | Delay Float Msg
     | ToggleMap
-    | Go Location
-      -- TODO remove all the movement msg and use Go location
-    | BoardTrain Train
-    | ExitTrain
-    | ArriveAtStation Station
-    | LeaveStation
-    | RemoveTitleCard
+    | ShowStory Bool
+    | Go StationArea
+    | BoardTrain Line Station
+    | Disembark Station
     | Continue
-
-
-type TrainStatus
-    = Stopped
-    | Moving
-    | OutOfService
 
 
 type StationArea
@@ -41,6 +21,18 @@ type StationArea
     | Lobby
 
 
+type TrainStatus
+    = InTransit
+    | Arriving
+
+
+type alias TrainProps =
+    { line : Line
+    , status : TrainStatus
+    , desiredStop : Station
+    }
+
+
 type Location
-    = OnTrain Train TrainStatus
+    = OnTrain TrainProps
     | InStation StationArea

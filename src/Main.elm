@@ -44,14 +44,6 @@ main =
         }
 
 
-type Day
-    = Monday
-    | Tuesday
-    | Wednesday
-    | Thursday
-    | Friday
-
-
 type alias Model =
     { engineModel : Engine.Model
     , loaded : Bool
@@ -60,9 +52,7 @@ type alias Model =
     , map : Subway.Map City.Station City.Line
     , mapImage : String
     , location : Location
-    , isIntro : Bool
-    , titleCard : Maybe String
-    , day : Day
+    , showStory : Bool
     , showMap : Bool
     }
 
@@ -85,30 +75,18 @@ init =
       , narrativeContent = Dict.map (\a b -> getNarrative ( a, b )) Rules.rules
       , map = City.fullMap
       , mapImage = City.mapImage City.RedMap
-      , location = InStation Lobby
-      , isIntro = False
-      , titleCard = Nothing
-      , day = Monday
+      , location = OnTrain { line = Red, status = InTransit, desiredStop = TwinBrooks }
+      , showStory = False
       , showMap = False
       }
-        |> updateStory "nextDay"
-    , delay titleCardDelay RemoveTitleCard
+        |> updateStory "intro"
+    , delay 5000 (ShowStory True)
     )
-
-
-titleCardDelay : Float
-titleCardDelay =
-    1 * 1000
 
 
 transitDelay : Float
 transitDelay =
-    7 * 1000
-
-
-platformDelay : Float
-platformDelay =
-    5 * 1000
+    2 * 1000
 
 
 findEntity : String -> Entity
@@ -146,48 +124,14 @@ updateStory interactableId model =
     }
 
 
-nextDay : Day -> { titleCard : String, day : Day }
-nextDay day =
-    case day of
-        Monday ->
-            { titleCard = "Tuesday, 6:02 AM"
-            , day = Tuesday
-            }
-
-        Tuesday ->
-            { titleCard = "Wednesday, 6:01 AM"
-            , day = Wednesday
-            }
-
-        Wednesday ->
-            { titleCard = "Thursday, 6:04 AM"
-            , day = Thursday
-            }
-
-        Thursday ->
-            { titleCard = "Friday, 6:05 AM"
-            , day = Friday
-            }
-
-        Friday ->
-            { titleCard = "Friday"
-            , day = Friday
-            }
-
-
 noop : Model -> ( Model, Cmd Msg )
 noop model =
     ( model, Cmd.none )
 
 
-changeTrainStatus : TrainStatus -> Location -> Location
-changeTrainStatus newStatus status =
-    case status of
-        OnTrain train _ ->
-            OnTrain train newStatus
-
-        other ->
-            other
+changeTrainStatus : TrainStatus -> TrainProps -> TrainProps
+changeTrainStatus newStatus { line, desiredStop } =
+    { line = line, status = newStatus, desiredStop = desiredStop }
 
 
 {-| Use when you need to manually change the Model outside of the normal subway mechanics.
@@ -202,67 +146,6 @@ Tip: use the event name as a discrete string for updateStory, then you can set t
 scriptedEvents : Msg -> ( Model, Cmd Msg ) -> ( Model, Cmd Msg )
 scriptedEvents msg ( model, cmd ) =
     case ( Engine.getCurrentScene model.engineModel, msg ) of
-        ( "meetSteve", Continue ) ->
-            case ( model.isIntro, model.day, model.location ) of
-                ( True, _, InStation Lobby ) ->
-                    -- board train to work (via the Msg)
-                    ( { model | location = InStation Hall }
-                    , delay 0 <| BoardTrain ( Red, TwinBrooks )
-                    )
-
-                ( True, Friday, OnTrain _ _ ) ->
-                    noop model
-
-                ( True, _, OnTrain train _ ) ->
-                    -- jump to next day
-                    ( { model
-                        | location = InStation Lobby
-                        , day = nextDay model.day |> .day
-                        , titleCard = Just <| .titleCard <| nextDay model.day
-                      }
-                        |> updateStory "nextDay"
-                    , delay titleCardDelay RemoveTitleCard
-                    )
-
-                _ ->
-                    noop model
-
-        ( "meetSteve", ArriveAtStation MetroCenter ) ->
-            -- jump to next day (save as above)
-            ( { model
-                | location = InStation Lobby
-                , day = nextDay model.day |> .day
-                , titleCard = Just <| .titleCard <| nextDay model.day
-              }
-                |> updateStory "nextDay"
-            , delay titleCardDelay RemoveTitleCard
-            )
-
-        ( "meetSteve", ArriveAtStation ChurchStreet ) ->
-            -- fall asleep, end intro
-            if model.day == Friday then
-                ( { model
-                    | location = changeTrainStatus Stopped model.location
-                    , isIntro = False
-                    , titleCard = Just ""
-                  }
-                    |> updateStory "fallAsleep"
-                , delay 4000 RemoveTitleCard
-                )
-
-            else
-                ( model, cmd )
-
-        ( "overslept", ArriveAtStation FederalTriangle ) ->
-            -- stop the train before Metro Center and add yellow line
-            ( { model
-                | location = changeTrainStatus OutOfService model.location
-                , map = City.map [ Red, Yellow ]
-              }
-                |> updateStory "outOfService"
-            , Cmd.none
-            )
-
         _ ->
             ( model, cmd )
 
@@ -308,86 +191,54 @@ update_ msg model =
                 , Task.perform (always delayedMsg) <| Process.sleep duration
                 )
 
-            Continue ->
-                -- use scriptedEvents to respond to Continue's
-                noop model
-
-            RemoveTitleCard ->
-                ( { model
-                    | titleCard = Nothing
-                    , showMap = False
-                  }
-                , Cmd.none
-                )
-
             ToggleMap ->
                 ( { model | showMap = not model.showMap }
                 , Cmd.none
                 )
 
-            Go location ->
-                ( { model | location = location }, Cmd.none )
+            Go area ->
+                ( { model | location = InStation area }, Cmd.none )
 
-            BoardTrain train ->
+            BoardTrain line desiredStop ->
+                ( { model
+                    | location = OnTrain { line = line, status = InTransit, desiredStop = desiredStop }
+                    , showStory = False
+                  }
+                    |> updateStory "train"
+                , delay transitDelay (ShowStory True)
+                )
+
+            ShowStory yesNo ->
+                ( { model | showStory = yesNo }
+                , Cmd.none
+                )
+
+            Continue ->
+                -- note, use scriptedEvents to respond special to Continue's
                 case model.location of
-                    InStation Hall ->
-                        let
-                            cmd =
-                                -- TODO update for new mechanics of navigation...
-                                delay 0 <| LeaveStation
-                        in
+                    InStation _ ->
+                        ( { model | showStory = False }, Cmd.none )
+
+                    OnTrain ({ desiredStop } as train) ->
                         ( { model
-                            | location = OnTrain train Stopped
+                            | location = OnTrain <| changeTrainStatus Arriving train
+                            , showStory = False
                           }
-                            |> updateStory "train"
-                        , cmd
+                        , delay transitDelay <| Disembark desiredStop
                         )
 
-                    _ ->
-                        noop model
-
-            ExitTrain ->
-                case model.location of
-                    OnTrain train Stopped ->
-                        ( { model | location = InStation Lobby } |> updateStory "platform", Cmd.none )
-
-                    OnTrain train OutOfService ->
-                        ( { model | location = InStation Lobby } |> updateStory "platform", Cmd.none )
-
-                    _ ->
-                        noop model
-
-            ArriveAtStation newStation ->
-                case model.location of
-                    OnTrain train Moving ->
-                        ( { model
-                            | location = model.location |> changeTrainStatus Stopped
-                            , engineModel =
-                                -- this is the only place there should be an Engine.changeWorld call to set the location
-                                Engine.changeWorld
-                                    [ Engine.moveTo (newStation |> stationInfo |> .id |> String.fromInt) ]
-                                    model.engineModel
-                          }
-                        , Cmd.batch
-                            [ delay platformDelay LeaveStation
-                            ]
-                        )
-
-                    _ ->
-                        noop model
-
-            LeaveStation ->
-                case model.location of
-                    -- TODO needs to be updated with new navigation mechanic
-                    OnTrain train Stopped ->
-                        ( { model
-                            | location = changeTrainStatus Moving model.location
-                          }
-                        , Cmd.none
-                        )
-
-                    _ ->
-                        noop model
+            Disembark station ->
+                ( { model
+                    | location = InStation Lobby
+                    , showStory = True
+                    , engineModel =
+                        -- this is the only place there should be an Engine.changeWorld call to set the location
+                        Engine.changeWorld
+                            [ Engine.moveTo (station |> stationInfo |> .id |> String.fromInt) ]
+                            model.engineModel
+                  }
+                , Cmd.none
+                )
 
 
 delay : Float -> Msg -> Cmd Msg
@@ -407,20 +258,13 @@ subscriptions model =
 
 view : Model -> Html Msg
 view model =
-    let
-        showTheMap =
-            Debug.log (Subway.graphViz (stationInfo >> .name) (lineInfo >> .name) City.fullMap ++ "\n") "Copy and paste in http://viz-js.com/"
-    in
-    div [ class "game" ] <|
-        List.filterMap identity
-            [ Just <| gameView model
-            , Maybe.map titleCardView model.titleCard
-            ]
-
-
-titleCardView : String -> Html Msg
-titleCardView title =
-    div [ class "titlecard" ] [ text title ]
+    -- let
+    --     showTheMap =
+    --         Debug.log (Subway.graphViz (stationInfo >> .name) (lineInfo >> .name) City.fullMap ++ "\n") "Copy and paste in http://viz-js.com/"
+    -- in
+    div [ class "game" ]
+        [ gameView model
+        ]
 
 
 gameView : Model -> Html Msg
@@ -443,7 +287,7 @@ gameView model =
     div []
         [ case model.location of
             InStation Lobby ->
-                lobby currentStation model.storyLine
+                lobby currentStation
 
             InStation Hall ->
                 hall model.map currentStation
@@ -451,39 +295,46 @@ gameView model =
             InStation (Platform line) ->
                 platform model.map currentStation line
 
-            OnTrain (( line, end ) as train) status ->
-                -- TODO update to pass in desired stop
+            OnTrain { line, status, desiredStop } ->
                 Views.Train.view
-                    line
-                    end
-                    currentStation
-                    status
-                    (case model.location of
-                        OnTrain _ Moving ->
-                            False
+                    { line = line
+                    , arrivingAtStation =
+                        if status == Arriving then
+                            Just desiredStop
 
-                        _ ->
-                            True
-                    )
-                    model.isIntro
-                    (model.day == Friday)
-                    model.storyLine
+                        else
+                            Nothing
+                    }
         , if model.showMap then
             mapView model.mapImage
 
           else
-            div [ onClick ToggleMap, class "map_toggle" ] [ text "Map" ]
+            case model.location of
+                InStation _ ->
+                    div [ onClick ToggleMap, class "map_toggle" ] [ text "Map" ]
+
+                _ ->
+                    text ""
+        , if model.showStory then
+            Maybe.map storyView model.storyLine
+                |> Maybe.withDefault (text "... no story for this state ...")
+
+          else
+            text ""
         ]
 
 
-lobby : Station -> Maybe String -> Html Msg
-lobby currentStation storyLine =
-    let
-        story storyLine_ =
-            div [ class "Station__story" ] [ storyView storyLine_ False ]
 
+-- TODO
+-- break out views
+-- add minimal story
+
+
+lobby : Station -> Html Msg
+lobby currentStation =
+    let
         toTrains =
-            div [ class "Station__connections", onClick <| Go (InStation Hall) ] <|
+            div [ class "Station__connections", onClick <| Go Hall ] <|
                 [ span [ class "icon icon--train" ] [], arrowView 0 ]
     in
     div [ class "Station Station--lobby" ] <|
@@ -493,7 +344,6 @@ lobby currentStation storyLine =
                     [ h2 [ class "Station__name" ] [ text (stationInfo currentStation |> .name) ]
                     , toTrains
                     ]
-            , Maybe.map story storyLine
             ]
 
 
@@ -537,7 +387,7 @@ platform map currentStation line =
             Subway.connections City.config map station
 
         stopView currentLine station =
-            div [ class "Stop" ] <|
+            div [ class "Stop", onClick <| BoardTrain line station ] <|
                 [ div [ class "Stop__connections" ] <|
                     List.map (City.lineInfo >> lineConnectionView) (List.filter ((/=) currentLine) <| connections station)
                 , div
@@ -558,7 +408,7 @@ platform map currentStation line =
                 ]
     in
     div [ class "Station Station--platform" ]
-        [ exitView (Go <| InStation Hall)
+        [ exitView (Go Hall)
         , div
             [ class "Line_map" ]
             [ lineInfoView <| City.lineInfo line
@@ -596,7 +446,7 @@ hall map currentStation =
             in
             li
                 [ class "Connection"
-                , onClick <| Go (InStation (Platform line))
+                , onClick <| Go (Platform line)
                 ]
                 [ div
                     [ class "Connection__number"
@@ -612,7 +462,7 @@ hall map currentStation =
             Subway.connections City.config map currentStation
     in
     div [ class "Station Station--hall" ]
-        [ exitView (Go <| InStation Lobby)
+        [ exitView (Go Lobby)
         , div [ class "Connections" ] <|
             div [ class "Connections__title" ] [ text "Connecting trains" ]
                 :: List.map connectionView connections
@@ -621,22 +471,18 @@ hall map currentStation =
 
 exitView : Msg -> Html Msg
 exitView msg =
-    div [ class "Exit", onClick msg ] [ arrowView -180, div [class "Exit__text"] [text "Exit" ]]
+    div [ class "Exit", onClick msg ] [ arrowView -180, div [ class "Exit__text" ] [ text "Exit" ] ]
 
 
-storyView : String -> Bool -> Html Msg
-storyView storyLine showContinue =
+storyView : String -> Html Msg
+storyView storyLine =
     Html.Keyed.node "div"
         [ class "StoryLine" ]
         [ ( storyLine
-          , div [ class "StoryLine__content" ] <|
-                [ Markdown.toHtml [] storyLine ]
-                    ++ (if showContinue then
-                            [ span [ class "StoryLine__continue", onClick Continue ] [ text "Continue..." ] ]
-
-                        else
-                            []
-                       )
+          , div [ class "StoryLine__content" ]
+                [ Markdown.toHtml [] storyLine
+                , span [ class "StoryLine__continue", onClick Continue ] [ text "Continue..." ]
+                ]
           )
         ]
 
