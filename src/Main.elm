@@ -74,7 +74,7 @@ init =
       , storyLine = Nothing
       , narrativeContent = Dict.map (\a b -> getNarrative ( a, b )) Rules.rules
       , map = City.fullMap
-      , mapImage = City.mapImage City.RedMap
+      , mapImage = City.mapImage City.RedYellowGreenMap
       , location = OnTrain { line = Red, status = InTransit, desiredStop = TwinBrooks }
       , showStory = False
       , showMap = False
@@ -493,8 +493,7 @@ storyView storyLine =
 mapView : String -> Html Msg
 mapView mapImage =
     div [ onClick ToggleMap, class "map" ]
-        [ pre [ class "map__image", style "fontFamily" "monospace" ]
-            [ text <| mapImage ]
+        [ img [ class "map__image", src <| "img/" ++ mapImage ] []
         ]
 
 

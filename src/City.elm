@@ -39,6 +39,7 @@ type Station
 type MapImage
     = RedMap
     | RedYellowMap
+    | RedYellowGreenMap
 
 
 type alias StationInfo =
@@ -183,55 +184,10 @@ mapImage : MapImage -> String
 mapImage m =
     case m of
         RedMap ->
-            """
-
-  Red Line:
-
-        WestMulberry
-             |
-             |
-        EastMulberry
-             |
-             |
-        ChurchStreet
-             |
-             |
-        MetroCenter
-             |
-             |
-        FederalTriangle
-             |
-             |
-        SpringHill
-             |
-             |
-        TwinBrooks
-
-"""
+            "map-red.png"
 
         RedYellowMap ->
-            """
+            "map-red-yellow.png"
 
-   Red Line:         Yellow Line:
-
-         WestMulberry       MetroCenter
-              |                 |
-              |                 |
-         EastMulberr       FederalTriangle
-              |                 |
-              |                 |
-         ChurchStree       CapitolHeights
-              |                 |
-              |                 |
-         MetroCenter       MacArthursPark
-              |
-              |
-         FederalTria
-              |
-              |
-         SpringHill
-              |
-              |
-         TwinBrooks
-
-"""
+        RedYellowGreenMap ->
+            "map-red-yellow-green.png"

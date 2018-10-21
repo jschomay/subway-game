@@ -94,12 +94,11 @@ body {
   right: 0;
   left: 0;
   margin: auto;
-  width: 750px;
-  height: 650px;
+  max-height: 90%;
   background: #aaaaaa;
-  border: 2em solid #e2e2e2;
+  border: 1em solid #e2e2e2;
   box-shadow: 0 0 100px 0px black;
-  padding: 1em;
+  border-radius: 1em;
 }
 
 .titlecard {
