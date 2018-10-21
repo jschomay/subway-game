@@ -11,7 +11,7 @@
   border: 2px solid white;
   border-radius: 4em;
   margin: 1em;
-  animation: fadeIn 0.2s linear forwards
+  animation: fadeIn 0.5s linear forwards
 }
 
 .StoryLine__content {

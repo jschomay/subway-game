@@ -80,13 +80,23 @@ init =
       , showMap = False
       }
         |> updateStory "intro"
-    , delay 5000 (ShowStory True)
+    , delay introDelay (ShowStory True)
     )
 
 
-transitDelay : Float
-transitDelay =
+introDelay : Float
+introDelay =
+    3 * 1000
+
+
+departingDelay : Float
+departingDelay =
     2 * 1000
+
+
+arrivingDelay : Float
+arrivingDelay =
+    1.5 * 1000
 
 
 findEntity : String -> Entity
@@ -205,7 +215,7 @@ update_ msg model =
                     , showStory = False
                   }
                     |> updateStory "train"
-                , delay transitDelay (ShowStory True)
+                , delay departingDelay (ShowStory True)
                 )
 
             ShowStory yesNo ->
@@ -224,13 +234,13 @@ update_ msg model =
                             | location = OnTrain <| changeTrainStatus Arriving train
                             , showStory = False
                           }
-                        , delay transitDelay <| Disembark desiredStop
+                        , delay arrivingDelay <| Disembark desiredStop
                         )
 
             Disembark station ->
                 ( { model
                     | location = InStation Lobby
-                    , showStory = True
+                    , showStory = False
                     , engineModel =
                         -- this is the only place there should be an Engine.changeWorld call to set the location
                         Engine.changeWorld
@@ -322,12 +332,6 @@ gameView model =
           else
             text ""
         ]
-
-
-
--- TODO
--- break out views
--- add minimal story
 
 
 lobby : Station -> Html Msg
@@ -455,7 +459,6 @@ hall map currentStation =
                     ]
                     [ text <| String.fromInt lineInfo.number ]
                 , div [ class "Connection__end_points" ] [ text <| String.join " • " [ from, to ] ]
-                , arrowView <| direction lineInfo
                 ]
 
         connections =
