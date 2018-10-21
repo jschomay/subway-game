@@ -2,7 +2,6 @@ port module Main exposing (main)
 
 import Browser
 import City exposing (..)
-import Color
 import Components exposing (..)
 import Dict exposing (Dict)
 import Engine exposing (..)
@@ -15,12 +14,14 @@ import List.Zipper as Zipper exposing (Zipper)
 import LocalTypes exposing (..)
 import Manifest
 import Markdown
-import Murmur3
 import Process
 import Rules
 import Subway
 import Task
 import Tuple
+import Views.Station.Hall as Hall
+import Views.Station.Lobby as Lobby
+import Views.Station.Platform as Platform
 import Views.Train
 
 
@@ -297,13 +298,13 @@ gameView model =
     div []
         [ case model.location of
             InStation Lobby ->
-                lobby currentStation
+                Lobby.view currentStation
 
             InStation Hall ->
-                hall model.map currentStation
+                Hall.view model.map currentStation
 
             InStation (Platform line) ->
-                platform model.map currentStation line
+                Platform.view model.map currentStation line
 
             OnTrain { line, status, desiredStop } ->
                 Views.Train.view
@@ -334,149 +335,6 @@ gameView model =
         ]
 
 
-lobby : Station -> Html Msg
-lobby currentStation =
-    let
-        toTrains =
-            div [ class "Station__connections", onClick <| Go Hall ] <|
-                [ span [ class "icon icon--train" ] [], arrowView 0 ]
-    in
-    div [ class "Station Station--lobby" ] <|
-        List.filterMap identity
-            [ Just <|
-                div [ class "Station__top" ] <|
-                    [ h2 [ class "Station__name" ] [ text (stationInfo currentStation |> .name) ]
-                    , toTrains
-                    ]
-            ]
-
-
-arrowView : Int -> Html Msg
-arrowView direction =
-    div
-        [ class "Arrow"
-        , style "transform" ("rotate(" ++ String.fromInt direction ++ "deg)")
-        ]
-        [ text "→" ]
-
-
-{-| shows line map for a line
--}
-platform : Subway.Map City.Station City.Line -> Station -> Line -> Html Msg
-platform map currentStation line =
-    let
-        lineInfoView lineInfo =
-            div [ class "Line_map__info" ]
-                [ lineNumberView lineInfo
-                , text <| .name <| lineInfo
-                ]
-
-        lineNumberView lineInfo =
-            div
-                [ class "Line_map__number"
-                , style "color" (toColor lineInfo.color)
-                , style "borderColor" (toColor lineInfo.color)
-                ]
-                [ text <| String.fromInt lineInfo.number ]
-
-        lineConnectionView lineInfo =
-            div
-                [ class "Stop__connection"
-                , style "border-color" (toColor lineInfo.color)
-                , style "color" (toColor lineInfo.color)
-                ]
-                [ text <| String.fromInt lineInfo.number ]
-
-        connections station =
-            Subway.connections City.config map station
-
-        stopView currentLine station =
-            div [ class "Stop", onClick <| BoardTrain line station ] <|
-                [ div [ class "Stop__connections" ] <|
-                    List.map (City.lineInfo >> lineConnectionView) (List.filter ((/=) currentLine) <| connections station)
-                , div
-                    [ classList
-                        [ ( "Stop__dot", True )
-                        , ( "Stop__dot--current", station == currentStation )
-                        ]
-                    , style "borderColor" (toColor <| .color <| lineInfo <| currentLine)
-                    ]
-                    []
-                , div
-                    [ classList
-                        [ ( "Stop__name", True )
-                        , ( "Stop__name--current", station == currentStation )
-                        ]
-                    ]
-                    [ text <| .name <| stationInfo station ]
-                ]
-    in
-    div [ class "Station Station--platform" ]
-        [ exitView (Go Hall)
-        , div
-            [ class "Line_map" ]
-            [ lineInfoView <| City.lineInfo line
-            , div [ class "Line_map__stops" ] <|
-                [ div
-                    [ class "Line_map__line"
-                    , style "background" (toColor <| .color <| lineInfo <| line)
-                    ]
-                    []
-                ]
-                    ++ List.map (stopView line) (City.lineInfo line |> .stations)
-            ]
-        ]
-
-
-{-| shows the lines servicing this station
--}
-hall : Subway.Map City.Station City.Line -> Station -> Html Msg
-hall map currentStation =
-    let
-        direction lineInfo =
-            -- 45deg from -90 to +90 (90 = up)
-            modBy 5 (Murmur3.hashString 1234 ((City.stationInfo currentStation |> .name) ++ lineInfo.name)) * 45 - 180
-
-        connectionView line =
-            let
-                lineInfo =
-                    City.lineInfo line
-
-                from =
-                    lineInfo |> .stations |> List.head |> Maybe.map (City.stationInfo >> .name) |> Maybe.withDefault ""
-
-                to =
-                    lineInfo |> .stations |> List.reverse |> List.head |> Maybe.map (City.stationInfo >> .name) |> Maybe.withDefault ""
-            in
-            li
-                [ class "Connection"
-                , onClick <| Go (Platform line)
-                ]
-                [ div
-                    [ class "Connection__number"
-                    , style "color" (toColor lineInfo.color)
-                    , style "borderColor" (toColor lineInfo.color)
-                    ]
-                    [ text <| String.fromInt lineInfo.number ]
-                , div [ class "Connection__end_points" ] [ text <| String.join " • " [ from, to ] ]
-                ]
-
-        connections =
-            Subway.connections City.config map currentStation
-    in
-    div [ class "Station Station--hall" ]
-        [ exitView (Go Lobby)
-        , div [ class "Connections" ] <|
-            div [ class "Connections__title" ] [ text "Connecting trains" ]
-                :: List.map connectionView connections
-        ]
-
-
-exitView : Msg -> Html Msg
-exitView msg =
-    div [ class "Exit", onClick msg ] [ arrowView -180, div [ class "Exit__text" ] [ text "Exit" ] ]
-
-
 storyView : String -> Html Msg
 storyView storyLine =
     Html.Keyed.node "div"
@@ -495,9 +353,3 @@ mapView mapImage =
     div [ onClick ToggleMap, class "map" ]
         [ img [ class "map__image", src <| "img/" ++ mapImage ] []
         ]
-
-
-toColor : Color.Color -> String
-toColor color =
-    Color.toRgb color
-        |> (\{ red, green, blue } -> "rgb(" ++ String.fromInt red ++ "," ++ String.fromInt green ++ "," ++ String.fromInt blue ++ ")")
