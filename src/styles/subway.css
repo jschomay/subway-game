@@ -1,11 +1,45 @@
 /* Station */
 
 .Station {
-  position: fixed;
   min-height: 100vh;
   width: 100%;
   display: flex;
   flex-direction: column;
+  opacity: 1;
+  animation: fadeIn 0.3s linear forwards;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+}
+
+.Station--lobby:before {
+  content: "";
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: url(../img/subway-lobby.jpg);
+  background-size: cover;
+  filter: blur(3px);
+  opacity: 0.8;
+  animation: flicker 0.3s cubic-bezier(0.840, 0.170, 0.540, 1.350) alternate infinite 0s;
+  max-height: 100vh;
+}
+
+@keyframes flicker {
+  0% {
+    opacity: 0.8;
+  }
+  
+  30% {
+    opacity: 0.75;
+  }
+
+  100% {
+    opacity: 0.8;
+  }
 }
 
 .Station--hall, .Station--platform {
@@ -60,6 +94,44 @@
   justify-content: center;
   align-items: center;
   padding: 1.5em;
+  position: relative;
+}
+
+.Station__scene {
+  padding: 5em 3em;
+  flex: 1 0 auto;
+  display: flex;
+  justify-content: space-around;
+  align-items: flex-start;
+  position: relative;
+}
+
+.Station__interactables {
+  background: white;
+  user-select: none;
+  padding: 0 2em;
+  border: 0.2em solid #333;
+  background: white;
+  border-radius: 1.1em;
+  width: 280px;
+  min-height: 5em;
+}
+
+.Station__interactables_title {
+  text-align: center;
+  text-transform: uppercase;
+  font-weight: bold;
+  font-size: 1.5em;
+  padding: 0.4em 0.7em;
+  color: #222;
+}
+
+.Station__interactable {
+  display: flex;
+  align-items: center;
+  padding: 0.9em 0em;
+  cursor: pointer;
+  font-weight: normal;
 }
 
 /* Connections */
@@ -91,11 +163,6 @@
   align-items: center;
   padding: 0.9em 0em;
   cursor: pointer;
-  border-bottom: 1px solid #ccc;
-}
-
-.Connection:last-of-type {
-  border-bottom: none;
 }
 
 .Connection__number {
@@ -144,7 +211,6 @@
   font-size: 1.5em;
   justify-content: center;
   padding-right: 1em;
-  border-bottom: 1px solid black;
   padding-bottom: 0.5em;
 }
 

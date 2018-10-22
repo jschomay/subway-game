@@ -8,7 +8,6 @@ type Msg
     | Loaded
     | Delay Float Msg
     | ToggleMap
-    | ShowStory Bool
     | Go StationArea
     | BoardTrain Line Station
     | Disembark Station

@@ -11,7 +11,20 @@ import Narrative
 -}
 startingState : List Engine.ChangeWorldCommand
 startingState =
-    [ loadScene "meetSteve" ]
+    [ loadScene "meetSteve"
+
+    -- inventory
+    , moveItemToInventory "briefcase"
+    , moveItemToInventory "redLinePass"
+
+    -- characters
+    , moveCharacterToLocation "ticketCollector" (station WestMulberry)
+    , moveCharacterToLocation "skaterDude" (station WestMulberry)
+
+    -- items
+    , moveItemToLocationFixed "safteyWarningPoster" (station WestMulberry)
+    , moveItemToLocationFixed "mapPoster" (station WestMulberry)
+    ]
 
 
 {-| A simple helper for making rules, since I want all of my rules to include RuleData and Narrative components.
@@ -36,6 +49,14 @@ rules : Dict String Components
 rules =
     Dict.fromList <|
         []
+            ++ [ rule "end of line"
+                    { interaction = with "ticketCollector"
+                    , conditions =
+                        [ currentSceneIs "meetSteve" ]
+                    , changes = []
+                    }
+                    Narrative.endOfLine
+               ]
             -- story events
             ++ [ rule "meeting steve (platform)"
                     { interaction = with "intro"
@@ -43,7 +64,8 @@ rules =
                         [ currentSceneIs "meetSteve"
                         ]
                     , changes =
-                        [ moveTo <| station WestMulberry ]
+                        -- [ moveTo <| station WestMulberry ]
+                        []
                     }
                     Narrative.introPlatform
                , rule "fall asleep and miss your stop"
@@ -53,7 +75,8 @@ rules =
                         ]
                     , changes =
                         [ loadScene "overslept"
-                        , moveTo <| station TwinBrooks
+
+                        -- , moveTo <| station TwinBrooks
                         ]
                     }
                     Narrative.fellAsleep

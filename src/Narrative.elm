@@ -1,4 +1,4 @@
-module Narrative exposing (fellAsleep, findANewWayPlatform, findANewWayTrain, gotToGetBackPlatform, gotToGetBackTrain, introPlatform, introTrain, outOfService)
+module Narrative exposing (endOfLine, fellAsleep, findANewWayPlatform, findANewWayTrain, gotToGetBackPlatform, gotToGetBackTrain, introPlatform, introTrain, outOfService)
 
 {-| The text that will show when the story first starts, before the player interacts with anythin.
 -}
@@ -8,6 +8,17 @@ module Narrative exposing (fellAsleep, findANewWayPlatform, findANewWayTrain, go
    I sometimes like to write all my narrative content first, then create the rules they correspond to.
    Note that you can use **markdown** in your text!
 -}
+
+
+endOfLine : List String
+endOfLine =
+    [ """
+  Hey buddy, this is the end of the line!
+  """
+    , """
+  Don't make me tell you again, you need to find another way
+  """
+    ]
 
 
 introPlatform : List String

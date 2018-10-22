@@ -48,12 +48,11 @@ main =
 type alias Model =
     { engineModel : Engine.Model
     , loaded : Bool
-    , storyLine : Maybe String
+    , story : Maybe String
     , narrativeContent : Dict String (Zipper String)
     , map : Subway.Map City.Station City.Line
     , mapImage : String
     , location : Location
-    , showStory : Bool
     , showMap : Bool
     }
 
@@ -72,16 +71,14 @@ init =
     in
     ( { engineModel = engineModel
       , loaded = False
-      , storyLine = Nothing
+      , story = Nothing
       , narrativeContent = Dict.map (\a b -> getNarrative ( a, b )) Rules.rules
       , map = City.fullMap
       , mapImage = City.mapImage City.RedYellowGreenMap
       , location = OnTrain { line = Red, status = InTransit, desiredStop = TwinBrooks }
-      , showStory = False
       , showMap = False
       }
-        |> updateStory "intro"
-    , delay introDelay (ShowStory True)
+    , delay introDelay (Interact "intro")
     )
 
 
@@ -100,37 +97,39 @@ arrivingDelay =
     1.5 * 1000
 
 
-findEntity : String -> Entity
-findEntity id =
-    (Manifest.items ++ Manifest.locations ++ Manifest.characters)
-        |> List.filter (Tuple.first >> (==) id)
-        |> List.head
-        |> Maybe.withDefault (entity id)
-
-
+{-| "Ticks" the narrative engine, and displays the story content
+-}
 updateStory : String -> Model -> Model
 updateStory interactableId model =
     let
         ( newEngineModel, maybeMatchedRuleId ) =
             Engine.update interactableId model.engineModel
 
-        narrativeForThisInteraction =
-            maybeMatchedRuleId
-                |> Maybe.andThen (\id -> Dict.get id model.narrativeContent)
-                |> Maybe.map Zipper.current
+        ( narrativeForThisInteraction, updatedContent ) =
+            Maybe.andThen
+                (\matchedRuleId ->
+                    Maybe.map
+                        (\definedNarrative ->
+                            ( Zipper.current definedNarrative
+                            , Dict.update matchedRuleId updateNarrativeContent model.narrativeContent
+                            )
+                        )
+                        (Dict.get matchedRuleId model.narrativeContent)
+                )
+                maybeMatchedRuleId
+                |> Maybe.withDefault
+                    ( .description <| Components.getDisplayInfo <| Manifest.findEntity <| interactableId
+                    , model.narrativeContent
+                    )
 
         updateNarrativeContent : Maybe (Zipper String) -> Maybe (Zipper String)
-        updateNarrativeContent =
-            Maybe.andThen (\narrative -> Zipper.next narrative)
-
-        updatedContent =
-            maybeMatchedRuleId
-                |> Maybe.map (\id -> Dict.update id updateNarrativeContent model.narrativeContent)
-                |> Maybe.withDefault model.narrativeContent
+        updateNarrativeContent maybeZipper =
+            -- Note, sets the narrative content to `Nothing` if at the "end" of the zipper
+            Maybe.andThen Zipper.next maybeZipper
     in
     { model
         | engineModel = newEngineModel
-        , storyLine = narrativeForThisInteraction
+        , story = Just <| narrativeForThisInteraction
         , narrativeContent = updatedContent
     }
 
@@ -213,27 +212,20 @@ update_ msg model =
             BoardTrain line desiredStop ->
                 ( { model
                     | location = OnTrain { line = line, status = InTransit, desiredStop = desiredStop }
-                    , showStory = False
                   }
-                    |> updateStory "train"
-                , delay departingDelay (ShowStory True)
-                )
-
-            ShowStory yesNo ->
-                ( { model | showStory = yesNo }
-                , Cmd.none
+                , delay departingDelay (Interact "train")
                 )
 
             Continue ->
                 -- note, use scriptedEvents to respond special to Continue's
                 case model.location of
                     InStation _ ->
-                        ( { model | showStory = False }, Cmd.none )
+                        ( { model | story = Nothing }, Cmd.none )
 
                     OnTrain ({ desiredStop } as train) ->
                         ( { model
                             | location = OnTrain <| changeTrainStatus Arriving train
-                            , showStory = False
+                            , story = Nothing
                           }
                         , delay arrivingDelay <| Disembark desiredStop
                         )
@@ -241,7 +233,7 @@ update_ msg model =
             Disembark station ->
                 ( { model
                     | location = InStation Lobby
-                    , showStory = False
+                    , story = Nothing
                     , engineModel =
                         -- this is the only place there should be an Engine.changeWorld call to set the location
                         Engine.changeWorld
@@ -269,18 +261,9 @@ subscriptions model =
 
 view : Model -> Html Msg
 view model =
-    -- let
-    --     showTheMap =
-    --         Debug.log (Subway.graphViz (stationInfo >> .name) (lineInfo >> .name) City.fullMap ++ "\n") "Copy and paste in http://viz-js.com/"
-    -- in
-    div [ class "game" ]
-        [ gameView model
-        ]
-
-
-gameView : Model -> Html Msg
-gameView model =
     let
+        --     showTheMap =
+        --         Debug.log (Subway.graphViz (stationInfo >> .name) (lineInfo >> .name) City.fullMap ++ "\n") "Copy and paste in http://viz-js.com/"
         currentStation =
             getCurrentStation model
 
@@ -295,53 +278,54 @@ gameView model =
             , lineToId = lineToId
             }
     in
-    div []
-        [ case model.location of
-            InStation Lobby ->
-                Lobby.view currentStation
+    if not model.loaded then
+        div [ class "Loading" ] [ text "Loading..." ]
 
-            InStation Hall ->
-                Hall.view model.map currentStation
+    else
+        div [ class "game" ]
+            [ case model.location of
+                InStation Lobby ->
+                    Lobby.view model.engineModel currentStation
 
-            InStation (Platform line) ->
-                Platform.view model.map currentStation line
+                InStation Hall ->
+                    Hall.view model.map currentStation
 
-            OnTrain { line, status, desiredStop } ->
-                Views.Train.view
-                    { line = line
-                    , arrivingAtStation =
-                        if status == Arriving then
-                            Just desiredStop
+                InStation (Platform line) ->
+                    Platform.view model.map currentStation line
 
-                        else
-                            Nothing
-                    }
-        , if model.showMap then
-            mapView model.mapImage
+                OnTrain { line, status, desiredStop } ->
+                    Views.Train.view
+                        { line = line
+                        , arrivingAtStation =
+                            if status == Arriving then
+                                Just desiredStop
 
-          else
-            case model.location of
-                InStation _ ->
-                    div [ onClick ToggleMap, class "map_toggle" ] [ text "Map" ]
+                            else
+                                Nothing
+                        }
+            , if model.showMap then
+                mapView model.mapImage
 
-                _ ->
-                    text ""
-        , if model.showStory then
-            Maybe.map storyView model.storyLine
-                |> Maybe.withDefault (text "... no story for this state ...")
+              else
+                case model.location of
+                    InStation _ ->
+                        div [ onClick ToggleMap, class "map_toggle" ] [ text "Map" ]
 
-          else
-            text ""
-        ]
+                    _ ->
+                        text ""
+            , model.story
+                |> Maybe.map storyView
+                |> Maybe.withDefault (text "")
+            ]
 
 
 storyView : String -> Html Msg
-storyView storyLine =
+storyView story =
     Html.Keyed.node "div"
         [ class "StoryLine" ]
-        [ ( storyLine
+        [ ( story
           , div [ class "StoryLine__content" ]
-                [ Markdown.toHtml [] storyLine
+                [ Markdown.toHtml [] story
                 , span [ class "StoryLine__continue", onClick Continue ] [ text "Continue..." ]
                 ]
           )

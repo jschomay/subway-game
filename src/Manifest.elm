@@ -1,6 +1,14 @@
-module Manifest exposing (characters, items, locations)
+module Manifest exposing (characters, findEntity, items, locations)
 
 import Components exposing (..)
+
+
+findEntity : String -> Entity
+findEntity id =
+    (items ++ locations ++ characters)
+        |> List.filter (Tuple.first >> (==) id)
+        |> List.head
+        |> Maybe.withDefault (Components.entity id)
 
 
 
@@ -11,13 +19,19 @@ import Components exposing (..)
 
 items : List Entity
 items =
-    [ entity "map"
+    [ entity "briefcase"
+        |> addDisplayInfo "Briefcase" "The tool of your trade, perfectly organized, and always by your side.  It has papers, pencils, but most importantly, the hard copy of your presentation."
+    , entity "redLinePass"
+        |> addDisplayInfo "Red Line pass" "This will get you to any station along the Red Line.  Expires in 8 months."
+    , entity "safteyWarningPoster"
+    , entity "mapPoster"
     ]
 
 
 characters : List Entity
 characters =
-    [ entity "Steve"
+    [ entity "ticketCollector"
+    , entity "skaterDude"
     ]
 
 

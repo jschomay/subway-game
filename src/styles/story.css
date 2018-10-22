@@ -1,5 +1,5 @@
 .StoryLine {
-  padding: 8em;
+  padding: 5em;
   color: white;
   /* background: rgba(0,0,0,0.8); */
   background: linear-gradient(to top, #111 0%, #000 100%);
@@ -7,11 +7,13 @@
   line-height: 1.4em;
   font-weight: normal;
   font-family: 'Quicksand', sans-serif;
-  position: relative;
+  position: absolute;
+  top: 2em;
+  left: 1em;
+  right: 1em;
   border: 2px solid white;
   border-radius: 4em;
-  margin: 1em;
-  animation: fadeIn 0.5s linear forwards
+  animation: fadeIn 0.3s linear forwards;
 }
 
 .StoryLine__content {
@@ -20,7 +22,6 @@
 }
 
 .StoryLine__continue {
-  text-decoration: underline;
   text-transform: uppercase;
   user-select: none;
   font-style: italic;

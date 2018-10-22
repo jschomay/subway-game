@@ -35,10 +35,12 @@ function loadImage(path) {
   var img = new Image();
   img.src = "img/" + path;
   img.onload = assetLoaded;
+  console.log("loading", img.src)
   return img;
 }
 
 function loaded() {
   app.ports.loaded.send(true);
+  console.log("loaded")
 }
 
