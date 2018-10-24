@@ -284,6 +284,7 @@
 
 .Stop__name--current {
   font-weight: bold;
+  cursor: default;
 }
 
 .Stop__dot {

@@ -40,7 +40,16 @@ view map currentStation line =
             Subway.connections City.config map station
 
         stopView currentLine station =
-            div [ class "Stop", onClick <| BoardTrain line station ] <|
+            div
+                [ class "Stop"
+                , onClick <|
+                    if station /= currentStation then
+                        BoardTrain line station
+
+                    else
+                        NoOp
+                ]
+            <|
                 [ div [ class "Stop__connections" ] <|
                     List.map (City.lineInfo >> lineConnectionView) (List.filter ((/=) currentLine) <| connections station)
                 , div
