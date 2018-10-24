@@ -327,6 +327,9 @@ view model =
                             else
                                 Nothing
                         }
+            , model.story
+                |> Maybe.map storyView
+                |> Maybe.withDefault (text "")
             , if model.showMap then
                 mapView model.mapImage
 
@@ -337,9 +340,6 @@ view model =
 
                     _ ->
                         text ""
-            , model.story
-                |> Maybe.map storyView
-                |> Maybe.withDefault (text "")
             ]
 
 

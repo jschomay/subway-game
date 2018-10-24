@@ -1,6 +1,7 @@
 /* Station */
 
 .Station {
+  position: fixed;
   min-height: 100vh;
   width: 100%;
   display: flex;
@@ -22,7 +23,7 @@
   height: 100%;
   background: url(../img/subway-lobby.jpg);
   background-size: cover;
-  filter: blur(3px);
+  background-position: top center;
   opacity: 0.8;
   animation: flicker 0.3s cubic-bezier(0.840, 0.170, 0.540, 1.350) alternate infinite 0s;
   max-height: 100vh;
