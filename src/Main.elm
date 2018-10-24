@@ -186,6 +186,9 @@ update_ msg model =
 
     else
         case msg of
+            NoOp ->
+                noop model
+
             Interact interactableId ->
                 ( updateStory interactableId model
                 , Cmd.none
@@ -252,11 +255,32 @@ delay duration msg =
 port loaded : (Bool -> msg) -> Sub msg
 
 
+port keyPress : (String -> msg) -> Sub msg
+
+
 subscriptions : Model -> Sub Msg
 subscriptions model =
     Sub.batch
         [ loaded <| always Loaded
+        , keyPress <| handleKey model
         ]
+
+
+handleKey : Model -> String -> Msg
+handleKey model key =
+    case key of
+        " " ->
+            if model.story /= Nothing then
+                Continue
+
+            else
+                NoOp
+
+        "m" ->
+            ToggleMap
+
+        _ ->
+            NoOp
 
 
 view : Model -> Html Msg

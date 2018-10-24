@@ -4,7 +4,8 @@ import City exposing (..)
 
 
 type Msg
-    = Interact String
+    = NoOp
+    | Interact String
     | Loaded
     | Delay Float Msg
     | ToggleMap

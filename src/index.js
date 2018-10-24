@@ -44,3 +44,10 @@ function loaded() {
   console.log("loaded")
 }
 
+
+document.addEventListener("keydown", function (e) {
+  app.ports.keyPress.send(e.key)
+  if ( e.key == " " || e.key === "Backspace") {
+    e.preventDefault();
+  }
+});
