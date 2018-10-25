@@ -24,19 +24,34 @@ items =
     , entity "redLinePass"
         |> addDisplayInfo "Red Line pass" "This will get you to any station along the Red Line.  Expires in 8 months."
     , entity "safteyWarningPoster"
+        |> addDisplayInfo "Safety Message Poster" "A poster that warns you to watch out for pickpockets and report any suspicious activity. "
     , entity "mapPoster"
+        |> addDisplayInfo "Map on the wall" "This shows the full map of the subway system."
+    , entity "cellPhone"
+        |> addDisplayInfo "Cellphone" "It's not one of those $800 ones, but it does everything you need.  Unless there's no service.  Down here there's no service, so it's practically useless.."
+        , entity "policeOffice" 
+        |> addDisplayInfo "Police Office" "It's not much help when it's closed."
+        , entity "ticketMachine"
+        |> addDisplayInfo "Ticket Machine" "You can buy tickets and passes here.  You reach for your wallet, but realize you left it in your briefcase!  It won't help you without money."
     ]
 
 
 characters : List Entity
 characters =
-    [ entity "ticketCollector"
-    , entity "skaterDude"
+    [ entity "securityGuard"
+        |> addDisplayInfo "Security Guard" "He's probably busy, you don't really have any reason to bother him."
+    , entity "ticketInspector"
+        |> addDisplayInfo "Ticket inspector" "Ticket inspectors aren't really the nicest people to associate with.  Unless you have a good reason to talk to him, you'd rather keep your distance."
+    , entity "largeCrowd"
+        |> addDisplayInfo "A large crowd" "They ignore you for the most part, occupied with the situation at hand."
+    , entity "securityOfficers"
+        |> addDisplayInfo "Security officers" "Two of them, looking official, but not really all that helpful over all."
     ]
 
 
+{-| The locations are mostly handled through the main code, and are the different stations. The train is hard coded as a psudo-location, it never actually ends up in `currentLocation` -}
 locations : List Entity
 locations =
     [ entity "train"
-    , entity "platform"
+        |> addDisplayInfo "Train car" "The train hurtles through the dark tunnel towards the next stop."
     ]

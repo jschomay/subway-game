@@ -73,8 +73,8 @@ init =
       , loaded = False
       , story = Nothing
       , narrativeContent = Dict.map (\a b -> getNarrative ( a, b )) Rules.rules
-      , map = City.fullMap
-      , mapImage = City.mapImage City.RedYellowGreenMap
+      , map = City.map [ Red ]
+      , mapImage = City.mapImage City.RedMap
       , location = OnTrain { line = Red, status = InTransit, desiredStop = TwinBrooks }
       , showMap = False
       }
@@ -89,7 +89,7 @@ introDelay =
 
 departingDelay : Float
 departingDelay =
-    2 * 1000
+    1.5 * 1000
 
 
 arrivingDelay : Float
@@ -132,6 +132,33 @@ updateStory interactableId model =
         , story = Just <| narrativeForThisInteraction
         , narrativeContent = updatedContent
     }
+        |> (\new_model ->
+                case maybeMatchedRuleId of
+                    Just ruleId ->
+                        respondToRuleID ruleId new_model
+
+                    Nothing ->
+                        new_model
+           )
+
+
+respondToRuleID : String -> Model -> Model
+respondToRuleID ruleId model =
+    case ruleId of
+        "redirectedToLostAndFound" ->
+            { model
+                | mapImage = City.mapImage RedYellowMap
+                , map = City.map [ Red, Yellow ]
+            }
+
+        "endOfDemo" ->
+            { model
+                | mapImage = City.mapImage RedYellowGreenMap
+                , map = City.map [ Red, Yellow, Green ]
+            }
+
+        _ ->
+            model
 
 
 noop : Model -> ( Model, Cmd Msg )
@@ -215,6 +242,12 @@ update_ msg model =
             BoardTrain line desiredStop ->
                 ( { model
                     | location = OnTrain { line = line, status = InTransit, desiredStop = desiredStop }
+                    , engineModel =
+                        -- this is the only place there should be an Engine.changeWorld call to set the location
+                        -- set here instead of Disembark so that the rules can match against currentLocation (which will be the desiredStop)
+                        Engine.changeWorld
+                            [ Engine.moveTo (desiredStop |> stationInfo |> .id |> String.fromInt) ]
+                            model.engineModel
                   }
                 , delay departingDelay (Interact "train")
                 )
@@ -237,11 +270,6 @@ update_ msg model =
                 ( { model
                     | location = InStation Lobby
                     , story = Nothing
-                    , engineModel =
-                        -- this is the only place there should be an Engine.changeWorld call to set the location
-                        Engine.changeWorld
-                            [ Engine.moveTo (station |> stationInfo |> .id |> String.fromInt) ]
-                            model.engineModel
                   }
                 , Cmd.none
                 )

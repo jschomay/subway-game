@@ -1,6 +1,6 @@
 .StoryLine {
   padding: 5em;
-  color: white;
+  color: #ccc;;
   /* background: rgba(0,0,0,0.8); */
   background: linear-gradient(to top, #111 0%, #000 100%);
   font-size: 1.2em;
@@ -18,7 +18,11 @@
 
 .StoryLine__content {
   width: 100%;
-  min-height: 100%vh;
+}
+
+.StoryLine__content code {
+  overflow: hidden;
+  white-space: pre-wrap;
 }
 
 .StoryLine__continue {

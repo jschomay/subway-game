@@ -11,19 +11,20 @@ import Narrative
 -}
 startingState : List Engine.ChangeWorldCommand
 startingState =
-    [ loadScene "meetSteve"
+    [ loadScene "deadline"
 
     -- inventory
     , moveItemToInventory "briefcase"
     , moveItemToInventory "redLinePass"
+    , moveItemToInventory "cellPhone"
 
     -- characters
-    , moveCharacterToLocation "ticketCollector" (station WestMulberry)
-    , moveCharacterToLocation "skaterDude" (station WestMulberry)
+    , moveCharacterToLocation "securityGuard" (station TwinBrooks)
+    , moveCharacterToLocation "largeCrowd" (station MetroCenter)
 
     -- items
-    , moveItemToLocationFixed "safteyWarningPoster" (station WestMulberry)
-    , moveItemToLocationFixed "mapPoster" (station WestMulberry)
+    , moveItemToLocationFixed "safteyWarningPoster" (station TwinBrooks)
+    , moveItemToLocationFixed "mapPoster" (station TwinBrooks)
     ]
 
 
@@ -44,98 +45,133 @@ station station_ =
 {-| All of the rules that govern your story. The first parameter to `rule` is an id for that rule. It must be unique, but generally isn't used directly anywhere else (though it gets returned from `Engine.update`, so you could do some special behavior if a specific rule matches). I like to write a short summary of what the rule is for as the id to help me easily identify them.
 Also, order does not matter, but I like to organize the rules by the story objects they are triggered by. This makes it easier to ensure I have set up the correct criteria so the right rule will match at the right time.
 Note that the ids used in the rules must match the ids set in `Manifest.elm`.
+
+"intro" and "train" are two special programatic triggers.
+
 -}
 rules : Dict String Components
 rules =
     Dict.fromList <|
         []
-            ++ [ rule "end of line"
-                    { interaction = with "ticketCollector"
-                    , conditions =
-                        [ currentSceneIs "meetSteve" ]
-                    , changes = []
-                    }
-                    Narrative.endOfLine
-               ]
-            -- story events
-            ++ [ rule "meeting steve (platform)"
+            -- story events - intro
+            ++ [ rule "intro, deadline, miss stop"
                     { interaction = with "intro"
                     , conditions =
-                        [ currentSceneIs "meetSteve"
+                        [ currentSceneIs "deadline"
                         ]
                     , changes =
-                        -- [ moveTo <| station WestMulberry ]
-                        []
+                        [ moveTo <| station TwinBrooks ]
                     }
-                    Narrative.introPlatform
-               , rule "fall asleep and miss your stop"
-                    { interaction = with "fallAsleep"
+                    Narrative.intro
+               ]
+            -- map
+            ++ [ rule "figure out how to get back to metro center"
+                    { interaction = with "mapPoster"
                     , conditions =
-                        [ currentSceneIs "meetSteve"
+                        [ currentSceneIs "deadline"
+                        , currentLocationIs <| station TwinBrooks
                         ]
-                    , changes =
-                        [ loadScene "overslept"
-
-                        -- , moveTo <| station TwinBrooks
-                        ]
+                    , changes = []
                     }
-                    Narrative.fellAsleep
-               , rule "stopped at Federal Triangle"
-                    { interaction = with "outOfService"
-                    , conditions =
-                        [ currentSceneIs "overslept"
-                        ]
-                    , changes =
-                        [ loadScene "detour" ]
-                    }
-                    Narrative.outOfService
+                    Narrative.missedStop
                ]
             ++ -- train
-               [ rule "meeting steve (train)"
+               [ rule "missedStopAgain"
                     { interaction = with "train"
                     , conditions =
-                        [ currentSceneIs "meetSteve"
+                        [ currentSceneIs "deadline"
+                        , currentLocationIsNot <| station MetroCenter
                         ]
-                    , changes =
-                        []
+                    , changes = []
                     }
-                    Narrative.introTrain
-               , rule "got to get back (train)"
+                    Narrative.missedStopAgain
+               , rule "delayAhead"
                     { interaction = with "train"
                     , conditions =
-                        [ currentSceneIs "overslept"
+                        [ currentSceneIs "deadline"
+                        , currentLocationIs <| station MetroCenter
                         ]
-                    , changes =
-                        []
+                    , changes = [ moveCharacterToLocation "securityOfficers" <| station MetroCenter ]
                     }
-                    Narrative.gotToGetBackTrain
-               , rule "detour (train)"
+                    Narrative.delayAhead
+               , rule "endOfDemo"
                     { interaction = with "train"
-                    , conditions =
-                        [ currentSceneIs "detour"
-                        ]
-                    , changes =
-                        []
+                    , conditions = [ currentSceneIs "wildGooseChase" ]
+                    , changes = [ loadScene "endOfDemo" ]
                     }
-                    Narrative.findANewWayTrain
+                    Narrative.endOfDemo
+               , rule "riding the train"
+                    { interaction = with "train"
+                    , conditions = []
+                    , changes = []
+                    }
+                    Narrative.ridingTheTrain
                ]
-            -- platform
-            ++ [ rule "got to get back (platform)"
-                    { interaction = with "platform"
+            ++ [ rule ""
+                    { interaction = with "securityGuard"
                     , conditions =
-                        [ currentSceneIs "overslept"
+                        [ currentSceneIs "deadline" ]
+                    , changes = []
+                    }
+                    Narrative.inquireHowToGetBack
+               ]
+            ++ -- cellPHone
+               [ rule "tryCellPhone"
+                    { interaction = with "cellPHone"
+                    , conditions = []
+                    , changes = []
+                    }
+                    Narrative.tryCellPhone
+               ]
+            ++ -- largeCrowd
+               [ rule "exitClosedBriefcaseStolen"
+                    { interaction = with "largeCrowd"
+                    , conditions =
+                        [ currentSceneIs "deadline"
+                        , currentLocationIs <| station MetroCenter
+                        , itemIsInInventory "briefcase"
                         ]
                     , changes =
-                        []
+                        [ loadScene "lostBriefcase"
+                        , moveItemOffScreen "briefcase"
+                        ]
                     }
-                    Narrative.gotToGetBackPlatform
-               , rule "detour (platform)"
-                    { interaction = with "platform"
+                    Narrative.exitClosedBriefcaseStolen
+               ]
+            ++ -- securityOfficers
+               [ rule "askAboutDelay"
+                    { interaction = with "securityOfficers"
                     , conditions =
-                        [ currentSceneIs "detour"
+                        [ currentSceneIs "deadline"
+                        , characterIsInLocation "largeCrowd" <| station MetroCenter
+                        , itemIsInInventory "briefcase"
+                        ]
+                    , changes = []
+                    }
+                    Narrative.askAboutDelay
+               , rule "reportStolenBriefcase"
+                    { interaction = with "securityOfficers"
+                    , conditions =
+                        [ currentSceneIs "lostBriefcase"
+                        , characterIsInLocation "largeCrowd" <| station MetroCenter
+                        , itemIsNotInInventory "briefcase"
                         ]
                     , changes =
-                        []
+                        [ moveItemToLocationFixed "policeOffice" <| station FederalTriangle
+                        , moveItemToLocationFixed "ticketMachine" <| station FederalTriangle
+                        ]
                     }
-                    Narrative.findANewWayPlatform
+                    Narrative.reportStolenBriefcase
+               ]
+            ++ -- policeOffice
+               [ rule "redirectedToLostAndFound"
+                    { interaction = with "policeOffice"
+                    , conditions = [ currentSceneIs "lostBriefcase" ]
+                    , changes =
+                        [ loadScene "wildGooseChase"
+                        , moveCharacterOffScreen "securityOfficers"
+                        , moveCharacterOffScreen "largeCrowd"
+                        ]
+                    }
+                    Narrative.redirectedToLostAndFound
                ]
