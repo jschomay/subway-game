@@ -21,6 +21,7 @@
 }
 
 .StoryLine__content code {
+  font-family: 'Quicksand', sans-serif;
   overflow: hidden;
   white-space: pre-wrap;
 }
