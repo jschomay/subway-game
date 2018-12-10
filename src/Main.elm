@@ -2,18 +2,18 @@ port module Main exposing (main)
 
 import Browser
 import City exposing (..)
-import Components exposing (..)
 import Dict exposing (Dict)
-import Engine exposing (..)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Html.Keyed
 import List.Extra
-import List.Zipper as Zipper exposing (Zipper)
 import LocalTypes exposing (..)
 import Manifest
 import Markdown
+import Narrative
+import Narrative.Rules exposing (..)
+import Narrative.WorldModel exposing (..)
 import Process
 import Rules
 import Subway
@@ -46,37 +46,29 @@ main =
 
 
 type alias Model =
-    { engineModel : Engine.Model
+    { worldModel : Manifest.WorldModel
     , loaded : Bool
     , story : Maybe String
-    , narrativeContent : Dict String (Zipper String)
+    , rules : Rules.Rules
     , map : Subway.Map City.Station City.Line
     , mapImage : String
     , location : Location
     , showMap : Bool
+    , gameOver : Bool
     }
 
 
 init : ( Model, Cmd Msg )
 init =
-    let
-        engineModel =
-            Engine.init
-                { items = List.map Tuple.first Manifest.items
-                , locations = List.map Tuple.first Manifest.locations
-                , characters = List.map Tuple.first Manifest.characters
-                }
-                (Dict.map (\a b -> getRuleData ( a, b )) Rules.rules)
-                |> Engine.changeWorld Rules.startingState
-    in
-    ( { engineModel = engineModel
+    ( { worldModel = Manifest.worldModel
       , loaded = False
       , story = Nothing
-      , narrativeContent = Dict.map (\a b -> getNarrative ( a, b )) Rules.rules
+      , rules = Rules.rules
       , map = City.map [ Red ]
       , mapImage = City.mapImage City.RedMap
       , location = OnTrain { line = Red, status = InTransit, desiredStop = TwinBrooks }
       , showMap = False
+      , gameOver = False
       }
     , delay introDelay (Interact "intro")
     )
@@ -100,50 +92,32 @@ arrivingDelay =
 {-| "Ticks" the narrative engine, and displays the story content
 -}
 updateStory : String -> Model -> Model
-updateStory interactableId model =
-    let
-        ( newEngineModel, maybeMatchedRuleId ) =
-            Engine.update interactableId model.engineModel
+updateStory trigger model =
+    case Narrative.Rules.findMatchingRule trigger model.rules model.worldModel of
+        Nothing ->
+            let
+                default =
+                    Dict.get trigger model.worldModel
+                        |> Maybe.map .description
+            in
+            { model | story = default }
 
-        ( narrativeForThisInteraction, updatedContent ) =
-            Maybe.andThen
-                (\matchedRuleId ->
-                    Maybe.map
-                        (\definedNarrative ->
-                            ( Zipper.current definedNarrative
-                            , Dict.update matchedRuleId updateNarrativeContent model.narrativeContent
-                            )
-                        )
-                        (Dict.get matchedRuleId model.narrativeContent)
-                )
-                maybeMatchedRuleId
-                |> Maybe.withDefault
-                    ( .description <| Components.getDisplayInfo <| Manifest.findEntity <| interactableId
-                    , model.narrativeContent
-                    )
-
-        updateNarrativeContent : Maybe (Zipper String) -> Maybe (Zipper String)
-        updateNarrativeContent maybeZipper =
-            -- Note, sets the narrative content to `Nothing` if at the "end" of the zipper
-            Maybe.andThen Zipper.next maybeZipper
-    in
-    { model
-        | engineModel = newEngineModel
-        , story = Just <| narrativeForThisInteraction
-        , narrativeContent = updatedContent
-    }
-        |> (\new_model ->
-                case maybeMatchedRuleId of
-                    Just ruleId ->
-                        respondToRuleID ruleId new_model
-
-                    Nothing ->
-                        new_model
-           )
+        Just ( matchedRuleID, matchedRule ) ->
+            let
+                ( currentNarrative, updatedNarrative ) =
+                    Narrative.update matchedRule.narrative
+            in
+            { model
+                | worldModel = applyChanges matchedRule.changes model.worldModel
+                , story = Just currentNarrative
+                , rules = Dict.insert matchedRuleID { matchedRule | narrative = updatedNarrative } model.rules
+            }
+                |> specialEvents matchedRuleID
 
 
-respondToRuleID : String -> Model -> Model
-respondToRuleID ruleId model =
+specialEvents : String -> Model -> Model
+specialEvents ruleId model =
+    -- TODO maybe this isn't needed, changing the map can be based on the world model
     case ruleId of
         "redirectedToLostAndFound" ->
             { model
@@ -171,26 +145,10 @@ changeTrainStatus newStatus { line, desiredStop } =
     { line = line, status = newStatus, desiredStop = desiredStop }
 
 
-{-| Use when you need to manually change the Model outside of the normal subway mechanics.
-
-Tip: use the event name as a discrete string for updateStory, then you can set the scene, location, etc of the EngineModel via the usual Engine rules instead of with Engine.changeWorld
-
-\*\* Don't forget to call `updateStory` to get the right narrative based on your changes, but be careful not to call it twice (if it was already called in `update`)
-
-\*\* Dont' forget to pass through or batch in the cmd if unless you know you want to cancel it
-
--}
-scriptedEvents : Msg -> ( Model, Cmd Msg ) -> ( Model, Cmd Msg )
-scriptedEvents msg ( model, cmd ) =
-    case ( Engine.getCurrentScene model.engineModel, msg ) of
-        _ ->
-            ( model, cmd )
-
-
 getCurrentStation : Model -> Station
 getCurrentStation model =
-    Engine.getCurrentLocation model.engineModel
-        |> String.toInt
+    Narrative.WorldModel.getLink "player" "location" model.worldModel
+        |> Maybe.andThen String.toInt
         |> Maybe.andThen (Subway.getStation model.map)
         |> Maybe.withDefault WestMulberry
 
@@ -200,14 +158,9 @@ update msg model =
     update_ msg model
 
 
-
--- TODO put back after adjusting train mechanics if needed
--- |> scriptedEvents msg
-
-
 update_ : Msg -> Model -> ( Model, Cmd Msg )
 update_ msg model =
-    if Engine.getEnding model.engineModel /= Nothing then
+    if model.gameOver then
         -- no-op if story has ended
         noop model
 
@@ -242,12 +195,13 @@ update_ msg model =
             BoardTrain line desiredStop ->
                 ( { model
                     | location = OnTrain { line = line, status = InTransit, desiredStop = desiredStop }
-                    , engineModel =
+                    , worldModel =
                         -- this is the only place there should be an Engine.changeWorld call to set the location
                         -- set here instead of Disembark so that the rules can match against currentLocation (which will be the desiredStop)
-                        Engine.changeWorld
-                            [ Engine.moveTo (desiredStop |> stationInfo |> .id |> String.fromInt) ]
-                            model.engineModel
+                        -- TODO maybe change to `Interact desiredStop` after delay and let rules handle move
+                        Narrative.WorldModel.applyChanges
+                            [ SetLink "player" "location" (desiredStop |> stationInfo |> .id |> String.fromInt) ]
+                            model.worldModel
                   }
                 , delay departingDelay (Interact "train")
                 )
@@ -337,7 +291,7 @@ view model =
         div [ class "game" ]
             [ case model.location of
                 InStation Lobby ->
-                    Lobby.view model.engineModel currentStation
+                    Lobby.view model.worldModel currentStation
 
                 InStation Hall ->
                     Hall.view model.map currentStation

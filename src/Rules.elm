@@ -1,177 +1,157 @@
-module Rules exposing (rule, rules, startingState, station)
+module Rules exposing (Rule, Rules, rule, rules, station)
 
 import City exposing (Station(..), stationInfo)
-import Components exposing (..)
 import Dict exposing (Dict)
-import Engine exposing (..)
-import Narrative
+import Narrative exposing (..)
+import Narrative.Rules as Rules exposing (..)
+import Narrative.WorldModel exposing (..)
 
 
-{-| This specifies the initial story world model. At a minimum, you need to set a starting location with the `moveTo` command. You may also want to place various items and characters in different locations. You can also specify a starting scene if required.
--}
-startingState : List Engine.ChangeWorldCommand
-startingState =
-    [ loadScene "deadline"
-
-    -- inventory
-    , moveItemToInventory "briefcase"
-    , moveItemToInventory "redLinePass"
-    , moveItemToInventory "cellPhone"
-
-    -- characters
-    , moveCharacterToLocation "securityGuard" (station TwinBrooks)
-    , moveCharacterToLocation "largeCrowd" (station MetroCenter)
-
-    -- items
-    , moveItemToLocationFixed "safteyWarningPoster" (station TwinBrooks)
-    , moveItemToLocationFixed "mapPoster" (station TwinBrooks)
-    ]
+type alias Rule =
+    Rules.Rule
+        { changes : List ChangeWorld
+        , narrative : Narrative
+        }
 
 
-{-| A simple helper for making rules, since I want all of my rules to include RuleData and Narrative components.
--}
-rule : String -> Engine.Rule -> List String -> Entity
-rule id ruleData narrative =
-    entity id
-        |> addRuleData ruleData
-        |> addNarrative narrative
+type alias Rules =
+    Dict String Rule
+
+
+rule : RuleID -> Rule -> ( RuleID, Rule )
+rule id rule_ =
+    ( id, rule_ )
 
 
 station : Station -> String
 station station_ =
+    -- TODO remove this after removing graph
     station_ |> stationInfo |> .id |> String.fromInt
 
 
-{-| All of the rules that govern your story. The first parameter to `rule` is an id for that rule. It must be unique, but generally isn't used directly anywhere else (though it gets returned from `Engine.update`, so you could do some special behavior if a specific rule matches). I like to write a short summary of what the rule is for as the id to help me easily identify them.
-Also, order does not matter, but I like to organize the rules by the story objects they are triggered by. This makes it easier to ensure I have set up the correct criteria so the right rule will match at the right time.
-Note that the ids used in the rules must match the ids set in `Manifest.elm`.
+location : String -> Station -> Condition
+location character station_ =
+    EntityMatching character [ HasLink "location" <| station station_ ]
 
-"intro" and "train" are two special programatic triggers.
 
+plot : String -> Int -> Condition
+plot plotLine level =
+    EntityMatching "player" [ HasStat plotLine EQ level ]
+
+
+
+{- scene map
+   intro - 1
+   lostBriefcase - 2
+   wildGooseChase - 3
+   endOfDemo - 4
 -}
-rules : Dict String Components
+
+
+rules : Dict String Rule
 rules =
     Dict.fromList <|
         []
-            -- story events - intro
+            -- TODO group by trigger
+            -- TODO group by scene?
             ++ [ rule "intro, deadline, miss stop"
-                    { interaction = with "intro"
-                    , conditions =
-                        [ currentSceneIs "deadline"
-                        ]
-                    , changes =
-                        [ moveTo <| station TwinBrooks ]
+                    { trigger = TriggerMatching "intro"
+                    , conditions = [ plot "mainPlot" 1 ]
+                    , changes = []
+                    , narrative = Narrative.intro
                     }
-                    Narrative.intro
                ]
             -- map
             ++ [ rule "figure out how to get back to metro center"
-                    { interaction = with "mapPoster"
+                    { trigger = TriggerMatching "mapPoster"
                     , conditions =
-                        [ currentSceneIs "deadline"
-                        , currentLocationIs <| station TwinBrooks
+                        [ plot "mainPlot" 1
+                        , location "player" TwinBrooks
                         ]
                     , changes = []
+                    , narrative = Narrative.missedStop
                     }
-                    Narrative.missedStop
                ]
             ++ -- train
                [ rule "missedStopAgain"
-                    { interaction = with "train"
+                    { trigger = TriggerMatching "train"
                     , conditions =
-                        [ currentSceneIs "deadline"
-                        , currentLocationIsNot <| station MetroCenter
+                        [ plot "mainPlot" 1
+                        , EntityMatching "player" [ Not <| HasLink "location" <| station MetroCenter ]
                         ]
                     , changes = []
+                    , narrative = Narrative.missedStopAgain
                     }
-                    Narrative.missedStopAgain
                , rule "delayAhead"
-                    { interaction = with "train"
+                    { trigger = TriggerMatching "train"
                     , conditions =
-                        [ currentSceneIs "deadline"
-                        , currentLocationIs <| station MetroCenter
+                        [ plot "mainPlot" 1
+                        , location "player" MetroCenter
                         ]
-                    , changes = [ moveCharacterToLocation "securityOfficers" <| station MetroCenter ]
+                    , changes = [ SetLink "securityOfficers" "location" <| station MetroCenter ]
+                    , narrative = Narrative.delayAhead
                     }
-                    Narrative.delayAhead
                , rule "endOfDemo"
-                    { interaction = with "train"
-                    , conditions = [ currentSceneIs "wildGooseChase" ]
-                    , changes = [ loadScene "endOfDemo" ]
+                    { trigger = TriggerMatching "train"
+                    , conditions = [ plot "mainPlot" 3 ]
+                    , changes = [ IncStat "player" "mainPlot" 1 ]
+                    , narrative = Narrative.endOfDemo
                     }
-                    Narrative.endOfDemo
                , rule "riding the train"
-                    { interaction = with "train"
+                    { trigger = TriggerMatching "train"
                     , conditions = []
                     , changes = []
+                    , narrative = Narrative.ridingTheTrain
                     }
-                    Narrative.ridingTheTrain
                ]
             ++ [ rule ""
-                    { interaction = with "securityGuard"
-                    , conditions =
-                        [ currentSceneIs "deadline" ]
+                    { trigger = TriggerMatching "securityGuard"
+                    , conditions = [ plot "mainPlot" 1 ]
                     , changes = []
+                    , narrative = Narrative.inquireHowToGetBack
                     }
-                    Narrative.inquireHowToGetBack
                ]
             ++ -- cellPHone
                [ rule "tryCellPhone"
-                    { interaction = with "cellPHone"
+                    { trigger = TriggerMatching "cellPHone"
                     , conditions = []
                     , changes = []
+                    , narrative = Narrative.tryCellPhone
                     }
-                    Narrative.tryCellPhone
                ]
             ++ -- largeCrowd
                [ rule "exitClosedBriefcaseStolen"
-                    { interaction = with "largeCrowd"
+                    { trigger = TriggerMatching "largeCrowd"
                     , conditions =
-                        [ currentSceneIs "deadline"
-                        , currentLocationIs <| station MetroCenter
-                        , itemIsInInventory "briefcase"
+                        [ plot "mainPlot" 1
+                        , EntityMatching "briefcase" [ HasLink "location" "player" ]
                         ]
                     , changes =
-                        [ loadScene "lostBriefcase"
-                        , moveItemOffScreen "briefcase"
+                        [ IncStat "player" "mainPlot" 1
+                        , SetLink "briefcase" "location" "thief"
                         ]
+                    , narrative = Narrative.exitClosedBriefcaseStolen
                     }
-                    Narrative.exitClosedBriefcaseStolen
                ]
             ++ -- securityOfficers
                [ rule "askAboutDelay"
-                    { interaction = with "securityOfficers"
-                    , conditions =
-                        [ currentSceneIs "deadline"
-                        , characterIsInLocation "largeCrowd" <| station MetroCenter
-                        , itemIsInInventory "briefcase"
-                        ]
+                    { trigger = TriggerMatching "securityOfficers"
+                    , conditions = [ plot "mainPlot" 1 ]
                     , changes = []
+                    , narrative = Narrative.askAboutDelay
                     }
-                    Narrative.askAboutDelay
                , rule "reportStolenBriefcase"
-                    { interaction = with "securityOfficers"
-                    , conditions =
-                        [ currentSceneIs "lostBriefcase"
-                        , characterIsInLocation "largeCrowd" <| station MetroCenter
-                        , itemIsNotInInventory "briefcase"
-                        ]
-                    , changes =
-                        [ moveItemToLocationFixed "policeOffice" <| station FederalTriangle
-                        , moveItemToLocationFixed "ticketMachine" <| station FederalTriangle
-                        ]
+                    { trigger = TriggerMatching "securityOfficers"
+                    , conditions = [ plot "mainPlot" 2 ]
+                    , changes = []
+                    , narrative = Narrative.reportStolenBriefcase
                     }
-                    Narrative.reportStolenBriefcase
                ]
             ++ -- policeOffice
                [ rule "redirectedToLostAndFound"
-                    { interaction = with "policeOffice"
-                    , conditions = [ currentSceneIs "lostBriefcase" ]
-                    , changes =
-                        [ loadScene "wildGooseChase"
-                        , moveCharacterOffScreen "securityOfficers"
-                        , moveCharacterOffScreen "largeCrowd"
-                        ]
+                    { trigger = TriggerMatching "policeOffice"
+                    , conditions = [ plot "mainPlot" 2 ]
+                    , changes = [ IncStat "player" "mainPlot" 1 ]
+                    , narrative = Narrative.redirectedToLostAndFound
                     }
-                    Narrative.redirectedToLostAndFound
                ]

@@ -1,26 +1,50 @@
 module Views.Station.Lobby exposing (view)
 
 import City exposing (..)
-import Components exposing (Entity)
-import Engine exposing (..)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import LocalTypes exposing (..)
-import Manifest
+import Manifest exposing (..)
+import Narrative.WorldModel exposing (..)
 import Views.Shared as Shared
 
 
-view : Engine.Model -> Station -> Html Msg
-view engineModel currentStation =
+view : Manifest.WorldModel -> Station -> Html Msg
+view worldmodel currentStation =
     let
         toTrains =
             div [ class "Station__connections", onClick <| Go Hall ] <|
                 [ span [ class "icon icon--train" ] [], Shared.arrow 0 ]
 
-        interactiveView interactable =
-            div [ class "Station__interactable", onClick <| Interact interactable ]
-                [ text <| .name <| Components.getDisplayInfo <| Manifest.findEntity <| interactable ]
+        interactiveView : ( Manifest.ID, DisplayComponent a ) -> Html Msg
+        interactiveView ( id, { name } ) =
+            div [ class "Station__interactable", onClick <| Interact id ]
+                [ text name ]
+
+        currentStationEntityID =
+            currentStation |> stationInfo |> .id |> String.fromInt
+
+        characters =
+            query
+                [ HasTag "character"
+                , HasLink "location" currentStationEntityID
+                ]
+                worldmodel
+
+        items =
+            query
+                [ HasTag "item"
+                , HasLink "location" currentStationEntityID
+                ]
+                worldmodel
+
+        inventory =
+            query
+                [ HasTag "item"
+                , HasLink "location" "player"
+                ]
+                worldmodel
     in
     div [ class "Station Station--lobby" ]
         [ div [ class "Station__top" ] <|
@@ -30,12 +54,12 @@ view engineModel currentStation =
         , div [ class "Station__scene" ] <|
             [ div [ class "Station__interactables" ] <|
                 div [ class "Station__interactables_title" ] [ text "Characters" ]
-                    :: (List.map interactiveView <| getCharactersInCurrentLocation engineModel)
+                    :: List.map interactiveView characters
             , div [ class "Station__interactables" ] <|
                 div [ class "Station__interactables_title" ] [ text "Items" ]
-                    :: (List.map interactiveView <| getItemsInCurrentLocation engineModel)
+                    :: List.map interactiveView items
             , div [ class "Station__interactables" ] <|
                 div [ class "Station__interactables_title" ] [ text "Inventory" ]
-                    :: (List.map interactiveView <| getItemsInInventory engineModel)
+                    :: List.map interactiveView inventory
             ]
         ]

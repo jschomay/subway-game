@@ -1,50 +1,79 @@
-module Narrative exposing (askAboutDelay, delayAhead, endOfDemo, exitClosedBriefcaseStolen, inquireHowToGetBack, intro, missedStop, missedStopAgain, redirectedToLostAndFound, reportStolenBriefcase, ridingTheTrain, tryCellPhone)
+module Narrative exposing
+    ( Narrative
+    , askAboutDelay
+    , delayAhead
+    , endOfDemo
+    , exitClosedBriefcaseStolen
+    , inquireHowToGetBack
+    , intro
+    , missedStop
+    , missedStopAgain
+    , redirectedToLostAndFound
+    , reportStolenBriefcase
+    , ridingTheTrain
+    , tryCellPhone
+    , update
+    )
 
-{- Here is where you can write all of your story text, which keeps the Rules.elm file a little cleaner.
-   The narrative that you add to a rule will be shown when that rule matches.  If you give a list of strings, each time the rule matches, it will show the next narrative in the list, which is nice for adding variety and texture to your story.
-   I sometimes like to write all my narrative content first, then create the rules they correspond to.
-   Note that you can use **markdown** in your text!
--}
+import List.Zipper as Zipper exposing (Zipper)
 
 
-inquireHowToGetBack : List String
+type Narrative
+    = InOrder (Zipper String)
+
+
+inOrder : List String -> Narrative
+inOrder l =
+    InOrder <| Zipper.withDefault "..." <| Zipper.fromList l
+
+
+update : Narrative -> ( String, Narrative )
+update narrative =
+    case narrative of
+        InOrder zipper ->
+            ( Zipper.current zipper, InOrder (Zipper.next zipper |> Maybe.withDefault zipper) )
+
+
+inquireHowToGetBack : Narrative
 inquireHowToGetBack =
-    [ """
+    inOrder
+        [ """
     The security guard got off the train with you, and is the only other person at this station.
     
     You have to get back to your stop as soon as possible, so you ask him, "Hey, when's the next train that stops at Metro Center?"
 
     He answers, "No clue kid, I don't run the trains.  Check the map.."
   """
-    , """
+        , """
     You look in his direction again, but you know better than to bother him.  He meets your gaze, then walks to the far end of the platform.
 
     You should be on your way too, you need to get back to your stop.
   """
-    ]
+        ]
 
 
-missedStopAgain : List String
+missedStopAgain : Narrative
 missedStopAgain =
-    [ """
+    inOrder [ """
     Wait, what are you doing?  You missed your stop again!  You meant to get off at the Metro Center station.  What is wrong with you today!?
     """ ]
 
 
-missedStop : List String
+missedStop : Narrative
 missedStop =
-    [ """
+    inOrder
+        [ """
     You can't believe you missed your stop.  You've never done that before, and today of all days.
 
     There's no time to lament, you need to get back to the Metro Center station as fast as possible.  It looks like you can just take the train back in the other direction.  If you ever get lost, you have a map with you (press 'm').
   """
-    , "If you hurry up and get on the train, you still probably have time to get back without your boss even noticing."
-    ]
+        , "If you hurry up and get on the train, you still probably have time to get back without your boss even noticing."
+        ]
 
 
-intro : List String
+intro : Narrative
 intro =
-    [ """
+    inOrder [ """
 Friday, 6:15AM
 
 It's been a hell of a week.
@@ -63,36 +92,37 @@ Oh shit.  You missed your stop.  It's 6:39.  You have to get back to the Metro C
   """ ]
 
 
-delayAhead : List String
+delayAhead : Narrative
 delayAhead =
-    [ """
+    inOrder [ """
   You're wide awake now.  There's still time to get to work and do one more run through of the presentation.  This is what you've been working so hard for.  You deserve a promotion.  This time, you'll get it.
 
   Your thoughts are interrupted by a crackle over the loudspeaker.  You realize the conductor is making an announcement, but it's so garbled that you only catch part of it.  Something about a delay... That doesn't sound good.  Some kind of problem at one of the stations... You just hope it won't effect your plans.
   """ ]
 
 
-ridingTheTrain : List String
+ridingTheTrain : Narrative
 ridingTheTrain =
-    [ """
+    inOrder
+        [ """
     The train hurtles through the dark tunnel towards the next stop.
     """
-    , """
+        , """
     You stare at the floor, avoiding the gaze of the other passengers, waiting for your next stop.
     """
-    ]
+        ]
 
 
-tryCellPhone : List String
+tryCellPhone : Narrative
 tryCellPhone =
-    [ """
+    inOrder [ """
   You think about giving your boss a call to let him know you'll be late.  There's just one problem - you don't get any service down here.
   """ ]
 
 
-exitClosedBriefcaseStolen : List String
+exitClosedBriefcaseStolen : Narrative
 exitClosedBriefcaseStolen =
-    [ """
+    inOrder [ """
     There's a large crowd gathering around.  Some people seem angry, others are asking questions.  You turn to a young woman with glasses.
 
     "Hey, what's going on?"
@@ -112,9 +142,9 @@ exitClosedBriefcaseStolen =
   """ ]
 
 
-askAboutDelay : List String
+askAboutDelay : Narrative
 askAboutDelay =
-    [ """
+    inOrder [ """
     "Excuse me, can you tell me what's going on here?"
 
     The officers are preoccupied trying to keep everyone calm.  "Nothing to worry about, please try a different station."
@@ -125,9 +155,10 @@ askAboutDelay =
   """ ]
 
 
-reportStolenBriefcase : List String
+reportStolenBriefcase : Narrative
 reportStolenBriefcase =
-    [ """
+    inOrder
+        [ """
     "Hey, didn't you see that?  That guy stole my briefcase!  He went in there, stop him."
 
     The officers try to brush you off, "We need everyone to clear this station, please go to another station."
@@ -138,19 +169,19 @@ reportStolenBriefcase =
 
     You can't give the presentation without getting it back first.  There's not much else you can do than try to report it.  You better head towards Federal Triangle.
   """
-    , """
+        , """
     "You need to clear this station.  That way please."
     "Where did you say the police office was?"
     "Federal Triangle.  Good bye."
 
     Those are the most unhelpful security officers you've ever seen.
  """
-    ]
+        ]
 
 
-redirectedToLostAndFound : List String
+redirectedToLostAndFound : Narrative
 redirectedToLostAndFound =
-    [ """
+    inOrder [ """
     You found the police office.  But the door is closed, no one is in there.  You see a note on the door:
 
     "CLOSED.  We are busy attending to other issues at the moment.  Please come back later.  You can also try the Lost and Found at the MacArthur's Park station."
@@ -161,9 +192,9 @@ redirectedToLostAndFound =
   """ ]
 
 
-endOfDemo : List String
+endOfDemo : Narrative
 endOfDemo =
-    [ """
+    inOrder [ """
     This is the end of the demo.  Thank you for playing!
 
     The Green Line has been unlocked for you (press "m" to see it), so feel free to have fun riding the rails.
