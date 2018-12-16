@@ -55,6 +55,7 @@ type alias Model =
     , location : Location
     , showMap : Bool
     , gameOver : Bool
+    , selectScene : Bool
     }
 
 
@@ -69,8 +70,10 @@ init =
       , location = OnTrain { line = Red, status = InTransit, desiredStop = TwinBrooks }
       , showMap = False
       , gameOver = False
+      , selectScene = True
       }
-    , delay introDelay (Interact "intro")
+      -- , delay introDelay (Interact "intro")
+    , Cmd.none
     )
 
 
@@ -168,6 +171,11 @@ update_ msg model =
         case msg of
             NoOp ->
                 noop model
+
+            SelectScene scene ->
+                ( { model | selectScene = False }
+                , delay introDelay (Interact scene)
+                )
 
             Interact interactableId ->
                 ( updateStory interactableId model
@@ -287,6 +295,9 @@ view model =
     if not model.loaded then
         div [ class "Loading" ] [ text "Loading..." ]
 
+    else if model.selectScene then
+        selectSceneView
+
     else
         div [ class "game" ]
             [ case model.location of
@@ -323,6 +334,17 @@ view model =
                     _ ->
                         text ""
             ]
+
+
+selectSceneView : Html Msg
+selectSceneView =
+    div [ class "SelectScene" ]
+        [ h1 [] [ text "Select a scene to jump to:" ]
+        , ul []
+            [ li [ onClick <| SelectScene "beginning" ] [ text "Beginning" ]
+            , li [ onClick <| SelectScene "lostBriefcase" ] [ text "Losing briefcase" ]
+            ]
+        ]
 
 
 storyView : String -> Html Msg

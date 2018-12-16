@@ -106,6 +106,7 @@ characters =
         , entity "securityOfficers"
             "Security officers"
             "Two of them, looking official, but not really all that helpful over all."
+            |> link "location" (station MetroCenter)
         ]
 
 

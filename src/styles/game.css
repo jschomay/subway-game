@@ -56,6 +56,18 @@ body {
   background-color: black;
 }
 
+.SelectScene {
+  color: white;
+  padding: 10% 30%;
+}
+
+.SelectScene li {
+  list-style: circle;
+  margin-left: 10px;
+  cursor: pointer;
+  margin-bottom: 10px;
+}
+
 .game {
   font-family: sans-serif;
   font-family: helvetica;

@@ -1,19 +1,4 @@
-module Narrative exposing
-    ( Narrative
-    , askAboutDelay
-    , delayAhead
-    , endOfDemo
-    , exitClosedBriefcaseStolen
-    , inquireHowToGetBack
-    , intro
-    , missedStop
-    , missedStopAgain
-    , redirectedToLostAndFound
-    , reportStolenBriefcase
-    , ridingTheTrain
-    , tryCellPhone
-    , update
-    )
+module Narrative exposing (Narrative(..), askAboutDelay, delayAhead, endOfDemo, exitClosedBriefcaseStolen, inOrder, inquireHowToGetBack, intro, jumpToLostBriefcase, missedStop, missedStopAgain, redirectedToLostAndFound, reportStolenBriefcase, ridingTheTrain, tryCellPhone, update)
 
 import List.Zipper as Zipper exposing (Zipper)
 
@@ -32,6 +17,13 @@ update narrative =
     case narrative of
         InOrder zipper ->
             ( Zipper.current zipper, InOrder (Zipper.next zipper |> Maybe.withDefault zipper) )
+
+
+jumpToLostBriefcase : Narrative
+jumpToLostBriefcase =
+    inOrder [ """
+  After missing your stop, you go back, only to find the exits sealed.  During the confusion, someone steals your briefcase!  You notice the thief disappear down the tunnel for the Red line trains towards West Mulberry...
+  """ ]
 
 
 inquireHowToGetBack : Narrative

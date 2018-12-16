@@ -39,24 +39,45 @@ plot plotLine level =
     EntityMatching "player" [ HasStat plotLine EQ level ]
 
 
+scenes =
+    { intro = 1
+    , lostBriefcase = 2
+    , wildGooseChase = 3
+    , endOfDemo = 4
+    }
 
-{- scene map
-   intro - 1
-   lostBriefcase - 2
-   wildGooseChase - 3
-   endOfDemo - 4
--}
+
+selectScene =
+    []
+        ++ [ rule "selectBeginning"
+                { trigger = TriggerMatching "beginning"
+                , conditions = []
+                , changes = []
+                , narrative = Narrative.intro
+                }
+           ]
+        ++ [ rule "selectLostBriefcase"
+                { trigger = TriggerMatching "lostBriefcase"
+                , conditions = []
+                , changes =
+                    [ SetStat "player" "mainPlot" scenes.lostBriefcase
+                    , SetLink "player" "location" <| station MetroCenter
+                    , SetLink "briefcase" "location" "thief"
+                    ]
+                , narrative = Narrative.jumpToLostBriefcase
+                }
+           ]
 
 
 rules : Dict String Rule
 rules =
     Dict.fromList <|
-        []
+        selectScene
             -- TODO group by trigger
             -- TODO group by scene?
             ++ [ rule "intro, deadline, miss stop"
-                    { trigger = TriggerMatching "intro"
-                    , conditions = [ plot "mainPlot" 1 ]
+                    { trigger = TriggerMatching "missStop"
+                    , conditions = [ plot "mainPlot" scenes.intro ]
                     , changes = []
                     , narrative = Narrative.intro
                     }
@@ -65,7 +86,7 @@ rules =
             ++ [ rule "figure out how to get back to metro center"
                     { trigger = TriggerMatching "mapPoster"
                     , conditions =
-                        [ plot "mainPlot" 1
+                        [ plot "mainPlot" scenes.intro
                         , location "player" TwinBrooks
                         ]
                     , changes = []
@@ -76,7 +97,7 @@ rules =
                [ rule "missedStopAgain"
                     { trigger = TriggerMatching "train"
                     , conditions =
-                        [ plot "mainPlot" 1
+                        [ plot "mainPlot" scenes.intro
                         , EntityMatching "player" [ Not <| HasLink "location" <| station MetroCenter ]
                         ]
                     , changes = []
@@ -85,15 +106,15 @@ rules =
                , rule "delayAhead"
                     { trigger = TriggerMatching "train"
                     , conditions =
-                        [ plot "mainPlot" 1
+                        [ plot "mainPlot" scenes.intro
                         , location "player" MetroCenter
                         ]
-                    , changes = [ SetLink "securityOfficers" "location" <| station MetroCenter ]
+                    , changes = []
                     , narrative = Narrative.delayAhead
                     }
                , rule "endOfDemo"
                     { trigger = TriggerMatching "train"
-                    , conditions = [ plot "mainPlot" 3 ]
+                    , conditions = [ plot "mainPlot" scenes.wildGooseChase ]
                     , changes = [ IncStat "player" "mainPlot" 1 ]
                     , narrative = Narrative.endOfDemo
                     }
@@ -106,7 +127,7 @@ rules =
                ]
             ++ [ rule ""
                     { trigger = TriggerMatching "securityGuard"
-                    , conditions = [ plot "mainPlot" 1 ]
+                    , conditions = [ plot "mainPlot" scenes.intro ]
                     , changes = []
                     , narrative = Narrative.inquireHowToGetBack
                     }
@@ -123,7 +144,7 @@ rules =
                [ rule "exitClosedBriefcaseStolen"
                     { trigger = TriggerMatching "largeCrowd"
                     , conditions =
-                        [ plot "mainPlot" 1
+                        [ plot "mainPlot" scenes.intro
                         , EntityMatching "briefcase" [ HasLink "location" "player" ]
                         ]
                     , changes =
@@ -136,13 +157,13 @@ rules =
             ++ -- securityOfficers
                [ rule "askAboutDelay"
                     { trigger = TriggerMatching "securityOfficers"
-                    , conditions = [ plot "mainPlot" 1 ]
+                    , conditions = [ plot "mainPlot" scenes.intro ]
                     , changes = []
                     , narrative = Narrative.askAboutDelay
                     }
                , rule "reportStolenBriefcase"
                     { trigger = TriggerMatching "securityOfficers"
-                    , conditions = [ plot "mainPlot" 2 ]
+                    , conditions = [ plot "mainPlot" scenes.lostBriefcase ]
                     , changes = []
                     , narrative = Narrative.reportStolenBriefcase
                     }
@@ -150,7 +171,7 @@ rules =
             ++ -- policeOffice
                [ rule "redirectedToLostAndFound"
                     { trigger = TriggerMatching "policeOffice"
-                    , conditions = [ plot "mainPlot" 2 ]
+                    , conditions = [ plot "mainPlot" scenes.lostBriefcase ]
                     , changes = [ IncStat "player" "mainPlot" 1 ]
                     , narrative = Narrative.redirectedToLostAndFound
                     }
