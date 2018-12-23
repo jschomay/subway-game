@@ -12,7 +12,7 @@ type Msg
     | ToggleMap
     | Go StationArea
     | BoardTrain Line Station
-    | Disembark Station
+    | Disembark
     | Continue
 
 
@@ -30,7 +30,6 @@ type TrainStatus
 type alias TrainProps =
     { line : Line
     , status : TrainStatus
-    , desiredStop : Station
     }
 
 

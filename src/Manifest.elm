@@ -120,12 +120,16 @@ general =
     ]
 
 
-{-| The locations are mostly handled through the main code, and are the different stations. The train is hard coded as a psudo-location, it never actually ends up in `currentLocation`
--}
 locations : List ( ID, Entity )
 locations =
-    List.map (tag "location")
-        [ entity "train"
-            "Train car"
-            "The train hurtles through the dark tunnel towards the next stop."
-        ]
+    -- no need to make this unique here, as the world model is a map by id
+    City.allLines
+        |> List.concatMap (City.lineInfo >> .stations)
+        |> List.map
+            (City.stationInfo
+                >> (\info ->
+                        entity (String.fromInt info.id) info.name info.name
+                            |> tag "location"
+                            |> tag "station"
+                   )
+            )

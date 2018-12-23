@@ -67,7 +67,7 @@ init =
       , rules = Rules.rules
       , map = City.map [ Red ]
       , mapImage = City.mapImage City.RedMap
-      , location = OnTrain { line = Red, status = InTransit, desiredStop = TwinBrooks }
+      , location = OnTrain { line = Red, status = InTransit }
       , showMap = False
       , gameOver = False
       , selectScene = True
@@ -144,8 +144,8 @@ noop model =
 
 
 changeTrainStatus : TrainStatus -> TrainProps -> TrainProps
-changeTrainStatus newStatus { line, desiredStop } =
-    { line = line, status = newStatus, desiredStop = desiredStop }
+changeTrainStatus newStatus trainProps =
+    { trainProps | status = newStatus }
 
 
 getCurrentStation : Model -> Station
@@ -200,18 +200,17 @@ update_ msg model =
             Go area ->
                 ( { model | location = InStation area }, Cmd.none )
 
-            BoardTrain line desiredStop ->
+            BoardTrain line station ->
                 ( { model
-                    | location = OnTrain { line = line, status = InTransit, desiredStop = desiredStop }
+                    | location = OnTrain { line = line, status = InTransit }
+                    -- always move to the selected station (you can override this in the rules if needed)
                     , worldModel =
-                        -- this is the only place there should be an Engine.changeWorld call to set the location
-                        -- set here instead of Disembark so that the rules can match against currentLocation (which will be the desiredStop)
-                        -- TODO maybe change to `Interact desiredStop` after delay and let rules handle move
                         Narrative.WorldModel.applyChanges
-                            [ SetLink "player" "location" (desiredStop |> stationInfo |> .id |> String.fromInt) ]
+                            [ SetLink "player" "location" (station |> stationInfo |> .id |> String.fromInt) ]
                             model.worldModel
                   }
-                , delay departingDelay (Interact "train")
+                  -- also trigger story rules with station
+                , delay departingDelay (Interact (station |> stationInfo |> .id |> String.fromInt))
                 )
 
             Continue ->
@@ -220,15 +219,15 @@ update_ msg model =
                     InStation _ ->
                         ( { model | story = Nothing }, Cmd.none )
 
-                    OnTrain ({ desiredStop } as train) ->
+                    OnTrain train ->
                         ( { model
                             | location = OnTrain <| changeTrainStatus Arriving train
                             , story = Nothing
                           }
-                        , delay arrivingDelay <| Disembark desiredStop
+                        , delay arrivingDelay <| Disembark
                         )
 
-            Disembark station ->
+            Disembark ->
                 ( { model
                     | location = InStation Lobby
                     , story = Nothing
@@ -310,12 +309,12 @@ view model =
                 InStation (Platform line) ->
                     Platform.view model.map currentStation line
 
-                OnTrain { line, status, desiredStop } ->
+                OnTrain { line, status } ->
                     Views.Train.view
                         { line = line
                         , arrivingAtStation =
                             if status == Arriving then
-                                Just desiredStop
+                                Just currentStation
 
                             else
                                 Nothing

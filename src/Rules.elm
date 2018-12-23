@@ -93,39 +93,42 @@ rules =
                     , narrative = Narrative.missedStop
                     }
                ]
-            ++ -- train
+            ++ -- stations
                [ rule "missedStopAgain"
-                    { trigger = TriggerMatching "train"
-                    , conditions =
-                        [ plot "mainPlot" scenes.intro
-                        , EntityMatching "player" [ Not <| HasLink "location" <| station MetroCenter ]
-                        ]
+                    -- TODO need generic triggers for this rule
+                    -- { trigger = MatchAny [HasTag "station", Not (HasTag "stevesWork")]
+                    -- this will never trigger at the moment...
+                    { trigger = TriggerMatching "station"
+                    , conditions = [ plot "mainPlot" scenes.intro ]
                     , changes = []
                     , narrative = Narrative.missedStopAgain
                     }
                , rule "delayAhead"
-                    { trigger = TriggerMatching "train"
-                    , conditions =
-                        [ plot "mainPlot" scenes.intro
-                        , location "player" MetroCenter
-                        ]
+                    { trigger = TriggerMatching <| station MetroCenter
+                    , conditions = [ plot "mainPlot" scenes.intro ]
                     , changes = []
                     , narrative = Narrative.delayAhead
                     }
                , rule "endOfDemo"
-                    { trigger = TriggerMatching "train"
+                    -- TODO need generic triggers for this rule
+                    -- { trigger = MatchAny [HasTag "station", Not (HasTag "stevesWork")]
+                    -- this will never trigger at the moment...
+                    { trigger = TriggerMatching "station"
                     , conditions = [ plot "mainPlot" scenes.wildGooseChase ]
                     , changes = [ IncStat "player" "mainPlot" 1 ]
                     , narrative = Narrative.endOfDemo
                     }
-               , rule "riding the train"
-                    { trigger = TriggerMatching "train"
+               , rule "ridingTheTrain"
+                    -- TODO need generic triggers for this rule
+                    -- { trigger = MatchAny [HasTag "station", Not (HasTag "stevesWork")]
+                    -- this will never trigger at the moment...
+                    { trigger = TriggerMatching "station"
                     , conditions = []
                     , changes = []
                     , narrative = Narrative.ridingTheTrain
                     }
                ]
-            ++ [ rule ""
+            ++ [ rule "inquireHowToGetBack"
                     { trigger = TriggerMatching "securityGuard"
                     , conditions = [ plot "mainPlot" scenes.intro ]
                     , changes = []

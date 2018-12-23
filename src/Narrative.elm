@@ -47,7 +47,7 @@ inquireHowToGetBack =
 missedStopAgain : Narrative
 missedStopAgain =
     inOrder [ """
-    Wait, what are you doing?  You missed your stop again!  You meant to get off at the Metro Center station.  What is wrong with you today!?
+    Wait, what are you doing?  You need to get off at the Metro Center station to get to work.  What is wrong with you today!?
     """ ]
 
 
@@ -86,11 +86,16 @@ Oh shit.  You missed your stop.  It's 6:39.  You have to get back to the Metro C
 
 delayAhead : Narrative
 delayAhead =
-    inOrder [ """
+    inOrder
+        [ """
   You're wide awake now.  There's still time to get to work and do one more run through of the presentation.  This is what you've been working so hard for.  You deserve a promotion.  This time, you'll get it.
 
   Your thoughts are interrupted by a crackle over the loudspeaker.  You realize the conductor is making an announcement, but it's so garbled that you only catch part of it.  Something about a delay... That doesn't sound good.  Some kind of problem at one of the stations... You just hope it won't effect your plans.
-  """ ]
+  """
+        , """
+  As the train pulls in to the station, you can see that the exists are still closed.
+  """
+        ]
 
 
 ridingTheTrain : Narrative

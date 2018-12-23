@@ -4,6 +4,7 @@ module City exposing
     , MapImage(..)
     , Station(..)
     , StationInfo
+    , allLines
     , config
     , fullMap
     , lineInfo
@@ -170,9 +171,14 @@ stationsOnLine line =
     ( line, lineInfo line |> .stations )
 
 
+allLines : List Line
+allLines =
+    [ Red, Yellow, Green ]
+
+
 fullMap : Map Station Line
 fullMap =
-    [ Red, Yellow, Green ] |> map
+    map allLines
 
 
 map : List Line -> Map Station Line
