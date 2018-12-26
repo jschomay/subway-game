@@ -1,6 +1,7 @@
 module Rules exposing (Rule, Rules, rule, rules, station)
 
 import City exposing (Station(..), stationInfo)
+import Constants exposing (..)
 import Dict exposing (Dict)
 import Narrative exposing (..)
 import Narrative.Rules as Rules exposing (..)
@@ -29,35 +30,31 @@ station station_ =
     station_ |> stationInfo |> .id |> String.fromInt
 
 
-location : String -> Station -> Condition
+location : String -> Station -> EntityMatcher
 location character station_ =
-    EntityMatching character [ HasLink "location" <| station station_ ]
+    Match character [ HasLink "location" <| station station_ ]
 
 
-plot : String -> Int -> Condition
+plot : String -> Int -> EntityMatcher
 plot plotLine level =
-    EntityMatching "player" [ HasStat plotLine EQ level ]
+    Match "player" [ HasStat plotLine EQ level ]
 
 
-scenes =
-    { intro = 1
-    , lostBriefcase = 2
-    , wildGooseChase = 3
-    , endOfDemo = 4
-    }
+jumpToScene s =
+    Match "selectScene" [ HasStat "jumpToScene" EQ s ]
 
 
 selectScene =
     []
-        ++ [ rule "selectBeginning"
-                { trigger = TriggerMatching "beginning"
+        ++ [ rule "jumpToIntro"
+                { trigger = jumpToScene scenes.intro
                 , conditions = []
                 , changes = []
                 , narrative = Narrative.intro
                 }
            ]
-        ++ [ rule "selectLostBriefcase"
-                { trigger = TriggerMatching "lostBriefcase"
+        ++ [ rule "jumpToLostBriefcase"
+                { trigger = jumpToScene scenes.lostBriefcase
                 , conditions = []
                 , changes =
                     [ SetStat "player" "mainPlot" scenes.lostBriefcase
@@ -73,10 +70,11 @@ rules : Dict String Rule
 rules =
     Dict.fromList <|
         selectScene
-            -- TODO group by trigger
-            -- TODO group by scene?
+            -- TODO group by scene (not trigger)
             ++ [ rule "intro, deadline, miss stop"
-                    { trigger = TriggerMatching "missStop"
+                    -- TODO this rule doesn't take effect with the current "scene selection" screen
+                    -- after removing that, this needs to be triggered in `init`
+                    { trigger = Match "missStop" []
                     , conditions = [ plot "mainPlot" scenes.intro ]
                     , changes = []
                     , narrative = Narrative.intro
@@ -84,7 +82,7 @@ rules =
                ]
             -- map
             ++ [ rule "figure out how to get back to metro center"
-                    { trigger = TriggerMatching "mapPoster"
+                    { trigger = Match "mapPoster" []
                     , conditions =
                         [ plot "mainPlot" scenes.intro
                         , location "player" TwinBrooks
@@ -94,42 +92,36 @@ rules =
                     }
                ]
             ++ -- stations
-               [ rule "missedStopAgain"
-                    -- TODO need generic triggers for this rule
-                    -- { trigger = MatchAny [HasTag "station", Not (HasTag "stevesWork")]
-                    -- this will never trigger at the moment...
-                    { trigger = TriggerMatching "station"
-                    , conditions = [ plot "mainPlot" scenes.intro ]
-                    , changes = []
-                    , narrative = Narrative.missedStopAgain
-                    }
-               , rule "delayAhead"
-                    { trigger = TriggerMatching <| station MetroCenter
+               [ rule "delayAhead"
+                    { trigger = Match (station MetroCenter) []
                     , conditions = [ plot "mainPlot" scenes.intro ]
                     , changes = []
                     , narrative = Narrative.delayAhead
                     }
+               , rule "missedStopAgain"
+                    { trigger = MatchAny [ HasTag "station", Not (HasTag "stevesWork") ]
+                    , conditions = [ plot "mainPlot" scenes.intro ]
+                    , changes = []
+                    , narrative = Narrative.missedStopAgain
+                    }
                , rule "endOfDemo"
-                    -- TODO need generic triggers for this rule
-                    -- { trigger = MatchAny [HasTag "station", Not (HasTag "stevesWork")]
-                    -- this will never trigger at the moment...
-                    { trigger = TriggerMatching "station"
+                    { trigger = MatchAny [ HasTag "station"]
                     , conditions = [ plot "mainPlot" scenes.wildGooseChase ]
-                    , changes = [ IncStat "player" "mainPlot" 1 ]
+                    , changes =
+                        [ IncStat "player" "mainPlot" 1
+                        , IncStat "player" "mapLevel" 1
+                        ]
                     , narrative = Narrative.endOfDemo
                     }
                , rule "ridingTheTrain"
-                    -- TODO need generic triggers for this rule
-                    -- { trigger = MatchAny [HasTag "station", Not (HasTag "stevesWork")]
-                    -- this will never trigger at the moment...
-                    { trigger = TriggerMatching "station"
+                    { trigger = MatchAny [ HasTag "station" ]
                     , conditions = []
                     , changes = []
                     , narrative = Narrative.ridingTheTrain
                     }
                ]
             ++ [ rule "inquireHowToGetBack"
-                    { trigger = TriggerMatching "securityGuard"
+                    { trigger = Match "securityGuard" []
                     , conditions = [ plot "mainPlot" scenes.intro ]
                     , changes = []
                     , narrative = Narrative.inquireHowToGetBack
@@ -137,7 +129,7 @@ rules =
                ]
             ++ -- cellPHone
                [ rule "tryCellPhone"
-                    { trigger = TriggerMatching "cellPHone"
+                    { trigger = Match "cellPHone" []
                     , conditions = []
                     , changes = []
                     , narrative = Narrative.tryCellPhone
@@ -145,10 +137,10 @@ rules =
                ]
             ++ -- largeCrowd
                [ rule "exitClosedBriefcaseStolen"
-                    { trigger = TriggerMatching "largeCrowd"
+                    { trigger = Match "largeCrowd" []
                     , conditions =
                         [ plot "mainPlot" scenes.intro
-                        , EntityMatching "briefcase" [ HasLink "location" "player" ]
+                        , Match "briefcase" [ HasLink "location" "player" ]
                         ]
                     , changes =
                         [ IncStat "player" "mainPlot" 1
@@ -159,13 +151,13 @@ rules =
                ]
             ++ -- securityOfficers
                [ rule "askAboutDelay"
-                    { trigger = TriggerMatching "securityOfficers"
+                    { trigger = Match "securityOfficers" []
                     , conditions = [ plot "mainPlot" scenes.intro ]
                     , changes = []
                     , narrative = Narrative.askAboutDelay
                     }
                , rule "reportStolenBriefcase"
-                    { trigger = TriggerMatching "securityOfficers"
+                    { trigger = Match "securityOfficers" []
                     , conditions = [ plot "mainPlot" scenes.lostBriefcase ]
                     , changes = []
                     , narrative = Narrative.reportStolenBriefcase
@@ -173,9 +165,12 @@ rules =
                ]
             ++ -- policeOffice
                [ rule "redirectedToLostAndFound"
-                    { trigger = TriggerMatching "policeOffice"
+                    { trigger = Match "policeOffice" []
                     , conditions = [ plot "mainPlot" scenes.lostBriefcase ]
-                    , changes = [ IncStat "player" "mainPlot" 1 ]
+                    , changes =
+                        [ IncStat "player" "mainPlot" 1
+                        , IncStat "player" "mapLevel" 1
+                        ]
                     , narrative = Narrative.redirectedToLostAndFound
                     }
                ]

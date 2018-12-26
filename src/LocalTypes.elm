@@ -5,7 +5,7 @@ import City exposing (..)
 
 type Msg
     = NoOp
-    | SelectScene String
+    | SelectScene Int
     | Interact String
     | Loaded
     | Delay Float Msg

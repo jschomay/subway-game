@@ -2,6 +2,7 @@ port module Main exposing (main)
 
 import Browser
 import City exposing (..)
+import Constants exposing (..)
 import Dict exposing (Dict)
 import Html exposing (..)
 import Html.Attributes exposing (..)
@@ -50,8 +51,6 @@ type alias Model =
     , loaded : Bool
     , story : Maybe String
     , rules : Rules.Rules
-    , map : Subway.Map City.Station City.Line
-    , mapImage : String
     , location : Location
     , showMap : Bool
     , gameOver : Bool
@@ -65,8 +64,6 @@ init =
       , loaded = False
       , story = Nothing
       , rules = Rules.rules
-      , map = City.map [ Red ]
-      , mapImage = City.mapImage City.RedMap
       , location = OnTrain { line = Red, status = InTransit }
       , showMap = False
       , gameOver = False
@@ -120,22 +117,7 @@ updateStory trigger model =
 
 specialEvents : String -> Model -> Model
 specialEvents ruleId model =
-    -- TODO maybe this isn't needed, changing the map can be based on the world model
-    case ruleId of
-        "redirectedToLostAndFound" ->
-            { model
-                | mapImage = City.mapImage RedYellowMap
-                , map = City.map [ Red, Yellow ]
-            }
-
-        "endOfDemo" ->
-            { model
-                | mapImage = City.mapImage RedYellowGreenMap
-                , map = City.map [ Red, Yellow, Green ]
-            }
-
-        _ ->
-            model
+    model
 
 
 noop : Model -> ( Model, Cmd Msg )
@@ -148,11 +130,11 @@ changeTrainStatus newStatus trainProps =
     { trainProps | status = newStatus }
 
 
-getCurrentStation : Model -> Station
-getCurrentStation model =
-    Narrative.WorldModel.getLink "player" "location" model.worldModel
+getCurrentStation : City.Map -> Manifest.WorldModel -> Station
+getCurrentStation map worldModel =
+    Narrative.WorldModel.getLink "player" "location" worldModel
         |> Maybe.andThen String.toInt
-        |> Maybe.andThen (Subway.getStation model.map)
+        |> Maybe.andThen (Subway.getStation map)
         |> Maybe.withDefault WestMulberry
 
 
@@ -173,8 +155,14 @@ update_ msg model =
                 noop model
 
             SelectScene scene ->
-                ( { model | selectScene = False }
-                , delay introDelay (Interact scene)
+                ( { model
+                    | selectScene = False
+
+                    -- sort of a hack for a minimal way to get a "custom event" to trigger a rule
+                    -- TODO a better way to do this would be to hardcode the list of interactions to "complete" a scene, and fold them into the model
+                    , worldModel = applyChanges [ SetStat "selectScene" "jumpToScene" scene ] model.worldModel
+                  }
+                , delay introDelay (Interact "selectScene")
                 )
 
             Interact interactableId ->
@@ -203,6 +191,7 @@ update_ msg model =
             BoardTrain line station ->
                 ( { model
                     | location = OnTrain { line = line, status = InTransit }
+
                     -- always move to the selected station (you can override this in the rules if needed)
                     , worldModel =
                         Narrative.WorldModel.applyChanges
@@ -278,7 +267,16 @@ view model =
         --     showTheMap =
         --         Debug.log (Subway.graphViz (stationInfo >> .name) (lineInfo >> .name) City.fullMap ++ "\n") "Copy and paste in http://viz-js.com/"
         currentStation =
-            getCurrentStation model
+            getCurrentStation map model.worldModel
+
+        map =
+            mapLevel
+                |> City.mapLines
+                |> City.map
+
+        mapLevel =
+            Narrative.WorldModel.getStat "player" "mapLevel" model.worldModel
+                |> Maybe.withDefault 1
 
         stationToId station =
             stationInfo station |> .id
@@ -304,10 +302,10 @@ view model =
                     Lobby.view model.worldModel currentStation
 
                 InStation Hall ->
-                    Hall.view model.map currentStation
+                    Hall.view map currentStation
 
                 InStation (Platform line) ->
-                    Platform.view model.map currentStation line
+                    Platform.view map currentStation line
 
                 OnTrain { line, status } ->
                     Views.Train.view
@@ -323,7 +321,7 @@ view model =
                 |> Maybe.map storyView
                 |> Maybe.withDefault (text "")
             , if model.showMap then
-                mapView model.mapImage
+                mapView mapLevel
 
               else
                 case model.location of
@@ -340,8 +338,8 @@ selectSceneView =
     div [ class "SelectScene" ]
         [ h1 [] [ text "Select a scene to jump to:" ]
         , ul []
-            [ li [ onClick <| SelectScene "beginning" ] [ text "Beginning" ]
-            , li [ onClick <| SelectScene "lostBriefcase" ] [ text "Losing briefcase" ]
+            [ li [ onClick <| SelectScene Constants.scenes.intro ] [ text "Beginning" ]
+            , li [ onClick <| SelectScene Constants.scenes.lostBriefcase ] [ text "Losing briefcase" ]
             ]
         ]
 
@@ -359,8 +357,8 @@ storyView story =
         ]
 
 
-mapView : String -> Html Msg
-mapView mapImage =
+mapView : Int -> Html Msg
+mapView mapLevel =
     div [ onClick ToggleMap, class "map" ]
-        [ img [ class "map__image", src <| "img/" ++ mapImage ] []
+        [ img [ class "map__image", src <| "img/" ++ City.mapImage mapLevel ] []
         ]

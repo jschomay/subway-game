@@ -1,6 +1,7 @@
 module City exposing
     ( Line(..)
     , LineInfo
+    , Map
     , MapImage(..)
     , Station(..)
     , StationInfo
@@ -10,11 +11,16 @@ module City exposing
     , lineInfo
     , map
     , mapImage
+    , mapLines
     , stationInfo
     )
 
 import Color exposing (..)
 import Subway exposing (..)
+
+
+type alias Map =
+    Subway.Map Station Line
 
 
 type Line
@@ -176,24 +182,43 @@ allLines =
     [ Red, Yellow, Green ]
 
 
-fullMap : Map Station Line
+fullMap : Map
 fullMap =
     map allLines
 
 
-map : List Line -> Map Station Line
+map : List Line -> Map
 map lines =
     Subway.init (stationInfo >> .id) (List.map stationsOnLine lines)
 
 
-mapImage : MapImage -> String
-mapImage m =
-    case m of
-        RedMap ->
+mapLines : Int -> List Line
+mapLines level =
+    case level of
+        1 ->
+            [ Red ]
+
+        2 ->
+            [ Red, Yellow ]
+
+        3 ->
+            [ Red, Yellow, Green ]
+
+        _ ->
+            [ Red, Yellow, Green ]
+
+
+mapImage : Int -> String
+mapImage level =
+    case level of
+        1 ->
             "map-red.png"
 
-        RedYellowMap ->
+        2 ->
             "map-red-yellow.png"
 
-        RedYellowGreenMap ->
+        3 ->
+            "map-red-yellow-green.png"
+
+        _ ->
             "map-red-yellow-green.png"

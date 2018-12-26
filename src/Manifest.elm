@@ -116,7 +116,11 @@ general =
         "Steve"
         "A guy just trying to get ahead by following the rules."
         |> stat "mainPlot" 1
+        |> stat "mapLevel" 1
         |> link "location" (station TwinBrooks)
+    , entity "selectScene"
+        "-"
+        "a hack to allow jumping to a scene"
     ]
 
 
@@ -131,5 +135,12 @@ locations =
                         entity (String.fromInt info.id) info.name info.name
                             |> tag "location"
                             |> tag "station"
+                            |> (\e ->
+                                    if String.fromInt info.id == station MetroCenter then
+                                        tag "stevesWork" e
+
+                                    else
+                                        e
+                               )
                    )
             )
