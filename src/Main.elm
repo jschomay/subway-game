@@ -55,6 +55,7 @@ type alias Model =
     , showMap : Bool
     , gameOver : Bool
     , selectScene : Bool
+    , history : List String
     }
 
 
@@ -64,12 +65,17 @@ init =
       , loaded = False
       , story = Nothing
       , rules = Rules.rules
-      , location = OnTrain { line = Red, status = InTransit }
+      , location = InStation Lobby
+
+      -- after removing scene select:
+      -- , location = OnTrain { line = Red, status = InTransit }
       , showMap = False
       , gameOver = False
       , selectScene = True
+      , history = []
       }
-      -- , delay introDelay (Interact "intro")
+      -- after removing scene select:
+      -- , delay introDelay (Interact "player")
     , Cmd.none
     )
 
@@ -120,6 +126,24 @@ specialEvents ruleId model =
     model
 
 
+{-| Sometimes you need to react to an interaction regardless of which rule matches. For example, things like moving to a locaiton, or taking an item.
+This happens before `updateStory`, so you can always override these changes in the rules if need.
+Warning, this should be used sparingly!
+-}
+genericUpdates : String -> Model -> Model
+genericUpdates interactableId model =
+    let
+        changes =
+            if assert interactableId [ HasTag "station" ] model.worldModel then
+                -- move to selected station
+                [ SetLink "player" "location" interactableId ]
+
+            else
+                []
+    in
+    { model | worldModel = applyChanges changes model.worldModel }
+
+
 noop : Model -> ( Model, Cmd Msg )
 noop model =
     ( model, Cmd.none )
@@ -140,11 +164,6 @@ getCurrentStation map worldModel =
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
-    update_ msg model
-
-
-update_ : Msg -> Model -> ( Model, Cmd Msg )
-update_ msg model =
     if model.gameOver then
         -- no-op if story has ended
         noop model
@@ -154,24 +173,24 @@ update_ msg model =
             NoOp ->
                 noop model
 
-            SelectScene scene ->
-                ( { model
-                    | selectScene = False
-
-                    -- sort of a hack for a minimal way to get a "custom event" to trigger a rule
-                    -- TODO a better way to do this would be to hardcode the list of interactions to "complete" a scene, and fold them into the model
-                    , worldModel = applyChanges [ SetStat "selectScene" "jumpToScene" scene ] model.worldModel
-                  }
-                , delay introDelay (Interact "selectScene")
-                )
-
-            Interact interactableId ->
-                ( updateStory interactableId model
+            Loaded ->
+                ( { model | loaded = True }
                 , Cmd.none
                 )
 
-            Loaded ->
-                ( { model | loaded = True }
+            LoadScene history ->
+                List.foldl
+                    (\id ( m, cmds ) ->
+                        update (Interact id) m
+                            |> Tuple.mapSecond (\c -> Cmd.batch [ c, cmds ])
+                    )
+                    ( { model | selectScene = False }, Cmd.none )
+                    history
+
+            Interact interactableId ->
+                ( { model | history = model.history ++ [ interactableId ] |> Debug.log "history\n" }
+                    |> genericUpdates interactableId
+                    |> updateStory interactableId
                 , Cmd.none
                 )
 
@@ -189,21 +208,11 @@ update_ msg model =
                 ( { model | location = InStation area }, Cmd.none )
 
             BoardTrain line station ->
-                ( { model
-                    | location = OnTrain { line = line, status = InTransit }
-
-                    -- always move to the selected station (you can override this in the rules if needed)
-                    , worldModel =
-                        Narrative.WorldModel.applyChanges
-                            [ SetLink "player" "location" (station |> stationInfo |> .id |> String.fromInt) ]
-                            model.worldModel
-                  }
-                  -- also trigger story rules with station
+                ( { model | location = OnTrain { line = line, status = InTransit } }
                 , delay departingDelay (Interact (station |> stationInfo |> .id |> String.fromInt))
                 )
 
             Continue ->
-                -- note, use scriptedEvents to respond special to Continue's
                 case model.location of
                     InStation _ ->
                         ( { model | story = Nothing }, Cmd.none )
@@ -335,11 +344,18 @@ view model =
 
 selectSceneView : Html Msg
 selectSceneView =
+    let
+        beginning =
+            [ "player" ]
+
+        lostBriefcase =
+            beginning ++ [ "1", "largeCrowd" ]
+    in
     div [ class "SelectScene" ]
         [ h1 [] [ text "Select a scene to jump to:" ]
         , ul []
-            [ li [ onClick <| SelectScene Constants.scenes.intro ] [ text "Beginning" ]
-            , li [ onClick <| SelectScene Constants.scenes.lostBriefcase ] [ text "Losing briefcase" ]
+            [ li [ onClick <| LoadScene beginning ] [ text "Beginning" ]
+            , li [ onClick <| LoadScene lostBriefcase ] [ text "Losing briefcase" ]
             ]
         ]
 

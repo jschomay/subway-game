@@ -118,9 +118,6 @@ general =
         |> stat "mainPlot" 1
         |> stat "mapLevel" 1
         |> link "location" (station TwinBrooks)
-    , entity "selectScene"
-        "-"
-        "a hack to allow jumping to a scene"
     ]
 
 

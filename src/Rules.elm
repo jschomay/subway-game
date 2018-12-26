@@ -40,41 +40,13 @@ plot plotLine level =
     Match "player" [ HasStat plotLine EQ level ]
 
 
-jumpToScene s =
-    Match "selectScene" [ HasStat "jumpToScene" EQ s ]
-
-
-selectScene =
-    []
-        ++ [ rule "jumpToIntro"
-                { trigger = jumpToScene scenes.intro
-                , conditions = []
-                , changes = []
-                , narrative = Narrative.intro
-                }
-           ]
-        ++ [ rule "jumpToLostBriefcase"
-                { trigger = jumpToScene scenes.lostBriefcase
-                , conditions = []
-                , changes =
-                    [ SetStat "player" "mainPlot" scenes.lostBriefcase
-                    , SetLink "player" "location" <| station MetroCenter
-                    , SetLink "briefcase" "location" "thief"
-                    ]
-                , narrative = Narrative.jumpToLostBriefcase
-                }
-           ]
-
-
 rules : Dict String Rule
 rules =
     Dict.fromList <|
-        selectScene
+        []
             -- TODO group by scene (not trigger)
             ++ [ rule "intro, deadline, miss stop"
-                    -- TODO this rule doesn't take effect with the current "scene selection" screen
-                    -- after removing that, this needs to be triggered in `init`
-                    { trigger = Match "missStop" []
+                    { trigger = Match "player" []
                     , conditions = [ plot "mainPlot" scenes.intro ]
                     , changes = []
                     , narrative = Narrative.intro
@@ -105,7 +77,7 @@ rules =
                     , narrative = Narrative.missedStopAgain
                     }
                , rule "endOfDemo"
-                    { trigger = MatchAny [ HasTag "station"]
+                    { trigger = MatchAny [ HasTag "station" ]
                     , conditions = [ plot "mainPlot" scenes.wildGooseChase ]
                     , changes =
                         [ IncStat "player" "mainPlot" 1
