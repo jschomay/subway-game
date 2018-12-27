@@ -50,7 +50,7 @@ type alias Model =
     { worldModel : Manifest.WorldModel
     , loaded : Bool
     , story : Maybe String
-    , rules : Rules.Rules
+    , rules : LocalTypes.Rules
     , location : Location
     , showMap : Bool
     , gameOver : Bool

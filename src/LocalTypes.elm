@@ -1,6 +1,10 @@
-module LocalTypes exposing (Location(..), Msg(..), StationArea(..), TrainProps, TrainStatus(..))
+module LocalTypes exposing (Location(..), Msg(..), Rule, Rules, StationArea(..), TrainProps, TrainStatus(..))
 
 import City exposing (..)
+import Dict exposing (Dict)
+import Narrative exposing (..)
+import Narrative.Rules as Rules exposing (..)
+import Narrative.WorldModel exposing (..)
 
 
 type Msg
@@ -14,6 +18,17 @@ type Msg
     | BoardTrain Line Station
     | Disembark
     | Continue
+
+
+type alias Rule =
+    Rules.Rule
+        { changes : List ChangeWorld
+        , narrative : Narrative
+        }
+
+
+type alias Rules =
+    Dict String Rule
 
 
 type StationArea
