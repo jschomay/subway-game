@@ -20,6 +20,7 @@ import Rules
 import Subway
 import Task
 import Tuple
+import Views.Station.CentralGuardOffice as CentralGuardOffice
 import Views.Station.Hall as Hall
 import Views.Station.Lobby as Lobby
 import Views.Station.Platform as Platform
@@ -87,12 +88,12 @@ introDelay =
 
 departingDelay : Float
 departingDelay =
-    1.5 * 1000
+    0.5 * 1000
 
 
 arrivingDelay : Float
 arrivingDelay =
-    1.5 * 1000
+    0.5 * 1000
 
 
 {-| "Ticks" the narrative engine, and displays the story content
@@ -217,6 +218,9 @@ update msg model =
                     InStation _ ->
                         ( { model | story = Nothing }, Cmd.none )
 
+                    CentralGuardOffice ->
+                        ( { model | story = Nothing }, Cmd.none )
+
                     OnTrain train ->
                         ( { model
                             | location = OnTrain <| changeTrainStatus Arriving train
@@ -278,6 +282,13 @@ view model =
         currentStation =
             getCurrentStation map model.worldModel
 
+        location =
+            if assert "player" [ HasTag "caught" ] model.worldModel then
+                CentralGuardOffice
+
+            else
+                model.location
+
         map =
             mapLevel
                 |> City.mapLines
@@ -306,7 +317,10 @@ view model =
 
     else
         div [ class "game" ]
-            [ case model.location of
+            [ case location of
+                CentralGuardOffice ->
+                    CentralGuardOffice.view model.worldModel
+
                 InStation Lobby ->
                     Lobby.view model.worldModel currentStation
 
@@ -350,12 +364,16 @@ selectSceneView =
 
         lostBriefcase =
             beginning ++ [ "1", "largeCrowd" ]
+
+        centralGuardOffice =
+            lostBriefcase ++ [ "2", "policeOffice", "3" ]
     in
     div [ class "SelectScene" ]
         [ h1 [] [ text "Select a scene to jump to:" ]
         , ul []
             [ li [ onClick <| LoadScene beginning ] [ text "Beginning" ]
             , li [ onClick <| LoadScene lostBriefcase ] [ text "Losing briefcase" ]
+            , li [ onClick <| LoadScene centralGuardOffice ] [ text "In the central guard office" ]
             ]
         ]
 

@@ -51,3 +51,4 @@ type alias TrainProps =
 type Location
     = OnTrain TrainProps
     | InStation StationArea
+    | CentralGuardOffice

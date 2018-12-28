@@ -71,7 +71,7 @@ items =
                     "Cellphone"
                     "It's not one of those $800 ones, but it does everything you need.  Unless there's no service.  Down here there's no service, so it's practically useless.."
                 ]
-            ++ (location <| station TwinBrooks)
+            ++ location (station TwinBrooks)
                 [ entity "safteyWarningPoster"
                     "Safety Message Poster"
                     "A poster that warns you to watch out for pickpockets and report any suspicious activity. "
@@ -79,7 +79,7 @@ items =
                     "Map on the wall"
                     "This shows the full map of the subway system."
                 ]
-            ++ (location <| station FederalTriangle)
+            ++ location (station FederalTriangle)
                 [ entity "policeOffice"
                     "Police Office"
                     "A small police office."
@@ -87,18 +87,30 @@ items =
                     "Ticket Machine"
                     "You can buy tickets and passes here."
                 ]
+            ++ location (station ChurchStreet)
+                [ entity "paperScrap"
+                    "Scrap of paper"
+                    "It's just trash."
+                ]
+            ++ location (station WestMulberry)
+                [ entity "maintenanceDoor"
+                    "Maintenance door"
+                    "The sign on it says \"Maintenance access only\"."
+                ]
+            ++ location "maintenanceMan"
+                [ entity "keyCard"
+                    "Maintenance Key Card"
+                    "This will get you in to maintenance areas."
+                ]
 
 
 characters : List ( ID, Entity )
 characters =
     List.map (tag "character")
-        [ entity "securityGuard"
-            "Security Guard"
+        [ entity "maintenanceMan"
+            "Maintenance man"
             "He's probably busy, you don't really have any reason to bother him."
             |> link "location" (station TwinBrooks)
-        , entity "ticketInspector"
-            "Ticket inspector"
-            "Ticket inspectors aren't really the nicest people to associate with.  Unless you have a good reason to talk to him, you'd rather keep your distance."
         , entity "largeCrowd"
             "A large crowd"
             "They ignore you for the most part, occupied with the situation at hand."
@@ -107,6 +119,14 @@ characters =
             "Security officers"
             "Two of them, looking official, but not really all that helpful over all."
             |> link "location" (station MetroCenter)
+        , entity "commuter1"
+            "Commuter"
+            "Another commuter, waiting for the train."
+            |> link "location" (station EastMulberry)
+        , entity "commuter2"
+            "Commuter"
+            "Another commuter, waiting for the train."
+            |> link "location" (station WestMulberry)
         ]
 
 

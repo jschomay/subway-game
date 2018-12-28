@@ -43,7 +43,7 @@ rules =
                     }
                ]
             ++ [ rule "inquireHowToGetBack"
-                    { trigger = Match "securityGuard" []
+                    { trigger = Match "maintenanceMan" []
                     , conditions = []
                     , changes = []
                     , narrative = inquireHowToGetBack
@@ -56,6 +56,10 @@ rules =
                     , changes =
                         [ IncStat "player" "mainPlot" 1
                         , SetLink "briefcase" "location" "thief"
+                        , SetLink "thief" "location" (station WestMulberry)
+                        , AddTag (station ChurchStreet) "possibleThiefLocation"
+                        , AddTag (station EastMulberry) "possibleThiefLocation"
+                        , AddTag (station WestMulberry) "possibleThiefLocation"
                         ]
                     , narrative = exitClosedBriefcaseStolen
                     }
@@ -94,7 +98,7 @@ Oh shit.  You missed your stop.  It's 6:39.  You have to get back to the Metro C
 missedStopAgain : Narrative
 missedStopAgain =
     inOrder [ """
-    Wait, what are you doing?  You need to get off at the Metro Center station to get to work.  What is wrong with you today!?
+Wait, what are you doing?  You need to get off at the Metro Center station to get to work.  What is wrong with you today!?
     """ ]
 
 
@@ -102,10 +106,10 @@ missedStop : Narrative
 missedStop =
     inOrder
         [ """
-    You can't believe you missed your stop.  You've never done that before, and today of all days.
+You can't believe you missed your stop.  You've never done that before, and today of all days.
 
-    There's no time to lament, you need to get back to the Metro Center station as fast as possible.  It looks like you can just take the train back in the other direction.  If you ever get lost, you have a map with you (press 'm').
-  """
+There's no time to lament, you need to get back to the Metro Center station as fast as possible.  It looks like you can just take the train back in the other direction.  If you ever get lost, you have a map with you (press 'm').
+"""
         , "If you hurry up and get on the train, you still probably have time to get back without your boss even noticing."
         ]
 
@@ -114,12 +118,12 @@ delayAhead : Narrative
 delayAhead =
     inOrder
         [ """
-  You're wide awake now.  There's still time to get to work and do one more run through of the presentation.  This is what you've been working so hard for.  You deserve a promotion.  This time, you'll get it.
+You're wide awake now.  There's still time to get to work and do one more run through of the presentation.  This is what you've been working so hard for.  You deserve a promotion.  This time, you'll get it.
 
-  Your thoughts are interrupted by a crackle over the loudspeaker.  You realize the conductor is making an announcement, but it's so garbled that you only catch part of it.  Something about a delay... That doesn't sound good.  Some kind of problem at one of the stations... You just hope it won't effect your plans.
-  """
+Your thoughts are interrupted by a crackle over the loudspeaker.  You realize the conductor is making an announcement, but it's so garbled that you only catch part of it.  Something about a delay... That doesn't sound good.  Some kind of problem at one of the stations... You just hope it won't effect your plans.
+"""
         , """
-  As the train pulls in to the station, you can see that the exists are still closed.
+As the train pulls in to the station, you can see that the exists are still closed.
   """
         ]
 
@@ -128,16 +132,14 @@ inquireHowToGetBack : Narrative
 inquireHowToGetBack =
     inOrder
         [ """
-    The security guard got off the train with you, and is the only other person at this station.
-    
-    You have to get back to your stop as soon as possible, so you ask him, "Hey, when's the next train that stops at Metro Center?"
+You see a maintenance man at the end of the platform, working on some broken panel.  He looks very focused, but he is the only other person on this platform.
 
-    He answers, "No clue kid, I don't run the trains.  Check the map.."
-  """
+You have to get back to your stop as soon as possible, so you ask him, "Excuse me?  Do you know the quickest way to get back to Metro Center?"
+
+He looks up from his work, obviously annoyed.  "No clue, I don't run the trains.  Check the map."  He goes back to his work, totally ignoring you.
+"""
         , """
-    You look in his direction again, but you know better than to bother him.  He meets your gaze, then walks to the far end of the platform.
-
-    You should be on your way too, you need to get back to your stop.
+You look in his direction again, but you know better than to bother him.  You should be on your way too, you need to get back to your stop.
   """
         ]
 
@@ -145,33 +147,26 @@ inquireHowToGetBack =
 exitClosedBriefcaseStolen : Narrative
 exitClosedBriefcaseStolen =
     inOrder [ """
-    There's a large crowd gathering around.  Some people seem angry, others are asking questions.  You turn to a young woman with glasses.
+From the angry shouting, you gather that station's exits are locked.  But that doesn't make sense, why would they lock the exits during the morning commute?
 
-    "Hey, what's going on?"
-    "The exits are locked!  We can't get out."
-    "Why would they lock the exits?  That doesn't make sense, they wouldn't do that during the weekday morning rush hour."
+You feel a shot of panic as you realize you can't get out.  And then you feel a tug at your arm and look down, and see someone run off with your briefcase!
 
-    She throws her hands in the air walks off.  You try to get more information from a teenage in a dirty hoody.
-    "There's some problem, but they won't say what, something about security."
+Your presentation is in that briefcase.  You need it!  "Stop, thief!"
 
-    This is no good.  You have to get to work.  Maybe you could take the train to the next stop and walk--
+The thief runs down the tunnel for the Red line heading towards West Mulberry.  The security officers don't seem to notice a crime has occurred.
 
-    Someone knocks into you, hard.  You feel a tug at your arm, and realize someone has grabbed your briefcase and ran.
-
-    "Stop!  Thief!  Someone... help!"
-
-    The thief disappears into a door marked "Employees only."  It's gone.  Your presentation was in there.  You need to get it back.
+You need that briefcase back.
   """ ]
 
 
 askAboutDelay : Narrative
 askAboutDelay =
     inOrder [ """
-    "Excuse me, can you tell me what's going on here?"
+"Excuse me, can you tell me what's going on here?"
 
-    The officers are preoccupied trying to keep everyone calm.  "Nothing to worry about, please try a different station."
-    "But this is my stop."
-    "We're asking people to use a different station."
+The officers are preoccupied trying to keep everyone calm.  "Nothing to worry about, please try a different station."
+"But this is my stop."
+"We're asking people to use a different station."
 
-    They brush past you.  This is ridiculous.  Maybe one of the people in the crowd knows what's going on.
+They brush past you.  This is ridiculous.  Maybe one of the people in the crowd knows what's going on.
   """ ]
