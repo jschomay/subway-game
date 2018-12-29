@@ -57,6 +57,7 @@ type alias Model =
     , gameOver : Bool
     , selectScene : Bool
     , history : List String
+    , pendingChanges : List ChangeWorld
     }
 
 
@@ -74,6 +75,7 @@ init =
       , gameOver = False
       , selectScene = True
       , history = []
+      , pendingChanges = []
       }
       -- after removing scene select:
       -- , delay introDelay (Interact "player")
@@ -103,19 +105,28 @@ updateStory trigger model =
     case Narrative.Rules.findMatchingRule trigger model.rules model.worldModel of
         Nothing ->
             let
+                genericChanges =
+                    genericUpdates trigger model.worldModel
+
                 default =
                     Dict.get trigger model.worldModel
                         |> Maybe.map .description
             in
-            { model | story = default }
+            { model
+                | story = default
+                , pendingChanges = genericChanges
+            }
 
         Just ( matchedRuleID, matchedRule ) ->
             let
+                genericChanges =
+                    genericUpdates trigger model.worldModel
+
                 ( currentNarrative, updatedNarrative ) =
                     Narrative.update matchedRule.narrative
             in
             { model
-                | worldModel = applyChanges matchedRule.changes model.worldModel
+                | pendingChanges = matchedRule.changes ++ genericChanges
                 , story = Just currentNarrative
                 , rules = Dict.insert matchedRuleID { matchedRule | narrative = updatedNarrative } model.rules
             }
@@ -131,18 +142,14 @@ specialEvents ruleId model =
 This happens before `updateStory`, so you can always override these changes in the rules if need.
 Warning, this should be used sparingly!
 -}
-genericUpdates : String -> Model -> Model
-genericUpdates interactableId model =
-    let
-        changes =
-            if assert interactableId [ HasTag "station" ] model.worldModel then
-                -- move to selected station
-                [ SetLink "player" "location" interactableId ]
+genericUpdates : String -> Manifest.WorldModel -> List ChangeWorld
+genericUpdates interactableId worldModel =
+    if assert interactableId [ HasTag "station" ] worldModel then
+        -- move to selected station
+        [ SetLink "player" "location" interactableId ]
 
-            else
-                []
-    in
-    { model | worldModel = applyChanges changes model.worldModel }
+    else
+        []
 
 
 noop : Model -> ( Model, Cmd Msg )
@@ -163,6 +170,11 @@ getCurrentStation map worldModel =
         |> Maybe.withDefault WestMulberry
 
 
+updateAndThen : (m -> ( m, Cmd c )) -> ( m, Cmd c ) -> ( m, Cmd c )
+updateAndThen f ( model, cmds ) =
+    f model |> Tuple.mapSecond (\cmd -> Cmd.batch [ cmd, cmds ])
+
+
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     if model.gameOver then
@@ -181,16 +193,24 @@ update msg model =
 
             LoadScene history ->
                 List.foldl
-                    (\id ( m, cmds ) ->
-                        update (Interact id) m
-                            |> Tuple.mapSecond (\c -> Cmd.batch [ c, cmds ])
+                    (\id modelTuple ->
+                        modelTuple
+                            |> updateAndThen (update <| Interact id)
+                            |> updateAndThen
+                                (\m ->
+                                    ( { m
+                                        | pendingChanges = []
+                                        , worldModel = applyChanges m.pendingChanges m.worldModel
+                                      }
+                                    , Cmd.none
+                                    )
+                                )
                     )
                     ( { model | selectScene = False }, Cmd.none )
                     history
 
             Interact interactableId ->
                 ( { model | history = model.history ++ [ interactableId ] |> Debug.log "history\n" }
-                    |> genericUpdates interactableId
                     |> updateStory interactableId
                 , Cmd.none
                 )
@@ -214,26 +234,31 @@ update msg model =
                 )
 
             Continue ->
-                case model.location of
+                (case model.location of
                     InStation _ ->
-                        ( { model | story = Nothing }, Cmd.none )
+                        ( model, Cmd.none )
 
                     CentralGuardOffice ->
-                        ( { model | story = Nothing }, Cmd.none )
+                        ( model, Cmd.none )
 
                     OnTrain train ->
-                        ( { model
-                            | location = OnTrain <| changeTrainStatus Arriving train
-                            , story = Nothing
-                          }
+                        ( { model | location = OnTrain <| changeTrainStatus Arriving train }
                         , delay arrivingDelay <| Disembark
+                        )
+                )
+                    |> updateAndThen
+                        (\m ->
+                            ( { m
+                                | worldModel = applyChanges model.pendingChanges model.worldModel
+                                , pendingChanges = []
+                                , story = Nothing
+                              }
+                            , Cmd.none
+                            )
                         )
 
             Disembark ->
-                ( { model
-                    | location = InStation Lobby
-                    , story = Nothing
-                  }
+                ( { model | location = InStation Lobby }
                 , Cmd.none
                 )
 
