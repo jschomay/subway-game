@@ -1,9 +1,9 @@
 .StoryLine {
   padding: 5em;
-  color: #ccc;;
+  color: #ddd;;
   /* background: rgba(0,0,0,0.8); */
   background: linear-gradient(to top, #111 0%, #000 100%);
-  font-size: 1.2em;
+  font-size: 1.4em;
   line-height: 1.4em;
   font-weight: normal;
   font-family: 'Quicksand', sans-serif;

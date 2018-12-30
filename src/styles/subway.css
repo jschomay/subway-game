@@ -129,11 +129,16 @@
   flex: 0 0 auto;
 }
 
-.Connection__end_points {
-  margin-right: 0.8em;
+.Connection__name {
   font-weight: bold;
   cursor: pointer;
-  flex: 1 0 auto;
+  font-size: 1em;
+  text-transform: uppercase;
+}
+
+.Connection__end_points {
+  cursor: pointer;
+  font-size: 0.8em;
 }
 
 

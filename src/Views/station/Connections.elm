@@ -40,7 +40,10 @@ view map currentStation =
                     , style "borderColor" (Shared.toColor lineInfo.color)
                     ]
                     [ text <| String.fromInt lineInfo.number ]
-                , div [ class "Connection__end_points" ] [ text <| String.join " • " [ from, to ] ]
+                , div [ class "Connection__info" ]
+                    [ div [ class "Connection__name" ] [ text lineInfo.name ]
+                    , div [ class "Connection__end_points" ] [ text <| String.join " • " [ from, to ] ]
+                    ]
                 ]
 
         connections =
