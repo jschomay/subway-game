@@ -33,7 +33,6 @@ type alias Rules =
 
 type StationArea
     = Platform Line
-    | Hall
     | Lobby
 
 

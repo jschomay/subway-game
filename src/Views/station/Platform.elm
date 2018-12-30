@@ -69,8 +69,8 @@ view map currentStation line =
                     [ text <| .name <| stationInfo station ]
                 ]
     in
-    div [ class "Station Station--platform" ]
-        [ Shared.exit (Go Hall)
+    div [ class "Platform" ]
+        [ Shared.exit (Go Lobby)
         , div
             [ class "Line_map" ]
             [ lineInfoView <| City.lineInfo line

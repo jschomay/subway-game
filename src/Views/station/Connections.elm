@@ -1,4 +1,4 @@
-module Views.Station.Hall exposing (view)
+module Views.Station.Connections exposing (view)
 
 import City exposing (..)
 import Html exposing (..)
@@ -12,7 +12,7 @@ import Views.Shared as Shared
 
 {-| shows the lines servicing this station
 -}
-view : Subway.Map City.Station City.Line -> Station -> Html Msg
+view : City.Map -> Station -> List (Html Msg)
 view map currentStation =
     let
         direction lineInfo =
@@ -30,7 +30,7 @@ view map currentStation =
                 to =
                     lineInfo |> .stations |> List.reverse |> List.head |> Maybe.map (City.stationInfo >> .name) |> Maybe.withDefault ""
             in
-            li
+            div
                 [ class "Connection"
                 , onClick <| Go (Platform line)
                 ]
@@ -46,9 +46,4 @@ view map currentStation =
         connections =
             Subway.connections City.config map currentStation
     in
-    div [ class "Station Station--hall" ]
-        [ Shared.exit (Go Lobby)
-        , div [ class "Connections" ] <|
-            div [ class "Connections__title" ] [ text "Connecting trains" ]
-                :: List.map connectionView connections
-        ]
+    List.map connectionView connections

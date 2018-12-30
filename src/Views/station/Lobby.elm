@@ -8,15 +8,12 @@ import LocalTypes exposing (..)
 import Manifest exposing (..)
 import Narrative.WorldModel exposing (..)
 import Views.Shared as Shared
+import Views.Station.Connections as Connections
 
 
-view : Manifest.WorldModel -> Station -> Html Msg
-view worldmodel currentStation =
+view : City.Map -> Manifest.WorldModel -> Station -> Html Msg
+view map worldmodel currentStation =
     let
-        toTrains =
-            div [ class "Station__connections", onClick <| Go Hall ] <|
-                [ span [ class "icon icon--train" ] [], Shared.arrow 0 ]
-
         interactiveView : ( Manifest.ID, DisplayComponent a ) -> Html Msg
         interactiveView ( id, { name } ) =
             div [ class "Station__interactable", onClick <| Interact id ]
@@ -45,21 +42,25 @@ view worldmodel currentStation =
                 , HasLink "location" "player"
                 ]
                 worldmodel
+
+        section list =
+            if List.isEmpty list then
+                []
+
+            else
+                div [ class "Station__interactables_divider" ] []
+                    :: list
     in
-    div [ class "Station Station--lobby" ]
-        [ div [ class "Station__top" ] <|
-            [ h2 [ class "Station__name" ] [ text (stationInfo currentStation |> .name) ]
-            , toTrains
-            ]
-        , div [ class "Station__scene" ] <|
+    div [ class "Station" ]
+        [ div [ class "Station__scene" ] <|
             [ div [ class "Station__interactables" ] <|
-                div [ class "Station__interactables_title" ] [ text "Characters" ]
-                    :: List.map interactiveView characters
-            , div [ class "Station__interactables" ] <|
-                div [ class "Station__interactables_title" ] [ text "Items" ]
-                    :: List.map interactiveView items
-            , div [ class "Station__interactables" ] <|
-                div [ class "Station__interactables_title" ] [ text "Inventory" ]
-                    :: List.map interactiveView inventory
+                div [ class "Station__name" ] [ text (stationInfo currentStation |> .name) ]
+                    :: (section <| List.map interactiveView characters)
+                    ++ (section <| List.map interactiveView items)
+                    ++ (section <| Connections.view map currentStation)
+
+            -- , div [ class "Station__interactables" ] <|
+            --     div [ class "Station__interactables_title" ] [ text "Inventory" ]
+            --         :: List.map interactiveView inventory
             ]
         ]

@@ -21,7 +21,6 @@ import Subway
 import Task
 import Tuple
 import Views.Station.CentralGuardOffice as CentralGuardOffice
-import Views.Station.Hall as Hall
 import Views.Station.Lobby as Lobby
 import Views.Station.Platform as Platform
 import Views.Train
@@ -343,22 +342,22 @@ view model =
         selectSceneView
 
     else
-        div [ class "game" ]
+        -- keyed so fade in animations play
+        Html.Keyed.node "div"
+            [ class "game" ]
             [ case location of
                 CentralGuardOffice ->
-                    CentralGuardOffice.view model.worldModel
+                    ( "centralGuardOffice", CentralGuardOffice.view model.worldModel )
 
                 InStation Lobby ->
-                    Lobby.view model.worldModel currentStation
-
-                InStation Hall ->
-                    Hall.view map currentStation
+                    ( "lobby", Lobby.view map model.worldModel currentStation )
 
                 InStation (Platform line) ->
-                    Platform.view map currentStation line
+                    ( "platform", Platform.view map currentStation line )
 
                 OnTrain { line, status } ->
-                    Views.Train.view
+                    ( "train"
+                    , Views.Train.view
                         { line = line
                         , arrivingAtStation =
                             if status == Arriving then
@@ -367,19 +366,24 @@ view model =
                             else
                                 Nothing
                         }
-            , model.story
-                |> Maybe.map storyView
-                |> Maybe.withDefault (text "")
-            , if model.showMap then
-                mapView mapLevel
+                    )
+            , ( "story"
+              , model.story
+                    |> Maybe.map storyView
+                    |> Maybe.withDefault (text "")
+              )
+            , ( "map"
+              , if model.showMap then
+                    mapView mapLevel
 
-              else
-                case model.location of
-                    InStation _ ->
-                        div [ onClick ToggleMap, class "map_toggle" ] [ text "Map" ]
+                else
+                    case model.location of
+                        InStation _ ->
+                            div [ onClick ToggleMap, class "map_toggle" ] [ text "Map" ]
 
-                    _ ->
-                        text ""
+                        _ ->
+                            text ""
+              )
             ]
 
 

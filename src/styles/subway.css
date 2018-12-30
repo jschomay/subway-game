@@ -1,11 +1,8 @@
 /* Station */
 
 .Station {
-  position: fixed;
-  min-height: 100vh;
-  width: 100%;
-  display: flex;
-  flex-direction: column;
+  background: black;
+  padding: 3em;
   opacity: 1;
   animation: fadeIn 0.3s linear forwards;
 }
@@ -16,14 +13,38 @@
   }
 }
 
-.Station--lobby:before {
+.Station:before {
   content: "";
-  position: absolute;
+  position: fixed;
+  top: 0;
+  left: 0;
   width: 100%;
   height: 100%;
   background: url(../img/subway-lobby.jpg);
   background-size: cover;
-  background-position: top center;
+  background-position: center;
+  opacity: 0.8;
+  animation: flicker 0.3s cubic-bezier(0.840, 0.170, 0.540, 1.350) alternate infinite 0s;
+  max-height: 100vh;
+}
+
+.Platform {
+  background: black;
+  padding: 3em;
+  opacity: 1;
+  animation: fadeIn 0.3s linear forwards;
+}
+
+.Platform:before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: url(../img/train.jpg);
+  background-size: cover;
+  background-position: center;
   opacity: 0.8;
   animation: flicker 0.3s cubic-bezier(0.840, 0.170, 0.540, 1.350) alternate infinite 0s;
   max-height: 100vh;
@@ -43,61 +64,6 @@
   }
 }
 
-.Station--hall, .Station--platform {
-  background: black url(../img/tile.jpg);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 3em;
-}
-
-
-.Station__name {
-  display: inline-block;
-  text-align: center;
-  text-transform: uppercase;
-  font-weight: bold;
-  font-size: 2em;
-  padding: 0.4em 0.7em;
-  color: #222;
-  background: #eee;
-  border: 0.1em solid #222;
-}
-
-.Station__connections {
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  text-transform: uppercase;
-  font-weight: bold;
-  font-size: 1em;
-  border: 0.1em solid black;
-  padding: 0.3em;
-  color: #111;
-  background: white;
-  position: absolute;
-  right: 1em;
-}
-
-.Station__connections .icon {
-  width: 2em;
-  height: 2em;
-  cursor: pointer;
-}
-
-
-.Station__top {
-  flex: 0 0 auto;
-  background: black url(../img/tile.jpg);
-  background-size: 40%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 1.5em;
-  position: relative;
-}
-
 .Station__scene {
   padding: 5em 3em;
   flex: 1 0 auto;
@@ -107,54 +73,35 @@
   position: relative;
 }
 
-.Station__interactables {
-  background: white;
-  user-select: none;
-  padding: 0 2em;
-  border: 0.2em solid #333;
-  background: white;
-  border-radius: 1.1em;
-  width: 280px;
-  min-height: 5em;
-}
-
-.Station__interactables_title {
+.Station__name {
   text-align: center;
   text-transform: uppercase;
   font-weight: bold;
-  font-size: 1.5em;
-  padding: 0.4em 0.7em;
+  font-size: 2em;
+  padding: 0.7em;
   color: #222;
+}
+
+.Station__interactables {
+  user-select: none;
+  background: white;
+  max-width: 500px;
+  min-height: 5em;
+  border-radius: 0.5em;
+  border: 0.2em solid #333;
+}
+
+.Station__interactables_divider {
+  border-top: 1px solid #ccc;
+  padding-top: 1em;
 }
 
 .Station__interactable {
   display: flex;
   align-items: center;
-  padding: 0.9em 0em;
+  padding: 0 3em 1em;
   cursor: pointer;
-  font-weight: normal;
-}
-
-/* Connections */
-
-.Connections {
-  background: white;
-  user-select: none;
-  position: fixed;
-  padding: 0 1em;
-  border: 0.2em solid #333;
-  background: white;
-  border-radius: 1.1em;
-}
-
-.Connections__title {
-  display: inline-block;
-  text-align: center;
-  text-transform: uppercase;
   font-weight: bold;
-  font-size: 1.5em;
-  padding: 0.4em 0.7em;
-  color: #222;
 }
 
 /* Connection */
@@ -162,7 +109,7 @@
 .Connection {
   display: flex;
   align-items: center;
-  padding: 0.9em 0em;
+  padding: 0 2em 1em;
   cursor: pointer;
 }
 
@@ -179,6 +126,7 @@
   font-weight: bold;
   margin-right: 0.8em;
   cursor: pointer;
+  flex: 0 0 auto;
 }
 
 .Connection__end_points {
@@ -192,14 +140,14 @@
 /* Line map */
 
 .Line_map {
-  background: white;
+  position: relative;
+  margin: auto;
   user-select: none;
   padding: 1em;
   width: 330px;
   border: 0.2em solid #333;
   background: white;
   border-radius: 1.1em;
-  flex: 0 0 auto;
 }
 
 .Line_map__info {
@@ -321,9 +269,7 @@
   font-size: 1em;
   border: 0.1em solid black;
   padding: 0.4em;
-  color: #111;
-  background: white;
-  position: absolute;
+  position: fixed;
   left: 2em;
   top: 2em;
   background: black;
@@ -331,14 +277,8 @@
 }
 
 .Exit__text {
+  cursor: pointer;
   margin-left: 0.5em;
-}
-
-.icon {
-}
-
-.icon--train {
-  max-width: 256px;max-height: 256px;background-image: url(data:image/svg+xml;utf8;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iaXNvLTg4NTktMSI/Pgo8IS0tIEdlbmVyYXRvcjogQWRvYmUgSWxsdXN0cmF0b3IgMTYuMC4wLCBTVkcgRXhwb3J0IFBsdWctSW4gLiBTVkcgVmVyc2lvbjogNi4wMCBCdWlsZCAwKSAgLS0+CjwhRE9DVFlQRSBzdmcgUFVCTElDICItLy9XM0MvL0RURCBTVkcgMS4xLy9FTiIgImh0dHA6Ly93d3cudzMub3JnL0dyYXBoaWNzL1NWRy8xLjEvRFREL3N2ZzExLmR0ZCI+CjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0iQ2FwYV8xIiB4PSIwcHgiIHk9IjBweCIgd2lkdGg9IjMycHgiIGhlaWdodD0iMzJweCIgdmlld0JveD0iMCAwIDU4Mi42NzUgNTgyLjY3NSIgc3R5bGU9ImVuYWJsZS1iYWNrZ3JvdW5kOm5ldyAwIDAgNTgyLjY3NSA1ODIuNjc1OyIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+CjxnPgoJPGcgaWQ9IkxheWVyXzFfMjFfIj4KCQk8cGF0aCBkPSJNNTE4LjI4OCw1NDUuN2wtODUuNDI1LTE1NS41NWMyNC4yMjUtMy44MjUsNDIuMDc0LTI1LjUsNDIuMDc0LTQ5LjcyNnYtMjI5LjVDNDc0LjkzNyw0OS43MjUsNDI1LjIxMiwwLDM2NC4wMTIsMCAgICBoLTE0NS4zNWMtNjEuMiwwLTExMi4yLDQ5LjcyNS0xMTIuMiwxMTIuMnYyMjguMjI1YzAsMjUuNSwxNy44NSw0NS45LDQyLjA3NSw0OS43MjZMNjQuMzg3LDU0NS43ICAgIGMtNi4zNzUsMTIuNzUtMi41NSwyOC4wNSwxMC4yLDM0LjQyNWMzLjgyNSwyLjU1LDcuNjUsMi41NSwxMS40NzUsMi41NWM4LjkyNSwwLDE3Ljg1LTUuMSwyMS42NzUtMTIuNzVsNy42NS0xMi43NWgzNTEuOSAgICBsNy42NDksMTIuNzVjNS4xMDEsOC45MjUsMTIuNzUsMTIuNzUsMjEuNjc2LDEyLjc1YzMuODI0LDAsNy42NDktMS4yNzQsMTEuNDc1LTIuNTVDNTIwLjgzNyw1NzMuNzUsNTI0LjY2Myw1NTguNDUsNTE4LjI4OCw1NDUuNyAgICB6IE0zOTguNDM3LDQzMC45NWgtMjE0LjJsMjEuNjc1LTM5LjUyNWgxNzAuODVMMzk4LjQzNyw0MzAuOTV6IE0zOTQuNjEzLDM0NS41MjVjLTIwLjQsMC0zNi45NzYtMTYuNTc1LTM2Ljk3Ni0zNi45NzYgICAgYzAtMjAuNCwxNi41NzUtMzYuOTc1LDM2Ljk3Ni0zNi45NzVjMjAuMzk5LDAsMzYuOTc1LDE2LjU3NSwzNi45NzUsMzYuOTc1QzQzMS41ODcsMzI3LjY3NSw0MTUuMDEyLDM0NS41MjUsMzk0LjYxMywzNDUuNTI1eiAgICAgTTE1MS4wODcsMTI2LjIyNWMwLTM5LjUyNSwzMS44NzUtNzEuNCw3MC4xMjUtNzEuNGgxMzguOTc1YzM4LjI1LDAsNzEuNCwzMS44NzUsNzEuNCw3MS40djYxLjIgICAgYzAsMTQuMDI1LTExLjQ3NSwyNC4yMjUtMjUuNSwyNC4yMjVoLTIyOS41Yy0xNC4wMjUsMC0yNC4yMjUtMTEuNDc1LTI0LjIyNS0yNC4yMjVMMTUxLjA4NywxMjYuMjI1TDE1MS4wODcsMTI2LjIyNXogICAgIE0xODguMDYyLDI3MC4zYzIwLjQsMCwzNi45NzUsMTYuNTc1LDM2Ljk3NSwzNi45NzZjMCwyMC4zOTktMTYuNTc1LDM2Ljk3NS0zNi45NzUsMzYuOTc1cy0zNi45NzUtMTYuNTc1LTM2Ljk3NS0zNi45NzUgICAgQzE1MS4wODcsMjg2Ljg3NSwxNjcuNjYzLDI3MC4zLDE4OC4wNjIsMjcwLjN6IE0xMzUuNzg4LDUxOC45MjVsMjguMDUtNDkuNzI1aDI1NWwyOC4wNSw0OS43MjVIMTM1Ljc4OHoiIGZpbGw9IiMwMDAwMDAiLz4KCTwvZz4KPC9nPgo8Zz4KPC9nPgo8Zz4KPC9nPgo8Zz4KPC9nPgo8Zz4KPC9nPgo8Zz4KPC9nPgo8Zz4KPC9nPgo8Zz4KPC9nPgo8Zz4KPC9nPgo8Zz4KPC9nPgo8Zz4KPC9nPgo8Zz4KPC9nPgo8Zz4KPC9nPgo8Zz4KPC9nPgo8Zz4KPC9nPgo8Zz4KPC9nPgo8L3N2Zz4K)
 }
 
 .CentralGuardOffice {
