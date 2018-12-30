@@ -78,6 +78,7 @@ init =
       , pendingChanges = []
       }
       -- after removing scene select:
+      -- actually, this should happen in the Loaded Msg handling
       -- , delay introDelay (Interact "player")
     , Cmd.none
     )
@@ -105,8 +106,8 @@ updateStory trigger model =
     case Narrative.Rules.findMatchingRule trigger model.rules model.worldModel of
         Nothing ->
             let
-                genericChanges =
-                    genericUpdates trigger model.worldModel
+                defaultChanges =
+                    defaultUpdate trigger model.worldModel
 
                 default =
                     Dict.get trigger model.worldModel
@@ -114,19 +115,20 @@ updateStory trigger model =
             in
             { model
                 | story = default
-                , pendingChanges = genericChanges
+                , pendingChanges = defaultChanges
             }
 
         Just ( matchedRuleID, matchedRule ) ->
             let
-                genericChanges =
-                    genericUpdates trigger model.worldModel
+                defaultChanges =
+                    defaultUpdate trigger model.worldModel
 
                 ( currentNarrative, updatedNarrative ) =
                     Narrative.update matchedRule.narrative
             in
             { model
-                | pendingChanges = matchedRule.changes ++ genericChanges
+              -- make sure rule changes are second so that they can overrite default changes if needed
+                | pendingChanges = defaultChanges ++ matchedRule.changes
                 , story = Just currentNarrative
                 , rules = Dict.insert matchedRuleID { matchedRule | narrative = updatedNarrative } model.rules
             }
@@ -142,8 +144,8 @@ specialEvents ruleId model =
 This happens before `updateStory`, so you can always override these changes in the rules if need.
 Warning, this should be used sparingly!
 -}
-genericUpdates : String -> Manifest.WorldModel -> List ChangeWorld
-genericUpdates interactableId worldModel =
+defaultUpdate : String -> Manifest.WorldModel -> List ChangeWorld
+defaultUpdate interactableId worldModel =
     if assert interactableId [ HasTag "station" ] worldModel then
         -- move to selected station
         [ SetLink "player" "location" interactableId ]
