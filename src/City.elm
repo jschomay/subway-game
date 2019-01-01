@@ -57,6 +57,7 @@ type alias StationInfo =
 
 type alias LineInfo =
     { name : String
+    , id : String
     , number : Int
     , color : Color
     , stations : List Station
@@ -128,6 +129,7 @@ lineInfo line =
         Red ->
             { number = 1
             , name = "Red Line"
+            , id = "redLine"
             , color = red
             , stations =
                 [ WestMulberry
@@ -143,6 +145,7 @@ lineInfo line =
         Yellow ->
             { number = 2
             , name = "Yellow Line"
+            , id = "yellowLine"
             , color = yellow
             , stations =
                 [ MetroCenter
@@ -155,6 +158,7 @@ lineInfo line =
         Green ->
             { number = 3
             , name = "Green Line"
+            , id = "greenLine"
             , color = green
             , stations =
                 [ Burlington

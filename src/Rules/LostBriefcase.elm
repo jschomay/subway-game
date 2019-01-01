@@ -46,10 +46,16 @@ rules =
                     , narrative = tryToBuyTickets
                     }
                ]
+            ++ [ rule "considerRidingYellowLine"
+                    { trigger = Match "yellowLine" []
+                    , conditions = [ Match "player" [ HasStat "ticketLevel" LT 2 ] ]
+                    , changes = []
+                    , narrative = considerRidingYellowLine
+                    }
+               ]
             ++ [ rule "attemptToRideYellowLine"
-                    -- TODO this should trigger when the player rides the yellow line
-                    { trigger = Match (station MacArthursPark) []
-                    , conditions = []
+                    { trigger = MatchAny [ HasTag "station" ]
+                    , conditions = [ Match "player" [ HasLink "line" "yellowLine" ] ]
                     , changes =
                         [ IncStat "player" "ruleBreaker" 1
                         , IncStat "player" "mainPlot" 1
@@ -206,6 +212,14 @@ tryToBuyTickets =
     inOrder
         [ """
 You could buy a ticket here... except your wallet is in your briefcase!
+        """
+        ]
+
+
+considerRidingYellowLine =
+    inOrder
+        [ """
+You don't have a pass for the yellow line, so you have to jump the turnstyle.  Jumping turnstyles is not something you normally do.  What if you get caught?
         """
         ]
 

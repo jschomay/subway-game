@@ -138,28 +138,41 @@ general =
         "A guy just trying to get ahead by following the rules."
         |> stat "mainPlot" 1
         |> stat "mapLevel" 1
+        |> stat "ticketLevel" 1
         |> link "location" (station TwinBrooks)
         |> (\e -> List.foldl (\{ id, starting } -> stat id starting) e Constants.characterStats)
     ]
+        ++ List.map
+            (City.lineInfo
+                >> (\info ->
+                        entity info.id info.name info.name
+                            |> tag "line"
+                            |> tag "silent"
+                   )
+            )
+            City.allLines
 
 
 locations : List ( ID, Entity )
 locations =
-    -- no need to make this unique here, as the world model is a map by id
-    City.allLines
-        |> List.concatMap (City.lineInfo >> .stations)
-        |> List.map
-            (City.stationInfo
-                >> (\info ->
-                        entity (String.fromInt info.id) info.name info.name
-                            |> tag "location"
-                            |> tag "station"
-                            |> (\e ->
-                                    if String.fromInt info.id == station MetroCenter then
-                                        tag "stevesWork" e
+    let
+        stations =
+            List.map
+                (City.stationInfo
+                    >> (\info ->
+                            entity (String.fromInt info.id) info.name info.name
+                                |> tag "location"
+                                |> tag "station"
+                                |> (\e ->
+                                        if String.fromInt info.id == station MetroCenter then
+                                            tag "stevesWork" e
 
-                                    else
-                                        e
-                               )
-                   )
-            )
+                                        else
+                                            e
+                                   )
+                       )
+                )
+                (List.concatMap (City.lineInfo >> .stations) City.allLines)
+    in
+    -- no need to make this unique here, as the world model is a map by id
+    stations

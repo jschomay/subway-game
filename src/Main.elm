@@ -111,12 +111,16 @@ updateStory trigger model =
                 defaultChanges =
                     defaultUpdate trigger model.worldModel
 
-                default =
-                    Dict.get trigger model.worldModel
-                        |> Maybe.map .description
+                defaultStory =
+                    if assert trigger [ HasTag "silent" ] model.worldModel then
+                        Nothing
+
+                    else
+                        Dict.get trigger model.worldModel
+                            |> Maybe.map .description
             in
             { model
-                | story = default
+                | story = defaultStory
                 , pendingChanges = defaultChanges
             }
 
@@ -151,6 +155,10 @@ defaultUpdate interactableId worldModel =
     if assert interactableId [ HasTag "station" ] worldModel then
         -- move to selected station
         [ SetLink "player" "location" interactableId ]
+
+    else if assert interactableId [ HasTag "line" ] worldModel then
+        -- handle going to a line color
+        [ SetLink "player" "line" interactableId ]
 
     else
         []
@@ -235,7 +243,18 @@ update msg model =
                 )
 
             Go area ->
-                ( { model | location = InStation area }, Cmd.none )
+                -- TODO would be best to move all of `model.location` into the world model, but for now, just duplicate the line color there
+                (case area of
+                    Platform line ->
+                        update (Interact <| .id <| lineInfo line) model
+
+                    _ ->
+                        ( model, Cmd.none )
+                )
+                    |> updateAndThen
+                        (\m ->
+                            ( { m | location = InStation area }, Cmd.none )
+                        )
 
             BoardTrain line station ->
                 ( { model | location = OnTrain { line = line, status = InTransit } }
