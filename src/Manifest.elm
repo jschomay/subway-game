@@ -1,6 +1,7 @@
 module Manifest exposing (DisplayComponent, Entity, ID, WorldModel, characters, entity, items, locations, worldModel)
 
 import City exposing (Station(..), stationInfo)
+import Constants
 import Dict exposing (Dict)
 import Narrative.WorldModel exposing (..)
 
@@ -138,6 +139,7 @@ general =
         |> stat "mainPlot" 1
         |> stat "mapLevel" 1
         |> link "location" (station TwinBrooks)
+        |> (\e -> List.foldl (\{ id, starting } -> stat id starting) e Constants.characterStats)
     ]
 
 

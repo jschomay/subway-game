@@ -20,10 +20,11 @@ import Rules
 import Subway
 import Task
 import Tuple
+import Views.CharacterInfo as CharacterInfo
 import Views.Station.CentralGuardOffice as CentralGuardOffice
 import Views.Station.Lobby as Lobby
 import Views.Station.Platform as Platform
-import Views.Train
+import Views.Train as Train
 
 
 
@@ -53,6 +54,7 @@ type alias Model =
     , rules : LocalTypes.Rules
     , location : Location
     , showMap : Bool
+    , showCharacterInfo : Bool
     , gameOver : Bool
     , selectScene : Bool
     , history : List String
@@ -71,6 +73,7 @@ init =
       -- after removing scene select:
       -- , location = OnTrain { line = Red, status = InTransit }
       , showMap = False
+      , showCharacterInfo = False
       , gameOver = False
       , selectScene = True
       , history = []
@@ -226,6 +229,11 @@ update msg model =
                 , Cmd.none
                 )
 
+            ToggleCharacterInfo ->
+                ( { model | showCharacterInfo = not model.showCharacterInfo }
+                , Cmd.none
+                )
+
             Go area ->
                 ( { model | location = InStation area }, Cmd.none )
 
@@ -296,6 +304,9 @@ handleKey model key =
         "m" ->
             ToggleMap
 
+        "c" ->
+            ToggleCharacterInfo
+
         _ ->
             NoOp
 
@@ -357,7 +368,7 @@ view model =
 
                 OnTrain { line, status } ->
                     ( "train"
-                    , Views.Train.view
+                    , Train.view
                         { line = line
                         , arrivingAtStation =
                             if status == Arriving then
@@ -367,22 +378,35 @@ view model =
                                 Nothing
                         }
                     )
-            , ( "story"
-              , model.story
-                    |> Maybe.map storyView
-                    |> Maybe.withDefault (text "")
+            , ( "toggles"
+              , case model.location of
+                    InStation _ ->
+                        div [ class "toggles" ]
+                            [ div [ onClick ToggleMap, class "toggle" ] [ text "Map (M)" ]
+                            , div [ onClick ToggleCharacterInfo, class "toggle" ] [ text "Character (C)" ]
+                            ]
+
+                    _ ->
+                        text ""
+              )
+            , ( "characterInfoView"
+              , if model.showCharacterInfo then
+                    CharacterInfo.view model.worldModel
+
+                else
+                    text ""
               )
             , ( "map"
               , if model.showMap then
                     mapView mapLevel
 
                 else
-                    case model.location of
-                        InStation _ ->
-                            div [ onClick ToggleMap, class "map_toggle" ] [ text "Map" ]
-
-                        _ ->
-                            text ""
+                    text ""
+              )
+            , ( "story"
+              , model.story
+                    |> Maybe.map storyView
+                    |> Maybe.withDefault (text "")
               )
             ]
 

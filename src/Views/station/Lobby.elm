@@ -36,12 +36,6 @@ view map worldmodel currentStation =
                 ]
                 worldmodel
 
-        inventory =
-            query
-                [ HasTag "item"
-                , HasLink "location" "player"
-                ]
-                worldmodel
 
         section list =
             if List.isEmpty list then
@@ -59,8 +53,5 @@ view map worldmodel currentStation =
                     ++ (section <| List.map interactiveView items)
                     ++ (section <| Connections.view map currentStation)
 
-            -- , div [ class "Station__interactables" ] <|
-            --     div [ class "Station__interactables_title" ] [ text "Inventory" ]
-            --         :: List.map interactiveView inventory
             ]
         ]

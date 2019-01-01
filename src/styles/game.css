@@ -2,7 +2,6 @@
   box-sizing: border-box;
   margin: 0;
   padding: 0;
-  cursor: default;
 }
 
 ul, li {
@@ -77,17 +76,22 @@ body {
   min-height: 100vh;
 }
 
-.map_toggle {
+.toggles {
   position: fixed;
-  display: block;
+  display: flex;
   bottom: 1em;
   left: 1em;
+}
+
+.toggle {
   padding: 1em;
   background: #333;
   cursor: pointer;
   font-size: 1em;
   color: white;
   text-transform: uppercase;
+  margin-right: 1em;
+  user-select: none;
 }
 
 .map {
@@ -114,17 +118,56 @@ body {
   border-radius: 1em;
 }
 
-.titlecard {
-  user-select: none;
-  width: 100%;
-  height: 100%;
+.CharacterInfo {
   display: flex;
   align-items: center;
   justify-content: center;
-  color: white;
-  font-family: helvetica;
-  font-size: 48px;
-  font-weight: normal;
-  background-color: black;
   position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  left: 0;
+  margin: auto;
+}
+
+.CharacterInfo__display {
+  display: flex;
+  user-select: none;
+  background: white;
+  max-width: 70%;
+  border-radius: 0.5em;
+  border: 0.2em solid #333;
+  padding: 0 1em 2em;
+}
+
+.CharacterInfo__section {
+  flex: 1 1 50%;
+  padding: 0 2em;
+}
+
+.CharacterInfo__title {
+  text-transform: uppercase;
+  font-weight: bold;
+  font-size: 1.2em;
+  padding: 1em 1em 0 0em;
+  color: #222;
+  border-bottom: 1px solid #ccc;
+  margin: 1em 0;
+  white-space: nowrap;
+}
+
+.CharacterInfo__item {
+  padding: 0.5em 0;
+  white-space: nowrap;
+}
+
+.CharacterInfo__item--inventory {
+  padding: 1em 0;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.CharacterInfo__item_header {
+  font-weight: bold;
+  margin-bottom: 0.3em;
 }

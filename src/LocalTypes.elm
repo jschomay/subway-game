@@ -14,6 +14,7 @@ type Msg
     | Loaded
     | Delay Float Msg
     | ToggleMap
+    | ToggleCharacterInfo
     | Go StationArea
     | BoardTrain Line Station
     | Disembark

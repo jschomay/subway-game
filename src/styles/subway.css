@@ -125,19 +125,16 @@
   font-size: 1em;
   font-weight: bold;
   margin-right: 0.8em;
-  cursor: pointer;
   flex: 0 0 auto;
 }
 
 .Connection__name {
   font-weight: bold;
-  cursor: pointer;
   font-size: 1em;
   text-transform: uppercase;
 }
 
 .Connection__end_points {
-  cursor: pointer;
   font-size: 0.8em;
 }
 
@@ -213,7 +210,6 @@
   display: flex;
   justify-content: flex-end;
   margin-right: 0.7em;
-  cursor: pointer;
 }
 
 .Stop__connection {
@@ -227,17 +223,14 @@
   justify-content: center;
   font-size: 0.7em;
   font-weight: bold;
-  cursor: pointer;
   margin-right: 3px;
 }
 
 .Stop__name {
-  cursor: pointer;
 }
 
 .Stop__name--current {
   font-weight: bold;
-  cursor: default;
 }
 
 .Stop__dot {
@@ -247,7 +240,6 @@
   border-radius: 50%;
   border: 3px solid;
   background: white;
-  cursor: pointer;
 }
 
 .Stop__dot--current {
@@ -282,7 +274,6 @@
 }
 
 .Exit__text {
-  cursor: pointer;
   margin-left: 0.5em;
 }
 
