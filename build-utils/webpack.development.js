@@ -14,6 +14,9 @@ module.exports = () => ({
             loader: 'elm-webpack-loader',
             options: {
               cwd: path.join(__dirname, '../'),
+              files: [
+                  path.resolve(__dirname, "../src/RuleGraph.elm"),
+              ],
               debug: true
             }
           }

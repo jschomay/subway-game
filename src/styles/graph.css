@@ -1,0 +1,7 @@
+.RuleGraph {
+  display: flex;
+}
+
+.RuleGraph > * {
+  flex: 1 0 auto;
+}
