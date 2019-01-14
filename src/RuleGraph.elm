@@ -1,7 +1,7 @@
 port module RuleGraph exposing (main)
 
 import Browser
-import Dict
+import Dict exposing (Dict)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
@@ -35,7 +35,17 @@ port drawGraph : String -> Cmd msg
 
 
 init =
-    ( { rules = Rules.rules }, drawGraph graph )
+    ( { rules = Rules.rules }, drawGraph <| toDOT <| buildGraph Rules.rules )
+
+
+buildGraph rules =
+    Dict.foldl
+        (\id _ ( lastId, acc ) ->
+            ( id, Dict.insert id lastId acc )
+        )
+        ( "start", Dict.empty )
+        rules
+        |> Tuple.second
 
 
 update msg model =
@@ -57,7 +67,21 @@ view model =
         ]
 
 
-graph =
+toDOT : Dict String String -> String
+toDOT dict =
+    let
+        edges =
+            dict
+                |> Dict.foldl
+                    (\from to acc -> acc ++ "\"" ++ from ++ "\" -> \"" ++ to ++ "\"\n")
+                    ""
+    in
+    "digraph G {\n"
+        ++ edges
+        ++ "\n}"
+
+
+graphExample =
     """
 digraph G {
 
