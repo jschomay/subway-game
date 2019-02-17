@@ -12,14 +12,6 @@ const app = Elm.RuleGraph.init({
 });
 
 
-
-document.addEventListener("keydown", function (e) {
-  app.ports.keyPress.send(e.key)
-  if ( e.key == " " || e.key === "Backspace") {
-    e.preventDefault();
-  }
-});
-
 app.ports.drawGraph.subscribe(function(src) {
   setTimeout(function() {
     var graph = Viz(src, options = {

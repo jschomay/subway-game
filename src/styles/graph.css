@@ -5,3 +5,15 @@
 .RuleGraph > * {
   flex: 1 0 auto;
 }
+
+.Rule {
+  cursor: pointer;
+}
+
+.Rule:hover {
+  text-decoration: underline;
+}
+
+.Rule--selected {
+  font-weight: bold;
+}
