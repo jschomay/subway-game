@@ -58,12 +58,27 @@ init =
             , selectedRule = "start"
             }
     in
-    ( model, drawGraph <| toDOT <| buildGraph model )
+    ( model, drawGraph <| (\x -> Debug.log x "" |> always x) <| toDOT <| buildGraph model )
 
 
+{-| Generate full deps graph of all possible paths through rules.
+
+Logic:
+
+  - From starting state, find all reachable rules, adding to deps graph
+  - For each rule, apply changes, then recur (for rules no already in deps graph)
+  - Regenerate entire graph on rule change (may be able to optimize what needs to change)
+
+-}
 buildGraph : Model -> Deps
 buildGraph model =
     let
+        isReachable : WorldModel -> Rule -> Bool
+        isReachable worldModel rule =
+            rule
+                |> breakRuleIntoReqs
+                |> List.all (\req -> req worldModel)
+
         breakRuleIntoReqs : Rule -> List Req
         breakRuleIntoReqs rule =
             -- becomes a list of predicates fns with one query each
@@ -81,84 +96,58 @@ buildGraph model =
                     else
                         List.map (\query store -> WorldModel.assert id [ query ] store) queries
 
-        applyRuleToState state rule =
+        applyRule : Rule -> WorldModel -> WorldModel
+        applyRule rule state =
             WorldModel.applyChanges rule.changes state
 
-        isDep req rule =
-            rule |> applyRuleToState model.startingState |> req
-
         -- Dict depId [ruleId]
-        addDepForRule depId ruleId deps =
-            Dict.get depId deps
+        addDep : String -> String -> Deps -> Deps
+        addDep depId ruleId graph =
+            Dict.get depId graph
                 |> Maybe.withDefault []
-                |> (\satisfies -> Dict.insert depId (ruleId :: satisfies) deps)
+                |> (\satisfies -> Dict.insert depId (ruleId :: satisfies) graph)
 
-        startingStateSatisfies rule =
-            List.foldl (\fn acc -> acc && fn model.startingState) True <| breakRuleIntoReqs rule
+        findReachableRules : WorldModel -> Rules
+        findReachableRules worldModel =
+            model.rules
+                |> Dict.filter (\id rule -> isReachable worldModel rule)
 
-        validatePath : String -> List String -> Deps -> Maybe Deps
-        validatePath from path knownDeps =
-            -- if done, return deps
-            -- if from satisfies head, add to path and recur
-            -- if not, return Nothing
-            case path of
-                [] ->
-                    -- TODO
-                    Nothing
+        -- TODO rename to needsToBeAdded?
+        -- this probably only returns true if there is the link from -> [to]
+        -- also shouldn't go to itself?
+        -- also might not want an arrow in both directions??
+        -- ignore rules without changes?
+        inDeps : String -> String -> Rule -> Deps -> Bool
+        inDeps from to rule deps =
+            -- List.isEmpty rule.changes
+            Dict.get from deps
+                |> Maybe.map (List.member to)
+                |> Maybe.withDefault False
 
-                to :: remaining ->
-                    Nothing
-
-        buildSubGraph : String -> Rule -> List String -> Deps -> Deps
-        buildSubGraph ruleId rule path knownDeps =
-            -- TODO need to validate path to stop recursion and get proper results!!!!!!!!!!
-            -- (need to pass path forward and not add rules into knownDeps until validated)
-            if
-                (List.isEmpty <| breakRuleIntoReqs rule)
-                    || startingStateSatisfies rule
-            then
-                knownDeps
-                    |> addDepForRule "start" ruleId
-                    |> validatePath ruleId path
-                    |> Maybe.withDefault knownDeps
+        -- adds rule to deps and recurs
+        followRule : String -> WorldModel -> String -> Rule -> Deps -> Deps
+        followRule fromId currentWorldModel ruleId rule deps =
+            if inDeps fromId ruleId rule deps then
+                deps
 
             else
-                breakRuleIntoReqs rule
-                    |> List.foldl (reduceReqs ruleId path) (Just knownDeps)
-                    |> Maybe.withDefault (Dict.singleton "UNREACHABLE" [ ruleId ])
-
-        reduceReqs : String -> List String -> Req -> Maybe Deps -> Maybe Deps
-        reduceReqs ruleId path req knownDeps =
-            case knownDeps of
-                Nothing ->
-                    Nothing
-
-                Just deps ->
-                    Dict.foldl (depsForReq ruleId req path) deps model.rules
-                        |> (\newDeps ->
-                                if newDeps == deps then
-                                    Nothing
-
-                                else
-                                    Just newDeps
-                           )
-
-        depsForReq : String -> Req -> List String -> String -> Rule -> Deps -> Deps
-        depsForReq ruleId req path depId dep knownDeps =
-            if not <| isDep req dep then
-                knownDeps
-
-            else if Dict.member depId knownDeps then
-                addDepForRule depId ruleId knownDeps
-
-            else
-                buildSubGraph depId dep path knownDeps
-
-        -- addDepForRule "TODO subgraph" depId knownDeps
+                findReachableRules (applyRule rule currentWorldModel)
+                    |> Dict.foldl
+                        (followRule ruleId (applyRule rule currentWorldModel))
+                        (addDep fromId ruleId deps)
     in
-    Dict.get model.selectedRule model.rules
-        |> Maybe.map (\rule -> buildSubGraph model.selectedRule rule [ model.selectedRule ] Dict.empty)
-        |> Maybe.withDefault Dict.empty
+    findReachableRules model.startingState
+        |> Dict.foldl (followRule "start" model.startingState) Dict.empty
+
+
+{-| Traces all possible paths to get to selected rule from starting state
+-}
+highlightPathsToRule : String -> Deps -> Deps
+highlightPathsToRule ruleId deps =
+    -- Dict.get model.selectedRule model.rules
+    --     |> Maybe.map (\rule -> go model.selectedRule rule [ model.selectedRule ] Dict.empty)
+    --     |> Maybe.withDefault Dict.empty
+    deps
 
 
 update msg model =
@@ -199,7 +188,7 @@ toDOT : Deps -> String
 toDOT dict =
     let
         edgesFrom from tos =
-            List.map (\to -> "\"" ++ to ++ "\" -> \"" ++ from ++ "\"\n") tos
+            List.map (\to -> "\"" ++ from ++ "\" -> \"" ++ to ++ "\"\n") tos
                 |> String.join ""
 
         nodes =

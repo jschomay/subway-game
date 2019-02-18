@@ -152,6 +152,9 @@ Warning, this should be used sparingly!
 -}
 defaultUpdate : String -> Manifest.WorldModel -> List ChangeWorld
 defaultUpdate interactableId worldModel =
+    -- TODO this messes up the graph (plus overriding wouldn't actually work, since you can't "undo" or "set to previous value"), fix with:
+    --- *** make these actual rules and remember to add the change to any more specific rule (though you'll need the `@` to match the selected interactable in the change if it is generic)
+    --- ~~add these as rules with manual triggers and call updateStory again with manual trigger~~
     if assert interactableId [ HasTag "station" ] worldModel then
         -- move to selected station
         [ SetLink "player" "location" interactableId ]
