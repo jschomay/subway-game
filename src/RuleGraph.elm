@@ -29,6 +29,7 @@ type alias Model =
     { rules : Rules
     , startingState : WorldModel
     , selectedRule : String
+    , deps : Deps
     }
 
 
@@ -56,9 +57,11 @@ init =
             { rules = Rules.rules
             , startingState = Manifest.worldModel
             , selectedRule = "start"
+            , deps = Dict.empty
             }
+                |> (\m -> { m | deps = buildGraph m })
     in
-    ( model, drawGraph <| (\x -> Debug.log x "" |> always x) <| toDOT <| buildGraph model )
+    ( model, drawGraph <| (\x -> Debug.log x "" |> always x) <| toDOT <| model.deps )
 
 
 {-| Generate full deps graph of all possible paths through rules.
@@ -100,12 +103,12 @@ buildGraph model =
         applyRule rule state =
             WorldModel.applyChanges rule.changes state
 
-        -- Dict depId [ruleId]
+        -- Dict ruleId [depIds]
         addDep : String -> String -> Deps -> Deps
         addDep depId ruleId graph =
-            Dict.get depId graph
+            Dict.get ruleId graph
                 |> Maybe.withDefault []
-                |> (\satisfies -> Dict.insert depId (ruleId :: satisfies) graph)
+                |> (\existingDeps -> Dict.insert ruleId (depId :: existingDeps) graph)
 
         findReachableRules : WorldModel -> Rules
         findReachableRules worldModel =
@@ -114,27 +117,26 @@ buildGraph model =
 
         -- TODO rename to needsToBeAdded?
         -- this probably only returns true if there is the link from -> [to]
-        -- also shouldn't go to itself?
-        -- also might not want an arrow in both directions??
-        -- ignore rules without changes?
+        -- ignore rules without changes (or conditions)?
         inDeps : String -> String -> Rule -> Deps -> Bool
-        inDeps from to rule deps =
+        inDeps depId ruleId rule deps =
             -- List.isEmpty rule.changes
-            Dict.get from deps
-                |> Maybe.map (List.member to)
+            -- || List.isEmpty rule.conditions
+            Dict.get ruleId deps
+                |> Maybe.map (List.member depId)
                 |> Maybe.withDefault False
 
         -- adds rule to deps and recurs
         followRule : String -> WorldModel -> String -> Rule -> Deps -> Deps
-        followRule fromId currentWorldModel ruleId rule deps =
-            if inDeps fromId ruleId rule deps then
+        followRule previousRuleId currentWorldModel ruleId rule deps =
+            if inDeps previousRuleId ruleId rule deps then
                 deps
 
             else
                 findReachableRules (applyRule rule currentWorldModel)
                     |> Dict.foldl
                         (followRule ruleId (applyRule rule currentWorldModel))
-                        (addDep fromId ruleId deps)
+                        (addDep previousRuleId ruleId deps)
     in
     findReachableRules model.startingState
         |> Dict.foldl (followRule "start" model.startingState) Dict.empty
@@ -143,11 +145,44 @@ buildGraph model =
 {-| Traces all possible paths to get to selected rule from starting state
 -}
 highlightPathsToRule : String -> Deps -> Deps
-highlightPathsToRule ruleId deps =
+highlightPathsToRule selectedRuleId fullDeps =
     -- Dict.get model.selectedRule model.rules
     --     |> Maybe.map (\rule -> go model.selectedRule rule [ model.selectedRule ] Dict.empty)
     --     |> Maybe.withDefault Dict.empty
-    deps
+    let
+        depsForRule : String -> List String
+        depsForRule ruleId =
+            Dict.get ruleId fullDeps
+                |> Maybe.withDefault []
+
+        -- Dict ruleId [depIds]
+        addDep : String -> String -> Deps -> Deps
+        addDep depId ruleId graph =
+            Dict.get ruleId graph
+                |> Maybe.withDefault []
+                |> (\existingDeps -> Dict.insert ruleId (depId :: existingDeps) graph)
+
+        inDeps : String -> String -> Deps -> Bool
+        inDeps depId ruleId deps =
+            -- List.isEmpty rule.changes
+            -- || List.isEmpty rule.conditions
+            Dict.get ruleId deps
+                |> Maybe.map (List.member depId)
+                |> Maybe.withDefault False
+
+        buildFilteredGraph rule dep deps =
+            if inDeps dep rule deps then
+                deps
+
+            else
+                depsForRule dep
+                    |> List.foldl (buildFilteredGraph dep) (addDep dep rule deps)
+    in
+    -- get all deps for selected rule
+    -- for each one, add to accumulated filtered deps graph
+    -- and recur
+    depsForRule selectedRuleId
+        |> List.foldl (buildFilteredGraph selectedRuleId) Dict.empty
 
 
 update msg model =
@@ -157,7 +192,7 @@ update msg model =
                 newModel =
                     { model | selectedRule = ruleId }
             in
-            ( newModel, drawGraph <| toDOT <| buildGraph newModel )
+            ( newModel, drawGraph <| toDOT <| highlightPathsToRule ruleId model.deps )
 
 
 subscriptions model =
@@ -188,7 +223,7 @@ toDOT : Deps -> String
 toDOT dict =
     let
         edgesFrom from tos =
-            List.map (\to -> "\"" ++ from ++ "\" -> \"" ++ to ++ "\"\n") tos
+            List.map (\to -> "\"" ++ to ++ "\" -> \"" ++ from ++ "\"\n") tos
                 |> String.join ""
 
         nodes =

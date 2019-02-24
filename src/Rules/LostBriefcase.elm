@@ -9,6 +9,10 @@ import Narrative.WorldModel exposing (..)
 import Rules.Helpers exposing (..)
 
 
+
+-- TODO capture graph as is, then change all this to use plot sequences instead of plot points, and see how it improves
+
+
 rules : List ( String, LocalTypes.Rule )
 rules =
     rulesForScene scenes.lostBriefcase <|
