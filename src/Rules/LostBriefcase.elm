@@ -155,6 +155,12 @@ rules =
                         ]
                     , narrative = openMaintenanceDoor
                     }
+               , rule "end"
+                    { trigger = MatchAny []
+                    , conditions = [ Match "player" [ HasTag "caught" ] ]
+                    , changes = [ IncStat "player" "mainPlot" 1 ]
+                    , narrative = inOrder [ "this is just to complete the graph" ]
+                    }
                ]
 
 

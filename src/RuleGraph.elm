@@ -5,6 +5,7 @@ import Dict exposing (Dict)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
+import List.Extra as List
 import LocalTypes exposing (..)
 import Manifest exposing (WorldModel)
 import Narrative.Rules as Rules
@@ -12,9 +13,19 @@ import Narrative.WorldModel as WorldModel
 import Rules
 
 
+{-| Graph of how rules can be reached, expressed as a Dict
+-}
 type alias Deps =
-    -- TODO use set instead of list (to avoid double arrows)
-    Dict String (List String)
+    Dict String Edge
+
+
+{-| All of the rule IDs that that the node is reachable from, along with the length of the path to get there.
+
+If an edge between the same two rules can be created in multiple ways, it only tracks the shortest path.
+
+-}
+type alias Edge =
+    Dict String Int
 
 
 type alias Req =
@@ -103,86 +114,89 @@ buildGraph model =
         applyRule rule state =
             WorldModel.applyChanges rule.changes state
 
-        -- Dict ruleId [depIds]
-        addDep : String -> String -> Deps -> Deps
-        addDep depId ruleId graph =
+        addDep : String -> String -> Int -> Deps -> Deps
+        addDep depId ruleId pathLength graph =
             Dict.get ruleId graph
-                |> Maybe.withDefault []
-                |> (\existingDeps -> Dict.insert ruleId (depId :: existingDeps) graph)
+                |> Maybe.withDefault Dict.empty
+                |> (\existingDeps -> Dict.insert ruleId (Dict.insert depId pathLength existingDeps) graph)
 
         findReachableRules : WorldModel -> Rules
         findReachableRules worldModel =
             model.rules
                 |> Dict.filter (\id rule -> isReachable worldModel rule)
 
-        -- TODO rename to needsToBeAdded?
-        -- this probably only returns true if there is the link from -> [to]
-        -- ignore rules without changes (or conditions)?
+        -- TODO rename to needsToBeAdded or alreadyConnected?
+        -- this probably only returns true if there is the link between the two nodes
         inDeps : String -> String -> Rule -> Deps -> Bool
         inDeps depId ruleId rule deps =
+            -- TODO filtering out rules with no changes should happen in rendering the graph, not building it
             -- List.isEmpty rule.changes
-            -- || List.isEmpty rule.conditions
+            --     || List.isEmpty rule.conditions
             Dict.get ruleId deps
-                |> Maybe.map (List.member depId)
+                |> Maybe.map (Dict.member depId)
                 |> Maybe.withDefault False
 
         -- adds rule to deps and recurs
-        followRule : String -> WorldModel -> String -> Rule -> Deps -> Deps
-        followRule previousRuleId currentWorldModel ruleId rule deps =
+        followRule : Int -> String -> WorldModel -> String -> Rule -> Deps -> Deps
+        followRule pathLength previousRuleId currentWorldModel ruleId rule deps =
             if inDeps previousRuleId ruleId rule deps then
-                deps
+                -- keep the shorter path for this edge
+                Dict.update ruleId
+                    (Maybe.map <|
+                        Dict.update previousRuleId (Maybe.map (Basics.min pathLength))
+                    )
+                    deps
 
             else
                 findReachableRules (applyRule rule currentWorldModel)
                     |> Dict.foldl
-                        (followRule ruleId (applyRule rule currentWorldModel))
-                        (addDep previousRuleId ruleId deps)
+                        (followRule (pathLength + 1) ruleId (applyRule rule currentWorldModel))
+                        (addDep previousRuleId ruleId pathLength deps)
     in
     findReachableRules model.startingState
-        |> Dict.foldl (followRule "start" model.startingState) Dict.empty
+        |> Dict.foldl (followRule 0 "start" model.startingState) (Dict.singleton "start" Dict.empty)
 
 
 {-| Traces all possible paths to get to selected rule from starting state
 -}
 highlightPathsToRule : String -> Deps -> Deps
 highlightPathsToRule selectedRuleId fullDeps =
-    -- Dict.get model.selectedRule model.rules
-    --     |> Maybe.map (\rule -> go model.selectedRule rule [ model.selectedRule ] Dict.empty)
-    --     |> Maybe.withDefault Dict.empty
+    -- TODO fix logic repitition here and in buildGraph
     let
-        depsForRule : String -> List String
+        depsForRule : String -> Edge
         depsForRule ruleId =
             Dict.get ruleId fullDeps
-                |> Maybe.withDefault []
+                |> Maybe.withDefault Dict.empty
 
         -- Dict ruleId [depIds]
         addDep : String -> String -> Deps -> Deps
         addDep depId ruleId graph =
+            -- TODO include path length
             Dict.get ruleId graph
-                |> Maybe.withDefault []
-                |> (\existingDeps -> Dict.insert ruleId (depId :: existingDeps) graph)
+                |> Maybe.withDefault Dict.empty
+                |> (\existingDeps -> Dict.insert ruleId (Dict.insert depId 0 existingDeps) graph)
 
         inDeps : String -> String -> Deps -> Bool
         inDeps depId ruleId deps =
             -- List.isEmpty rule.changes
             -- || List.isEmpty rule.conditions
             Dict.get ruleId deps
-                |> Maybe.map (List.member depId)
+                |> Maybe.map (Dict.member depId)
                 |> Maybe.withDefault False
 
-        buildFilteredGraph rule dep deps =
-            if inDeps dep rule deps then
+        buildFilteredGraph rule depId pathLength deps =
+            if inDeps depId rule deps then
                 deps
 
             else
-                depsForRule dep
-                    |> List.foldl (buildFilteredGraph dep) (addDep dep rule deps)
+                depsForRule depId
+                    |> Dict.foldl (buildFilteredGraph depId) (addDep depId rule deps)
     in
     -- get all deps for selected rule
     -- for each one, add to accumulated filtered deps graph
     -- and recur
     depsForRule selectedRuleId
-        |> List.foldl (buildFilteredGraph selectedRuleId) Dict.empty
+        |> Dict.foldl (buildFilteredGraph selectedRuleId) Dict.empty
 
 
 update msg model =
@@ -222,19 +236,86 @@ view model =
 toDOT : Deps -> String
 toDOT dict =
     let
-        edgesFrom from tos =
-            List.map (\to -> "\"" ++ to ++ "\" -> \"" ++ from ++ "\"\n") tos
+        color i =
+            case i of
+                0 ->
+                    "\"#000000\""
+
+                1 ->
+                    "\"#333333\""
+
+                2 ->
+                    "\"#666666\""
+
+                3 ->
+                    "\"#999999\""
+
+                _ ->
+                    "\"#bbbbbb\""
+
+        weight i =
+            case i of
+                0 ->
+                    "9"
+
+                1 ->
+                    "6"
+
+                2 ->
+                    "3"
+
+                _ ->
+                    "1"
+
+        -- sorts by path length, the "normalizes" the values
+        -- ex: 4, 7, 3, 7, 8 -> 1, 2, 3, 3, 4
+        rank : Edge -> List ( String, Int )
+        rank edge =
+            -- TODO optimize?
+            edge
+                |> Dict.toList
+                |> List.sortBy Tuple.second
+                |> List.groupWhile (\( _, a ) ( _, b ) -> a == b)
+                -- [(1, [1,1]), (2,[])]
+                |> List.map (\( x, xs ) -> x :: xs)
+                -- [[1,1,1], [2]]
+                |> List.indexedMap (\i group -> List.map (Tuple.mapSecond (always i)) group)
+                |> List.concat
+
+        buildEdge rule deps =
+            deps
+                |> rank
+                |> List.map
+                    (\( from, i ) ->
+                        "\""
+                            ++ (from ++ "\" -> \"" ++ rule ++ "\" ")
+                            ++ ("[penwidth=" ++ weight i)
+                            ++ (", color=" ++ color i)
+                            ++ "]\n"
+                    )
                 |> String.join ""
+
+        nodeAttrs key =
+            -- TODO "end" should be the selected rule (fall back to "end")
+            case key of
+                "start" ->
+                    "style=filled, fontcolor=white, color=green shape=box, fontsize=20"
+
+                "end" ->
+                    "style=filled, fontcolor=white, color=red shape=box, fontsize=20"
+
+                _ ->
+                    ""
 
         nodes =
             Dict.keys dict
-                |> List.foldl (\key acc -> "\"" ++ key ++ "\"\n" ++ acc) "\n"
+                |> List.foldl (\key acc -> "\"" ++ key ++ "\" [" ++ nodeAttrs key ++ "]\n" ++ acc) "\n"
 
         edges =
             dict
                 |> Dict.foldl
-                    (\from to acc ->
-                        acc ++ edgesFrom from to
+                    (\rule deps acc ->
+                        acc ++ buildEdge rule deps
                     )
                     ""
     in
@@ -242,32 +323,3 @@ toDOT dict =
         ++ edges
         ++ nodes
         ++ "\n}"
-
-
-graphExample =
-    """
-digraph G {
-
-    node [style=filled]
-    edge [fontcolor=gray]
-
-  start -> findClosedPoliceOffice
-  findClosedPoliceOffice -> rideWithoutTicketToLostFound [label="+1 rule breaker"]
-  rideWithoutTicketToLostFound -> caught
-
-  start -> followThief [label="+1 bravery"]
-  followThief -> lockedMaintDoor
-  followThief -> randomPerson
-  followThief -> redHerringPaper
-  lockedMaintDoor -> stealKeyCardFromMaintMan [label="start 'down the rabit hole' (woman in yellow)"]
-  stealKeyCardFromMaintMan -> unlockDoor [label="+2 rule breaker get key card"]
-  unlockDoor -> caught [label="lose keycard"]
-
-  caught -> end
-
-
-  start [label="case stolen", color=lightblue];
-  end [label="guard office", color=lightblue];
-  rideWithoutTicketToLostFound [label="ride without ticket (only available wo/ key card)"]
-}
-"""
