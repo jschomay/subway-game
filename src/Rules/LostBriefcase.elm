@@ -94,7 +94,7 @@ rules =
                     , narrative = askAboutThiefMiss
                     }
                , rule "askAboutThiefHit"
-                    { trigger = Match "commuter2" []
+                    { trigger = Match "commuter2" [ HasLink "location" (station WestMulberry) ]
                     , conditions = []
                     , changes =
                         [ AddTag "maintenanceDoor" "plotPoint"

@@ -72,7 +72,7 @@ init =
             }
                 |> (\m -> { m | deps = buildGraph m })
     in
-    ( model, drawGraph <| (\x -> Debug.log x "" |> always x) <| toDOT <| model.deps )
+    ( model, drawGraph <| (\x -> Debug.log x "" |> always x) <| toDOT "end" <| model.deps )
 
 
 {-| Generate full deps graph of all possible paths through rules.
@@ -129,9 +129,6 @@ buildGraph model =
         -- this probably only returns true if there is the link between the two nodes
         inDeps : String -> String -> Rule -> Deps -> Bool
         inDeps depId ruleId rule deps =
-            -- TODO filtering out rules with no changes should happen in rendering the graph, not building it
-            -- List.isEmpty rule.changes
-            --     || List.isEmpty rule.conditions
             Dict.get ruleId deps
                 |> Maybe.map (Dict.member depId)
                 |> Maybe.withDefault False
@@ -146,6 +143,9 @@ buildGraph model =
                         Dict.update previousRuleId (Maybe.map (Basics.min pathLength))
                     )
                     deps
+
+            else if List.isEmpty rule.changes then
+                addDep previousRuleId ruleId pathLength deps
 
             else
                 findReachableRules (applyRule rule currentWorldModel)
@@ -169,17 +169,14 @@ highlightPathsToRule selectedRuleId fullDeps =
                 |> Maybe.withDefault Dict.empty
 
         -- Dict ruleId [depIds]
-        addDep : String -> String -> Deps -> Deps
-        addDep depId ruleId graph =
-            -- TODO include path length
+        addDep : String -> String -> Int -> Deps -> Deps
+        addDep depId ruleId pathLength graph =
             Dict.get ruleId graph
                 |> Maybe.withDefault Dict.empty
-                |> (\existingDeps -> Dict.insert ruleId (Dict.insert depId 0 existingDeps) graph)
+                |> (\existingDeps -> Dict.insert ruleId (Dict.insert depId pathLength existingDeps) graph)
 
         inDeps : String -> String -> Deps -> Bool
         inDeps depId ruleId deps =
-            -- List.isEmpty rule.changes
-            -- || List.isEmpty rule.conditions
             Dict.get ruleId deps
                 |> Maybe.map (Dict.member depId)
                 |> Maybe.withDefault False
@@ -190,13 +187,13 @@ highlightPathsToRule selectedRuleId fullDeps =
 
             else
                 depsForRule depId
-                    |> Dict.foldl (buildFilteredGraph depId) (addDep depId rule deps)
+                    |> Dict.foldl (buildFilteredGraph depId) (addDep depId rule pathLength deps)
     in
     -- get all deps for selected rule
     -- for each one, add to accumulated filtered deps graph
     -- and recur
     depsForRule selectedRuleId
-        |> Dict.foldl (buildFilteredGraph selectedRuleId) Dict.empty
+        |> Dict.foldl (buildFilteredGraph selectedRuleId) (Dict.singleton "start" Dict.empty)
 
 
 update msg model =
@@ -206,7 +203,7 @@ update msg model =
                 newModel =
                     { model | selectedRule = ruleId }
             in
-            ( newModel, drawGraph <| toDOT <| highlightPathsToRule ruleId model.deps )
+            ( newModel, drawGraph <| toDOT ruleId <| highlightPathsToRule ruleId model.deps )
 
 
 subscriptions model =
@@ -233,8 +230,8 @@ view model =
         ]
 
 
-toDOT : Deps -> String
-toDOT dict =
+toDOT : String -> Deps -> String
+toDOT endPoint dict =
     let
         color i =
             case i of
@@ -296,16 +293,15 @@ toDOT dict =
                 |> String.join ""
 
         nodeAttrs key =
-            -- TODO "end" should be the selected rule (fall back to "end")
-            case key of
-                "start" ->
-                    "style=filled, fontcolor=white, color=green shape=box, fontsize=20"
+            -- TODO visualize dead ends (this seems hard/expense to figure out, should it happen here, or in building the graph?)
+            if key == "start" then
+                "style=filled, fontcolor=white, color=green shape=box, fontsize=20"
 
-                "end" ->
-                    "style=filled, fontcolor=white, color=red shape=box, fontsize=20"
+            else if key == endPoint then
+                "style=filled, fontcolor=white, color=red shape=box, fontsize=20"
 
-                _ ->
-                    ""
+            else
+                ""
 
         nodes =
             Dict.keys dict
