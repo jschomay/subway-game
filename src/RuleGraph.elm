@@ -11,6 +11,7 @@ import Manifest exposing (WorldModel)
 import Narrative.Rules as Rules
 import Narrative.WorldModel as WorldModel
 import Rules
+import Set exposing (Set)
 
 
 {-| Graph of how rules can be reached, expressed as a Dict
@@ -67,12 +68,12 @@ init =
         model =
             { rules = Rules.rules
             , startingState = Manifest.worldModel
-            , selectedRule = "start"
+            , selectedRule = ""
             , deps = Dict.empty
             }
                 |> (\m -> { m | deps = buildGraph m })
     in
-    ( model, drawGraph <| (\x -> Debug.log x "" |> always x) <| toDOT "end" <| model.deps )
+    ( model, drawGraph <| (\x -> Debug.log x "" |> always x) <| toDOT model.rules <| model.deps )
 
 
 {-| Generate full deps graph of all possible paths through rules.
@@ -145,7 +146,9 @@ buildGraph model =
                     deps
 
             else if List.isEmpty rule.changes then
+                -- add dep to itself to differentiate it from dead ends, but not make the graph more complex
                 addDep previousRuleId ruleId pathLength deps
+                    |> addDep ruleId ruleId (pathLength + 1)
 
             else
                 findReachableRules (applyRule rule currentWorldModel)
@@ -154,7 +157,7 @@ buildGraph model =
                         (addDep previousRuleId ruleId pathLength deps)
     in
     findReachableRules model.startingState
-        |> Dict.foldl (followRule 0 "start" model.startingState) (Dict.singleton "start" Dict.empty)
+        |> Dict.foldl (followRule 0 "__start__" model.startingState) (Dict.singleton "__start__" Dict.empty)
 
 
 {-| Traces all possible paths to get to selected rule from starting state
@@ -193,7 +196,7 @@ highlightPathsToRule selectedRuleId fullDeps =
     -- for each one, add to accumulated filtered deps graph
     -- and recur
     depsForRule selectedRuleId
-        |> Dict.foldl (buildFilteredGraph selectedRuleId) (Dict.singleton "start" Dict.empty)
+        |> Dict.foldl (buildFilteredGraph selectedRuleId) (Dict.singleton "__start__" Dict.empty)
 
 
 update msg model =
@@ -203,7 +206,7 @@ update msg model =
                 newModel =
                     { model | selectedRule = ruleId }
             in
-            ( newModel, drawGraph <| toDOT ruleId <| highlightPathsToRule ruleId model.deps )
+            ( newModel, drawGraph <| toDOT model.rules <| highlightPathsToRule ruleId model.deps )
 
 
 subscriptions model =
@@ -230,8 +233,8 @@ view model =
         ]
 
 
-toDOT : String -> Deps -> String
-toDOT endPoint dict =
+toDOT : Rules -> Deps -> String
+toDOT rules graph =
     let
         color i =
             case i of
@@ -292,23 +295,48 @@ toDOT endPoint dict =
                     )
                 |> String.join ""
 
-        nodeAttrs key =
-            -- TODO visualize dead ends (this seems hard/expense to figure out, should it happen here, or in building the graph?)
-            if key == "start" then
+        allDeps =
+            Dict.foldl
+                (\_ deps ids ->
+                    Dict.foldl
+                        (\depId _ acc -> Set.insert depId acc)
+                        ids
+                        deps
+                )
+                Set.empty
+                graph
+
+        isStart _ deps =
+            Dict.isEmpty deps
+
+        isTexture key _ =
+            Dict.get key rules
+                |> Maybe.map (.changes >> List.isEmpty)
+                |> Maybe.withDefault False
+
+        isEnd key _ =
+            -- TODO this doesn't always trigger, because it will be a dep to a rule with no conditions
+            not <| Set.member key allDeps
+
+        nodeAttrs key deps =
+            if isStart key deps then
                 "style=filled, fontcolor=white, color=green shape=box, fontsize=20"
 
-            else if key == endPoint then
-                "style=filled, fontcolor=white, color=red shape=box, fontsize=20"
+            else if isEnd key deps then
+                "style=filled, fontcolor=white, color=red, shape=box, fontsize=20"
+
+            else if isTexture key deps then
+                "style=filled, color=lightblue"
 
             else
                 ""
 
         nodes =
-            Dict.keys dict
-                |> List.foldl (\key acc -> "\"" ++ key ++ "\" [" ++ nodeAttrs key ++ "]\n" ++ acc) "\n"
+            Dict.toList graph
+                |> List.foldl (\( key, deps ) acc -> "\"" ++ key ++ "\" [" ++ nodeAttrs key deps ++ "]\n" ++ acc) "\n"
 
         edges =
-            dict
+            graph
                 |> Dict.foldl
                     (\rule deps acc ->
                         acc ++ buildEdge rule deps
@@ -316,6 +344,13 @@ toDOT endPoint dict =
                     ""
     in
     "digraph G {\n"
+        ++ "node [style=filled]"
         ++ edges
         ++ nodes
         ++ "\n}"
+
+
+
+-- TODO add any rules that aren't in the graph in orange
+-- TODO make work with selected rule
+-- TODO highlight the selected node in the graph

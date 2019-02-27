@@ -64,6 +64,7 @@ rules =
                         [ IncStat "player" "ruleBreaker" 1
                         , IncStat "player" "mainPlot" 1
                         , AddTag "player" "caught"
+                        , IncStat "player" "mainPlot" 1
                         ]
                     , narrative = attemptToRideYellowLine
                     }
@@ -152,14 +153,9 @@ rules =
                         [ SetLink "keyCard" "location" "offscreen"
                         , AddTag "player" "caught"
                         , RemoveTag "maintenanceDoor" "plotPoint"
+                        , IncStat "player" "mainPlot" 1
                         ]
                     , narrative = openMaintenanceDoor
-                    }
-               , rule "end"
-                    { trigger = MatchAny []
-                    , conditions = [ Match "player" [ HasTag "caught" ] ]
-                    , changes = [ IncStat "player" "mainPlot" 1 ]
-                    , narrative = inOrder [ "this is just to complete the graph" ]
                     }
                ]
 
