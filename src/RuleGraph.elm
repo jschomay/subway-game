@@ -41,12 +41,16 @@ type alias Model =
     { rules : Rules
     , startingState : WorldModel
     , selectedRule : String
-    , deps : Deps
+    , graph : Deps
     }
 
 
 type Msg
     = SelectRule String
+
+
+startLabel =
+    "__start__"
 
 
 main : Program Flags Model Msg
@@ -69,11 +73,11 @@ init =
             { rules = Rules.rules
             , startingState = Manifest.worldModel
             , selectedRule = ""
-            , deps = Dict.empty
+            , graph = Dict.empty
             }
-                |> (\m -> { m | deps = buildGraph m })
+                |> (\m -> { m | graph = buildGraph m })
     in
-    ( model, drawGraph <| (\x -> Debug.log x "" |> always x) <| toDOT model.rules <| model.deps )
+    ( model, drawGraph <| (\x -> Debug.log x "" |> always x) <| toDOT model )
 
 
 {-| Generate full deps graph of all possible paths through rules.
@@ -126,10 +130,15 @@ buildGraph model =
             model.rules
                 |> Dict.filter (\id rule -> isReachable worldModel rule)
 
-        -- TODO rename to needsToBeAdded or alreadyConnected?
-        -- this probably only returns true if there is the link between the two nodes
-        inDeps : String -> String -> Rule -> Deps -> Bool
-        inDeps depId ruleId rule deps =
+        -- no when edge already exists
+        -- also no when has no conditions (general rules) -- NOTE this could be too agressive if authors don't add any conditions at all (like main plot conditions)
+        skip : String -> String -> Rule -> Deps -> Bool
+        skip depId ruleId rule deps =
+            -- List.isEmpty rule.conditions
+            --     || (Dict.get ruleId deps
+            --             |> Maybe.map (Dict.member depId)
+            --             |> Maybe.withDefault False
+            --        )
             Dict.get ruleId deps
                 |> Maybe.map (Dict.member depId)
                 |> Maybe.withDefault False
@@ -137,8 +146,8 @@ buildGraph model =
         -- adds rule to deps and recurs
         followRule : Int -> String -> WorldModel -> String -> Rule -> Deps -> Deps
         followRule pathLength previousRuleId currentWorldModel ruleId rule deps =
-            if inDeps previousRuleId ruleId rule deps then
-                -- keep the shorter path for this edge
+            if skip previousRuleId ruleId rule deps then
+                -- update edge to keep the shortest path
                 Dict.update ruleId
                     (Maybe.map <|
                         Dict.update previousRuleId (Maybe.map (Basics.min pathLength))
@@ -146,9 +155,12 @@ buildGraph model =
                     deps
 
             else if List.isEmpty rule.changes then
-                -- add dep to itself to differentiate it from dead ends, but not make the graph more complex
                 addDep previousRuleId ruleId pathLength deps
-                    |> addDep ruleId ruleId (pathLength + 1)
+                    -- add dep to itself to differentiate it from dead ends, but not make the graph more complex
+                    -- |> addDep ruleId ruleId (pathLength + 1)
+                    -- OR
+                    -- draw line back to the previous node
+                    |> addDep ruleId previousRuleId (pathLength + 1)
 
             else
                 findReachableRules (applyRule rule currentWorldModel)
@@ -157,46 +169,7 @@ buildGraph model =
                         (addDep previousRuleId ruleId pathLength deps)
     in
     findReachableRules model.startingState
-        |> Dict.foldl (followRule 0 "__start__" model.startingState) (Dict.singleton "__start__" Dict.empty)
-
-
-{-| Traces all possible paths to get to selected rule from starting state
--}
-highlightPathsToRule : String -> Deps -> Deps
-highlightPathsToRule selectedRuleId fullDeps =
-    -- TODO fix logic repitition here and in buildGraph
-    let
-        depsForRule : String -> Edge
-        depsForRule ruleId =
-            Dict.get ruleId fullDeps
-                |> Maybe.withDefault Dict.empty
-
-        -- Dict ruleId [depIds]
-        addDep : String -> String -> Int -> Deps -> Deps
-        addDep depId ruleId pathLength graph =
-            Dict.get ruleId graph
-                |> Maybe.withDefault Dict.empty
-                |> (\existingDeps -> Dict.insert ruleId (Dict.insert depId pathLength existingDeps) graph)
-
-        inDeps : String -> String -> Deps -> Bool
-        inDeps depId ruleId deps =
-            Dict.get ruleId deps
-                |> Maybe.map (Dict.member depId)
-                |> Maybe.withDefault False
-
-        buildFilteredGraph rule depId pathLength deps =
-            if inDeps depId rule deps then
-                deps
-
-            else
-                depsForRule depId
-                    |> Dict.foldl (buildFilteredGraph depId) (addDep depId rule pathLength deps)
-    in
-    -- get all deps for selected rule
-    -- for each one, add to accumulated filtered deps graph
-    -- and recur
-    depsForRule selectedRuleId
-        |> Dict.foldl (buildFilteredGraph selectedRuleId) (Dict.singleton "__start__" Dict.empty)
+        |> Dict.foldl (followRule 0 startLabel model.startingState) (Dict.singleton startLabel Dict.empty)
 
 
 update msg model =
@@ -206,7 +179,7 @@ update msg model =
                 newModel =
                     { model | selectedRule = ruleId }
             in
-            ( newModel, drawGraph <| toDOT model.rules <| highlightPathsToRule ruleId model.deps )
+            ( newModel, drawGraph <| toDOT newModel )
 
 
 subscriptions model =
@@ -233,27 +206,34 @@ view model =
         ]
 
 
-toDOT : Rules -> Deps -> String
-toDOT rules graph =
+toDOT : Model -> String
+toDOT { selectedRule, rules, graph } =
     let
-        color i =
-            case i of
-                0 ->
-                    "\"#000000\""
+        color from to i =
+            if from == selectedRule then
+                "red"
 
-                1 ->
-                    "\"#333333\""
+            else if to == selectedRule then
+                "green"
 
-                2 ->
-                    "\"#666666\""
+            else
+                case i of
+                    0 ->
+                        "\"#000000\""
 
-                3 ->
-                    "\"#999999\""
+                    1 ->
+                        "\"#333333\""
 
-                _ ->
-                    "\"#bbbbbb\""
+                    2 ->
+                        "\"#666666\""
 
-        weight i =
+                    3 ->
+                        "\"#999999\""
+
+                    _ ->
+                        "\"#bbbbbb\""
+
+        edgeWeight i =
             case i of
                 0 ->
                     "9"
@@ -282,54 +262,116 @@ toDOT rules graph =
                 |> List.indexedMap (\i group -> List.map (Tuple.mapSecond (always i)) group)
                 |> List.concat
 
-        buildEdge rule deps =
+        buildEdge to deps =
             deps
                 |> rank
                 |> List.map
                     (\( from, i ) ->
                         "\""
-                            ++ (from ++ "\" -> \"" ++ rule ++ "\" ")
-                            ++ ("[penwidth=" ++ weight i)
-                            ++ (", color=" ++ color i)
+                            ++ (from ++ "\" -> \"" ++ to ++ "\" ")
+                            ++ ("[penwidth=" ++ edgeWeight i)
+                            ++ (", color=" ++ color from to i)
                             ++ "]\n"
                     )
                 |> String.join ""
 
         allDeps =
+            -- NOT including deps for rules with no conditions
             Dict.foldl
-                (\_ deps ids ->
-                    Dict.foldl
-                        (\depId _ acc -> Set.insert depId acc)
+                (\ruleId deps ids ->
+                    if Dict.member ruleId generalRules then
                         ids
-                        deps
+
+                    else
+                        Dict.foldl
+                            (\depId _ acc -> Set.insert depId acc)
+                            ids
+                            deps
                 )
                 Set.empty
                 graph
 
-        isStart _ deps =
-            Dict.isEmpty deps
+        generalRules =
+            rules
+                |> Dict.filter (\id rule -> List.isEmpty rule.conditions)
+
+        unreachable_rules =
+            Dict.diff rules graph
+                |> Dict.foldl
+                    (\id rule acc ->
+                        "\""
+                            ++ id
+                            ++ "\" ["
+                            ++ (if id == selectedRule then
+                                    selectedAttrs
+
+                                else
+                                    ""
+                               )
+                            ++ "]\n"
+                            ++ acc
+                    )
+                    "\n"
+
+        isStart key _ =
+            key == startLabel
 
         isTexture key _ =
             Dict.get key rules
                 |> Maybe.map (.changes >> List.isEmpty)
                 |> Maybe.withDefault False
 
-        isEnd key _ =
-            -- TODO this doesn't always trigger, because it will be a dep to a rule with no conditions
+        isDeadEnd key _ =
             not <| Set.member key allDeps
 
-        nodeAttrs key deps =
-            if isStart key deps then
-                "style=filled, fontcolor=white, color=green shape=box, fontsize=20"
+        hasNoConditions key _ =
+            case Dict.get key generalRules of
+                Nothing ->
+                    False
 
-            else if isEnd key deps then
-                "style=filled, fontcolor=white, color=red, shape=box, fontsize=20"
+                _ ->
+                    True
+
+        nodeAttrs key deps =
+            nodeAttrsGeneral key deps ++ ", " ++ nodeAttrsByType key deps
+
+        nodeWeight i =
+            if i <= 2 then
+                "10"
+
+            else if i <= 4 then
+                "15"
+
+            else if i <= 8 then
+                "20"
+
+            else
+                "30"
+
+        nodeAttrsGeneral key deps =
+            "fontsize=" ++ nodeWeight (Dict.size deps) ++ ""
+
+        nodeAttrsByType key deps =
+            if selectedRule == key then
+                selectedAttrs
+
+            else if isStart key deps then
+                "style=filled, fontcolor=white, color=green"
+
+            else if hasNoConditions key deps then
+                "style=filled, fontcolor=white, color=orange"
+
+            else if isDeadEnd key deps then
+                "style=filled, fontcolor=white, color=red"
 
             else if isTexture key deps then
-                "style=filled, color=lightblue"
+                "style=filled, fontcolor=white, color=lightblue"
 
             else
                 ""
+
+        selectedAttrs =
+            "fontsize=50, style=filled, fontcolor=white, color=blue"
 
         nodes =
             Dict.toList graph
@@ -343,14 +385,23 @@ toDOT rules graph =
                     )
                     ""
     in
-    "digraph G {\n"
-        ++ "node [style=filled]"
+    """
+    digraph G {
+
+      subgraph cluster_0 {
+        node [style=filled, color=red, fontcolor=white];
+        label = "Unreachable rules";
+        """
+        ++ unreachable_rules
+        ++ """
+      }
+
+    node [style=filled]
+    """
         ++ edges
         ++ nodes
         ++ "\n}"
 
 
 
--- TODO add any rules that aren't in the graph in orange
--- TODO make work with selected rule
--- TODO highlight the selected node in the graph
+-- TODO clicking on node in graph should select it
