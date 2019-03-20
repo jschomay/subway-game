@@ -5,6 +5,7 @@ import Dict exposing (Dict)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
+import Json.Decode as JD
 import List.Extra as List
 import LocalTypes exposing (..)
 import Manifest exposing (WorldModel)
@@ -196,13 +197,22 @@ view model =
 
         rule r =
             li [ classList <| classes r, onClick <| SelectRule r ] [ text r ]
+
+        targetId =
+            -- target will be the text or elipse, use parentElement to reach the <g> which has the id
+            JD.at [ "target", "parentElement", "id" ] JD.string
     in
     div [ class "RuleGraph" ]
         [ div []
             [ text "Rules Visualizer"
             , ul [] <| List.map rule <| Dict.keys model.rules
             ]
-        , div [ id "graph", class "Graph" ] [ text "loading" ]
+        , div
+            [ id "graph"
+            , class "Graph"
+            , on "click" <| JD.map SelectRule targetId
+            ]
+            [ text "loading" ]
         ]
 
 
@@ -375,7 +385,18 @@ toDOT { selectedRule, rules, graph } =
 
         nodes =
             Dict.toList graph
-                |> List.foldl (\( key, deps ) acc -> "\"" ++ key ++ "\" [" ++ nodeAttrs key deps ++ "]\n" ++ acc) "\n"
+                |> List.foldl
+                    (\( key, deps ) acc ->
+                        "\""
+                            ++ key
+                            ++ "\" [id=\""
+                            ++ key
+                            ++ "\", "
+                            ++ nodeAttrs key deps
+                            ++ "]\n"
+                            ++ acc
+                    )
+                    "\n"
 
         edges =
             graph
@@ -401,7 +422,3 @@ toDOT { selectedRule, rules, graph } =
         ++ edges
         ++ nodes
         ++ "\n}"
-
-
-
--- TODO clicking on node in graph should select it
