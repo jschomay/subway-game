@@ -135,14 +135,13 @@ buildGraph model =
         -- also no when has no conditions (general rules) -- NOTE this could be too agressive if authors don't add any conditions at all (like main plot conditions)
         skip : String -> String -> Rule -> Deps -> Bool
         skip depId ruleId rule deps =
-            -- List.isEmpty rule.conditions
-            --     || (Dict.get ruleId deps
-            --             |> Maybe.map (Dict.member depId)
-            --             |> Maybe.withDefault False
-            --        )
-            Dict.get ruleId deps
-                |> Maybe.map (Dict.member depId)
-                |> Maybe.withDefault False
+            List.isEmpty rule.conditions
+                -- || List.isEmpty rule.changes
+                -- False
+                || (Dict.get ruleId deps
+                        |> Maybe.map (Dict.member depId)
+                        |> Maybe.withDefault False
+                   )
 
         -- adds rule to deps and recurs
         followRule : Int -> String -> WorldModel -> String -> Rule -> Deps -> Deps
@@ -158,10 +157,10 @@ buildGraph model =
             else if List.isEmpty rule.changes then
                 addDep previousRuleId ruleId pathLength deps
                     -- add dep to itself to differentiate it from dead ends, but not make the graph more complex
-                    -- |> addDep ruleId ruleId (pathLength + 1)
-                    -- OR
-                    -- draw line back to the previous node
-                    |> addDep ruleId previousRuleId (pathLength + 1)
+                    |> addDep ruleId ruleId (pathLength + 1)
+                -- OR
+                -- draw line back to the previous node
+                -- |> addDep ruleId previousRuleId (pathLength + 1)
 
             else
                 findReachableRules (applyRule rule currentWorldModel)
@@ -243,23 +242,27 @@ toDOT { selectedRule, rules, graph } =
                     _ ->
                         "\"#bbbbbb\""
 
-        edgeWeight i =
-            case i of
-                0 ->
-                    "9"
+        edgeWeight to i =
+            if isTexture to Dict.empty then
+                "1"
 
-                1 ->
-                    "6"
+            else
+                case i of
+                    0 ->
+                        "9"
 
-                2 ->
-                    "3"
+                    1 ->
+                        "6"
 
-                _ ->
-                    "1"
+                    2 ->
+                        "3"
+
+                    _ ->
+                        "1"
 
         -- sorts by path length, the "normalizes" the values
         -- ex: 4, 7, 3, 7, 8 -> 1, 2, 3, 3, 4
-        rank : Edge -> List ( String, Int )
+        rank : Edge -> List ( String, ( Int, Int ) )
         rank edge =
             -- TODO optimize?
             edge
@@ -269,18 +272,19 @@ toDOT { selectedRule, rules, graph } =
                 -- [(1, [1,1]), (2,[])]
                 |> List.map (\( x, xs ) -> x :: xs)
                 -- [[1,1,1], [2]]
-                |> List.indexedMap (\i group -> List.map (Tuple.mapSecond (always i)) group)
+                |> List.indexedMap (\i group -> List.map (Tuple.mapSecond (\original -> ( i, original ))) group)
                 |> List.concat
 
         buildEdge to deps =
             deps
                 |> rank
                 |> List.map
-                    (\( from, i ) ->
+                    (\( from, ( i, original ) ) ->
                         "\""
                             ++ (from ++ "\" -> \"" ++ to ++ "\" ")
-                            ++ ("[penwidth=" ++ edgeWeight i)
+                            ++ ("[penwidth=" ++ edgeWeight to i)
                             ++ (", color=" ++ color from to i)
+                            ++ (", xlabel=" ++ String.fromInt original)
                             ++ "]\n"
                     )
                 |> String.join ""
@@ -359,7 +363,8 @@ toDOT { selectedRule, rules, graph } =
                 "30"
 
         nodeAttrsGeneral key deps =
-            "fontsize=" ++ nodeWeight (Dict.size deps) ++ ""
+            -- "fontsize=" ++ nodeWeight (Dict.size deps) ++ ""
+            "fontsize=14"
 
         nodeAttrsByType key deps =
             if selectedRule == key then
@@ -381,7 +386,7 @@ toDOT { selectedRule, rules, graph } =
                 ""
 
         selectedAttrs =
-            "fontsize=50, style=filled, fontcolor=white, color=blue"
+            "fontsize=20, style=filled, fontcolor=white, color=blue"
 
         nodes =
             Dict.toList graph
