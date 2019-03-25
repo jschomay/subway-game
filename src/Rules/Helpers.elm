@@ -1,4 +1,4 @@
-module Rules.Helpers exposing (location, plot, rule, rulesForScene, station)
+module Rules.Helpers exposing (location, plotLine, rule, rulesForScene, station)
 
 import City exposing (Station(..), stationInfo)
 import Constants exposing (..)
@@ -19,7 +19,7 @@ rulesForScene scene rules_ =
     rules_
         |> List.map
             (\( id, { conditions } as r ) ->
-                ( id, { r | conditions = [ plot "mainPlot" scene ] ++ conditions } )
+                ( id, { r | conditions = [ plotLine "mainPlot" EQ scene ] ++ conditions } )
             )
 
 
@@ -34,6 +34,6 @@ location character station_ =
     Match character [ HasLink "location" <| station station_ ]
 
 
-plot : String -> Int -> EntityMatcher
-plot plotLine level =
-    Match "player" [ HasStat plotLine EQ level ]
+plotLine : String -> Order -> Int -> EntityMatcher
+plotLine key compare level =
+    Match "player" [ HasStat key compare level ]

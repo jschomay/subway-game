@@ -9,10 +9,6 @@ import Narrative.WorldModel exposing (..)
 import Rules.Helpers exposing (..)
 
 
-
--- TODO capture graph as is, then change all this to use plot sequences instead of plot points, and see how it improves
-
-
 rules : List ( String, LocalTypes.Rule )
 rules =
     rulesForScene scenes.lostBriefcase <|
@@ -21,84 +17,94 @@ rules =
             ++ -- securityOfficers
                [ rule "reportStolenBriefcase"
                     { trigger = Match "securityOfficers" []
-                    , conditions = []
-                    , changes = [ AddTag "policeOffice" "plotPoint" ]
+                    , conditions = [ plotLine "chaseThief" EQ 0, plotLine "lostAndFound" LT 2 ]
+                    , changes =
+                        [ SetStat "player" "lostAndFound" 1
+                        ]
                     , narrative = reportStolenBriefcase
                     }
                ]
-            ++ [ rule "reflectOnPoliceOffice"
+            ++ [ rule "travelToPoliceOffice"
                     { trigger = Match (station FederalTriangle) []
-                    , conditions = [ Match "policeOffice" [ HasTag "plotPoint" ] ]
-                    , changes = [ RemoveTag "policeOffice" "plotPoint" ]
-                    , narrative = reflectOnPoliceOffice
+                    , conditions = [ plotLine "lostAndFound" EQ 1 ]
+                    , changes = []
+                    , narrative = travelToPoliceOffice
                     }
                ]
             ++ -- policeOffice
-               [ rule "redirectedToLostAndFound"
+               [ rule "findClosedPoliceOffice"
                     { trigger = Match "policeOffice" []
                     , conditions = []
-                    , changes =
-                        [ IncStat "player" "mapLevel" 1
-                        ]
-                    , narrative = redirectedToLostAndFound
+                    , changes = [ SetStat "player" "lostAndFound" 2, SetStat "player" "mapLevel" 2 ]
+                    , narrative = findClosedPoliceOffice
                     }
                ]
             ++ [ rule "tryToBuyTickets"
                     { trigger = Match "ticketMachine" []
                     , conditions = [ Match "briefcase" [ Not <| HasLink "location" "player" ] ]
-                    , changes = [ SetLink "paperScrap" "location" "offscreen" ]
+                    , changes = []
                     , narrative = tryToBuyTickets
                     }
                ]
             ++ [ rule "considerRidingYellowLine"
                     { trigger = Match "yellowLine" []
-                    , conditions = [ Match "player" [ HasStat "ticketLevel" LT 2 ] ]
+                    , conditions =
+                        [ Match "player" [ HasStat "mapLevel" GT 1 ]
+                        , Match "player" [ HasStat "ticketLevel" LT 2 ]
+                        ]
                     , changes = []
                     , narrative = considerRidingYellowLine
                     }
                ]
             ++ [ rule "attemptToRideYellowLine"
                     { trigger = MatchAny [ HasTag "station" ]
-                    , conditions = [ Match "player" [ HasLink "line" "yellowLine" ] ]
+                    , conditions = [ plotLine "lostAndFound" EQ 2, Match "player" [ HasLink "line" "yellowLine" ] ]
                     , changes =
                         [ IncStat "player" "ruleBreaker" 1
                         , IncStat "player" "mainPlot" 1
+                        , IncStat "player" "lostAndFound" 1
                         , AddTag "player" "caught"
-                        , IncStat "player" "mainPlot" 1
                         ]
                     , narrative = attemptToRideYellowLine
                     }
                ]
             -------- follow thief route
-            ++ [ rule "reflectOnFollowingThief"
+            ++ [ rule "chaseAfterThief"
                     { trigger = MatchAny [ HasTag "station", HasTag "possibleThiefLocation" ]
-                    , conditions = []
-                    , changes = [ IncStat "player" "bravery" 1 ]
+                    , conditions = [ plotLine "lostAndFound" EQ 0 ]
+                    , changes = [ SetStat "player" "chaseThief" 1, IncStat "player" "bravery" 1 ]
 
                     -- TODO remove possibleThiefLocation tag from matched station
-                    , narrative = reflectOnFollowingThief
+                    , narrative = chaseAfterThief
+                    }
+               , rule "thiefHasEscaped"
+                    { trigger = MatchAny [ HasTag "station", HasTag "possibleThiefLocation" ]
+                    , conditions = [ plotLine "lostAndFound" GT 0 ]
+                    , changes =
+                        [ RemoveTag (station ChurchStreet) "possibleThiefLocation"
+                        , RemoveTag (station EastMulberry) "possibleThiefLocation"
+                        , RemoveTag (station WestMulberry) "possibleThiefLocation"
+                        , SetStat "player" "chaseThief" 0
+                        ]
+                    , narrative = thiefHasEscaped
                     }
                , rule "examinePaperScrap"
-                    { trigger = Match "paperScrap" []
-
-                    -- TODO only match while searching for theif
-                    , conditions = []
+                    { trigger = Match "paperScrap" [ Not <| HasLink "location" "offscreen" ]
+                    , conditions = [ plotLine "chaseThief" EQ 1, plotLine "lostAndFound" EQ 0 ]
                     , changes = [ SetLink "paperScrap" "location" "offscreen" ]
                     , narrative = examinePaperScrap
                     }
-               , rule "askAboutThiefMiss"
+               , rule "askAboutThiefFail"
                     { trigger = Match "commuter1" []
-
-                    -- TODO only match while searching for theif
-                    , conditions = []
+                    , conditions = [ plotLine "chaseThief" EQ 1, plotLine "lostAndFound" EQ 0 ]
                     , changes = []
-                    , narrative = askAboutThiefMiss
+                    , narrative = askAboutThiefFail
                     }
-               , rule "askAboutThiefHit"
+               , rule "askAboutThiefSucceed"
                     { trigger = Match "commuter2" [ HasLink "location" (station WestMulberry) ]
-                    , conditions = []
+                    , conditions = [ plotLine "chaseThief" EQ 1, plotLine "lostAndFound" EQ 0 ]
                     , changes =
-                        [ AddTag "maintenanceDoor" "plotPoint"
+                        [ SetStat "player" "chaseThief" 2
                         , SetLink "commuter2" "location" "offscreen"
 
                         -- TODO use bulk update
@@ -106,31 +112,30 @@ rules =
                         , RemoveTag (station EastMulberry) "possibleThiefLocation"
                         , RemoveTag (station WestMulberry) "possibleThiefLocation"
                         ]
-                    , narrative = askAboutThiefHit
+                    , narrative = askAboutThiefSucceed
                     }
                , rule "examineMaintenanceDoor"
-                    { trigger = Match "maintenanceDoor" [ HasTag "plotPoint" ]
-                    , conditions = []
-                    , changes = [ AddTag "maintenanceMan" "plotPoint" ]
+                    { trigger = Match "maintenanceDoor" []
+                    , conditions = [ plotLine "chaseThief" EQ 2 ]
+                    , changes = [ SetStat "player" "chaseThief" 3 ]
                     , narrative = examineMaintenanceDoor
                     }
                , rule "reflectOnMaintenanceDoor"
                     { trigger = MatchAny [ HasTag "station" ]
                     , conditions =
-                        [ Match "maintenanceMan" [ HasTag "plotPoint" ]
-                        , Match "maintenanceDoor" [ HasTag "plotPoint" ]
-                        , Match "player" [ Not <| HasStat "downTheRabbitHole" GT 0 ]
+                        [ plotLine "chaseThief" EQ 3
+                        , Match "player" [ HasStat "downTheRabbitHole" EQ 0 ]
                         ]
                     , changes = [ SetStat "player" "downTheRabbitHole" 1 ]
                     , narrative = reflectOnMaintenanceDoor
                     }
                , rule "stealMaintenanceKeyCard"
-                    { trigger = Match "maintenanceMan" [ HasTag "plotPoint" ]
-                    , conditions = []
+                    { trigger = Match "maintenanceMan" []
+                    , conditions = [ plotLine "chaseThief" EQ 3 ]
                     , changes =
                         [ SetLink "keyCard" "location" "player"
                         , IncStat "player" "ruleBreaker" 2
-                        , RemoveTag "maintenanceMan" "plotPoint"
+                        , SetStat "player" "chaseThief" 4
                         ]
                     , narrative = stealMaintenanceKeyCard
                     }
@@ -152,8 +157,8 @@ rules =
                     , changes =
                         [ SetLink "keyCard" "location" "offscreen"
                         , AddTag "player" "caught"
-                        , RemoveTag "maintenanceDoor" "plotPoint"
                         , IncStat "player" "mainPlot" 1
+                        , IncStat "player" "chaseThief" 1
                         ]
                     , narrative = openMaintenanceDoor
                     }
@@ -181,7 +186,7 @@ Those are the most unhelpful security officers you've ever seen.
         ]
 
 
-reflectOnPoliceOffice =
+travelToPoliceOffice =
     inOrder
         [ """
 You can't believe it.  This is the worst thing that could happen.  You always do everything right. Why can't something just work out for you for once.  If you don't get your presentation back you'll be ruined.
@@ -189,16 +194,16 @@ You can't believe it.  This is the worst thing that could happen.  You always do
 Hopefully the police station that the guards told you about can help you.
 """
         , """
-Maybe the police station will be open now.
+You suppose you could try the police station again.
 """
         ]
 
 
-redirectedToLostAndFound : Narrative
-redirectedToLostAndFound =
+findClosedPoliceOffice : Narrative
+findClosedPoliceOffice =
     inOrder
         [ """
-You found the police office.  But the door is closed, no one is in there.  You see a note on the door:
+You find a police office.  But the door is closed, no one is in there.  You see a note on the door:
 
 "CLOSED.  We are busy attending to other issues at the moment.  Please come back later.  You can also try the Lost and Found at the MacArthur's Park station."
 
@@ -246,7 +251,7 @@ The Central Guard Station.
         ]
 
 
-reflectOnFollowingThief =
+chaseAfterThief =
     inOrder
         [ """
 You can't believe you ran after the thief.  That's not like you.  But you do need to get the presentation back.
@@ -264,6 +269,12 @@ No, you have to keep trying.  Maybe this he'll be at this station.
         ]
 
 
+thiefHasEscaped =
+    inOrder [ """
+You saw the thief head in this direction.  Maybe if you went after him right away you could have caught him, but by now he would have escaped.
+""" ]
+
+
 examinePaperScrap =
     inOrder
         [ """
@@ -274,18 +285,18 @@ But on closer inspection it is just a piece of trash.  You throw it in the rubbi
         ]
 
 
-askAboutThiefMiss =
+askAboutThiefFail =
     inOrder
         [ """
 "Excuse me - did you happen to see a man with a briefcase get off at this stop a few minutes ago?  No?  Are you sure?  OK, fine, thanks anyway."
         """
         , """
-You don't want to both him any more.
+You don't want to bother him any more.
 """
         ]
 
 
-askAboutThiefHit =
+askAboutThiefSucceed =
     inOrder
         [ """
 "Hi, did a man with a briefcase get off at this stop a few minutes ago?  Yes!?  Where did he go?"
