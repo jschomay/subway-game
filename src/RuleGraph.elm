@@ -48,6 +48,7 @@ type alias Model =
 
 type Msg
     = SelectRule String
+    | SelectEdge String
 
 
 startLabel =
@@ -181,6 +182,14 @@ update msg model =
             in
             ( newModel, drawGraph <| toDOT newModel )
 
+        SelectEdge edgeId ->
+            let
+                newModel =
+                    -- TODO set edgeId
+                    { model | selectedRule = "" }
+            in
+            ( newModel, drawGraph <| toDOT newModel )
+
 
 subscriptions model =
     Sub.none
@@ -197,9 +206,26 @@ view model =
         rule r =
             li [ classList <| classes r, onClick <| SelectRule r ] [ text r ]
 
-        targetId =
-            -- target will be the text or elipse, use parentElement to reach the <g> which has the id
-            JD.at [ "target", "parentElement", "id" ] JD.string
+        selectGraphElement =
+            -- This could be a node OR an edge, so we need to figure out which one in order to send the correct message
+            -- Note that the target will always be one layer down from <g>, where the id is located, so we need to use `parentElement`
+            -- Also this is svg, so we need to look into `attributes`, which is a NameNodeMap that we need to dig into further
+            JD.at [ "target", "parentElement", "attributes" ] <|
+                JD.map2
+                    (\class id ->
+                        case class of
+                            "node" ->
+                                SelectRule id
+
+                            "edge" ->
+                                SelectEdge id
+
+                            _ ->
+                                -- clicking anything else should deselect everything
+                                SelectRule ""
+                    )
+                    (JD.at [ "class", "value" ] JD.string)
+                    (JD.at [ "id", "value" ] JD.string)
     in
     div [ class "RuleGraph" ]
         [ div []
@@ -209,7 +235,7 @@ view model =
         , div
             [ id "graph"
             , class "Graph"
-            , on "click" <| JD.map SelectRule targetId
+            , on "click" selectGraphElement
             ]
             [ text "loading" ]
         ]
