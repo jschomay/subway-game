@@ -21,13 +21,13 @@ type alias Deps =
     Dict String Edge
 
 
-{-| All of the rule IDs that that the node is reachable from, along with the length of the path to get there.
+{-| All of the rule IDs that that the node is reachable from, along with the length of the path to get there, and the list of reachable rules from that path.
 
-If an edge between the same two rules can be created in multiple ways, it only tracks the shortest path.
+If an edge between the same two rules can be created in multiple ways, it only tracks the shortest path, and it concat the list of reachable rules (TODO if there is a cycle, concat might be a bug?)
 
 -}
 type alias Edge =
-    Dict String Int
+    Dict String { pathLength : Int, reachableRules : List String }
 
 
 type alias Req =
@@ -59,7 +59,7 @@ main : Program Flags Model Msg
 main =
     Browser.document
         { init = always init
-        , view = \model -> { title = "Subway!", body = [ view model ] }
+        , view = \model -> { title = "Subway Graph", body = [ view model ] }
         , update = update
         , subscriptions = subscriptions
         }
@@ -121,11 +121,12 @@ buildGraph model =
         applyRule rule state =
             WorldModel.applyChanges rule.changes state
 
-        addDep : String -> String -> Int -> Deps -> Deps
-        addDep depId ruleId pathLength graph =
+        addDep : String -> String -> Int -> List String -> Deps -> Deps
+        addDep depId ruleId pathLength reachableRules graph =
+            -- TODO take a record instead of positional args
             Dict.get ruleId graph
                 |> Maybe.withDefault Dict.empty
-                |> (\existingDeps -> Dict.insert ruleId (Dict.insert depId pathLength existingDeps) graph)
+                |> (\existingDeps -> Dict.insert ruleId (Dict.insert depId { pathLength = pathLength, reachableRules = reachableRules } existingDeps) graph)
 
         findReachableRules : WorldModel -> Rules
         findReachableRules worldModel =
@@ -151,23 +152,27 @@ buildGraph model =
                 -- update edge to keep the shortest path
                 Dict.update ruleId
                     (Maybe.map <|
-                        Dict.update previousRuleId (Maybe.map (Basics.min pathLength))
+                        -- TODO concat reachableRules?
+                        Dict.update previousRuleId (Maybe.map (\dep -> { dep | pathLength = Basics.min dep.pathLength pathLength }))
                     )
                     deps
 
             else if List.isEmpty rule.changes then
-                addDep previousRuleId ruleId pathLength deps
+                addDep previousRuleId ruleId pathLength [] deps
                     -- add dep to itself to differentiate it from dead ends, but not make the graph more complex
-                    |> addDep ruleId ruleId (pathLength + 1)
+                    |> addDep ruleId ruleId (pathLength + 1) []
                 -- OR
                 -- draw line back to the previous node
                 -- |> addDep ruleId previousRuleId (pathLength + 1)
 
             else
                 findReachableRules (applyRule rule currentWorldModel)
-                    |> Dict.foldl
-                        (followRule (pathLength + 1) ruleId (applyRule rule currentWorldModel))
-                        (addDep previousRuleId ruleId pathLength deps)
+                    |> (\reachableRules ->
+                            Dict.foldl
+                                (followRule (pathLength + 1) ruleId (applyRule rule currentWorldModel))
+                                (addDep previousRuleId ruleId pathLength (Dict.keys reachableRules) deps)
+                                reachableRules
+                       )
     in
     findReachableRules model.startingState
         |> Dict.foldl (followRule 0 startLabel model.startingState) (Dict.singleton startLabel Dict.empty)
@@ -286,15 +291,16 @@ toDOT { selectedRule, rules, graph } =
                     _ ->
                         "1"
 
-        -- sorts by path length, the "normalizes" the values
+        -- sorts by path length, then "normalizes" the values
         -- ex: 4, 7, 3, 7, 8 -> 1, 2, 3, 3, 4
-        rank : Edge -> List ( String, ( Int, Int ) )
+        -- TODO this could be a lot clearer
+        rank : Edge -> List ( String, ( Int, { pathLength : Int, reachableRules : List String } ) )
         rank edge =
             -- TODO optimize?
             edge
                 |> Dict.toList
-                |> List.sortBy Tuple.second
-                |> List.groupWhile (\( _, a ) ( _, b ) -> a == b)
+                |> List.sortBy (\( _, { pathLength } ) -> pathLength)
+                |> List.groupWhile (\( _, a ) ( _, b ) -> a.pathLength == b.pathLength)
                 -- [(1, [1,1]), (2,[])]
                 |> List.map (\( x, xs ) -> x :: xs)
                 -- [[1,1,1], [2]]
@@ -302,6 +308,10 @@ toDOT { selectedRule, rules, graph } =
                 |> List.concat
 
         buildEdge to deps =
+            -- TODO colorize valid paths when an edge is selected
+            -- going forward: current edge's "to" is in the selected rule's reachableRules
+            -- going back: current edge's reachableRules includes the "to" of the selected rule
+            -- (first I need to tag edge ids as `from|to` so I can parse from and to out)
             deps
                 |> rank
                 |> List.map
@@ -310,7 +320,8 @@ toDOT { selectedRule, rules, graph } =
                             ++ (from ++ "\" -> \"" ++ to ++ "\" ")
                             ++ ("[penwidth=" ++ edgeWeight to i)
                             ++ (", color=" ++ color from to i)
-                            ++ (", xlabel=" ++ String.fromInt original)
+                            -- ++ (", xlabel=" ++ String.fromInt original.pathLength)
+                            ++ (", tooltip=\"" ++ String.join "\n" original.reachableRules ++ "\"")
                             ++ "]\n"
                     )
                 |> String.join ""
