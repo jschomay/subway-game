@@ -80,28 +80,44 @@
   font-size: 2em;
   padding: 0.7em;
   color: #222;
+  background: white;
 }
 
-.Station__interactables {
+.Station__name::after {
+  content: "Station";
+  display: block;
+  font-size: 0.7em;;
+}
+
+.Interactables {
   user-select: none;
-  background: white;
   max-width: 500px;
   min-height: 5em;
-  border-radius: 0.5em;
-  border: 0.2em solid #333;
+  border-radius: 0.8em;
+  border: 0.3em solid #333;
+  overflow: hidden;
 }
 
-.Station__interactables_divider {
-  border-top: 1px solid #ccc;
-  padding-top: 1em;
+.Interactables__section {
+  border-top: 1px solid lightgray;
+  padding: 0.5em;
+  background: white;
 }
 
-.Station__interactable {
+.Interactables__section_name {
+  padding: 0.5em;
+  text-align: center;
+  font-weight: bold;
+  font-size: 0.8em;
+  text-transform: uppercase;
+}
+
+.Interactable {
   display: flex;
   align-items: center;
-  padding: 0 3em 1em;
+  padding: 0.5em 3em;
   cursor: pointer;
-  font-weight: bold;
+  font-weight: normal;
 }
 
 /* Connection */
@@ -109,7 +125,7 @@
 .Connection {
   display: flex;
   align-items: center;
-  padding: 0 2em 1em;
+  padding: 1em 2em;
   cursor: pointer;
 }
 

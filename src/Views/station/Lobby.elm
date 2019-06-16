@@ -16,7 +16,7 @@ view map worldmodel currentStation =
     let
         interactiveView : ( Manifest.ID, DisplayComponent a ) -> Html Msg
         interactiveView ( id, { name } ) =
-            div [ class "Station__interactable", onClick <| Interact id ]
+            div [ class "Interactable", onClick <| Interact id ]
                 [ text name ]
 
         currentStationEntityID =
@@ -36,22 +36,21 @@ view map worldmodel currentStation =
                 ]
                 worldmodel
 
-
-        section list =
+        section name list =
             if List.isEmpty list then
-                []
+                text ""
 
             else
-                div [ class "Station__interactables_divider" ] []
-                    :: list
+                div [ class "Interactables__section" ] <|
+                    [ div [ class "Interactables__section_name" ] [ text name ] ]
+                        ++ list
     in
     div [ class "Station" ]
         [ div [ class "Station__scene" ] <|
-            [ div [ class "Station__interactables" ] <|
-                div [ class "Station__name" ] [ text (stationInfo currentStation |> .name) ]
-                    :: (section <| List.map interactiveView characters)
-                    ++ (section <| List.map interactiveView items)
-                    ++ (section <| Connections.view map currentStation)
-
+            [ div [ class "Interactables" ]
+                [ div [ class "Station__name" ] [ text (stationInfo currentStation |> .name) ]
+                , section "On this platform:" <| List.map interactiveView (characters ++ items)
+                , section "Conneting lines:" <| Connections.view map currentStation
+                ]
             ]
         ]
