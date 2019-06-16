@@ -119,7 +119,8 @@ buildGraph model =
 
         applyRule : Rule -> WorldModel -> WorldModel
         applyRule rule state =
-            WorldModel.applyChanges rule.changes state
+            -- TODO need to get the trigger in here to properly apply trigger matching bulk updates
+            WorldModel.applyChanges rule.changes "TODO this will never match" state
 
         addDep : String -> String -> Int -> List String -> Deps -> Deps
         addDep depId ruleId pathLength reachableRules graph =

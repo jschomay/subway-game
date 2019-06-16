@@ -19,7 +19,7 @@ rules =
                     { trigger = Match "securityOfficers" []
                     , conditions = [ plotLine "chaseThief" EQ 0, plotLine "lostAndFound" LT 2 ]
                     , changes =
-                        [ SetStat "player" "lostAndFound" 1
+                        [ Update "player" [ SetStat "lostAndFound" 1 ]
                         ]
                     , narrative = reportStolenBriefcase
                     }
@@ -35,7 +35,7 @@ rules =
                [ rule "findClosedPoliceOffice"
                     { trigger = Match "policeOffice" []
                     , conditions = []
-                    , changes = [ SetStat "player" "lostAndFound" 2, SetStat "player" "mapLevel" 2 ]
+                    , changes = [ Update "player" [ SetStat "lostAndFound" 2, SetStat "mapLevel" 2 ] ]
                     , narrative = findClosedPoliceOffice
                     }
                ]
@@ -60,10 +60,12 @@ rules =
                     { trigger = MatchAny [ HasTag "station" ]
                     , conditions = [ plotLine "lostAndFound" EQ 2, Match "player" [ HasLink "line" "yellowLine" ] ]
                     , changes =
-                        [ IncStat "player" "ruleBreaker" 1
-                        , IncStat "player" "mainPlot" 1
-                        , IncStat "player" "lostAndFound" 1
-                        , AddTag "player" "caught"
+                        [ Update "player"
+                            [ IncStat "ruleBreaker" 1
+                            , IncStat "mainPlot" 1
+                            , IncStat "lostAndFound" 1
+                            , AddTag "caught"
+                            ]
                         ]
                     , narrative = attemptToRideYellowLine
                     }
@@ -72,26 +74,25 @@ rules =
             ++ [ rule "chaseAfterThief"
                     { trigger = MatchAny [ HasTag "station", HasTag "possibleThiefLocation" ]
                     , conditions = [ plotLine "lostAndFound" EQ 0 ]
-                    , changes = [ SetStat "player" "chaseThief" 1, IncStat "player" "bravery" 1 ]
-
-                    -- TODO remove possibleThiefLocation tag from matched station
+                    , changes =
+                        [ Update "player" [ SetStat "chaseThief" 1, IncStat "bravery" 1 ]
+                        , Update "$" [ RemoveTag "possibleThiefLocation" ]
+                        ]
                     , narrative = chaseAfterThief
                     }
                , rule "thiefHasEscaped"
                     { trigger = MatchAny [ HasTag "station", HasTag "possibleThiefLocation" ]
                     , conditions = [ plotLine "lostAndFound" GT 0 ]
                     , changes =
-                        [ RemoveTag (station ChurchStreet) "possibleThiefLocation"
-                        , RemoveTag (station EastMulberry) "possibleThiefLocation"
-                        , RemoveTag (station WestMulberry) "possibleThiefLocation"
-                        , SetStat "player" "chaseThief" 0
+                        [ UpdateAll [ HasTag "possibleThiefLocation" ] [ RemoveTag "possibleThiefLocation" ]
+                        , Update "player" [ SetStat "chaseThief" 0 ]
                         ]
                     , narrative = thiefHasEscaped
                     }
                , rule "examinePaperScrap"
                     { trigger = Match "paperScrap" [ Not <| HasLink "location" "offscreen" ]
                     , conditions = [ plotLine "chaseThief" EQ 1, plotLine "lostAndFound" EQ 0 ]
-                    , changes = [ SetLink "paperScrap" "location" "offscreen" ]
+                    , changes = [ Update "paperScrap" [ SetLink "location" "offscreen" ] ]
                     , narrative = examinePaperScrap
                     }
                , rule "askAboutThiefFail"
@@ -104,20 +105,16 @@ rules =
                     { trigger = Match "commuter2" [ HasLink "location" (station WestMulberry) ]
                     , conditions = [ plotLine "chaseThief" EQ 1, plotLine "lostAndFound" EQ 0 ]
                     , changes =
-                        [ SetStat "player" "chaseThief" 2
-                        , SetLink "commuter2" "location" "offscreen"
-
-                        -- TODO use bulk update
-                        , RemoveTag (station ChurchStreet) "possibleThiefLocation"
-                        , RemoveTag (station EastMulberry) "possibleThiefLocation"
-                        , RemoveTag (station WestMulberry) "possibleThiefLocation"
+                        [ Update "player" [ SetStat "chaseThief" 2 ]
+                        , Update "commuter2" [ SetLink "location" "offscreen" ]
+                        , UpdateAll [ HasTag "possibleThiefLocation" ] [ RemoveTag "possibleThiefLocation" ]
                         ]
                     , narrative = askAboutThiefSucceed
                     }
                , rule "examineMaintenanceDoor"
                     { trigger = Match "maintenanceDoor" []
                     , conditions = [ plotLine "chaseThief" EQ 2 ]
-                    , changes = [ SetStat "player" "chaseThief" 3 ]
+                    , changes = [ Update "player" [ SetStat "chaseThief" 3 ] ]
                     , narrative = examineMaintenanceDoor
                     }
                , rule "reflectOnMaintenanceDoor"
@@ -126,16 +123,15 @@ rules =
                         [ plotLine "chaseThief" EQ 3
                         , Match "player" [ HasStat "downTheRabbitHole" EQ 0 ]
                         ]
-                    , changes = [ SetStat "player" "downTheRabbitHole" 1 ]
+                    , changes = [ Update "player" [ SetStat "downTheRabbitHole" 1 ] ]
                     , narrative = reflectOnMaintenanceDoor
                     }
                , rule "stealMaintenanceKeyCard"
                     { trigger = Match "maintenanceMan" []
                     , conditions = [ plotLine "chaseThief" EQ 3 ]
                     , changes =
-                        [ SetLink "keyCard" "location" "player"
-                        , IncStat "player" "ruleBreaker" 2
-                        , SetStat "player" "chaseThief" 4
+                        [ Update "player" [ IncStat "ruleBreaker" 2, SetStat "chaseThief" 4 ]
+                        , Update "keyCard" [ SetLink "location" "player" ]
                         ]
                     , narrative = stealMaintenanceKeyCard
                     }
@@ -155,10 +151,12 @@ rules =
                     { trigger = Match "maintenanceDoor" []
                     , conditions = [ Match "keyCard" [ HasLink "location" "player" ] ]
                     , changes =
-                        [ SetLink "keyCard" "location" "offscreen"
-                        , AddTag "player" "caught"
-                        , IncStat "player" "mainPlot" 1
-                        , IncStat "player" "chaseThief" 1
+                        [ Update "keyCard" [ SetLink "location" "offscreen" ]
+                        , Update "player"
+                            [ AddTag "caught"
+                            , IncStat "mainPlot" 1
+                            , IncStat "chaseThief" 1
+                            ]
                         ]
                     , narrative = openMaintenanceDoor
                     }

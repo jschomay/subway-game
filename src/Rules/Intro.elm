@@ -54,12 +54,12 @@ rules =
                     { trigger = Match "largeCrowd" []
                     , conditions = []
                     , changes =
-                        [ IncStat "player" "mainPlot" 1
-                        , SetLink "briefcase" "location" "thief"
-                        , SetLink "thief" "location" (station WestMulberry)
-                        , AddTag (station ChurchStreet) "possibleThiefLocation"
-                        , AddTag (station EastMulberry) "possibleThiefLocation"
-                        , AddTag (station WestMulberry) "possibleThiefLocation"
+                        [ Update "player" [ IncStat "mainPlot" 1 ]
+                        , Update "briefcase" [ SetLink "location" "thief" ]
+                        , Update "thief" [ SetLink "location" (station WestMulberry) ]
+                        , Update (station ChurchStreet) [ AddTag "possibleThiefLocation" ]
+                        , Update (station EastMulberry) [ AddTag "possibleThiefLocation" ]
+                        , Update (station WestMulberry) [ AddTag "possibleThiefLocation" ]
                         ]
                     , narrative = exitClosedBriefcaseStolen
                     }

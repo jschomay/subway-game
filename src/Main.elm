@@ -58,7 +58,7 @@ type alias Model =
     , gameOver : Bool
     , selectScene : Bool
     , history : List String
-    , pendingChanges : List ChangeWorld
+    , pendingChanges : Maybe ( Narrative.WorldModel.ID, List ChangeWorld )
     }
 
 
@@ -77,7 +77,7 @@ init =
       , gameOver = False
       , selectScene = True
       , history = []
-      , pendingChanges = []
+      , pendingChanges = Nothing
       }
       -- after removing scene select:
       -- actually, this should happen in the Loaded Msg handling
@@ -121,11 +121,14 @@ updateStory trigger model =
             in
             { model
                 | story = defaultStory
-                , pendingChanges = defaultChanges
+                , pendingChanges = Just ( trigger, defaultChanges )
             }
 
         Just ( matchedRuleID, matchedRule ) ->
             let
+                debug =
+                    Debug.log "Matched rule:" matchedRuleID
+
                 defaultChanges =
                     defaultUpdate trigger model.worldModel
 
@@ -134,7 +137,7 @@ updateStory trigger model =
             in
             { model
               -- make sure rule changes are second so that they can overrite default changes if needed
-                | pendingChanges = defaultChanges ++ matchedRule.changes
+                | pendingChanges = Just <| ( trigger, defaultChanges ++ matchedRule.changes )
                 , story = Just currentNarrative
                 , rules = Dict.insert matchedRuleID { matchedRule | narrative = updatedNarrative } model.rules
             }
@@ -157,11 +160,11 @@ defaultUpdate interactableId worldModel =
     --- ~~add these as rules with manual triggers and call updateStory again with manual trigger~~
     if assert interactableId [ HasTag "station" ] worldModel then
         -- move to selected station
-        [ SetLink "player" "location" interactableId ]
+        [ Update "player" [ SetLink "location" interactableId ] ]
 
     else if assert interactableId [ HasTag "line" ] worldModel then
         -- handle going to a line color
-        [ SetLink "player" "line" interactableId ]
+        [ Update "player" [ SetLink "line" interactableId ] ]
 
     else
         []
@@ -213,9 +216,15 @@ update msg model =
                             |> updateAndThen (update <| Interact id)
                             |> updateAndThen
                                 (\m ->
+                                    let
+                                        ( trigger, changes ) =
+                                            m.pendingChanges
+                                                |> Maybe.map identity
+                                                |> Maybe.withDefault ( "", [] )
+                                    in
                                     ( { m
-                                        | pendingChanges = []
-                                        , worldModel = applyChanges m.pendingChanges m.worldModel
+                                        | pendingChanges = Nothing
+                                        , worldModel = applyChanges changes trigger m.worldModel
                                       }
                                     , Cmd.none
                                     )
@@ -279,9 +288,15 @@ update msg model =
                 )
                     |> updateAndThen
                         (\m ->
+                            let
+                                ( trigger, changes ) =
+                                    m.pendingChanges
+                                        |> Maybe.map identity
+                                        |> Maybe.withDefault ( "", [] )
+                            in
                             ( { m
-                                | worldModel = applyChanges model.pendingChanges model.worldModel
-                                , pendingChanges = []
+                                | worldModel = applyChanges changes trigger model.worldModel
+                                , pendingChanges = Nothing
                                 , story = Nothing
                               }
                             , Cmd.none
@@ -443,7 +458,7 @@ selectSceneView =
             beginning ++ [ "1", "largeCrowd" ]
 
         centralGuardOffice =
-            lostBriefcase ++ [ "2", "policeOffice", "3" ]
+            lostBriefcase ++ [ "2", "policeOffice", "yellowline" ]
     in
     div [ class "SelectScene" ]
         [ h1 [] [ text "Select a scene to jump to:" ]
