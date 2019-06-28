@@ -24,6 +24,12 @@ rules =
                 , changes = []
                 , narrative = tryCellPhone
                 }
+           , rule "getMap"
+                { trigger = Match "mapPoster" []
+                , conditions = [ Match "map" [ Not <| HasLink "location" "player" ] ]
+                , changes = [ Update "map" [ SetLink "location" "player" ] ]
+                , narrative = checkMap
+                }
            ]
 
 
@@ -51,3 +57,12 @@ tryCellPhone =
     inOrder [ """
 You think about giving your boss a call to let him know you'll be late.  There's just one problem - you don't get any service down here.
   """ ]
+
+
+checkMap : Narrative
+checkMap =
+    inOrder
+        [ """
+You pick up a subway map.
+"""
+        ]

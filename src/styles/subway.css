@@ -73,14 +73,21 @@
   position: relative;
 }
 
-.Station__name {
+.Chapter__name {
   text-align: center;
   text-transform: uppercase;
   font-weight: bold;
-  font-size: 2em;
+  font-size: 1.3em;
   padding: 0.7em;
   color: #222;
-  background: white;
+}
+.Station__name {
+  text-align: center;
+  text-transform: uppercase;
+  font-size: 2em;
+  padding: 0.7em;
+  color: white;
+  background: #081b3c;
 }
 
 .Station__name::after {
@@ -96,12 +103,13 @@
   border-radius: 0.8em;
   border: 0.3em solid #333;
   overflow: hidden;
+  box-shadow: 0 0 3px 0 black inset;
+  background: white;
 }
 
 .Interactables__section {
   border-top: 1px solid lightgray;
   padding: 0.5em;
-  background: white;
 }
 
 .Interactables__section_name {
@@ -117,6 +125,13 @@
   align-items: center;
   padding: 0.5em 3em;
   cursor: pointer;
+  font-weight: normal;
+}
+
+.Noninteractable {
+  display: flex;
+  align-items: center;
+  padding: 0.5em 3em;
   font-weight: normal;
 }
 

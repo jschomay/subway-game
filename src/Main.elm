@@ -20,7 +20,6 @@ import Rules
 import Subway
 import Task
 import Tuple
-import Views.CharacterInfo as CharacterInfo
 import Views.Station.CentralGuardOffice as CentralGuardOffice
 import Views.Station.Lobby as Lobby
 import Views.Station.Platform as Platform
@@ -54,7 +53,6 @@ type alias Model =
     , rules : LocalTypes.Rules
     , location : Location
     , showMap : Bool
-    , showCharacterInfo : Bool
     , gameOver : Bool
     , selectScene : Bool
     , history : List String
@@ -73,7 +71,6 @@ init =
       -- after removing scene select:
       -- , location = OnTrain { line = Red, status = InTransit }
       , showMap = False
-      , showCharacterInfo = False
       , gameOver = False
       , selectScene = True
       , history = []
@@ -123,6 +120,7 @@ updateStory trigger model =
                 | story = defaultStory
                 , pendingChanges = Just ( trigger, defaultChanges )
             }
+                |> specialEvents trigger
 
         Just ( matchedRuleID, matchedRule ) ->
             let
@@ -146,7 +144,12 @@ updateStory trigger model =
 
 specialEvents : String -> Model -> Model
 specialEvents ruleId model =
-    model
+    case ruleId of
+        "map" ->
+            { model | showMap = not model.showMap }
+
+        _ ->
+            model
 
 
 {-| Sometimes you need to react to an interaction regardless of which rule matches. For example, things like moving to a locaiton, or taking an item.
@@ -245,12 +248,8 @@ update msg model =
                 )
 
             ToggleMap ->
+                -- TODO check if allowed to show map (ie. map in inventory, location lobby, etc)
                 ( { model | showMap = not model.showMap }
-                , Cmd.none
-                )
-
-            ToggleCharacterInfo ->
-                ( { model | showCharacterInfo = not model.showCharacterInfo }
                 , Cmd.none
                 )
 
@@ -332,7 +331,10 @@ handleKey : Model -> String -> Msg
 handleKey model key =
     case key of
         " " ->
-            if model.story /= Nothing then
+            if model.showMap then
+                ToggleMap
+
+            else if model.story /= Nothing then
                 Continue
 
             else
@@ -340,9 +342,6 @@ handleKey model key =
 
         "m" ->
             ToggleMap
-
-        "c" ->
-            ToggleCharacterInfo
 
         _ ->
             NoOp
@@ -415,23 +414,10 @@ view model =
                                 Nothing
                         }
                     )
-            , ( "toggles"
-              , case model.location of
-                    InStation _ ->
-                        div [ class "toggles" ]
-                            [ div [ onClick ToggleMap, class "toggle" ] [ text "Map (M)" ]
-                            , div [ onClick ToggleCharacterInfo, class "toggle" ] [ text "Character (C)" ]
-                            ]
-
-                    _ ->
-                        text ""
-              )
-            , ( "characterInfoView"
-              , if model.showCharacterInfo then
-                    CharacterInfo.view model.worldModel
-
-                else
-                    text ""
+            , ( "story"
+              , model.story
+                    |> Maybe.map storyView
+                    |> Maybe.withDefault (text "")
               )
             , ( "map"
               , if model.showMap then
@@ -439,11 +425,6 @@ view model =
 
                 else
                     text ""
-              )
-            , ( "story"
-              , model.story
-                    |> Maybe.map storyView
-                    |> Maybe.withDefault (text "")
               )
             ]
 
@@ -455,7 +436,7 @@ selectSceneView =
             [ "player" ]
 
         lostBriefcase =
-            beginning ++ [ "1", "largeCrowd" ]
+            beginning ++ [ "mapPoster", "1", "largeCrowd" ]
 
         centralGuardOffice =
             lostBriefcase ++ [ "2", "policeOffice", "yellowline" ]

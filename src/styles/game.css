@@ -76,24 +76,6 @@ body {
   min-height: 100vh;
 }
 
-.toggles {
-  position: fixed;
-  display: flex;
-  bottom: 1em;
-  left: 1em;
-}
-
-.toggle {
-  padding: 1em;
-  background: #333;
-  cursor: pointer;
-  font-size: 1em;
-  color: white;
-  text-transform: uppercase;
-  margin-right: 1em;
-  user-select: none;
-}
-
 .map {
   display: block;
   position: fixed;

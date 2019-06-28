@@ -23,8 +23,8 @@ rules =
             -- map
             ++ [ rule "figure out how to get back to metro center"
                     { trigger = Match "mapPoster" []
-                    , conditions = []
-                    , changes = []
+                    , conditions = [ Match "map" [ Not <| HasLink "location" "player" ] ]
+                    , changes = [ Update "map" [ SetLink "location" "player" ] ]
                     , narrative = missedStop
                     }
                ]
@@ -108,9 +108,9 @@ missedStop =
         [ """
 You can't believe you missed your stop.  You've never done that before, and today of all days.
 
-There's no time to lament, you need to get back to the Metro Center station as fast as possible.  It looks like you can just take the train back in the other direction.  If you ever get lost, you have a map with you (press 'm').
+You pick up a subway map and try to figure out how to get back to the Metro Center.
 """
-        , "If you hurry up and get on the train, you still probably have time to get back without your boss even noticing."
+        , "You already have a map.  If you hurry up and get on the train, you still probably have time to get back without your boss even noticing."
         ]
 
 

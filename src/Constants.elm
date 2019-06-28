@@ -1,4 +1,4 @@
-module Constants exposing (characterStats, distractions, goals, scenes)
+module Constants exposing (chapters, characterStats, distractions, scenes)
 
 import Array
 
@@ -19,17 +19,25 @@ characterStats =
     ]
 
 
-goals =
-    [ { id = "mainPlot"
-      , name = "Main"
-      , chapters =
-            Array.fromList
-                [ "Overslept!  Get back to your stop."
-                , "Thief!  Retrieve your briefcase."
-                , "Caught!"
-                ]
-      }
-    ]
+
+-- TODO list goals as entities (tags active/completed) with descriptions
+-- add goals via rules rather than per chapter here
+
+
+{-| Named chapters for main plot, displayed in UI
+-}
+chapters =
+    Array.fromList
+        [ ( "Deadline", [ "Give your 9AM presentation" ] )
+        , ( "Stop, Thief!", [ "Retrieve your briefcase", "Get to work in time to present" ] )
+        , ( "Stuck underground", [ "Track the thief", "END OF DEMO!", "THANK YOU FOR PLAYING!" ] )
+        ]
+
+
+
+-- TODO distractions should be the same as goals, but with (sidequest tag)
+-- which means we don't need to track these separately
+-- These will have one name, and the description will change over time based on the level of the plot (using conditional narrative)
 
 
 distractions =
@@ -37,7 +45,7 @@ distractions =
       , name = "Down the rabbit hole"
       , chapters =
             Array.fromList
-                [ "The girl in the yellow dress."
+                [ "Who was that girl in the yellow dress?"
                 ]
       }
     ]

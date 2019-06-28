@@ -59,7 +59,9 @@ location id =
 items : List ( ID, Entity )
 items =
     List.map (tag "item") <|
-        []
+        [ entity "map" "Subway map" "A map of all of the subway lines you know about."
+            |> tag "silent"
+        ]
             -- inventory
             ++ location "player"
                 [ entity "briefcase"
