@@ -9,10 +9,8 @@ import Html.Events exposing (..)
 arrow : Int -> Html msg
 arrow direction =
     div
-        [ class "Arrow"
-        , style "transform" ("rotate(" ++ String.fromInt direction ++ "deg)")
-        ]
-        [ text "→" ]
+        [ class "Arrow" ]
+        [ text " " ]
 
 
 exit : msg -> Html msg

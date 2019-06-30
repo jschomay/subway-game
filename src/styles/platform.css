@@ -41,25 +41,59 @@
 }
 
 .Exit {
+  user-select: none;
+  background: #1a1a1a;;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  text-transform: uppercase;
   font-weight: bold;
-  font-size: 1em;
+  font-size: 1.3em;
   border: 0.1em solid black;
-  padding: 0.4em;
+  padding: 0.3em;
   position: fixed;
   left: 2em;
   top: 2em;
-  background: black;
   color: white;
 }
+
+.Exit::before {
+  content: "";
+  position: absolute;
+  top: 0.1em;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: white;
+}
+
 
 .Exit__text {
   margin-left: 0.5em;
 }
+
+.Arrow {
+  cursor: pointer;
+  border: solid white;
+  border-width: 0 3px 3px 0;
+  display: inline-block;
+  padding: 3px;
+  transform: rotate(135deg);
+  position: relative;
+}
+
+.Arrow::before {
+  content: "";
+  display: block;
+  height: 3px;
+  width: 13px;
+  transform: rotate(45deg);
+  background: white;
+  position: absolute;
+  bottom: 3px;
+  right: -2px;
+}
+
 /* Line map */
 
 .Line_map {
