@@ -85,11 +85,7 @@ view map worldModel currentStation =
             div [ class "Sign__item" ] [ text name ]
 
         chapterInfoView =
-            div [ class "Sign Sign--chapter" ]
-                [ div [ class "Sign__header1" ] [ text fullChapterName ]
-                , sectionView "Goals" <| List.map nonInteractableItemView goals
-                , sectionView "Distractions" <| List.map nonInteractableItemView distractions
-                ]
+            div [ class "ChapterName" ] [ text fullChapterName ]
 
         stationInfoView =
             div [ class "Sign Sign--station" ]
@@ -101,6 +97,8 @@ view map worldModel currentStation =
             div [ class "Sign Sign--interactables" ]
                 [ sectionView "On this platform" <| List.map (Tuple.mapSecond .name >> interactableItemView) (characters ++ items)
                 , sectionView "Inventory" <| List.map (Tuple.mapSecond .name >> interactableItemView) inventory
+                , sectionView "Goals" <| List.map nonInteractableItemView goals
+                , sectionView "Distractions" <| List.map nonInteractableItemView distractions
                 ]
     in
     -- TODO make goals/distractions clickable with narrative
