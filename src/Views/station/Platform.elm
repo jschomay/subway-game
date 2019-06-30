@@ -7,6 +7,7 @@ import Html.Events exposing (..)
 import LocalTypes exposing (..)
 import Subway exposing (..)
 import Views.Shared as Shared
+import Views.Station.Connections as Connections
 
 
 {-| shows line map for a line
@@ -14,32 +15,19 @@ import Views.Shared as Shared
 view : Subway.Map City.Station City.Line -> Station -> Line -> Html Msg
 view map currentStation line =
     let
-        lineInfoView lineInfo =
+        lineInfo =
+            City.lineInfo line
+
+        lineInfoView =
             div [ class "Line_map__info" ]
-                [ lineNumberView lineInfo
-                , text <| .name <| lineInfo
+                [ Connections.byLine line
+                , text <| lineInfo.name
                 ]
-
-        lineNumberView lineInfo =
-            div
-                [ class "Line_map__number"
-                , style "color" (Shared.toColor lineInfo.color)
-                , style "borderColor" (Shared.toColor lineInfo.color)
-                ]
-                [ text <| String.fromInt lineInfo.number ]
-
-        lineConnectionView lineInfo =
-            div
-                [ class "Stop__connection"
-                , style "border-color" (Shared.toColor lineInfo.color)
-                , style "color" (Shared.toColor lineInfo.color)
-                ]
-                [ text <| String.fromInt lineInfo.number ]
 
         connections station =
             Subway.connections City.config map station
 
-        stopView currentLine station =
+        stopView transferLine station =
             div
                 [ class "Stop"
                 , onClick <|
@@ -51,13 +39,13 @@ view map currentStation line =
                 ]
             <|
                 [ div [ class "Stop__connections" ] <|
-                    List.map (City.lineInfo >> lineConnectionView) (List.filter ((/=) currentLine) <| connections station)
+                    List.map Connections.byLine (List.filter ((/=) transferLine) <| connections station)
                 , div
                     [ classList
                         [ ( "Stop__dot", True )
+                        , ( line |> City.lineInfo |> .id, True )
                         , ( "Stop__dot--current", station == currentStation )
                         ]
-                    , style "borderColor" (Shared.toColor <| .color <| lineInfo <| currentLine)
                     ]
                     []
                 , div
@@ -73,14 +61,12 @@ view map currentStation line =
         [ Shared.exit (Go Lobby)
         , div
             [ class "Line_map" ]
-            [ lineInfoView <| City.lineInfo line
+            [ lineInfoView
             , div [ class "Line_map__stops" ] <|
                 [ div
-                    [ class "Line_map__line"
-                    , style "background" (Shared.toColor <| .color <| lineInfo <| line)
-                    ]
+                    [ class <| "Line_map__line " ++ lineInfo.id ]
                     []
                 ]
-                    ++ List.map (stopView line) (City.lineInfo line |> .stations)
+                    ++ List.map (stopView line) lineInfo.stations
             ]
         ]

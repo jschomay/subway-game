@@ -94,7 +94,7 @@ view map worldModel currentStation =
         stationInfoView =
             div [ class "Sign Sign--station" ]
                 [ div [ class "Sign__header1" ] [ text stationName ]
-                , sectionView "Conneting lines" <| Connections.view map currentStation
+                , Connections.forStation map currentStation
                 ]
 
         interactablesView =

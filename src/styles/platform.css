@@ -40,6 +40,26 @@
   max-height: 100vh;
 }
 
+.Exit {
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-transform: uppercase;
+  font-weight: bold;
+  font-size: 1em;
+  border: 0.1em solid black;
+  padding: 0.4em;
+  position: fixed;
+  left: 2em;
+  top: 2em;
+  background: black;
+  color: white;
+}
+
+.Exit__text {
+  margin-left: 0.5em;
+}
 /* Line map */
 
 .Line_map {
@@ -54,30 +74,15 @@
 }
 
 .Line_map__info {
-  text-transform: uppercase;
   font-weight: bold;
   color: black;
   display: flex;
   align-items: center;
   margin-bottom: 1em;
-  font-size: 1.5em;
+  font-size: 1.7em;
   justify-content: center;
   padding-right: 1em;
   padding-bottom: 0.5em;
-}
-
-.Line_map__number {
-  background: white;
-  border: 3px solid;
-  border-radius: 50%;
-  width: 2em;
-  height: 2em;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1em;
-  font-weight: bold;
-  margin-right: 0.5em;
 }
 
 .Line_map__stops {
@@ -113,20 +118,6 @@
   margin-right: 0.7em;
 }
 
-.Stop__connection {
-  color: white;
-  border: 2px solid;
-  border-radius: 50%;
-  width: 20px;
-  height: 20px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.7em;
-  font-weight: bold;
-  margin-right: 3px;
-}
-
 .Stop__name {
 }
 
@@ -135,11 +126,22 @@
 }
 
 .Stop__dot {
+  position: relative;
   width: 20px;
   height: 20px;
   margin-right: 1em;
   border-radius: 50%;
-  border: 3px solid;
+}
+
+.Stop__dot::before {
+  content: "";
+  position: absolute;
+  display: block;
+  border-radius: 50%;
+  left: 3px;
+  right: 3px;
+  top: 3px;
+  bottom: 3px;
   background: white;
 }
 
@@ -147,33 +149,4 @@
   width: 26px;
   height: 26px;
   margin-left: -3px;
-}
-
-.Arrow {
-  cursor: pointer;
-  font-size: 1.4em;
-  font-weight: bold;
-  text-transform: uppercase;
-}
-
-
-.Exit {
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  text-transform: uppercase;
-  font-weight: bold;
-  font-size: 1em;
-  border: 0.1em solid black;
-  padding: 0.4em;
-  position: fixed;
-  left: 2em;
-  top: 2em;
-  background: black;
-  color: white;
-}
-
-.Exit__text {
-  margin-left: 0.5em;
 }

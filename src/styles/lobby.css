@@ -35,6 +35,7 @@
 .Sign {
   position: relative;
   user-select: none;
+  max-width: 33%;
   padding: 1em;
   background: #1a1a1a;
   color: white;
@@ -83,36 +84,50 @@
   cursor: pointer;
 }
 
-/* Connection */
+/* Connections */
 
-.Connection {
+.Connections {
+  padding: 0.2em 0;
   display: flex;
-  align-items: center;
-  padding: 1em 2em;
-  cursor: pointer;
+  font-size: 1.7em;
 }
 
-.Connection__number {
-  background: white;
-  border: 3px solid;
+.Connection {
+  color: white;
   border-radius: 50%;
-  width: 2em;
-  height: 2em;
   display: flex;
   align-items: center;
-  justify-content: center;
+  width: 1.5em;
+  height: 1.5em;
   font-size: 1em;
   font-weight: bold;
-  margin-right: 0.8em;
+  margin-right: 0.3em;
+  /* padding-top to compensate for numbers baseline */
+  padding-top: 3px;
+  justify-content: center;
   flex: 0 0 auto;
 }
 
-.Connection__name {
+.Connections .Connection {
+  cursor: pointer;
+}
+
+.Arrow {
+  cursor: pointer;
+  font-size: 1.4em;
   font-weight: bold;
-  font-size: 1em;
   text-transform: uppercase;
 }
 
-.Connection__end_points {
-  font-size: 0.8em;
+/* Line colors */
+
+.redLine {
+  background: #E13915;
+}
+.yellowLine {
+  background: #D9AD02;
+  color: black;
+}
+.greenLine {
+  background: #019966;
 }
