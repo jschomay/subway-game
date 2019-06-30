@@ -1,0 +1,179 @@
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes flicker {
+  0% {
+    opacity: 0.8;
+  }
+
+  30% {
+    opacity: 0.75;
+  }
+
+  100% {
+    opacity: 0.8;
+  }
+}
+
+.Platform {
+  background: black;
+  padding: 3em;
+  opacity: 1;
+  animation: fadeIn 0.3s linear forwards;
+}
+
+.Platform:before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: url(../img/train.jpg);
+  background-size: cover;
+  background-position: center;
+  opacity: 0.8;
+  animation: flicker 0.3s cubic-bezier(0.840, 0.170, 0.540, 1.350) alternate infinite 0s;
+  max-height: 100vh;
+}
+
+/* Line map */
+
+.Line_map {
+  position: relative;
+  margin: auto;
+  user-select: none;
+  padding: 1em;
+  width: 330px;
+  border: 0.2em solid #333;
+  background: white;
+  border-radius: 1.1em;
+}
+
+.Line_map__info {
+  text-transform: uppercase;
+  font-weight: bold;
+  color: black;
+  display: flex;
+  align-items: center;
+  margin-bottom: 1em;
+  font-size: 1.5em;
+  justify-content: center;
+  padding-right: 1em;
+  padding-bottom: 0.5em;
+}
+
+.Line_map__number {
+  background: white;
+  border: 3px solid;
+  border-radius: 50%;
+  width: 2em;
+  height: 2em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1em;
+  font-weight: bold;
+  margin-right: 0.5em;
+}
+
+.Line_map__stops {
+  position: relative;
+}
+
+.Line_map__line {
+  position: absolute;
+  width: 20px;
+  left: 88px;
+  top: 22px;
+  bottom: 22px;
+  border-radius: 20px;
+}
+
+
+/* Stop */
+
+.Stop {
+  display: flex;
+  padding: 0 0.8em;
+  height: 4em;
+  align-items: center;
+  position: relative;
+  cursor: pointer;
+}
+
+.Stop__connections {
+  width: 4em;
+  text-align: right;
+  display: flex;
+  justify-content: flex-end;
+  margin-right: 0.7em;
+}
+
+.Stop__connection {
+  color: white;
+  border: 2px solid;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7em;
+  font-weight: bold;
+  margin-right: 3px;
+}
+
+.Stop__name {
+}
+
+.Stop__name--current {
+  font-weight: bold;
+}
+
+.Stop__dot {
+  width: 20px;
+  height: 20px;
+  margin-right: 1em;
+  border-radius: 50%;
+  border: 3px solid;
+  background: white;
+}
+
+.Stop__dot--current {
+  width: 26px;
+  height: 26px;
+  margin-left: -3px;
+}
+
+.Arrow {
+  cursor: pointer;
+  font-size: 1.4em;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+
+.Exit {
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-transform: uppercase;
+  font-weight: bold;
+  font-size: 1em;
+  border: 0.1em solid black;
+  padding: 0.4em;
+  position: fixed;
+  left: 2em;
+  top: 2em;
+  background: black;
+  color: white;
+}
+
+.Exit__text {
+  margin-left: 0.5em;
+}

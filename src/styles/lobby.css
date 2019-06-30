@@ -1,0 +1,118 @@
+.Lobby {
+  background: black;
+  padding: 3em;
+  opacity: 1;
+  animation: fadeIn 0.3s linear forwards;
+}
+
+.Lobby:before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: url(../img/subway-lobby.jpg);
+  background-size: cover;
+  background-position: center;
+  opacity: 0.8;
+  animation: flicker 0.3s cubic-bezier(0.840, 0.170, 0.540, 1.350) alternate infinite 0s;
+  max-height: 100vh;
+}
+
+.Lobby__scene {
+  padding: 5em 3em;
+  flex: 1 0 auto;
+  display: flex;
+  justify-content: space-around;
+  align-items: flex-start;
+  position: relative;
+}
+
+
+/* Sign */
+
+.Sign {
+  position: relative;
+  user-select: none;
+  padding: 1em;
+  background: #1a1a1a;
+  color: white;
+  font-family: helvetica;
+}
+
+.Sign::before {
+  content: "";
+  position: absolute;
+  top: 0.6em;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: white;
+}
+
+.Sign__header1 {
+  font-size: 2.4em;
+  font-weight: bold;
+}
+
+.Sign__header2 {
+  font-size: 1.4em;
+  font-weight: bold;
+}
+
+.Sign__section {
+  padding-bottom: 0.5em;
+}
+
+.Sign__section:last-child {
+  padding-bottom: 0;
+}
+
+.Sign__list {
+  font-size: 0.9em;
+  font-weight: normal;
+  padding: 0.3em 0;
+}
+
+.Sign__item {
+  padding: 0.2em 0;
+}
+
+.Sign__item--interactable {
+  cursor: pointer;
+}
+
+/* Connection */
+
+.Connection {
+  display: flex;
+  align-items: center;
+  padding: 1em 2em;
+  cursor: pointer;
+}
+
+.Connection__number {
+  background: white;
+  border: 3px solid;
+  border-radius: 50%;
+  width: 2em;
+  height: 2em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1em;
+  font-weight: bold;
+  margin-right: 0.8em;
+  flex: 0 0 auto;
+}
+
+.Connection__name {
+  font-weight: bold;
+  font-size: 1em;
+  text-transform: uppercase;
+}
+
+.Connection__end_points {
+  font-size: 0.8em;
+}

@@ -1,7 +1,9 @@
 require("./styles/reset.css");
 require("./styles/story.css");
 require("./styles/train.css");
-require("./styles/subway.css");
+require("./styles/platform.css");
+require("./styles/lobby.css");
+require("./styles/guard-office.css");
 require("./styles/game.css");
 
 // inject bundled Elm app

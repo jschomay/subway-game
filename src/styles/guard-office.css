@@ -1,0 +1,23 @@
+.CentralGuardOffice {
+  display: flex;
+  flex-direction: column;
+}
+
+.CentralGuardOffice--top {
+  display: inline-block;
+  text-align: center;
+  text-transform: uppercase;
+  font-weight: bold;
+  font-size: 2em;
+  padding: 0.4em 0.7em;
+  color: white;
+  border: 0.1em solid #222;
+}
+
+.CentralGuardOffice--content {
+  color: white;
+  font-family: 'Quicksand', sans-serif;
+  font-size: 1.2em;
+  color: #ccc;;
+  padding: 5em;
+}
