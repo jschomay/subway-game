@@ -31,7 +31,7 @@ station station_ =
 
 location : String -> Station -> EntityMatcher
 location character station_ =
-    Match character [ HasLink "location" <| station station_ ]
+    Match character [ HasLink "location" <| Match (station station_) [] ]
 
 
 plotLine : String -> Order -> Int -> EntityMatcher

@@ -107,10 +107,10 @@ buildGraph model =
 
         breakMatcherIntoReqs matcher =
             case matcher of
-                Rules.MatchAny queries ->
+                WorldModel.MatchAny queries ->
                     List.map (\query store -> WorldModel.query [ query ] store |> List.isEmpty |> not) queries
 
-                Rules.Match id queries ->
+                WorldModel.Match id queries ->
                     if List.isEmpty queries then
                         [ always True ]
 

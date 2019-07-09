@@ -22,8 +22,7 @@ type Msg
 
 type alias Rule =
     Rules.Rule
-        { changes : List ChangeWorld
-        , narrative : Narrative
+        {  narrative : Narrative
         }
 
 

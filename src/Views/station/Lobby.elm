@@ -48,21 +48,21 @@ view map worldModel currentStation =
         characters =
             query
                 [ HasTag "character"
-                , HasLink "location" currentStationEntityID
+                , HasLink "location" <| Match currentStationEntityID []
                 ]
                 worldModel
 
         items =
             query
                 [ HasTag "item"
-                , HasLink "location" currentStationEntityID
+                , HasLink "location" <| Match currentStationEntityID []
                 ]
                 worldModel
 
         inventory =
             query
                 [ HasTag "item"
-                , HasLink "location" "player"
+                , HasLink "location" <| Match "player" []
                 ]
                 worldModel
 

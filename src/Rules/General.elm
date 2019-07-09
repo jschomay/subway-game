@@ -26,7 +26,7 @@ rules =
                 }
            , rule "getMap"
                 { trigger = Match "mapPoster" []
-                , conditions = [ Match "map" [ Not <| HasLink "location" "player" ] ]
+                , conditions = [ Match "map" [ Not <| HasLink "location" <| Match "player" [] ] ]
                 , changes = [ Update "map" [ SetLink "location" "player" ] ]
                 , narrative = checkMap
                 }

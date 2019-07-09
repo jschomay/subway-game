@@ -21,21 +21,21 @@ view worldmodel =
         characters =
             query
                 [ HasTag "character"
-                , HasLink "location" "centralGuardOffice"
+                , HasLink "location" <| Match "centralGuardOffice" []
                 ]
                 worldmodel
 
         items =
             query
                 [ HasTag "item"
-                , HasLink "location" "centralGuardOffice"
+                , HasLink "location" <| Match "centralGuardOffice" []
                 ]
                 worldmodel
 
         inventory =
             query
                 [ HasTag "item"
-                , HasLink "location" "player"
+                , HasLink "location" <| Match "player" []
                 ]
                 worldmodel
     in
