@@ -32,30 +32,17 @@
 }
 
 
+
 /* Sign */
 
-.ChapterName {
-  position: fixed;
-  bottom: 60px;
-  right: 0;
-  background: white;
-  color: black;
-  width: 30%;
-  padding: 0.2em 1em;
-  font-size: 1.4em;
-  font-weight: bold;
-}
-
-
 .Sign {
-  position: relative;
-  max-width: 33%;
+  position: fixed;
   padding: 1em;
   background: #1a1a1a;
   color: white;
 }
 
-.Sign::before {
+.Sign--station::before {
   content: "";
   position: absolute;
   top: 0.6em;
@@ -66,25 +53,36 @@
 }
 
 .Sign--station {
-  position: fixed;
   top: 40px;
 }
 
-.Sign--interactables {
-  position: fixed;
-  left: 20px;
-  top: 150px;
+.Sign--chapter {
+  opacity: 0.8;
+  top: 40px;
+  left: 40px;
 }
 
+.Sign--inventory {
+  opacity: 0.8;
+  bottom: 40px;
+  left: 40px;
+}
 
 .Sign__header1 {
   font-size: 2.4em;
   font-weight: bold;
+  margin-bottom: 0.2em;
 }
 
 .Sign__header2 {
   font-size: 1.4em;
   font-weight: bold;
+  margin-bottom: 1em;
+}
+
+.Sign__header3 {
+  font-weight: bold;
+  margin-bottom: 0.2em;
 }
 
 .Sign__section {
@@ -101,6 +99,19 @@
   padding: 0.3em 0;
 }
 
+.Sign__split {
+  display: flex;
+}
+
+.Sign__right {
+  flex: 1 0 auto;
+  text-align: right;
+}
+
+.Sign__left {
+  width: 12em;
+}
+
 .Sign__item {
   padding: 0.2em 0;
 }
@@ -114,7 +125,8 @@
 .Connections {
   padding: 0.2em 0;
   display: flex;
-  font-size: 1.7em;
+  font-size: 1.6em;
+  flex-wrap: wrap;
 }
 
 .Connection {
@@ -127,6 +139,7 @@
   font-size: 1em;
   font-weight: bold;
   margin-right: 0.3em;
+  margin-bottom: 0.3em;
   /* padding-top to compensate for numbers baseline */
   padding-top: 3px;
   justify-content: center;
@@ -148,4 +161,27 @@
 }
 .greenLine {
   background: #019966;
+}
+
+.Inventory {
+  display: flex;
+}
+
+.Inventory__item {
+  cursor: pointer;
+  margin: 0 1em;
+  height: 3em;
+  width: 3em;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center center;
+}
+
+
+/* Media queries */
+
+@media (max-width: 1024px) {
+ .Sign--chapter {
+   display: none;
+ }
 }

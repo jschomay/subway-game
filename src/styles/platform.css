@@ -55,6 +55,7 @@
   left: 2em;
   top: 2em;
   color: white;
+  z-index: 1;
 }
 
 .Exit::before {

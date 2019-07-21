@@ -90,12 +90,12 @@ introDelay =
 
 departingDelay : Float
 departingDelay =
-    0.5 * 1000
+    0.75 * 1000
 
 
 arrivingDelay : Float
 arrivingDelay =
-    0.5 * 1000
+    0.75 * 1000
 
 
 {-| "Ticks" the narrative engine, and displays the story content
