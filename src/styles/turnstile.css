@@ -1,0 +1,77 @@
+.Turnstile {
+  background: black;
+  opacity: 1;
+  animation: fadeIn 0.3s linear forwards;
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.Turnstile:before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: url(../img/subway-turnstile.jpg);
+  background-size: cover;
+  background-position: center 60%;
+  opacity: 0.8;
+  animation: flicker 0.3s cubic-bezier(0.840, 0.170, 0.540, 1.350) alternate infinite 0s;
+  max-height: 100vh;
+}
+
+.Turnstile__dialog {
+  user-select: none;
+  padding: 2em 3em;
+  background: #1a1a1a;;
+  position: relative;
+  color: white;
+  font-size: 1.5em;
+  font-weight: normal;
+  line-height: 1.5em;
+  text-align: center;
+}
+
+.Turnstile__status {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1.5em;
+}
+
+.Turnstile__icon {
+  width: 4em;
+  height: 4em;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center center;
+  margin-right: 1em;
+  flex: 0 0 auto;
+}
+
+.Turnstile__status_text {
+  font-size: 2em;
+  font-family: "arial";
+  text-transform: uppercase;
+  line-height: 1em;
+}
+
+.Turnstile__buttons {
+  display: flex;
+  justify-content: space-around;
+}
+
+.Turnstile__button {
+  font-weight: bold;
+  cursor: pointer;
+  padding-top: 2em;
+  text-align: center;
+  display: block;
+}

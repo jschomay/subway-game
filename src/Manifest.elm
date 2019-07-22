@@ -70,6 +70,7 @@ items =
                 , entity "redLinePass"
                     "Red Line pass"
                     "This will get you to any station along the Red Line.  Expires in 8 months."
+                    |> link "validOn" "redLine"
                 , entity "cellPhone"
                     "Cellphone"
                     "It's not one of those $800 ones, but it does everything you need.  Unless there's no service.  Down here there's no service, so it's practically useless.."
@@ -139,6 +140,7 @@ general =
         "Steve"
         "A guy just trying to get ahead by following the rules."
         |> stat "mainPlot" 1
+        -- TODO remove mapLevel and ticketLevel?
         |> stat "mapLevel" 1
         |> stat "ticketLevel" 1
         |> link "location" (station TwinBrooks)

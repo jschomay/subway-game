@@ -1,8 +1,10 @@
 require("./styles/reset.css");
+require("./styles/effects.css");
 require("./styles/story.css");
 require("./styles/train.css");
 require("./styles/platform.css");
 require("./styles/lobby.css");
+require("./styles/turnstile.css");
 require("./styles/guard-office.css");
 require("./styles/icons.css");
 require("./styles/game.css");

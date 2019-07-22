@@ -23,6 +23,7 @@ import Tuple
 import Views.Station.CentralGuardOffice as CentralGuardOffice
 import Views.Station.Lobby as Lobby
 import Views.Station.Platform as Platform
+import Views.Station.Turnstile as Turnstile
 import Views.Train as Train
 
 
@@ -329,6 +330,23 @@ subscriptions model =
 
 handleKey : Model -> String -> Msg
 handleKey model key =
+    let
+        atTurnstile =
+            case model.location of
+                InStation (Turnstile _) ->
+                    True
+
+                _ ->
+                    False
+
+        turnStileMessage =
+            case model.location of
+                InStation (Turnstile line) ->
+                    Interact <| .id <| lineInfo line
+
+                _ ->
+                    NoOp
+    in
     case key of
         " " ->
             if model.showMap then
@@ -336,6 +354,9 @@ handleKey model key =
 
             else if model.story /= Nothing then
                 Continue
+
+            else if atTurnstile then
+                turnStileMessage
 
             else
                 NoOp
@@ -401,6 +422,9 @@ view model =
 
                 InStation (Platform line) ->
                     ( "platform", Platform.view map currentStation line )
+
+                InStation (Turnstile line) ->
+                    ( "turnstile", Turnstile.view model.worldModel line )
 
                 OnTrain { line, status } ->
                     ( "train"

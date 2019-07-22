@@ -22,7 +22,7 @@ type Msg
 
 type alias Rule =
     Rules.Rule
-        {  narrative : Narrative
+        { narrative : Narrative
         }
 
 
@@ -32,6 +32,7 @@ type alias Rules =
 
 type StationArea
     = Platform Line
+    | Turnstile Line
     | Lobby
 
 

@@ -26,7 +26,7 @@ byLine line =
     in
     div
         [ class <| "Connection " ++ lineInfo.id
-        , onClick <| Go (Platform line)
+        , onClick <| Go (Turnstile line)
         ]
         [ text <| String.fromInt lineInfo.number ]
 
