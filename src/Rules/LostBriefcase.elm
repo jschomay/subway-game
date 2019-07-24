@@ -46,15 +46,14 @@ rules =
                     , narrative = tryToBuyTickets
                     }
                ]
-            ++ [ rule "considerRidingYellowLine"
-                    -- TODO this may need to be looked at
+            ++ [ rule "jumpYellowLineTurnstile"
                     { trigger = Match "yellowLine" []
-                    , conditions = []
-                    , changes = []
-                    , narrative = considerRidingYellowLine
+                    , conditions = [ plotLine "lostAndFound" EQ 2 ]
+                    , changes = [ Update "player" [ SetLink "line" "yellowLine" ] ]
+                    , narrative = jumpYellowLineTurnstile
                     }
                ]
-            ++ [ rule "attemptToRideYellowLine"
+            ++ [ rule "caughtOnYellowLine"
                     { trigger = MatchAny [ HasTag "station" ]
                     , conditions = [ plotLine "lostAndFound" EQ 2, Match "player" [ HasLink "line" <| Match "yellowLine" [] ] ]
                     , changes =
@@ -65,7 +64,7 @@ rules =
                             , AddTag "caught"
                             ]
                         ]
-                    , narrative = attemptToRideYellowLine
+                    , narrative = caughtOnYellowLine
                     }
                ]
             -------- follow thief route
@@ -203,7 +202,7 @@ You find a police office.  But the door is closed, no one is in there.  You see 
 
 "CLOSED.  We are busy attending to other issues at the moment.  Please come back later.  You can also try the Lost and Found at the MacArthur's Park station."
 
-Well that's not very helpful.  You don't even know where the MacArthur's Park station is.  It's not on your map.  Oh, there it is.  It's on the Yellow line (Yellow Line added to your map!).
+Well that's not very helpful.  You don't even know where the MacArthur's Park station is.  It's not on your map.  Oh, there it is.  It's on the Yellow line.
 
 The lost and found seems like a long shot.  But you don't know what else to do.
 
@@ -223,15 +222,20 @@ You could buy a ticket here... except your wallet is in your briefcase!
         ]
 
 
-considerRidingYellowLine =
+jumpYellowLineTurnstile =
     inOrder
         [ """
-You don't have a pass for the yellow line, so you have to jump the turnstyle.  Jumping turnstyles is not something you normally do.  What if you get caught?
+You consider jumping the turnstile.  You don't want to, but this is a special
+circumstance.  You need to get your briefcase back, so maybe just this once.
+
+You take a look around and when it looks safe you make your move.
+
+No one seems to have noticed.  In fact, it was pretty easy.
         """
         ]
 
 
-attemptToRideYellowLine =
+caughtOnYellowLine =
     inOrder
         [ """
 You've never ridden without a ticket before.  You don't like it.  You're sure you'll be caught.

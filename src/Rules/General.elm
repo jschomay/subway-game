@@ -18,6 +18,23 @@ rules =
                 , changes = []
                 , narrative = ridingTheTrain
                 }
+           , rule "goToLinePlatform"
+                { trigger = MatchAny [ HasTag "line" ]
+                , conditions =
+                    [ MatchAny
+                        [ HasLink "validOn" (Match "$" [])
+                        , HasLink "location" (Match "player" [])
+                        ]
+                    ]
+                , changes = [ Update "player" [ SetLink "line" "$" ] ]
+                , narrative = goToLinePlatform
+                }
+           , rule "jumpTurnstileFail"
+                { trigger = MatchAny [ HasTag "line" ]
+                , conditions = []
+                , changes = []
+                , narrative = jumpTurnstileFail
+                }
            , rule "tryCellPhone"
                 { trigger = Match "cellPHone" []
                 , conditions = []
@@ -49,6 +66,18 @@ The train hurtles through the dark tunnel towards the next stop.
         , """
 You stare at the floor, avoiding the gaze of the other passengers, waiting for your next stop.
     """
+        ]
+
+
+goToLinePlatform =
+    inOrder []
+
+
+jumpTurnstileFail =
+    inOrder
+        [ "You've never jumped a turnstile in your life, and you're not about to start now. "
+        , "Better to stick to the lines you have passes for."
+        , "You're too afraid you'll get caught."
         ]
 
 

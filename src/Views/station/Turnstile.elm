@@ -34,7 +34,7 @@ view worldModel line =
                 , div [ class "Turnstile__buttons" ]
                     [ div
                         [ class "Turnstile__button"
-                        , onClick <| Go <| Platform line
+                        , onClick <| Interact <| lineInfo.id
                         ]
                         [ text "Continue" ]
                     ]
@@ -53,7 +53,7 @@ view worldModel line =
                         [ text "Go back" ]
                     , div
                         [ class "Turnstile__button"
-                        , onClick <| Go <| Platform line
+                        , onClick <| Interact <| lineInfo.id
                         ]
                         [ text "Jump turnstile" ]
                     ]

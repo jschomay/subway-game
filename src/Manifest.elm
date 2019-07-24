@@ -148,7 +148,6 @@ general =
                 >> (\info ->
                         entity info.id info.name info.name
                             |> tag "line"
-                            |> tag "silent"
                    )
             )
             City.allLines

@@ -137,7 +137,7 @@ updateStory trigger model =
             { model
               -- make sure rule changes are second so that they can overrite default changes if needed
                 | pendingChanges = Just <| ( trigger, defaultChanges ++ matchedRule.changes )
-                , story = Just currentNarrative
+                , story = currentNarrative
                 , rules = Dict.insert matchedRuleID { matchedRule | narrative = updatedNarrative } model.rules
             }
                 |> specialEvents matchedRuleID
@@ -149,8 +149,13 @@ specialEvents ruleId model =
         "map" ->
             { model | showMap = not model.showMap }
 
-        _ ->
-            model
+        other ->
+            if List.member other [ "goToLinePlatform", "jumpYellowLineTurnstile" ] then
+                -- This is kind of janky, but it works for now
+                { model | location = InStation <| Platform <| Maybe.withDefault Red <| getCurrentLine model }
+
+            else
+                model
 
 
 {-| Sometimes you need to react to an interaction regardless of which rule matches. For example, things like moving to a locaiton, or taking an item.
@@ -165,10 +170,6 @@ defaultUpdate interactableId worldModel =
     if assert interactableId [ HasTag "station" ] worldModel then
         -- move to selected station
         [ Update "player" [ SetLink "location" interactableId ] ]
-
-    else if assert interactableId [ HasTag "line" ] worldModel then
-        -- handle going to a line color
-        [ Update "player" [ SetLink "line" interactableId ] ]
 
     else
         []
@@ -190,6 +191,16 @@ getCurrentStation map worldModel =
         |> Maybe.andThen String.toInt
         |> Maybe.andThen (Subway.getStation map)
         |> Maybe.withDefault WestMulberry
+
+
+getCurrentLine : Model -> Maybe City.Line
+getCurrentLine model =
+    case model.location of
+        InStation (Turnstile line) ->
+            Just line
+
+        _ ->
+            Nothing
 
 
 updateAndThen : (m -> ( m, Cmd c )) -> ( m, Cmd c ) -> ( m, Cmd c )
@@ -256,17 +267,7 @@ update msg model =
 
             Go area ->
                 -- TODO would be best to move all of `model.location` into the world model, but for now, just duplicate the line color there
-                (case area of
-                    Platform line ->
-                        update (Interact <| .id <| lineInfo line) model
-
-                    _ ->
-                        ( model, Cmd.none )
-                )
-                    |> updateAndThen
-                        (\m ->
-                            ( { m | location = InStation area }, Cmd.none )
-                        )
+                ( { model | location = InStation area }, Cmd.none )
 
             BoardTrain line station ->
                 ( { model | location = OnTrain { line = line, status = InTransit } }
