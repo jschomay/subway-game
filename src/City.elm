@@ -11,7 +11,6 @@ module City exposing
     , lineInfo
     , map
     , mapImage
-    , mapLines
     , stationInfo
     )
 
@@ -196,33 +195,6 @@ map lines =
     Subway.init (stationInfo >> .id) (List.map stationsOnLine lines)
 
 
-mapLines : Int -> List Line
-mapLines level =
-    case level of
-        1 ->
-            [ Red ]
-
-        2 ->
-            [ Red, Yellow ]
-
-        3 ->
-            [ Red, Yellow, Green ]
-
-        _ ->
-            [ Red, Yellow, Green ]
-
-
-mapImage : Int -> String
-mapImage level =
-    case level of
-        1 ->
-            "map-red.png"
-
-        2 ->
-            "map-red-yellow.png"
-
-        3 ->
-            "map-red-yellow-green.png"
-
-        _ ->
-            "map-red-yellow-green.png"
+mapImage : String
+mapImage =
+    "map-red-yellow-green.png"

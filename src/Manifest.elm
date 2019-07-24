@@ -140,9 +140,6 @@ general =
         "Steve"
         "A guy just trying to get ahead by following the rules."
         |> stat "mainPlot" 1
-        -- TODO remove mapLevel and ticketLevel?
-        |> stat "mapLevel" 1
-        |> stat "ticketLevel" 1
         |> link "location" (station TwinBrooks)
         |> (\e -> List.foldl (\{ id, starting } -> stat id starting) e Constants.characterStats)
     ]

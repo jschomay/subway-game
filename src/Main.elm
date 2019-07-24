@@ -384,13 +384,7 @@ view model =
                 model.location
 
         map =
-            mapLevel
-                |> City.mapLines
-                |> City.map
-
-        mapLevel =
-            Narrative.WorldModel.getStat "player" "mapLevel" model.worldModel
-                |> Maybe.withDefault 1
+            City.fullMap
 
         stationToId station =
             stationInfo station |> .id
@@ -445,7 +439,7 @@ view model =
               )
             , ( "map"
               , if model.showMap then
-                    mapView mapLevel
+                    mapView
 
                 else
                     text ""
@@ -488,8 +482,8 @@ storyView story =
         ]
 
 
-mapView : Int -> Html Msg
-mapView mapLevel =
+mapView : Html Msg
+mapView =
     div [ onClick ToggleMap, class "map" ]
-        [ img [ class "map__image", src <| "img/" ++ City.mapImage mapLevel ] []
+        [ img [ class "map__image", src <| "img/" ++ City.mapImage ] []
         ]

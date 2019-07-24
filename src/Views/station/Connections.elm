@@ -35,5 +35,5 @@ forStation : City.Map -> Station -> Html Msg
 forStation map currentStation =
     div [ class "Connections" ] <|
         List.map byLine <|
-            List.sortBy (City.lineInfo >> .id) <|
+            List.sortBy (City.lineInfo >> .number) <|
                 Subway.connections City.config map currentStation

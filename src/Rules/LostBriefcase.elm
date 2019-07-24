@@ -35,7 +35,7 @@ rules =
                [ rule "findClosedPoliceOffice"
                     { trigger = Match "policeOffice" []
                     , conditions = []
-                    , changes = [ Update "player" [ SetStat "lostAndFound" 2, SetStat "mapLevel" 2 ] ]
+                    , changes = [ Update "player" [ SetStat "lostAndFound" 2 ] ]
                     , narrative = findClosedPoliceOffice
                     }
                ]
@@ -47,11 +47,9 @@ rules =
                     }
                ]
             ++ [ rule "considerRidingYellowLine"
+                    -- TODO this may need to be looked at
                     { trigger = Match "yellowLine" []
-                    , conditions =
-                        [ Match "player" [ HasStat "mapLevel" GT 1 ]
-                        , Match "player" [ HasStat "ticketLevel" LT 2 ]
-                        ]
+                    , conditions = []
                     , changes = []
                     , narrative = considerRidingYellowLine
                     }
