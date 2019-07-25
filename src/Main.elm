@@ -67,26 +67,26 @@ init =
       , loaded = False
       , story = Nothing
       , rules = Rules.rules
-      , location = InStation Lobby
 
-      -- after removing scene select:
-      -- , location = OnTrain { line = Red, status = InTransit }
+      --  use this when using the scene select:
+      -- , location = InStation Lobby
+      , location = OnTrain { line = Red, status = InTransit }
       , showMap = False
       , gameOver = False
-      , selectScene = True
+      , selectScene = False
       , history = []
       , pendingChanges = Nothing
       }
-      -- after removing scene select:
+      -- comment out when using scene select:
       -- actually, this should happen in the Loaded Msg handling
-      -- , delay introDelay (Interact "player")
-    , Cmd.none
+    , delay introDelay (Interact "player")
+      -- , Cmd.none
     )
 
 
 introDelay : Float
 introDelay =
-    3 * 1000
+    2 * 1000
 
 
 departingDelay : Float
