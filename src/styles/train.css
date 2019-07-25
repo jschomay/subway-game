@@ -7,108 +7,98 @@
 
 .train {
   width: 100%;
-  min-height: 101vh;
+  min-height: 100vh;
   background: black;
   position: fixed;
   animation: bump 0.6s cubic-bezier(0.840, 0.170, 0.540, 1.350) alternate infinite 0s;
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.train:before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: url(../img/riding-train.jpg);
+  background-size: cover;
+  background-position: 50% 40%;
+  opacity: 0.6;
+  /* animation: flash 0.3s cubic-bezier(0.840, 0.170, 0.540, 1.350) alternate infinite 0s; */
+  animation: flash 0.9s ease-in-out alternate infinite 0s;
+  max-height: 100vh;
+}
+
+@keyframes flash {
+  0% {
+    opacity: 0.6;
+  }
+
+  10% {
+    opacity: 0.58;
+  }
+
+  70% {
+    opacity: 0.65;
+  }
+
+  80% {
+    opacity: 0.6;
+  }
+
+  90% {
+    opacity: 0.69;
+  }
+
+  100% {
+    opacity: 0.7;
+  }
 }
 
 @keyframes bump {
   0% {
     transform: translateY(0);
+    transform: translateX(0);
   }
-  
+
+  20% {
+    transform: translateX(-1px);
+  }
+
   30% {
     transform: translateY(-3px);
   }
 
+  70% {
+    transform: translateX(1px);
+  }
+
   100% {
     transform: translateY(0);
+    transform: translateX(0);
   }
 }
 
-.train__background {
-  background: linear-gradient(to right, #000000 0%,#5e5740 40%,#eee 50%,#5e5740 60%,#000000 100%);
-  width: 100%;
-  height: 100vh;
-  position: fixed;
-  left: -150%;
-  animation: scroll 0.7s linear forwards infinite 1.1s;
-}
-
-@keyframes scroll {
-  from {
-    left: 150%;
-  }
-  
-  to {
-    left: -150%
-  }
-}
-
-.train__foreground {
-  width: 100%;
-  height: 100vh;
-  position: fixed;
-}
-
-.train__door {
-  height: 100vh;
-  width: 50%;
-  display: inline-block;
-  position: relative;
-}
-
-.train__door::before {
-  content: "";
-  background: rgba(0, 0, 0, 0.2);
-  border: 0 solid gray;
-  border-top-width: 6em;
-  border-left-width: 10em;
-  border-right-width: 10em;
-  border-bottom-width: 10em;
-  display: block;
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  right: 0;
-  left: 0;
-}
-
-.train__door--left {
-  border-right: 0.5em solid black;
-}
-
-.train__door--right {
-}
-
-.train__top {
+.train__ticker {
   color: #ffc000;
   text-transform: uppercase;
   font-family: subway;
   padding: 1.0em;
   text-align: center;
-  top: 0;
-  right: 0;
-  left: 0;
+  position: relative;
+  top: -0.5em;
+  border: 0.3em solid #333;
+  padding: 0.6em 0.8em;
+  border-radius: 5px;
   background: black;
-  user-select: none;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background: linear-gradient(to top, #555 0%,#222 100%);
-}
-
-.train__ticker {
-  background: black;
-  border: 0.5em solid #444;
-  padding: 0.5em 0.8em;
-  min-width: 35em;
+  min-width: 40em;
 }
 
 .train__info {
   font-weight: normal;
   font-size: 1.4em;
 }
-

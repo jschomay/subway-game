@@ -34,9 +34,8 @@ view { line, arrivingAtStation } =
             arrivingAtStation
                 |> Maybe.map (\station -> "Arriving at: " ++ (stationInfo station |> .name))
                 |> Maybe.withDefault (.name <| lineInfo line)
+
+        displayView =
+            div [ class "train__ticker" ] [ div [ class "train__info" ] [ text display ] ]
     in
-    div [ class "train" ] <|
-        List.filterMap identity
-            [ Just background
-            , Just foreground
-            ]
+    div [ class "train" ] [ displayView ]
