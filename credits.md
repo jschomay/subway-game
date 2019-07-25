@@ -2,6 +2,7 @@ Subway platform https://unsplash.com/photos/ZUlalD3-AcI by Adam Marcucci on Unsp
 Subway elevator picture https://unsplash.com/photos/jeU05od8Go0 by Aniket Tonpe on Unsplash
 Subway tunnel picture https://pixabay.com/p-690513/
 Train picture https://unsplash.com/photos/ARpPPB5dUC0 by Paul Gaudriault on Unsplash
+Guard office picture https://unsplash.com/photos/4pPzKfd6BEg by Patryk Grądys on Unsplash
 
 Icons
 https://www.flaticon.com/free-icon/briefcase_149399

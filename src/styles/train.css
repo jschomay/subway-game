@@ -28,7 +28,6 @@
   background-size: cover;
   background-position: 50% 40%;
   opacity: 0.6;
-  /* animation: flash 0.3s cubic-bezier(0.840, 0.170, 0.540, 1.350) alternate infinite 0s; */
   animation: flash 0.9s ease-in-out alternate infinite 0s;
   max-height: 100vh;
 }

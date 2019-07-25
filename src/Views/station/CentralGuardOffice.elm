@@ -42,5 +42,10 @@ view worldmodel =
     -- TODO this needs to be figured out
     div [ class "CentralGuardOffice" ]
         [ h2 [ class "CentralGuardOffice--top" ] [ text "Central Guard Office" ]
-        , p [ class "CentralGuardOffice--content" ] [ text "You are caught! (end of demo, more to come later)" ]
+        , p [ class "CentralGuardOffice--content" ]
+            [ p [] [ text "You are caught! " ]
+            , p [] [ text "End of demo, thanks for playing!" ]
+            , p [] [ text "Made on the ", a [ href "http://elmnarrativeengine.com" ] [ text "Elm Narrative Engine" ] ]
+            , p [] [ text "Contact ", a [ href "mailto:jeff@elmnarrativeengine.com" ] [ text "jeff@elmnarrativeengine.com" ] ]
+            ]
         ]
