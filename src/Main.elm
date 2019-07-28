@@ -77,10 +77,7 @@ init =
       , history = []
       , pendingChanges = Nothing
       }
-      -- comment out when using scene select:
-      -- actually, this should happen in the Loaded Msg handling
-    , delay introDelay (Interact "player")
-      -- , Cmd.none
+    , Cmd.none
     )
 
 
@@ -224,7 +221,9 @@ update msg model =
 
             Loaded ->
                 ( { model | loaded = True }
-                , Cmd.none
+                  -- comment out when using scene select:
+                , delay introDelay (Interact "player")
+                  -- , Cmd.none
                 )
 
             LoadScene history ->
