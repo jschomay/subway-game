@@ -92,7 +92,9 @@ You'll just close your eyes for a few moments...
 You awake to a security guard shaking your arm.  "Wake up buddy, we're pulling in to the last station.  It's the end of the line, you've got to get off."
 
 Oh shit.  You missed your stop.  It's 6:39.  You have to get back to the Metro Center station.
-  """ ]
+
+(Tip: You can press the space bar to continue instead of clicking.)
+ """ ]
 
 
 missedStopAgain : Narrative
@@ -109,8 +111,9 @@ missedStop =
 You can't believe you missed your stop.  You've never done that before, and today of all days.
 
 You pick up a subway map and try to figure out how to get back to the Metro Center.
+
+(It is now in your inventory and you can view it at any time by clicking on it or pressing 'M')
 """
-        , "You already have a map.  If you hurry up and get on the train, you still probably have time to get back without your boss even noticing."
         ]
 
 

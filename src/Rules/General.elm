@@ -45,7 +45,13 @@ rules =
                 { trigger = Match "mapPoster" []
                 , conditions = [ Match "map" [ Not <| HasLink "location" <| Match "player" [] ] ]
                 , changes = [ Update "map" [ SetLink "location" "player" ] ]
-                , narrative = checkMap
+                , narrative = getMap
+                }
+           , rule "checkMap"
+                { trigger = Match "mapPoster" []
+                , conditions = []
+                , changes = []
+                , narrative = inOrder []
                 }
            ]
 
@@ -88,10 +94,12 @@ You think about giving your boss a call to let him know you'll be late.  There's
   """ ]
 
 
-checkMap : Narrative
-checkMap =
+getMap : Narrative
+getMap =
     inOrder
         [ """
 You pick up a subway map.
+
+(It is now in your inventory and you can view it at any time by clicking on it or pressing 'M')
 """
         ]

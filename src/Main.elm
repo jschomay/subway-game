@@ -149,6 +149,9 @@ specialEvents ruleId model =
         "map" ->
             { model | showMap = not model.showMap }
 
+        "checkMap" ->
+            { model | showMap = not model.showMap }
+
         other ->
             if List.member other [ "goToLinePlatform", "jumpYellowLineTurnstile" ] then
                 -- This is kind of janky, but it works for now
