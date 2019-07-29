@@ -50,7 +50,7 @@ main =
 type alias Model =
     { worldModel : Manifest.WorldModel
     , loaded : Bool
-    , story : Maybe String
+    , story : List String
     , rules : LocalTypes.Rules
     , location : Location
     , showMap : Bool
@@ -65,7 +65,7 @@ init : ( Model, Cmd Msg )
 init =
     ( { worldModel = Manifest.worldModel
       , loaded = False
-      , story = Nothing
+      , story = []
       , rules = Rules.rules
 
       --  use this when using the scene select:
@@ -108,11 +108,12 @@ updateStory trigger model =
 
                 defaultStory =
                     if assert trigger [ HasTag "silent" ] model.worldModel then
-                        Nothing
+                        []
 
                     else
                         Dict.get trigger model.worldModel
-                            |> Maybe.map .description
+                            |> Maybe.map (.description >> List.singleton)
+                            |> Maybe.withDefault []
             in
             { model
                 | story = defaultStory
@@ -300,7 +301,7 @@ update msg model =
                             ( { m
                                 | worldModel = applyChanges changes trigger model.worldModel
                                 , pendingChanges = Nothing
-                                , story = Nothing
+                                , story = List.drop 1 m.story
                               }
                             , Cmd.none
                             )
@@ -355,7 +356,7 @@ handleKey model key =
             if model.showMap then
                 ToggleMap
 
-            else if model.story /= Nothing then
+            else if not <| List.isEmpty model.story then
                 Continue
 
             else if atTurnstile then
@@ -437,6 +438,7 @@ view model =
                     )
             , ( "story"
               , model.story
+                    |> List.head
                     |> Maybe.map storyView
                     |> Maybe.withDefault (text "")
               )

@@ -80,15 +80,13 @@ intro =
 Friday, 6:15AM
 
 It's been a hell of a week.
-
+---
 You've been pulling all-nighters to finish up an important presentation your boss dumped on you lap four days ago.  He's passed you up for promotion three times in a row now, but if this presentation goes well, this could be it.
 
 If only you weren't so damned tired.  You need to be fresh to give the presentation at 9:00.  You work near the Metro Center subway station.  That's in 4 stops.  Enough time for a power nap.
 
 You'll just close your eyes for a few moments...
-
-...
-
+---
 You awake to a security guard shaking your arm.  "Wake up buddy, we're pulling in to the last station.  It's the end of the line, you've got to get off."
 
 Oh shit.  You missed your stop.  It's 6:39.  You have to get back to the Metro Center station.

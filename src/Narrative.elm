@@ -16,16 +16,17 @@ inOrder l =
     InOrder <| Zipper.withDefault "" <| Zipper.fromList l
 
 
-update : Narrative -> ( Maybe String, Narrative )
+update : Narrative -> ( List String, Narrative )
 update narrative =
     case narrative of
         InOrder zipper ->
             let
                 story =
-                    if Zipper.current zipper |> String.isEmpty then
-                        Nothing
+                    case Zipper.current zipper of
+                        "" ->
+                            []
 
-                    else
-                        Just <| Zipper.current zipper
+                        text ->
+                            String.split "---" text
             in
             ( story, InOrder (Zipper.next zipper |> Maybe.withDefault zipper) )
