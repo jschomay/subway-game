@@ -57,7 +57,7 @@ view map currentStation line =
                     [ text <| .name <| stationInfo station ]
                 ]
     in
-    div [ class "Platform" ]
+    div [ class "Scene Platform" ]
         [ Shared.exit (Go Lobby)
         , div
             [ class "Line_map" ]

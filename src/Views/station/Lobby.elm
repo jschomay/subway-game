@@ -112,7 +112,7 @@ view map worldModel currentStation =
                 , div [ class "Inventory" ] <| List.map inventoryItemView inventory
                 ]
     in
-    div [ class "Lobby" ]
+    div [ class "Scene Lobby" ]
         [ div [ class "Lobby__scene" ]
             [ stationInfoView
             , chapterInfoView

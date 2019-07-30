@@ -24,7 +24,7 @@ view worldModel line =
                 |> List.isEmpty
                 |> not
     in
-    div [ class "Turnstile" ]
+    div [ class "Scene Turnstile" ]
         [ div [ class "Turnstile__dialog" ] <|
             if canEnter then
                 [ div [ class "Turnstile__status" ]

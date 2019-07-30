@@ -12,7 +12,8 @@ require("./styles/game.css");
 // inject bundled Elm app
 const { Elm } = require("./Main.elm");
 const app = Elm.Main.init({
-  node: document.getElementById("main")
+  node: document.getElementById("main"),
+  flags: { selectScene: true }
 });
 
 var imagesToLoad = require.context("./img/", true, /\.*$/).keys();

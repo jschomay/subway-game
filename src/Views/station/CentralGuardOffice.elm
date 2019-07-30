@@ -40,7 +40,7 @@ view worldmodel =
                 worldmodel
     in
     -- TODO this needs to be figured out
-    div [ class "CentralGuardOffice" ]
+    div [ class "Scene CentralGuardOffice" ]
         [ h2 [ class "CentralGuardOffice--top" ] [ text "Central Guard Office" ]
         , p [ class "CentralGuardOffice--content" ]
             [ p [] [ text "You are caught! " ]

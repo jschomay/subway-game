@@ -1,15 +1,30 @@
-module LocalTypes exposing (Location(..), Msg(..), Rule, Rules, StationArea(..), TrainProps, TrainStatus(..))
+module LocalTypes exposing (Location(..), Model, Msg(..), Rule, Rules, StationArea(..), TrainProps, TrainStatus(..))
 
 import City exposing (..)
 import Dict exposing (Dict)
+import Manifest
 import Narrative exposing (..)
 import Narrative.Rules as Rules exposing (..)
 import Narrative.WorldModel exposing (..)
 
 
+type alias Model =
+    { worldModel : Manifest.WorldModel
+    , loaded : Bool
+    , story : List String
+    , rules : Rules
+    , location : Location
+    , showMap : Bool
+    , gameOver : Bool
+    , selectScene : Bool
+    , history : List String
+    , pendingChanges : Maybe ( Narrative.WorldModel.ID, List ChangeWorld )
+    }
+
+
 type Msg
     = NoOp
-    | LoadScene (List String)
+    | LoadScene ( Model, List String )
     | Interact String
     | Loaded
     | Delay Float Msg

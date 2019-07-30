@@ -38,4 +38,4 @@ view { line, arrivingAtStation } =
         displayView =
             div [ class "train__ticker" ] [ div [ class "train__info" ] [ text display ] ]
     in
-    div [ class "train" ] [ displayView ]
+    div [ class "Scene train" ] [ displayView ]

@@ -153,7 +153,7 @@ From the angry shouting, you gather that station's exits are locked.  But that d
 You feel a shot of panic as you realize you can't get out.  And then you feel a tug at your arm and look down, and see someone run off with your briefcase!
 
 Your presentation is in that briefcase.  You need it!  "Stop, thief!"
-
+---
 The thief runs down the tunnel for the Red line heading towards West Mulberry.  The security officers don't seem to notice a crime has occurred.
 
 You need that briefcase back.

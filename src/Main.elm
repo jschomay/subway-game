@@ -34,46 +34,29 @@ import Views.Train as Train
 
 
 type alias Flags =
-    {}
+    { selectScene : Bool }
 
 
 main : Program Flags Model Msg
 main =
     Browser.document
-        { init = always init
+        { init = init
         , view = \model -> { title = "Subway!", body = [ view model ] }
         , update = update
         , subscriptions = subscriptions
         }
 
 
-type alias Model =
-    { worldModel : Manifest.WorldModel
-    , loaded : Bool
-    , story : List String
-    , rules : LocalTypes.Rules
-    , location : Location
-    , showMap : Bool
-    , gameOver : Bool
-    , selectScene : Bool
-    , history : List String
-    , pendingChanges : Maybe ( Narrative.WorldModel.ID, List ChangeWorld )
-    }
-
-
-init : ( Model, Cmd Msg )
-init =
+init : Flags -> ( Model, Cmd Msg )
+init flags =
     ( { worldModel = Manifest.worldModel
       , loaded = False
       , story = []
       , rules = Rules.rules
-
-      --  use this when using the scene select:
-      -- , location = InStation Lobby
       , location = OnTrain { line = Red, status = InTransit }
       , showMap = False
       , gameOver = False
-      , selectScene = False
+      , selectScene = flags.selectScene
       , history = []
       , pendingChanges = Nothing
       }
@@ -222,12 +205,14 @@ update msg model =
 
             Loaded ->
                 ( { model | loaded = True }
-                  -- comment out when using scene select:
-                , delay introDelay (Interact "player")
-                  -- , Cmd.none
+                , if model.selectScene then
+                    Cmd.none
+
+                  else
+                    delay introDelay (Interact "player")
                 )
 
-            LoadScene history ->
+            LoadScene ( model_, history ) ->
                 List.foldl
                     (\id modelTuple ->
                         modelTuple
@@ -248,7 +233,7 @@ update msg model =
                                     )
                                 )
                     )
-                    ( { model | selectScene = False }, Cmd.none )
+                    ( { model_ | selectScene = False }, Cmd.none )
                     history
 
             Interact interactableId ->
@@ -278,34 +263,35 @@ update msg model =
                 )
 
             Continue ->
-                (case model.location of
-                    InStation _ ->
-                        ( model, Cmd.none )
+                if List.length model.story > 1 then
+                    ( { model | story = List.drop 1 model.story }, Cmd.none )
 
-                    CentralGuardOffice ->
-                        ( model, Cmd.none )
-
-                    OnTrain train ->
-                        ( { model | location = OnTrain <| changeTrainStatus Arriving train }
-                        , delay arrivingDelay <| Disembark
-                        )
-                )
-                    |> updateAndThen
-                        (\m ->
-                            let
-                                ( trigger, changes ) =
-                                    m.pendingChanges
-                                        |> Maybe.map identity
-                                        |> Maybe.withDefault ( "", [] )
-                            in
-                            ( { m
-                                | worldModel = applyChanges changes trigger model.worldModel
-                                , pendingChanges = Nothing
-                                , story = List.drop 1 m.story
-                              }
-                            , Cmd.none
+                else
+                    (case model.location of
+                        OnTrain train ->
+                            ( { model | location = OnTrain <| changeTrainStatus Arriving train }
+                            , delay arrivingDelay <| Disembark
                             )
-                        )
+
+                        _ ->
+                            ( model, Cmd.none )
+                    )
+                        |> updateAndThen
+                            (\m ->
+                                let
+                                    ( trigger, changes ) =
+                                        m.pendingChanges
+                                            |> Maybe.map identity
+                                            |> Maybe.withDefault ( "", [] )
+                                in
+                                ( { m
+                                    | worldModel = applyChanges changes trigger model.worldModel
+                                    , pendingChanges = Nothing
+                                    , story = []
+                                  }
+                                , Cmd.none
+                                )
+                            )
 
             Disembark ->
                 ( { model | location = InStation Lobby }
@@ -405,7 +391,7 @@ view model =
         div [ class "Loading" ] [ text "Loading..." ]
 
     else if model.selectScene then
-        selectSceneView
+        selectSceneView model
 
     else
         -- keyed so fade in animations play
@@ -452,17 +438,25 @@ view model =
             ]
 
 
-selectSceneView : Html Msg
-selectSceneView =
+selectSceneView : Model -> Html Msg
+selectSceneView model =
     let
         beginning =
-            [ "player" ]
+            ( model, [ "player" ] )
 
         lostBriefcase =
-            beginning ++ [ "mapPoster", "1", "largeCrowd" ]
+            ( { model
+                | location = InStation Lobby
+              }
+            , Tuple.second beginning ++ [ "mapPoster", "1", "largeCrowd" ]
+            )
 
         centralGuardOffice =
-            lostBriefcase ++ [ "2", "policeOffice", "yellowline" ]
+            ( { model
+                | location = CentralGuardOffice
+              }
+            , Tuple.second lostBriefcase ++ [ "2", "policeOffice", "yellowline" ]
+            )
     in
     div [ class "SelectScene" ]
         [ h1 [] [ text "Select a scene to jump to:" ]
