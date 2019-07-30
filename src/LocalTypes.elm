@@ -1,4 +1,4 @@
-module LocalTypes exposing (Location(..), Model, Msg(..), Rule, Rules, StationArea(..), TrainProps, TrainStatus(..))
+module LocalTypes exposing (Model, Msg(..), Rule, Rules, Scene(..), TrainProps, TrainStatus(..))
 
 import City exposing (..)
 import Dict exposing (Dict)
@@ -13,7 +13,7 @@ type alias Model =
     , loaded : Bool
     , story : List String
     , rules : Rules
-    , location : Location
+    , scene : Scene
     , showMap : Bool
     , gameOver : Bool
     , selectScene : Bool
@@ -29,7 +29,7 @@ type Msg
     | Loaded
     | Delay Float Msg
     | ToggleMap
-    | Go StationArea
+    | Go Scene
     | BoardTrain Line Station
     | Disembark
     | Continue
@@ -45,12 +45,6 @@ type alias Rules =
     Dict String Rule
 
 
-type StationArea
-    = Platform Line
-    | Turnstile Line
-    | Lobby
-
-
 type TrainStatus
     = InTransit
     | Arriving
@@ -62,7 +56,10 @@ type alias TrainProps =
     }
 
 
-type Location
-    = OnTrain TrainProps
-    | InStation StationArea
+type Scene
+    = Home
+    | Lobby
+    | Turnstile Line
+    | Platform Line
+    | Train TrainProps
     | CentralGuardOffice

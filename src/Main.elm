@@ -53,7 +53,7 @@ init flags =
       , loaded = False
       , story = []
       , rules = Rules.rules
-      , location = OnTrain { line = Red, status = InTransit }
+      , scene = Train { line = Red, status = InTransit }
       , showMap = False
       , gameOver = False
       , selectScene = flags.selectScene
@@ -136,7 +136,7 @@ specialEvents ruleId model =
         other ->
             if List.member other [ "goToLinePlatform", "jumpYellowLineTurnstile" ] then
                 -- This is kind of janky, but it works for now
-                { model | location = InStation <| Platform <| Maybe.withDefault Red <| getCurrentLine model }
+                { model | scene = Platform <| Maybe.withDefault Red <| getCurrentLine model }
 
             else
                 model
@@ -179,8 +179,8 @@ getCurrentStation map worldModel =
 
 getCurrentLine : Model -> Maybe City.Line
 getCurrentLine model =
-    case model.location of
-        InStation (Turnstile line) ->
+    case model.scene of
+        Turnstile line ->
             Just line
 
         _ ->
@@ -248,17 +248,17 @@ update msg model =
                 )
 
             ToggleMap ->
-                -- TODO check if allowed to show map (ie. map in inventory, location lobby, etc)
+                -- TODO check if allowed to show map (ie. map in inventory, scene lobby, etc)
                 ( { model | showMap = not model.showMap }
                 , Cmd.none
                 )
 
             Go area ->
-                -- TODO would be best to move all of `model.location` into the world model, but for now, just duplicate the line color there
-                ( { model | location = InStation area }, Cmd.none )
+                -- TODO would be best to move all of `model.scene` into the world model, but for now, just duplicate the line color there
+                ( { model | scene = area }, Cmd.none )
 
             BoardTrain line station ->
-                ( { model | location = OnTrain { line = line, status = InTransit } }
+                ( { model | scene = Train { line = line, status = InTransit } }
                 , delay departingDelay (Interact (station |> stationInfo |> .id |> String.fromInt))
                 )
 
@@ -267,9 +267,9 @@ update msg model =
                     ( { model | story = List.drop 1 model.story }, Cmd.none )
 
                 else
-                    (case model.location of
-                        OnTrain train ->
-                            ( { model | location = OnTrain <| changeTrainStatus Arriving train }
+                    (case model.scene of
+                        Train train ->
+                            ( { model | scene = Train <| changeTrainStatus Arriving train }
                             , delay arrivingDelay <| Disembark
                             )
 
@@ -294,7 +294,7 @@ update msg model =
                             )
 
             Disembark ->
-                ( { model | location = InStation Lobby }
+                ( { model | scene = Lobby }
                 , Cmd.none
                 )
 
@@ -322,16 +322,16 @@ handleKey : Model -> String -> Msg
 handleKey model key =
     let
         atTurnstile =
-            case model.location of
-                InStation (Turnstile _) ->
+            case model.scene of
+                Turnstile _ ->
                     True
 
                 _ ->
                     False
 
         turnStileMessage =
-            case model.location of
-                InStation (Turnstile line) ->
+            case model.scene of
+                Turnstile line ->
                     Interact <| .id <| lineInfo line
 
                 _ ->
@@ -366,12 +366,12 @@ view model =
         currentStation =
             getCurrentStation map model.worldModel
 
-        location =
+        scene =
             if assert "player" [ HasTag "caught" ] model.worldModel then
                 CentralGuardOffice
 
             else
-                model.location
+                model.scene
 
         map =
             City.fullMap
@@ -397,20 +397,23 @@ view model =
         -- keyed so fade in animations play
         Html.Keyed.node "div"
             [ class "game" ]
-            [ case location of
+            [ case scene of
+                Home ->
+                    ( "home", text "home" )
+
                 CentralGuardOffice ->
                     ( "centralGuardOffice", CentralGuardOffice.view model.worldModel )
 
-                InStation Lobby ->
+                Lobby ->
                     ( "lobby", Lobby.view map model.worldModel currentStation )
 
-                InStation (Platform line) ->
+                Platform line ->
                     ( "platform", Platform.view map currentStation line )
 
-                InStation (Turnstile line) ->
+                Turnstile line ->
                     ( "turnstile", Turnstile.view model.worldModel line )
 
-                OnTrain { line, status } ->
+                Train { line, status } ->
                     ( "train"
                     , Train.view
                         { line = line
@@ -446,14 +449,14 @@ selectSceneView model =
 
         lostBriefcase =
             ( { model
-                | location = InStation Lobby
+                | scene = Lobby
               }
             , Tuple.second beginning ++ [ "mapPoster", "1", "largeCrowd" ]
             )
 
         centralGuardOffice =
             ( { model
-                | location = CentralGuardOffice
+                | scene = CentralGuardOffice
               }
             , Tuple.second lostBriefcase ++ [ "2", "policeOffice", "yellowline" ]
             )
