@@ -12,13 +12,13 @@ import Rules.Helpers exposing (..)
 rules : List ( String, LocalTypes.Rule )
 rules =
     []
-        ++ [ rule "pickingThingsUp"
-                { trigger = MatchAny [ HasTag "item", Not <| HasTag "fixed", Not <| HasLink "location" (Match "player" []) ]
-                , conditions = []
-                , changes = [ Update "$" [ SetLink "location" "player" ] ]
-                , narrative = inOrder [ "You take it." ]
-                }
-           , rule "ridingTheTrain"
+        -- ++ [ rule "pickingThingsUp"
+        --         { trigger = MatchAny [ HasTag "item", Not <| HasTag "fixed", Not <| HasLink "location" (Match "player" []) ]
+        --         , conditions = []
+        --         , changes = [ Update "$" [ SetLink "location" "player" ] ]
+        --         , narrative = inOrder [ "You take it." ]
+        --         }
+        ++ [ rule "ridingTheTrain"
                 { trigger = MatchAny [ HasTag "station" ]
                 , conditions = []
                 , changes = []
