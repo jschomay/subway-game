@@ -76,25 +76,17 @@ view map worldModel currentStation =
                     , div [ class "Sign__list" ] list
                     ]
 
-        interactableItemView : ( Manifest.ID, String ) -> Html Msg
-        interactableItemView ( id, name ) =
-            div [ class "Sign__item Sign__item--interactable", onClick <| Interact id ]
-                [ text name ]
-
         inventoryItemView : ( Manifest.ID, Entity ) -> Html Msg
         inventoryItemView ( id, entity ) =
             div [ class <| "Inventory__item icon--" ++ id, onClick <| Interact id ] []
-
-        nonInteractableItemView name =
-            div [ class "Sign__item" ] [ text name ]
 
         chapterInfoView =
             div [ class "Sign Sign--chapter" ]
                 [ div [ class "Sign__header2" ] [ text fullChapterName ]
 
                 -- TODO make goals/distractions clickable with narrative
-                , sectionView "Goals" <| List.map nonInteractableItemView goals
-                , sectionView "Distractions" <| List.map nonInteractableItemView distractions
+                , sectionView "Goals" <| List.map Shared.nonInteractableItemView goals
+                , sectionView "Distractions" <| List.map Shared.nonInteractableItemView distractions
                 ]
 
         stationInfoView =
@@ -102,7 +94,7 @@ view map worldModel currentStation =
                 [ div [ class "Sign__header1" ] [ text stationName ]
                 , div [ class "Sign__split" ]
                     [ div [ class "Sign__left" ] [ Connections.forStation map currentStation ]
-                    , div [ class "Sign__right" ] <| List.map (Tuple.mapSecond .name >> interactableItemView) (characters ++ items)
+                    , div [ class "Sign__right" ] <| List.map (Tuple.mapSecond .name >> Shared.interactableItemView) (characters ++ items)
                     ]
                 ]
 

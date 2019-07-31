@@ -1,0 +1,28 @@
+.Scene.Home {
+}
+
+.Home:before {
+  background: url(../img/desk.jpg);
+}
+
+.Home__content {
+  position: relative;
+  background: black;
+  color: white;
+  padding: 2.5em;
+  font-size: 2em;
+  opacity: 0.85;
+}
+
+.Home__items {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-around;
+  max-width: 500px;
+  margin-bottom: 1em;
+}
+
+.Home__leave {
+  cursor: pointer;
+  text-align: center;
+}

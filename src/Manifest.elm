@@ -1,4 +1,4 @@
-module Manifest exposing (DisplayComponent, Entity, ID, WorldModel, characters, entity, items, locations, worldModel)
+module Manifest exposing (DisplayComponent, Entity, ID, WorldModel, characters, entity, initialWorldModel, items, locations)
 
 import City exposing (Station(..), stationInfo)
 import Constants
@@ -34,8 +34,8 @@ entity id name description =
     )
 
 
-worldModel : WorldModel
-worldModel =
+initialWorldModel : WorldModel
+initialWorldModel =
     Dict.fromList <|
         items
             ++ characters
@@ -63,17 +63,33 @@ items =
             |> tag "silent"
         ]
             -- inventory
-            ++ location "player"
+            ++ location "home"
                 [ entity "briefcase"
                     "Briefcase"
-                    "The tool of your trade, perfectly organized, and always by your side.  It has papers, pencils, but most importantly, the hard copy of your presentation."
+                    "The tool of your trade, and more than that, a badge of honor.  Yours is a tasteful brown leather, perfectly organized (usually), and always by your side."
                 , entity "redLinePass"
-                    "Red Line pass"
+                    "Red Line metro pass"
                     "This will get you to any station along the Red Line.  Expires in 8 months."
+                    |> link "location" "home"
                     |> link "validOn" "redLine"
                 , entity "cellPhone"
-                    "Cellphone"
-                    "It's not one of those $800 ones, but it does everything you need.  Unless there's no service.  Down here there's no service, so it's practically useless.."
+                    "Cell phone"
+                    "It's not one of those $800 ones, but it does everything you need."
+                , entity "coffee cup"
+                    "Empty coffee cup"
+                    "You've gone through a few of these while trying to finish the presentation."
+                    |> tag "fixed"
+                , entity "presentation"
+                    "Scattered papers"
+                    "Your desk is littered with the printed out copies of your presentation, covered in scribbles and sticky notes."
+                , entity "laptop"
+                    "Laptop"
+                    "Your laptop battery is almost dead, but you don't need it, you've got the hard copy of your presentation with your notes on it."
+                    |> tag "fixed"
+                , entity "deskPhone"
+                    "Desk phone"
+                    "You still have an old school landline in your home office, though you rarely use it."
+                    |> tag "fixed"
                 ]
             ++ location (station TwinBrooks)
                 [ entity "safteyWarningPoster"
@@ -175,4 +191,7 @@ locations =
                 (List.concatMap (City.lineInfo >> .stations) City.allLines)
     in
     -- no need to make this unique here, as the world model is a map by id
-    stations
+    (entity "home" "Desk" "Your home office desk is trashed from preparing the presentation all week."
+        |> tag "location"
+    )
+        :: stations

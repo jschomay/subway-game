@@ -1,6 +1,6 @@
 .Turnstile { }
 
-.Turnstile:before {
+.Scene.Turnstile:before {
   background: url(../img/subway-turnstile.jpg);
   background-position: center 60%;
   opacity: 0.8;

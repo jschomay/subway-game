@@ -13,11 +13,81 @@ rules : List ( String, LocalTypes.Rule )
 rules =
     rulesForScene scenes.intro <|
         []
-            ++ [ rule "intro, deadline, miss stop"
+            ++ [ rule "intro"
                     { trigger = Match "player" []
                     , conditions = []
-                    , changes = []
+                    , changes = [ Update "cellPhone" [ AddTag "ringing" ] ]
                     , narrative = intro
+                    }
+               ]
+            -- map
+            ++ [ rule "wrong phone"
+                    { trigger = Match "deskPhone" []
+                    , conditions = [ Match "cellPhone" [ HasTag "ringing" ] ]
+                    , changes = []
+                    , narrative = inOrder [ """
+You pick up your desk phone.  "Hello?"
+
+Silence on the other line.
+
+The ringing continues.  Wrong phone!""" ]
+                    }
+               ]
+            ++ [ rule "anything other than the phone"
+                    { trigger = MatchAny []
+                    , conditions = [ Match "cellPhone" [ HasTag "ringing" ] ]
+                    , changes = []
+                    , narrative = inOrder [ "The ringing is giving you a headache, you have to stop it first." ]
+                    }
+               ]
+            ++ [ rule "answer phone"
+                    { trigger = Match "cellPhone" [ HasTag "ringing" ]
+                    , conditions = []
+                    , changes = [ Update "cellPhone" [ RemoveTag "ringing" ] ]
+                    , narrative = whereAreYou
+                    }
+               ]
+            ++ [ rule "pack briefcase"
+                    { trigger = Match "briefcase" [ Not <| HasLink "location" (Match "player" []) ]
+                    , conditions = [ Match "cellPhone" [ Not <| HasTag "ringing" ] ]
+                    , changes = [ Update "$" [ SetLink "location" "player" ] ]
+                    , narrative = inOrder [ "You grab your trusty briefcase.  Its contents are a jumble now, but you'll organize it later when then presentation is over." ]
+                    }
+               ]
+            ++ [ rule "pack cell phone"
+                    { trigger = Match "cellPhone" [ Not <| HasLink "location" (Match "player" []) ]
+                    , conditions = [ Match "cellPhone" [ Not <| HasTag "ringing" ] ]
+                    , changes = [ Update "$" [ SetLink "location" "player" ] ]
+                    , narrative = inOrder [ """Luckily you remembered to charge it and the battery is at full.
+                    
+There's one new email that came in -- a job offer from a very persistent recruiter.  You don't have time to even look at it right now, so you put it in your coat pocket.
+
+Besides, you've built up five years of loyalty at your current job, and you wouldn't want to lose that.  Even if your boss is a jerk.""" ]
+                    }
+               ]
+            ++ [ rule "pack presentation"
+                    { trigger = Match "presentation" [ Not <| HasLink "location" (Match "briefcase" []) ]
+                    , conditions = [ Match "cellPhone" [ Not <| HasTag "ringing" ] ]
+                    , changes = [ Update "$" [ SetLink "location" "briefcase" ] ]
+                    , narrative = inOrder [ """
+Your presentation is scattered all over your desk.  It's covered in scribbles and sticky notes.  Some pages are wrinkled and a little smudged from when you fell asleep on them. 
+
+You put them back in order and carefully stack them, then slip them into your briefcase. Hopefully it's all worth it.
+                    """ ]
+                    }
+               ]
+            ++ [ rule "pack metro pass"
+                    { trigger = Match "redLinePass" [ Not <| HasLink "location" (Match "player" []) ]
+                    , conditions = [ Match "cellPhone" [ Not <| HasTag "ringing" ] ]
+                    , changes = [ Update "$" [ SetLink "location" "player" ] ]
+                    , narrative = inOrder [ "You ride the metro to work every day.  You had to buy the pass yourself, but it's cheaper than paying each way.  You throw it in your pocket." ]
+                    }
+               ]
+            ++ [ rule "fall asleep"
+                    { trigger = Match (station TwinBrooks) []
+                    , conditions = [ Match "player" [ Not <| HasTag "late" ] ]
+                    , changes = [ Update "player" [ AddTag "late" ] ]
+                    , narrative = fallAsleep
                     }
                ]
             -- map
@@ -25,7 +95,7 @@ rules =
                     { trigger = Match "mapPoster" []
                     , conditions = [ Match "map" [ Not <| HasLink "location" <| Match "player" [] ] ]
                     , changes = [ Update "map" [ SetLink "location" "player" ] ]
-                    , narrative = missedStop
+                    , narrative = getBack
                     }
                ]
             ++ -- stations
@@ -77,22 +147,66 @@ rules =
 intro : Narrative
 intro =
     inOrder [ """
-Friday, 6:15AM
+6:23AM.  Friday.  Your apartment.
 
-It's been a hell of a week.
+You are sleeping at your desk, snoring and drooling, face down in a pile of papers and other work littered across the desk.
+
+A phone rings, startling you awake.
+""" ]
+
+
+whereAreYou =
+    inOrder [ """
+"Where the hell are you?"
+
+It's your boss.
+
+The only thought in your mind is, "It's six twenty-five in the morning."
 ---
-You've been pulling all-nighters to finish up an important presentation your boss dumped on you lap four days ago.  He's passed you up for promotion three times in a row now, but if this presentation goes well, this could be it.
+"This presentation is important, I don't want to screw it up.  I want to run through it before the clients arrive, so get your ass down here."
 
-If only you weren't so damned tired.  You need to be fresh to give the presentation at 9:00.  You work near the Metro Center subway station.  That's in 4 stops.  Enough time for a power nap.
-
-You'll just close your eyes for a few moments...
+The presentation.  You've been killing yourself all week trying to get it done. But you're sure the hard work you put in will finally land you the promotion you've been promised for over a year now.
 ---
-You awake to a security guard shaking your arm.  "Wake up buddy, we're pulling in to the last station.  It's the end of the line, you've got to get off."
+He seems to notice your pause.  "Steve... it's done, right?"
 
-Oh shit.  You missed your stop.  It's 6:39.  You have to get back to the Metro Center station.
+"Of course," you blurt out.  "I'm on my way."
 
-(Tip: You can press the space bar to continue instead of clicking.)
- """ ]
+You hang up and get ready as quick as you can.
+
+(Tip: You can press "space key" to continue)
+""" ]
+
+
+fallAsleep =
+    inOrder [ """
+You board the red line train and find a seat.  You have to get off at the "Metro Center Station" stop.  You have about twenty minutes before you'll get there.
+---
+The train rushes through the dark underground tunnels.  Your boss is probably right, preparing before the clients get in is a good idea.  You're just so damned tired!
+---
+If all goes well, you should get the promotion you've been promised for so long.
+
+You yawn, and decide to go over the presentation in your head.
+---
+Your eyes start to droop, but you force them open and focus on how you are going to present.  Hopefully you can follow all of your scribbles.
+
+You're so tired...
+---
+...
+---
+Someone is shaking your arm.
+
+"Hey, buddy, wake up.  We're pulling in to the last stop, everyone has to get up."
+---
+Oh shit!!
+
+You fell asleep!
+---
+You missed your stop!
+---
+You're going to be late!
+---
+Ok, don't panic.  There's still plenty of time.  You just have to get back to Metro Center Station as quick as you can.
+    """ ]
 
 
 missedStopAgain : Narrative
@@ -102,12 +216,10 @@ Wait, what are you doing?  You need to get off at the Metro Center station to ge
     """ ]
 
 
-missedStop : Narrative
-missedStop =
+getBack : Narrative
+getBack =
     inOrder
         [ """
-You can't believe you missed your stop.  You've never done that before, and today of all days.
-
 You pick up a subway map and try to figure out how to get back to the Metro Center.
 
 (It is now in your inventory and you can view it at any time by clicking on it or pressing 'M')
@@ -119,9 +231,11 @@ delayAhead : Narrative
 delayAhead =
     inOrder
         [ """
-You're wide awake now.  There's still time to get to work and do one more run through of the presentation.  This is what you've been working so hard for.  You deserve a promotion.  This time, you'll get it.
+You're back on track now.  Hopefully your boss won't even notice.
 
-Your thoughts are interrupted by a crackle over the loudspeaker.  You realize the conductor is making an announcement, but it's so garbled that you only catch part of it.  Something about a delay... That doesn't sound good.  Some kind of problem at one of the stations... You just hope it won't effect your plans.
+Your thoughts are interrupted by a crackle over the loudspeaker.  You realize the conductor is making an announcement, but it's so garbled that you only catch part of it.
+---
+Something about a delay... That doesn't sound good.  Some kind of problem at one of the stations... You just hope it won't make you any later.
 """
         , """
 As the train pulls in to the station, you can see that the exists are still closed.

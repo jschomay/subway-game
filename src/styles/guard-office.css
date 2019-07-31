@@ -2,7 +2,7 @@
   justify-content: flex-start;
 }
 
-.CentralGuardOffice:before {
+.Scene.CentralGuardOffice:before {
   background: url(../img/gurad-office.jpg);
   background-position: 50% 40%;
   opacity: 0.6;

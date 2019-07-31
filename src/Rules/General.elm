@@ -12,7 +12,13 @@ import Rules.Helpers exposing (..)
 rules : List ( String, LocalTypes.Rule )
 rules =
     []
-        ++ [ rule "ridingTheTrain"
+        ++ [ rule "pickingThingsUp"
+                { trigger = MatchAny [ HasTag "item", Not <| HasTag "fixed", Not <| HasLink "location" (Match "player" []) ]
+                , conditions = []
+                , changes = [ Update "$" [ SetLink "location" "player" ] ]
+                , narrative = inOrder [ "You take it." ]
+                }
+           , rule "ridingTheTrain"
                 { trigger = MatchAny [ HasTag "station" ]
                 , conditions = []
                 , changes = []
@@ -34,12 +40,6 @@ rules =
                 , conditions = []
                 , changes = []
                 , narrative = jumpTurnstileFail
-                }
-           , rule "tryCellPhone"
-                { trigger = Match "cellPHone" []
-                , conditions = []
-                , changes = []
-                , narrative = tryCellPhone
                 }
            , rule "getMap"
                 { trigger = Match "mapPoster" []
@@ -85,13 +85,6 @@ jumpTurnstileFail =
         , "Better to stick to the lines you have passes for."
         , "You're too afraid you'll get caught."
         ]
-
-
-tryCellPhone : Narrative
-tryCellPhone =
-    inOrder [ """
-You think about giving your boss a call to let him know you'll be late.  There's just one problem - you don't get any service down here.
-  """ ]
 
 
 getMap : Narrative

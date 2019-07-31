@@ -20,6 +20,7 @@ import Rules
 import Subway
 import Task
 import Tuple
+import Views.Home as Home
 import Views.Station.CentralGuardOffice as CentralGuardOffice
 import Views.Station.Lobby as Lobby
 import Views.Station.Platform as Platform
@@ -49,11 +50,11 @@ main =
 
 init : Flags -> ( Model, Cmd Msg )
 init flags =
-    ( { worldModel = Manifest.worldModel
+    ( { worldModel = Manifest.initialWorldModel
       , loaded = False
       , story = []
       , rules = Rules.rules
-      , scene = Train { line = Red, status = InTransit }
+      , scene = Home
       , showMap = False
       , gameOver = False
       , selectScene = flags.selectScene
@@ -399,7 +400,7 @@ view model =
             [ class "game" ]
             [ case scene of
                 Home ->
-                    ( "home", text "home" )
+                    ( "home", Home.view model.worldModel )
 
                 CentralGuardOffice ->
                     ( "centralGuardOffice", CentralGuardOffice.view model.worldModel )
@@ -451,7 +452,7 @@ selectSceneView model =
             ( { model
                 | scene = Lobby
               }
-            , Tuple.second beginning ++ [ "mapPoster", "1", "largeCrowd" ]
+            , Tuple.second beginning ++ [ "cellPhone", "cellPhone", "briefcase", "presentation", "redLinePass", "6", "mapPoster", "1", "largeCrowd" ]
             )
 
         centralGuardOffice =
