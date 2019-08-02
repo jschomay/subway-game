@@ -67,7 +67,7 @@ init flags =
 
 introDelay : Float
 introDelay =
-    2 * 1000
+    0 * 1000
 
 
 departingDelay : Float
