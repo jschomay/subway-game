@@ -12,7 +12,6 @@ type alias Model =
     { worldModel : Manifest.WorldModel
     , loaded : Bool
     , story : List String
-    , rules : Rules
     , scene : Scene
     , showMap : Bool
     , gameOver : Bool

@@ -16,7 +16,7 @@ rules =
         --         { trigger = MatchAny [ HasTag "item", Not <| HasTag "fixed", Not <| HasLink "location" (Match "player" []) ]
         --         , conditions = []
         --         , changes = [ Update "$" [ SetLink "location" "player" ] ]
-        --         , narrative = inOrder [ "You take it." ]
+        --         , narrative =  [ "You take it." ]
         --         }
         ++ [ rule "ridingTheTrain"
                 { trigger = MatchAny [ HasTag "station" ]
@@ -33,7 +33,7 @@ rules =
                         ]
                     ]
                 , changes = [ Update "player" [ SetLink "line" "$" ] ]
-                , narrative = goToLinePlatform
+                , narrative = []
                 }
            , rule "jumpTurnstileFail"
                 { trigger = MatchAny [ HasTag "line" ]
@@ -51,48 +51,41 @@ rules =
                 { trigger = Match "mapPoster" []
                 , conditions = []
                 , changes = []
-                , narrative = inOrder []
+                , narrative = []
                 }
            ]
 
 
 jumpToLostBriefcase : Narrative
 jumpToLostBriefcase =
-    inOrder [ """
+    [ """
 After missing your stop, you go back, only to find the exits sealed.  During the confusion, someone steals your briefcase!  You notice the thief disappear down the tunnel for the Red line trains towards West Mulberry...
   """ ]
 
 
 ridingTheTrain : Narrative
 ridingTheTrain =
-    inOrder
-        [ """
+    [ """
 The train hurtles through the dark tunnel towards the next stop.
 """
-        , """
+    , """
 You stare at the floor, avoiding the gaze of the other passengers, waiting for your next stop.
     """
-        ]
-
-
-goToLinePlatform =
-    inOrder []
+    ]
 
 
 jumpTurnstileFail =
-    inOrder
-        [ "You've never jumped a turnstile in your life, and you're not about to start now. "
-        , "Better to stick to the lines you have passes for."
-        , "You're too afraid you'll get caught."
-        ]
+    [ "You've never jumped a turnstile in your life, and you're not about to start now. "
+    , "Better to stick to the lines you have passes for."
+    , "You're too afraid you'll get caught."
+    ]
 
 
 getMap : Narrative
 getMap =
-    inOrder
-        [ """
+    [ """
 You pick up a subway map.
 
 (It is now in your inventory and you can view it at any time by clicking on it or pressing 'M')
 """
-        ]
+    ]

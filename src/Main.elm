@@ -53,7 +53,6 @@ init flags =
     ( { worldModel = Manifest.initialWorldModel
       , loaded = False
       , story = []
-      , rules = Rules.rules
       , scene = Home
       , showMap = False
       , gameOver = False
@@ -84,7 +83,7 @@ arrivingDelay =
 -}
 updateStory : String -> Model -> Model
 updateStory trigger model =
-    case Narrative.Rules.findMatchingRule trigger model.rules model.worldModel of
+    case Narrative.Rules.findMatchingRule trigger Rules.rules model.worldModel of
         Nothing ->
             let
                 defaultChanges =
@@ -113,14 +112,13 @@ updateStory trigger model =
                 defaultChanges =
                     defaultUpdate trigger model.worldModel
 
-                ( currentNarrative, updatedNarrative ) =
-                    Narrative.update matchedRule.narrative
+                currentNarrative =
+                    Narrative.parse matchedRule.narrative
             in
             { model
               -- make sure rule changes are second so that they can overrite default changes if needed
                 | pendingChanges = Just <| ( trigger, defaultChanges ++ matchedRule.changes )
                 , story = currentNarrative
-                , rules = Dict.insert matchedRuleID { matchedRule | narrative = updatedNarrative } model.rules
             }
                 |> specialEvents matchedRuleID
 

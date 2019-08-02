@@ -17,8 +17,7 @@
             "elm-community/list-extra": "8.0.0",
             "elm-explorations/markdown": "1.0.0",
             "jschomay/elm-narrative-engine": "4.0.0",
-            "the-sett/elm-color": "1.0.0",
-            "wernerdegroot/listzipper": "3.1.1"
+            "the-sett/elm-color": "1.0.0"
         },
         "indirect": {
             "avh4/elm-fifo": "1.0.4",

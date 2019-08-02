@@ -1,32 +1,20 @@
-module Narrative exposing
-    ( Narrative(..)
-    , inOrder
-    , update
-    )
-
-import List.Zipper as Zipper exposing (Zipper)
+module Narrative exposing (Narrative, parse)
 
 
-type Narrative
-    = InOrder (Zipper String)
+type alias Narrative =
+    List String
 
 
-inOrder : List String -> Narrative
-inOrder l =
-    InOrder <| Zipper.withDefault "" <| Zipper.fromList l
+parse : Narrative -> List String
+parse narrative =
+    let
+        currentNarrative =
+            -- TODO choose based on matched rule count
+            List.head narrative
+    in
+    case currentNarrative of
+        Nothing ->
+            []
 
-
-update : Narrative -> ( List String, Narrative )
-update narrative =
-    case narrative of
-        InOrder zipper ->
-            let
-                story =
-                    case Zipper.current zipper of
-                        "" ->
-                            []
-
-                        text ->
-                            String.split "---" text
-            in
-            ( story, InOrder (Zipper.next zipper |> Maybe.withDefault zipper) )
+        Just text ->
+            String.split "---" text
