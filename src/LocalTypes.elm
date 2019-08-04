@@ -13,6 +13,7 @@ type alias Model =
     , loaded : Bool
     , story : List String
     , scene : Scene
+    , ruleMatchCounts : Dict RuleID Int
     , showMap : Bool
     , gameOver : Bool
     , selectScene : Bool

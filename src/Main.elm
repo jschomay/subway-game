@@ -53,6 +53,7 @@ init flags =
     ( { worldModel = Manifest.initialWorldModel
       , loaded = False
       , story = []
+      , ruleMatchCounts = Dict.empty
       , scene = Home
       , showMap = False
       , gameOver = False
@@ -96,6 +97,8 @@ updateStory trigger model =
                     else
                         Dict.get trigger model.worldModel
                             |> Maybe.map (.description >> List.singleton)
+                            -- TODO Narrative.parse this too (when Ink syntax is implemented) to allow for continuing descriptions
+                            -- TODO make sure to update ruleMatchCounts with trigger
                             |> Maybe.withDefault []
             in
             { model
@@ -112,13 +115,25 @@ updateStory trigger model =
                 defaultChanges =
                     defaultUpdate trigger model.worldModel
 
+                newMatchCounts =
+                    Dict.update
+                        matchedRuleID
+                        (\i ->
+                            i
+                                |> Maybe.map ((+) 1)
+                                |> Maybe.withDefault 1
+                                |> Just
+                        )
+                        model.ruleMatchCounts
+
                 currentNarrative =
-                    Narrative.parse matchedRule.narrative
+                    Narrative.parse newMatchCounts matchedRuleID matchedRule.narrative
             in
             { model
               -- make sure rule changes are second so that they can overrite default changes if needed
                 | pendingChanges = Just <| ( trigger, defaultChanges ++ matchedRule.changes )
                 , story = currentNarrative
+                , ruleMatchCounts = newMatchCounts
             }
                 |> specialEvents matchedRuleID
 
