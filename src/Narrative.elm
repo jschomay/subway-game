@@ -35,12 +35,14 @@ parse matchCounts ruleName narrative =
             String.split "---" text
 
 
+notReserved char =
+    not <| List.member char [ '{', '}', '|' ]
+
+
 staticText : Parser String
 staticText =
     succeed ()
-        |. chompUntilEndOr "{"
-        -- TODO chompWhile not { or } or end (to avoid "this}allprints"
-        -- or consider nested parsing
+        |. chompWhile notReserved
         |> getChompedString
         |> andThen notEmpty
 
@@ -75,7 +77,7 @@ cyclingText i =
         text : Parser ( String, Bool )
         text =
             succeed (\t continue -> ( t, continue ))
-                |= (getChompedString <| chompWhile (\c -> not <| List.member c [ '|', '}' ]))
+                |= (getChompedString <| chompWhile notReserved)
                 |= oneOf
                     [ break |> map (always True)
                     , close |> map (always False)
@@ -135,7 +137,9 @@ parseText i =
                 , map (always <| Done base) end
                 ]
     in
-    loop "" l
+    succeed identity
+        |= loop "" l
+        |. end
 
 
 getNarrative { cycleIndex } n =

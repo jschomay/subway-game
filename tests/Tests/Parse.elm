@@ -21,18 +21,10 @@ all =
                     getNarrative { opts | cycleIndex = 0 } "just a string"
         , test "orphan closer" <|
             \() ->
-                -- NOTE maybe this should error
-                Expect.equal (Ok "a}b") <|
-                    getNarrative { opts | cycleIndex = 0 } "a}b"
+                shouldError "a}b should error" <| getNarrative { opts | cycleIndex = 0 } "a}b"
         , test "orphan opener" <|
             \() ->
-                Expect.true "a{b should error" <|
-                    case getNarrative { opts | cycleIndex = 0 } "a{b" of
-                        Err _ ->
-                            True
-
-                        _ ->
-                            False
+                shouldError "a{b should error" <| getNarrative { opts | cycleIndex = 0 } "a{b"
 
         -- cycles
         , test "cycle at 0" <|
@@ -72,21 +64,30 @@ all =
             \() ->
                 Expect.equal (Ok "two three five") <|
                     getNarrative { opts | cycleIndex = 2 } "{one|two} three {four|five}"
-        , skip <|
-            test "orphan opener in cycle" <|
-                \() ->
-                    Expect.true "{a|b{c} should error" <|
-                        case getNarrative { opts | cycleIndex = 0 } "{abc{xyz}" of
-                            Err _ ->
-                                True
-
-                            _ ->
-                                False
-        , test "nested cycles" <|
+        , test "orphan opener in cycle" <|
             \() ->
-                Expect.equal (Ok "onetwo") <|
-                    getNarrative { opts | cycleIndex = 0 } "{one{two|three}four}"
+                shouldError "{abc{xyz} should error" <|
+                    getNarrative { opts | cycleIndex = 0 } "{abc{xyz}"
+        , test "orphan closer outside cycle" <|
+            \() ->
+                shouldError "{abc}xyz} should error" <|
+                    getNarrative { opts | cycleIndex = 0 } "{abc}xyz}"
+        , skip <|
+            test "nested cycles" <|
+                \() ->
+                    Expect.equal (Ok "onetwo") <|
+                        getNarrative { opts | cycleIndex = 0 } "{one{two|three}four}"
 
         -- property lookup
         , todo "property"
         ]
+
+
+shouldError message res =
+    Expect.true message <|
+        case res of
+            Err _ ->
+                True
+
+            _ ->
+                False
