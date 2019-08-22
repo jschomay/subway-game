@@ -65,39 +65,25 @@ cyclingText i =
                 |> Array.get (min (List.length l - 1) i)
                 |> Maybe.withDefault "ERROR finding correct cycling text"
 
-        open =
-            symbol "{"
-
-        break =
-            symbol "|"
-
-        close =
-            symbol "}"
-
-        text : Parser ( String, Bool )
-        text =
-            succeed (\t continue -> ( t, continue ))
-                |= (getChompedString <| chompWhile notReserved)
-                |= oneOf
-                    [ break |> map (always True)
-                    , close |> map (always False)
-                    ]
-
         helper acc =
-            text
-                |> map
-                    (\( t, continue ) ->
-                        case continue of
-                            True ->
-                                Loop (t :: acc)
+            oneOf
+                [ -- up to here is either "{" or text followed by "|" or "}"
+                  -- so if a break or close is found, this is an empty cycle part
+                  break |> map (always (Loop <| "" :: acc))
+                , close |> map (always (Done <| List.reverse ("" :: acc)))
 
-                            False ->
-                                Done <| List.reverse <| t :: acc
-                    )
+                --  if it wasn't empty, then it must be some text followed by a break
+                --  or close
+                , succeed (\a f -> f a)
+                    |= lazy (\_ -> parseText i)
+                    |= oneOf
+                        [ break |> map (always (\t -> Loop (t :: acc)))
+                        , close |> map (always (\t -> Done <| List.reverse (t :: acc)))
+                        ]
+                ]
     in
-    succeed findCurrent
-        |. open
-        |= loop [] helper
+    loop [] helper
+        |> map findCurrent
 
 
 propertyText : Parser String
@@ -115,14 +101,30 @@ propertyText =
         |> andThen notEmpty
 
 
+open =
+    symbol "{"
+
+
+break =
+    symbol "|"
+
+
+close =
+    symbol "}"
+
+
 parseText : Int -> Parser String
 parseText i =
     let
         topLevel =
             oneOf
-                [ backtrackable <| cyclingText i
+                [ succeed identity
+                    |. open
+                    |= oneOf
+                        [ backtrackable <| cyclingText i
 
-                -- , backtrackable propertyText
+                        -- , backtrackable propertyText
+                        ]
                 , staticText
                 ]
 
@@ -134,13 +136,21 @@ parseText i =
         l base =
             oneOf
                 [ map (join base) topLevel
-                , map (always <| Done base) end
+
+                -- no `end` here because parseText will be used recursively in
+                -- bracketed text
+                , succeed (Done base)
                 ]
     in
     succeed identity
         |= loop "" l
-        |. end
 
 
-getNarrative { cycleIndex } n =
-    run (parseText cycleIndex) n
+getNarrative { cycleIndex } textString =
+    let
+        parser =
+            -- make sure the entire line is used
+            parseText cycleIndex
+                |. end
+    in
+    run parser textString

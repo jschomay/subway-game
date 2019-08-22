@@ -72,11 +72,16 @@ all =
             \() ->
                 shouldError "{abc}xyz} should error" <|
                     getNarrative { opts | cycleIndex = 0 } "{abc}xyz}"
-        , skip <|
-            test "nested cycles" <|
-                \() ->
-                    Expect.equal (Ok "onetwo") <|
-                        getNarrative { opts | cycleIndex = 0 } "{one{two|three}four}"
+        , -- TODO this doesn't make sense, use property
+          test "nested" <|
+            \() ->
+                Expect.equal (Ok "onetwo") <|
+                    getNarrative { opts | cycleIndex = 0 } "{one{two|three}|four}"
+        , -- TODO this doesn't make sense, use property
+          test "nested 2" <|
+            \() ->
+                Expect.equal (Ok "four") <|
+                    getNarrative { opts | cycleIndex = 1 } "{one{two|three}|four}"
 
         -- property lookup
         , todo "property"
