@@ -3,10 +3,24 @@ module Narrative exposing (Narrative, cyclingText, getNarrative, parse, parseTex
 import Array
 import Dict exposing (Dict)
 import Parser exposing (..)
+import Result
 
 
 type alias Narrative =
     List String
+
+
+{-| Provides a context for the parser to process narrative correctly. Includes the following keys:
+
+`cycleIndex` - an integer starting at 0 indicating which index of cycle text should be used. Applies to call cycle texts and sticks on the last one. Ex: "{one|two} and {|three}" with a cycleIndex of 1 would produce "two and three"
+
+`propKeywords` - a dictionary of valid keywords to match against, and the corresponding functions that will take an entity ID and return a property as a Result. For example "{stranger.description}" could be matched with a keyword of "description" and a corresponding function that takes "stranger" and returns a description. If it returns and Err, the match will fail.
+
+-}
+type alias Config =
+    { cycleIndex : Int
+    , propKeywords : Dict String (String -> Result String String)
+    }
 
 
 parse : Dict String Int -> String -> Narrative -> List String
@@ -56,13 +70,20 @@ notEmpty s =
         succeed s
 
 
-cyclingText : Int -> Parser String
-cyclingText i =
+{-| Parses text that looks like "{a|b|c}".
+
+Chooses the option separated by "|" corresponding to the `cycleIndex` in the config (zero-indexed). It sticks on the final option.
+
+Note that empty options are valid, like "{|a||}" which has 3 empty segments.
+
+-}
+cyclingText : Config -> Parser String
+cyclingText config =
     let
         findCurrent : List String -> String
         findCurrent l =
             Array.fromList l
-                |> Array.get (min (List.length l - 1) i)
+                |> Array.get (min (List.length l - 1) config.cycleIndex)
                 |> Maybe.withDefault "ERROR finding correct cycling text"
 
         helper acc =
@@ -75,7 +96,7 @@ cyclingText i =
                 --  if it wasn't empty, then it must be some text followed by a break
                 --  or close
                 , succeed (\a f -> f a)
-                    |= lazy (\_ -> parseText i)
+                    |= lazy (\_ -> parseText config)
                     |= oneOf
                         [ break |> map (always (\t -> Loop (t :: acc)))
                         , close |> map (always (\t -> Done <| List.reverse (t :: acc)))
@@ -86,19 +107,44 @@ cyclingText i =
         |> map findCurrent
 
 
-propertyText : Parser String
-propertyText =
+{-| Parses text that looks like "{myEntity.name}".
+Takes a dict keyed by the acceptable keywords (Like "name") with values that take the id and return an appropriate string or error.
+
+Note that this means that entity ids cannot use any of the following four characters: `.{}|`
+
+-}
+propertyText : Config -> Parser String
+propertyText config =
     let
+        getProp : String -> (String -> Result String String) -> Result String String
         getProp id propFn =
-            propFn id ++ "(prop TODO)"
+            propFn id
+
+        keywords =
+            Dict.toList config.propKeywords
+                |> List.map
+                    (\( propName, fn ) ->
+                        succeed fn
+                            |. keyword propName
+                    )
     in
     succeed getProp
-        |. symbol "{"
-        |= (getChompedString (chompUntil ".") |> andThen notEmpty)
-        -- TODO use a oneof via a map of keyword/mappingFn
-        |= (keyword ".name" |> map (always String.toUpper))
-        |. symbol "}"
-        |> andThen notEmpty
+        |= (getChompedString (chompWhile <| \c -> not <| List.member c [ '{', '.', '|', '}' ])
+                |> andThen notEmpty
+           )
+        |. symbol "."
+        |= oneOf keywords
+        |. close
+        |> andThen fromResult
+
+
+fromResult res =
+    case res of
+        Ok s ->
+            succeed s
+
+        Err e ->
+            problem e
 
 
 open =
@@ -113,17 +159,18 @@ close =
     symbol "}"
 
 
-parseText : Int -> Parser String
-parseText i =
+parseText : Config -> Parser String
+parseText config =
     let
         topLevel =
             oneOf
                 [ succeed identity
                     |. open
                     |= oneOf
-                        [ backtrackable <| cyclingText i
-
-                        -- , backtrackable propertyText
+                        -- this order is important (because props are a more specific
+                        -- version of cycles)
+                        [ backtrackable <| propertyText config
+                        , backtrackable <| cyclingText config
                         ]
                 , staticText
                 ]
@@ -146,11 +193,11 @@ parseText i =
         |= loop "" l
 
 
-getNarrative { cycleIndex } textString =
+getNarrative config textString =
     let
         parser =
             -- make sure the entire line is used
-            parseText cycleIndex
+            parseText config
                 |. end
     in
     run parser textString
