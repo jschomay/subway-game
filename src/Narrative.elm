@@ -1,4 +1,4 @@
-module Narrative exposing (Narrative, cyclingText, getNarrative, parse, parseText)
+module Narrative exposing (Narrative, parse)
 
 import Array
 import Dict exposing (Dict)
@@ -6,6 +6,9 @@ import Parser exposing (..)
 import Result
 
 
+{-| A list of fully parsed strings. Each string will be displayed with a continue
+button until all have been shown.
+-}
 type alias Narrative =
     List String
 
@@ -23,30 +26,26 @@ type alias Config =
     }
 
 
-parse : Dict String Int -> String -> Narrative -> List String
-parse matchCounts ruleName narrative =
+{-| Parses the text, then splits for continues.
+-}
+parse : Config -> String -> Narrative
+parse config text =
     let
-        currentNarrative =
-            Dict.get ruleName matchCounts
-                |> Maybe.map narrationForCount
-                |> Maybe.withDefault (Just errorString)
-
-        narrationForCount count =
-            -- cycle from beginning, and sticking on the last
-            List.drop
-                (min (List.length narrative) count - 1)
-                narrative
-                |> List.head
-
-        errorString =
-            "ERROR! unable to find narrative for \"" ++ ruleName ++ "\""
+        parser =
+            -- make sure the entire line is used
+            parseText config
+                |. end
     in
-    case currentNarrative of
-        Nothing ->
-            []
+    case run parser text of
+        Ok parsed ->
+            String.split "---" parsed
 
-        Just text ->
-            String.split "---" text
+        Err e ->
+            let
+                x =
+                    Debug.log ("Unable to parse: " ++ text) e
+            in
+            [ "ERROR could not parse: " ++ text ++ "\n(see console for specific error)" ]
 
 
 notReserved char =
@@ -75,6 +74,8 @@ notEmpty s =
 Chooses the option separated by "|" corresponding to the `cycleIndex` in the config (zero-indexed). It sticks on the final option.
 
 Note that empty options are valid, like "{|a||}" which has 3 empty segments.
+
+-- TODO option for loop and maybe random
 
 -}
 cyclingText : Config -> Parser String
@@ -191,13 +192,3 @@ parseText config =
     in
     succeed identity
         |= loop "" l
-
-
-getNarrative config textString =
-    let
-        parser =
-            -- make sure the entire line is used
-            parseText config
-                |. end
-    in
-    run parser textString

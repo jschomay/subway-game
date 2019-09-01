@@ -115,6 +115,19 @@ updateStory trigger model =
                 defaultChanges =
                     defaultUpdate trigger model.worldModel
 
+                cycleIndex =
+                    Dict.get matchedRuleID model.ruleMatchCounts
+                        |> Maybe.withDefault 0
+
+                config =
+                    -- TODO
+                    { cycleIndex = cycleIndex
+                    , propKeywords = Dict.empty
+                    }
+
+                currentNarrative =
+                    Narrative.parse config matchedRule.narrative
+
                 newMatchCounts =
                     Dict.update
                         matchedRuleID
@@ -125,9 +138,6 @@ updateStory trigger model =
                                 |> Just
                         )
                         model.ruleMatchCounts
-
-                currentNarrative =
-                    Narrative.parse newMatchCounts matchedRuleID matchedRule.narrative
             in
             { model
               -- make sure rule changes are second so that they can overrite default changes if needed
@@ -442,8 +452,14 @@ view model =
             , ( "story"
               , model.story
                     |> List.head
-                    |> Maybe.map storyView
-                    |> Maybe.withDefault (text "")
+                    |> Maybe.withDefault ""
+                    |> (\t ->
+                            if String.isEmpty t then
+                                text ""
+
+                            else
+                                storyView t
+                       )
               )
             , ( "map"
               , if model.showMap then

@@ -2,7 +2,7 @@ module Tests.Parse exposing (all)
 
 import Dict
 import Expect
-import Narrative exposing (..)
+import Narrative exposing (parse)
 import Result
 import Test exposing (..)
 
@@ -13,6 +13,7 @@ all =
         , cycle
         , property
         , mixed
+        , withContinues
         ]
 
 
@@ -40,18 +41,18 @@ static =
     describe "static"
         [ test "empty string" <|
             \() ->
-                Expect.equal (Ok "") <|
-                    getNarrative { config | cycleIndex = 0 } ""
+                Expect.equal [ "" ] <|
+                    parse { config | cycleIndex = 0 } ""
         , test "static string" <|
             \() ->
-                Expect.equal (Ok "just a string") <|
-                    getNarrative { config | cycleIndex = 0 } "just a string"
+                Expect.equal [ "just a string" ] <|
+                    parse { config | cycleIndex = 0 } "just a string"
         , test "erors with orphan closer" <|
             \() ->
-                shouldError "a}b should error" <| getNarrative { config | cycleIndex = 0 } "a}b"
+                shouldError "a}b should error" <| parse { config | cycleIndex = 0 } "a}b"
         , test "erors with orphan opener" <|
             \() ->
-                shouldError "a{b should error" <| getNarrative { config | cycleIndex = 0 } "a{b"
+                shouldError "a{b should error" <| parse { config | cycleIndex = 0 } "a{b"
         ]
 
 
@@ -59,41 +60,41 @@ cycle =
     describe "cycles"
         [ test "cycle at 0" <|
             \() ->
-                Expect.equal (Ok "a") <|
-                    getNarrative { config | cycleIndex = 0 } "{a|b|c}"
+                Expect.equal [ "a" ] <|
+                    parse { config | cycleIndex = 0 } "{a|b|c}"
         , test "cycle at 2" <|
             \() ->
-                Expect.equal (Ok "c") <|
-                    getNarrative { config | cycleIndex = 2 } "{a|b|c}"
+                Expect.equal [ "c" ] <|
+                    parse { config | cycleIndex = 2 } "{a|b|c}"
         , test "cycle out of bounds" <|
             \() ->
-                Expect.equal (Ok "c") <|
-                    getNarrative { config | cycleIndex = 9 } "{a|b|c}"
+                Expect.equal [ "c" ] <|
+                    parse { config | cycleIndex = 9 } "{a|b|c}"
         , test "cycle with empties 1" <|
             \() ->
-                Expect.equal (Ok "") <|
-                    getNarrative { config | cycleIndex = 1 } "{||(ok|no}"
+                Expect.equal [ "" ] <|
+                    parse { config | cycleIndex = 1 } "{||ok|no}"
         , test "cycle with empties 2" <|
             \() ->
-                Expect.equal (Ok "ok") <|
-                    getNarrative { config | cycleIndex = 2 } "{||ok|no}"
+                Expect.equal [ "ok" ] <|
+                    parse { config | cycleIndex = 2 } "{||ok|no}"
         , test "empty cycle" <|
             \() ->
                 -- NOTE maybe this should be an error?
-                Expect.equal (Ok "ab") <|
-                    getNarrative { config | cycleIndex = 2 } "a{}b"
+                Expect.equal [ "ab" ] <|
+                    parse { config | cycleIndex = 2 } "a{}b"
         , test "two cycles" <|
             \() ->
-                Expect.equal (Ok "bb") <|
-                    getNarrative { config | cycleIndex = 1 } "{a|b|c}{a|b|c}"
+                Expect.equal [ "bb" ] <|
+                    parse { config | cycleIndex = 1 } "{a|b|c}{a|b|c}"
         , test "cycle in middle" <|
             \() ->
-                Expect.equal (Ok "hello good bye") <|
-                    getNarrative { config | cycleIndex = 2 } "hello {world|good} bye"
+                Expect.equal [ "hello good bye" ] <|
+                    parse { config | cycleIndex = 2 } "hello {world|good} bye"
         , test "cycles on ends" <|
             \() ->
-                Expect.equal (Ok "two three five") <|
-                    getNarrative { config | cycleIndex = 2 } "{one|two} three {four|five}"
+                Expect.equal [ "two three five" ] <|
+                    parse { config | cycleIndex = 2 } "{one|two} three {four|five}"
         , describe "cycles that looks similar to a prop (but isn't)" <|
             let
                 text =
@@ -102,24 +103,21 @@ cycle =
             in
             [ test "cycle 0" <|
                 \() ->
-                    Expect.equal (Ok "Meet Mr. X.  He says you can call him Henry.") <|
-                        getNarrative config text
+                    Expect.equal [ "Meet Mr. X.  He says you can call him Henry." ] <|
+                        parse config text
             , test "cycle 1" <|
                 \() ->
-                    Expect.equal (Ok "Meet Henry.") <|
-                        getNarrative { config | cycleIndex = 1 } text
+                    Expect.equal [ "Meet Henry." ] <|
+                        parse { config | cycleIndex = 1 } text
             ]
         , test "erors with orphan opener in cycle" <|
             \() ->
                 shouldError "{abc{xyz} should error" <|
-                    getNarrative { config | cycleIndex = 0 } "{abc{xyz}"
+                    parse { config | cycleIndex = 0 } "{abc{xyz}"
         , test "erors with orphan closer outside cycle" <|
             \() ->
                 shouldError "{abc}xyz} should error" <|
-                    getNarrative { config | cycleIndex = 0 } "{abc}xyz}"
-        , todo "errors with less than 2 items in cycle"
-
-        -- "{}" and "{a}" and "{a|{b}} and "{{{a}}}"
+                    parse { config | cycleIndex = 0 } "{abc}xyz}"
         ]
 
 
@@ -127,16 +125,16 @@ property =
     describe "property"
         [ test "happy path" <|
             \() ->
-                Expect.equal (Ok "Meet Mr. X.") <|
-                    getNarrative configWithName "Meet {x.name}."
+                Expect.equal [ "Meet Mr. X." ] <|
+                    parse configWithName "Meet {x.name}."
         , test "looks like prop but really cycle" <|
             \() ->
-                Expect.equal (Ok "x.name") <|
-                    getNarrative configWithName "{x.name|hi}"
+                Expect.equal [ "x.name" ] <|
+                    parse configWithName "{x.name|hi}"
         , test "if the keyword function returns an Err it doesn't match (will match as a cycle instead)" <|
             \() ->
-                Expect.equal (Ok "x.name") <|
-                    getNarrative configWithNameError "{x.name}"
+                Expect.equal [ "x.name" ] <|
+                    parse configWithNameError "{x.name}"
         ]
 
 
@@ -144,29 +142,29 @@ mixed =
     describe "mixed"
         [ test "nested cycles (works, but no real use case)" <|
             \() ->
-                Expect.equal (Ok "onetwo") <|
-                    getNarrative { config | cycleIndex = 0 } "{one{two|three}|four}"
+                Expect.equal [ "onetwo" ] <|
+                    parse { config | cycleIndex = 0 } "{one{two|three}|four}"
         , test "nested cycles 2 (works, but no real use case)" <|
             \() ->
-                Expect.equal (Ok "four") <|
-                    getNarrative { config | cycleIndex = 1 } "{one{two|three}|four}"
+                Expect.equal [ "four" ] <|
+                    parse { config | cycleIndex = 1 } "{one{two|three}|four}"
         , describe "basic prop and cycle mix" <|
             [ test "cycle 0, prop 1" <|
                 \() ->
-                    Expect.equal (Ok "a") <|
-                        getNarrative configWithName "{a|{x.name}}"
+                    Expect.equal [ "a" ] <|
+                        parse configWithName "{a|{x.name}}"
             , test "cycle 1, prop 1" <|
                 \() ->
-                    Expect.equal (Ok "Mr. X") <|
-                        getNarrative { configWithName | cycleIndex = 1 } "{a|{x.name}}"
+                    Expect.equal [ "Mr. X" ] <|
+                        parse { configWithName | cycleIndex = 1 } "{a|{x.name}}"
             , test "cycle 0, prop 0" <|
                 \() ->
-                    Expect.equal (Ok "Mr. X") <|
-                        getNarrative configWithName "{{x.name}|a}"
+                    Expect.equal [ "Mr. X" ] <|
+                        parse configWithName "{{x.name}|a}"
             , test "cycle 1, prop 0" <|
                 \() ->
-                    Expect.equal (Ok "a") <|
-                        getNarrative { configWithName | cycleIndex = 1 } "{{x.name}|a}"
+                    Expect.equal [ "a" ] <|
+                        parse { configWithName | cycleIndex = 1 } "{{x.name}|a}"
             ]
         , describe "complete cycle and props example" <|
             let
@@ -184,28 +182,32 @@ mixed =
             in
             [ test "cycle 0" <|
                 \() ->
-                    Expect.equal (Ok "Meet Mr. X.  He says you can call him Henry.") <|
-                        getNarrative nestedConfig text
+                    Expect.equal [ "Meet Mr. X.  He says you can call him Henry." ] <|
+                        parse nestedConfig text
             , test "cycle 1" <|
                 \() ->
-                    Expect.equal (Ok "Henry says hi.") <|
-                        getNarrative { nestedConfig | cycleIndex = 1 } text
+                    Expect.equal [ "Henry says hi." ] <|
+                        parse { nestedConfig | cycleIndex = 1 } text
             ]
-        , skip <|
-            -- needs empty cycle errors
-            test "cycle 1"
-            <|
-                \() ->
-                    Expect.equal (Ok "Henry says hi.") <|
-                        getNarrative { configWithName | cycleIndex = 1 } "{a|{x.asfadsf}}"
+        ]
+
+
+withContinues =
+    describe "continues"
+        [ test "basic" <|
+            \() ->
+                Expect.equal [ "one", "two", "three" ] <|
+                    parse { config | cycleIndex = 0 } "one---two---three"
+        , test "in cycle 1" <|
+            \() ->
+                Expect.equal [ "one", "two" ] <|
+                    parse { config | cycleIndex = 0 } "{one---two|three}"
+        , test "in cycle 2" <|
+            \() ->
+                Expect.equal [ "three" ] <|
+                    parse { config | cycleIndex = 1 } "{one---two|three}"
         ]
 
 
 shouldError message res =
-    Expect.true message <|
-        case res of
-            Err _ ->
-                True
-
-            _ ->
-                False
+    Expect.true message <| List.all identity <| List.map (String.startsWith "ERROR") res
