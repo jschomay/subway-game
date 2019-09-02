@@ -119,10 +119,32 @@ updateStory trigger model =
                     Dict.get matchedRuleID model.ruleMatchCounts
                         |> Maybe.withDefault 0
 
+                replaceTrigger id =
+                    if id == "$" then
+                        trigger
+
+                    else
+                        id
+
+                propFn keyword fn =
+                    ( keyword
+                    , replaceTrigger
+                        >> (\id ->
+                                Dict.get id model.worldModel
+                                    |> Maybe.map (fn >> Ok)
+                                    |> Maybe.withDefault (Err <| "Unable to find entity for id: " ++ id)
+                           )
+                    )
+
+                propKeywords =
+                    Dict.fromList
+                        [ propFn "name" .name
+                        , propFn "description" .description
+                        ]
+
                 config =
-                    -- TODO
                     { cycleIndex = cycleIndex
-                    , propKeywords = Dict.empty
+                    , propKeywords = propKeywords
                     }
 
                 currentNarrative =
