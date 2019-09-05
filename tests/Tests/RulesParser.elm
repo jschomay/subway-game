@@ -35,6 +35,16 @@ worldDefinition =
                 Expect.equal
                     (makeEntity "CAVE ENTRANCE" |> Ok)
                     (parseEntity "CAVE ENTRANCE")
+        , test "parses the whole thing (extra after id)" <|
+            \() ->
+                shouldFail "has extra chars after id"
+                    -- `;` isn't a valid prop char
+                    (parseEntity "CAVE_ENTRANCE;drop table")
+        , test "parses the whole thing (extra after prop)" <|
+            \() ->
+                shouldFail "has extra chars after prop"
+                    -- `;` isn't a valid prop char
+                    (parseEntity "CAVE_ENTRANCE.location;drop table")
         , test "with one tag" <|
             \() ->
                 Expect.equal

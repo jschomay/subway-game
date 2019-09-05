@@ -18,6 +18,7 @@ entityParser =
     succeed toEntity
         |= idParser
         |= propsParser
+        |. end
 
 
 idParser =
