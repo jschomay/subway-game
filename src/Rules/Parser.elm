@@ -7,32 +7,23 @@ import Set
 
 parseEntity : String -> Result (List DeadEnd) ( ID, NarrativeComponent {} )
 parseEntity text =
-    run parser text
+    run entityParser text
 
 
-parser =
+entityParser =
     let
-        toEntity id tags =
-            ( id
-            , { tags = tags
-              , stats = emptyStats
-              , links = emptyLinks
-              }
-            )
+        toEntity id narrativeComponent =
+            ( id, narrativeComponent )
     in
     succeed toEntity
         |= idParser
-        |= oneOf
-            [ end |> map (always Set.empty)
-            , propsParser
-                |. end
-            ]
+        |= propsParser
 
 
 idParser =
     let
         valid c =
-            Char.isAlphaNum c || List.member c [ '_', '-', ':', '#', '+' ]
+            Char.isAlphaNum c || List.member c [ ' ', '_', '-', ':', '#', '+' ]
     in
     succeed ()
         |. chompWhile valid
@@ -40,23 +31,29 @@ idParser =
         |> andThen notEmpty
 
 
-propsParser : Parser Tags
+propsParser : Parser (NarrativeComponent {})
 propsParser =
-    -- TODO this should be a record of tags, stats, strings
     let
-        tags =
-            -- this will need to be accumulated when looping
-            List.singleton >> Set.fromList
-    in
-    -- loop...
-    succeed tags
-        |. symbol "."
-        |= oneOf
-            [ tagParser
+        emptyNarrativeComponent =
+            { tags = emptyTags
+            , stats = emptyStats
+            , links = emptyLinks
+            }
 
-            -- statParser
-            -- linkParser
-            ]
+        helper acc =
+            oneOf
+                [ succeed identity
+                    |. symbol "."
+                    |= oneOf
+                        [ tagParser |> map (\t -> Loop <| addTag t acc)
+
+                        -- statParser
+                        -- linkParser
+                        ]
+                , succeed (Done acc)
+                ]
+    in
+    loop emptyNarrativeComponent helper
 
 
 tagParser : Parser String

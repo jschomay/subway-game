@@ -29,12 +29,12 @@ worldDefinition =
                 Expect.equal
                     (makeEntity "CAVE_ENTRANCE" |> Ok)
                     (parseEntity "CAVE_ENTRANCE")
-        , skip <|
-            test "does it work with a space in id?" <|
-                \() ->
-                    Expect.equal
-                        (makeEntity "CAVE ENTRANCE" |> Ok)
-                        (parseEntity "CAVE ENTRANCE")
+        , test "does it work with a space in id?" <|
+            -- TODO not sure I want this, need to test out with narrative parser
+            \() ->
+                Expect.equal
+                    (makeEntity "CAVE ENTRANCE" |> Ok)
+                    (parseEntity "CAVE ENTRANCE")
         , test "with one tag" <|
             \() ->
                 Expect.equal
@@ -43,7 +43,15 @@ worldDefinition =
                         |> Ok
                     )
                     (parseEntity "CAVE_ENTRANCE.location")
-        , todo "with multiple tags"
+        , test "with multiple tags" <|
+            \() ->
+                Expect.equal
+                    (makeEntity "CAVE_ENTRANCE"
+                        |> tag "location"
+                        |> tag "dark"
+                        |> Ok
+                    )
+                    (parseEntity "CAVE_ENTRANCE.location.dark")
 
         -- stats, links
         -- mixed
