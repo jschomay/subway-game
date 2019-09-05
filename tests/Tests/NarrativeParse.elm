@@ -1,4 +1,4 @@
-module Tests.Parse exposing (all)
+module Tests.NarrativeParse exposing (all)
 
 import Dict
 import Expect
