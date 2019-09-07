@@ -31,6 +31,9 @@ worldDefinition =
                     (parseEntity "CAVE_ENTRANCE")
         , test "does it work with a space in id?" <|
             -- TODO not sure I want this, need to test out with narrative parser
+            -- And what about spaces in props?
+            -- what about if you wanted "ID.mystat = 4.mytag .othertag"?  Should any
+            -- of that be allowed?
             \() ->
                 Expect.equal
                     (makeEntity "CAVE ENTRANCE" |> Ok)
@@ -62,11 +65,68 @@ worldDefinition =
                         |> Ok
                     )
                     (parseEntity "CAVE_ENTRANCE.location.dark")
+        , test "with one stat" <|
+            \() ->
+                Expect.equal
+                    (makeEntity "CAVE_ENTRANCE"
+                        |> stat "illumination" 4
+                        |> Ok
+                    )
+                    (parseEntity "CAVE_ENTRANCE.illumination=4")
+        , test "with one negative stat" <|
+            \() ->
+                Expect.equal
+                    (makeEntity "CAVE_ENTRANCE"
+                        |> stat "illumination" -4
+                        |> Ok
+                    )
+                    (parseEntity "CAVE_ENTRANCE.illumination=-4")
+        , test "improper stat" <|
+            \() ->
+                shouldFail "improper stat (char after int)"
+                    (parseEntity "CAVE_ENTRANCE.illumination=4x")
+        , test "tag followed by stat" <|
+            \() ->
+                Expect.equal
+                    (makeEntity "CAVE_ENTRANCE"
+                        |> stat "illumination" 4
+                        |> tag "scary"
+                        |> Ok
+                    )
+                    (parseEntity "CAVE_ENTRANCE.scary.illumination=4")
+        , test "stat followed by tag" <|
+            \() ->
+                Expect.equal
+                    (makeEntity "CAVE_ENTRANCE"
+                        |> stat "illumination" 4
+                        |> tag "scary"
+                        |> Ok
+                    )
+                    (parseEntity "CAVE_ENTRANCE.illumination=4.scary")
+        , test "multiple stats" <|
+            \() ->
+                Expect.equal
+                    (makeEntity "CAVE_ENTRANCE"
+                        |> stat "illumination" 4
+                        |> stat "temp" 32
+                        |> Ok
+                    )
+                    (parseEntity "CAVE_ENTRANCE.illumination=4.temp=32")
 
-        -- stats, links
+        -- links
         -- mixed
         -- multi line?
+        -- what about whitespace?
         ]
+
+
+shouldFail message res =
+    case res of
+        Err _ ->
+            Expect.pass
+
+        _ ->
+            Expect.fail message
 
 
 

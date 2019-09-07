@@ -41,15 +41,19 @@ propsParser =
             , links = emptyLinks
             }
 
+        toComponent key fn =
+            fn key
+
         helper acc =
             oneOf
-                [ succeed identity
+                [ succeed toComponent
                     |. symbol "."
+                    |= propertyNameParser
                     |= oneOf
-                        [ tagParser |> map (\t -> Loop <| addTag t acc)
+                        [ statParser |> map (\v -> \k -> Loop <| setStat k v acc)
 
-                        -- statParser
                         -- linkParser
+                        , succeed (\t -> Loop <| addTag t acc)
                         ]
                 , succeed (Done acc)
                 ]
@@ -57,9 +61,34 @@ propsParser =
     loop emptyNarrativeComponent helper
 
 
-tagParser : Parser String
-tagParser =
-    propertyNameParser
+statParser : Parser Int
+statParser =
+    succeed identity
+        |. symbol "="
+        |= numberParser
+
+
+{-| Can't use `int` because a "." can follow the number ("X.a.b=1.c"), and `int`
+doesn't allow a digit followed by a ".". This also handles negatives.
+-}
+numberParser : Parser Int
+numberParser =
+    let
+        int_ =
+            chompWhile Char.isDigit
+                |> getChompedString
+                |> andThen
+                    (String.toInt
+                        >> Maybe.map succeed
+                        >> Maybe.withDefault (problem "not an int")
+                    )
+    in
+    oneOf
+        [ succeed negate
+            |. symbol "-"
+            |= int_
+        , int_
+        ]
 
 
 propertyNameParser : Parser String
