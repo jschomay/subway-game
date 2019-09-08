@@ -21,6 +21,7 @@ entityParser =
         |. end
 
 
+idParser : Parser ID
 idParser =
     let
         valid c =
@@ -50,22 +51,18 @@ propsParser =
                     |. symbol "."
                     |= propertyNameParser
                     |= oneOf
-                        [ statParser |> map (\v -> \k -> Loop <| setStat k v acc)
-
-                        -- linkParser
+                        [ succeed identity
+                            |. symbol "="
+                            |= oneOf
+                                [ numberParser |> map (\v -> \k -> Loop <| setStat k v acc)
+                                , idParser |> map (\v -> \k -> Loop <| setLink k v acc)
+                                ]
                         , succeed (\t -> Loop <| addTag t acc)
                         ]
                 , succeed (Done acc)
                 ]
     in
     loop emptyNarrativeComponent helper
-
-
-statParser : Parser Int
-statParser =
-    succeed identity
-        |. symbol "="
-        |= numberParser
 
 
 {-| Can't use `int` because a "." can follow the number ("X.a.b=1.c"), and `int`

@@ -112,11 +112,30 @@ worldDefinition =
                         |> Ok
                     )
                     (parseEntity "CAVE_ENTRANCE.illumination=4.temp=32")
+        , test "with one link" <|
+            \() ->
+                Expect.equal
+                    (makeEntity "GOBLIN"
+                        |> link "location" "CAVE"
+                        |> Ok
+                    )
+                    (parseEntity "GOBLIN.location=CAVE")
+        , test "all together" <|
+            \() ->
+                Expect.equal
+                    (makeEntity "BAG_OF_GOLD"
+                        |> tag "item"
+                        |> tag "quest_item"
+                        |> stat "value" 99
+                        |> link "location" "CAVE"
+                        |> link "guarded_by" "GOBLIN"
+                        |> Ok
+                    )
+                    (parseEntity "BAG_OF_GOLD.item.quest_item.value=99.location=CAVE.guarded_by=GOBLIN")
 
-        -- links
-        -- mixed
         -- multi line?
         -- what about whitespace?
+        -- remember to test $ in changes and conditionals
         ]
 
 
@@ -175,6 +194,13 @@ shouldFail message res =
    GOBLIN.-sleeping
    PLAYER.fear=9
    narrative: There's an old saying, "Let sleeping dogs lie."  That applies double when it comes to goblins.  Too late...
+
+   // trigger match in conditional
+   trigger: *.location
+   conditions: *.enemy.location=$
+   narrative: The {$.name} is too dangerous to enter now...
+   // note, there is no way to reference the name/description of the enemy matcher
+
 
    // moving around
    trigger: *.location
