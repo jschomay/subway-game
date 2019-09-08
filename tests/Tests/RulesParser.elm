@@ -29,15 +29,6 @@ worldDefinition =
                 Expect.equal
                     (makeEntity "CAVE_ENTRANCE" |> Ok)
                     (parseEntity "CAVE_ENTRANCE")
-        , test "does it work with a space in id?" <|
-            -- TODO not sure I want this, need to test out with narrative parser
-            -- And what about spaces in props?
-            -- what about if you wanted "ID.mystat = 4.mytag .othertag"?  Should any
-            -- of that be allowed?
-            \() ->
-                Expect.equal
-                    (makeEntity "CAVE ENTRANCE" |> Ok)
-                    (parseEntity "CAVE ENTRANCE")
         , test "parses the whole thing (extra after id)" <|
             \() ->
                 shouldFail "has extra chars after id"
@@ -48,6 +39,14 @@ worldDefinition =
                 shouldFail "has extra chars after prop"
                     -- `;` isn't a valid prop char
                     (parseEntity "CAVE_ENTRANCE.location;drop table")
+        , test "spaces in id not allowed" <|
+            \() ->
+                shouldFail "can't use spaces"
+                    (parseEntity "CAVE ENTRANCE")
+        , test "spaces in prop not allowed" <|
+            \() ->
+                shouldFail "can't use spaces"
+                    (parseEntity "CAVE_ENTRANCE.is dark")
         , test "with one tag" <|
             \() ->
                 Expect.equal
@@ -132,9 +131,32 @@ worldDefinition =
                         |> Ok
                     )
                     (parseEntity "BAG_OF_GOLD.item.quest_item.value=99.location=CAVE.guarded_by=GOBLIN")
+        , test "spaced out" <|
+            \() ->
+                Expect.equal
+                    (makeEntity "BAG_OF_GOLD"
+                        |> tag "item"
+                        |> stat "value" 99
+                        |> link "location" "CAVE"
+                        |> Ok
+                    )
+                    (parseEntity "BAG_OF_GOLD      .item  .value=99  .location=CAVE")
+        , test "multi line" <|
+            \() ->
+                Expect.equal
+                    (makeEntity "BAG_OF_GOLD"
+                        |> tag "item"
+                        |> stat "value" 99
+                        |> link "location" "CAVE"
+                        |> Ok
+                    )
+                    (parseEntity
+                        """BAG_OF_GOLD
+                                .item
+                                .value=99
+                                .location=CAVE"""
+                    )
 
-        -- multi line?
-        -- what about whitespace?
         -- remember to test $ in changes and conditionals
         ]
 
@@ -156,6 +178,7 @@ shouldFail message res =
    CAVE.location.dark
 
    GOBLIN.character.sleeping.location=CAVE
+
    PLAYER
    .character
    .fear=0

@@ -25,7 +25,7 @@ idParser : Parser ID
 idParser =
     let
         valid c =
-            Char.isAlphaNum c || List.member c [ ' ', '_', '-', ':', '#', '+' ]
+            Char.isAlphaNum c || List.member c [ '_', '-', ':', '#', '+' ]
     in
     succeed ()
         |. chompWhile valid
@@ -48,6 +48,7 @@ propsParser =
         helper acc =
             oneOf
                 [ succeed toComponent
+                    |. spaces
                     |. symbol "."
                     |= propertyNameParser
                     |= oneOf
