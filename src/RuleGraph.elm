@@ -73,7 +73,7 @@ init =
     let
         model =
             { rules = Rules.rules
-            , startingState = Manifest.initialWorldModel
+            , startingState = Tuple.first Manifest.initialWorldModel
             , selectedRule = ""
             , graph = Dict.empty
             }

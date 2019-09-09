@@ -6,10 +6,12 @@ import Manifest
 import Narrative exposing (..)
 import Narrative.Rules as Rules exposing (..)
 import Narrative.WorldModel exposing (..)
+import Rules.Parser exposing (ParseError)
 
 
 type alias Model =
     { worldModel : Manifest.WorldModel
+    , parseErrors : List ( String, ParseError )
     , loaded : Bool
     , story : List String
     , scene : Scene

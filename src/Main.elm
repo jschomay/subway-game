@@ -17,6 +17,7 @@ import Narrative.Rules exposing (..)
 import Narrative.WorldModel exposing (..)
 import Process
 import Rules
+import Rules.Parser
 import Subway
 import Task
 import Tuple
@@ -50,7 +51,12 @@ main =
 
 init : Flags -> ( Model, Cmd Msg )
 init flags =
-    ( { worldModel = Manifest.initialWorldModel
+    let
+        ( initialWorldModel, entityParseErrors ) =
+            Manifest.initialWorldModel
+    in
+    ( { worldModel = initialWorldModel
+      , parseErrors = entityParseErrors
       , loaded = False
       , story = []
       , ruleMatchCounts = Dict.empty
@@ -435,6 +441,20 @@ view model =
     in
     if not model.loaded then
         div [ class "Loading" ] [ text "Loading..." ]
+
+    else if not <| List.isEmpty model.parseErrors then
+        div [ class "SelectScene" ]
+            [ h1 [] [ text "Errors when parsing!  Please fix:" ]
+            , ul [] <|
+                List.map
+                    (\( s, e ) ->
+                        li []
+                            [ h3 [] [ text s ]
+                            , text <| Rules.Parser.deadEndsToString e
+                            ]
+                    )
+                    model.parseErrors
+            ]
 
     else if model.selectScene then
         selectSceneView model

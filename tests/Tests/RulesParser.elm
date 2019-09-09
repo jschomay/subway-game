@@ -156,7 +156,12 @@ worldDefinition =
                                 .value=99
                                 .location=CAVE"""
                     )
+        , todo "ids cannot start with ints"
 
+        -- location=1st_base - should be link, but will be an error (because 1 int
+        -- parse matches, unless I make it backtrackable)
+        -- location=2 - cannot tell if this is a stat or link, would be
+        -- parsed as a stat
         -- remember to test $ in changes and conditionals
         ]
 

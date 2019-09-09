@@ -60,9 +60,9 @@ The ringing continues.  Wrong phone!"""
                     , changes = [ Update "$" [ SetLink "location" "player" ] ]
                     , narrative = """Luckily you remembered to charge it and the battery is at full.
 
-            There's one new email that came in -- a job offer from a very persistent recruiter.  You don't have time to even look at it right now, so you put it in your coat pocket.
+There's one new email that came in -- a job offer from a very persistent recruiter.  You don't have time to even look at it right now, so you put it in your coat pocket.
 
-            Besides, you've built up five years of loyalty at your current job, and you wouldn't want to lose that.  Even if your boss is a jerk."""
+Besides, you've built up five years of loyalty at your current job, and you wouldn't want to lose that.  Even if your boss is a jerk."""
                     }
                ]
             ++ [ rule "pack presentation"
@@ -70,9 +70,9 @@ The ringing continues.  Wrong phone!"""
                     , conditions = [ Match "cellPhone" [ Not <| HasTag "ringing" ] ]
                     , changes = [ Update "$" [ SetLink "location" "briefcase" ] ]
                     , narrative = """
-                    Your presentation is scattered all over your desk.  It's covered in scribbles and sticky notes.  Some pages are wrinkled and a little smudged from when you fell asleep on them. 
+Your presentation is scattered all over your desk.  It's covered in scribbles and sticky notes.  Some pages are wrinkled and a little smudged from when you fell asleep on them. 
 
-            You put them back in order and carefully stack them, then slip them into your briefcase. Hopefully it's all worth it.
+You put them back in order and carefully stack them, then slip them into your briefcase. Hopefully it's all worth it.
             """
                     }
                ]
