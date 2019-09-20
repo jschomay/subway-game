@@ -1,6 +1,5 @@
 module Rules.LostBriefcase exposing (rules)
 
-import City exposing (Station(..))
 import Constants exposing (..)
 import LocalTypes
 import Narrative exposing (..)
@@ -25,7 +24,7 @@ rules =
                     }
                ]
             ++ [ rule "travelToPoliceOffice"
-                    { trigger = Match (station FederalTriangle) []
+                    { trigger = Match "FederalTriangle" []
                     , conditions = [ plotLine "lostAndFound" EQ 1 ]
                     , changes = []
                     , narrative = travelToPoliceOffice
@@ -99,7 +98,7 @@ rules =
                     , narrative = askAboutThiefFail
                     }
                , rule "askAboutThiefSucceed"
-                    { trigger = Match "commuter2" [ HasLink "location" <| Match (station WestMulberry) [] ]
+                    { trigger = Match "commuter2" [ HasLink "location" <| Match "WestMulberry" [] ]
                     , conditions = [ plotLine "chaseThief" EQ 1, plotLine "lostAndFound" EQ 0 ]
                     , changes =
                         [ Update "player" [ SetStat "chaseThief" 2 ]

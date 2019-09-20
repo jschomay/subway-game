@@ -18,7 +18,7 @@ import Narrative.WorldModel exposing (..)
 import Process
 import Rules
 import Rules.Parser
-import Subway
+import SubwaySimple
 import Task
 import Tuple
 import Views.Home as Home
@@ -224,9 +224,7 @@ changeTrainStatus newStatus trainProps =
 getCurrentStation : City.Map -> Manifest.WorldModel -> Station
 getCurrentStation map worldModel =
     Narrative.WorldModel.getLink "player" "location" worldModel
-        |> Maybe.andThen String.toInt
-        |> Maybe.andThen (Subway.getStation map)
-        |> Maybe.withDefault WestMulberry
+        |> Maybe.withDefault "ERROR getting the current location of player from worldmodel"
 
 
 getCurrentLine : Model -> Maybe City.Line
@@ -311,7 +309,7 @@ update msg model =
 
             BoardTrain line station ->
                 ( { model | scene = Train { line = line, status = InTransit } }
-                , delay departingDelay (Interact (station |> stationInfo |> .id |> String.fromInt))
+                , delay departingDelay (Interact station)
                 )
 
             Continue ->
@@ -427,17 +425,6 @@ view model =
 
         map =
             City.fullMap
-
-        stationToId station =
-            stationInfo station |> .id
-
-        lineToId line =
-            lineInfo line |> .number
-
-        config =
-            { stationToId = stationToId
-            , lineToId = lineToId
-            }
     in
     if not model.loaded then
         div [ class "Loading" ] [ text "Loading..." ]

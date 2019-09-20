@@ -1,6 +1,6 @@
-module Rules.Helpers exposing (location, plotLine, rule, rulesForScene, station)
+module Rules.Helpers exposing (location, plotLine, rule, rulesForScene)
 
-import City exposing (Station(..), stationInfo)
+import City exposing (Station)
 import Constants exposing (..)
 import Dict exposing (Dict)
 import LocalTypes exposing (..)
@@ -23,15 +23,9 @@ rulesForScene scene rules_ =
             )
 
 
-station : Station -> String
-station station_ =
-    -- TODO remove this after removing graph
-    station_ |> stationInfo |> .id |> String.fromInt
-
-
 location : String -> Station -> EntityMatcher
-location character station_ =
-    Match character [ HasLink "location" <| Match (station station_) [] ]
+location character station =
+    Match character [ HasLink "location" <| Match station [] ]
 
 
 plotLine : String -> Order -> Int -> EntityMatcher

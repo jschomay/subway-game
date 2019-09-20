@@ -2,7 +2,8 @@ module Tests.Subway exposing (all)
 
 import Expect
 import Graph
-import Subway exposing (..)
+import Subway exposing (connections)
+import SubwaySimple
 import Test exposing (..)
 
 
@@ -92,7 +93,7 @@ blueLine =
     ( Blue, [ Central, Market, EastEnd ] )
 
 
-map : Map Station Line
+map : Subway.Map Station Line
 map =
     Subway.init stationToId [ redLine, greenLine, blueLine ]
 
@@ -130,8 +131,12 @@ map =
 -}
 
 
-all : Test
 all =
+    concat [ subway, subwaySimple ]
+
+
+subway : Test
+subway =
     let
         graphViz =
             Subway.graphViz
@@ -187,6 +192,34 @@ all =
             , test "WestEnd" <|
                 \() ->
                     Expect.equal (connections config map WestEnd) <|
+                        [ Green, Red ]
+            ]
+        ]
+
+
+subwaySimple : Test
+subwaySimple =
+    let
+        simpleMap =
+            [ redLine, greenLine, blueLine ]
+    in
+    describe "SubwaySimple"
+        [ describe "connections" <|
+            [ test "Central" <|
+                \() ->
+                    Expect.equal (SubwaySimple.connections simpleMap Central) <|
+                        [ Blue, Green ]
+            , test "Market" <|
+                \() ->
+                    Expect.equal (SubwaySimple.connections simpleMap Market) <|
+                        [ Blue, Green, Red ]
+            , test "EastEnd" <|
+                \() ->
+                    Expect.equal (SubwaySimple.connections simpleMap EastEnd) <|
+                        [ Blue, Green, Red ]
+            , test "WestEnd" <|
+                \() ->
+                    Expect.equal (SubwaySimple.connections simpleMap WestEnd) <|
                         [ Green, Red ]
             ]
         ]

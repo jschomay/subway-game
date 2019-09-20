@@ -5,14 +5,14 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import LocalTypes exposing (..)
-import Subway exposing (..)
+import SubwaySimple
 import Views.Shared as Shared
 import Views.Station.Connections as Connections
 
 
 {-| shows line map for a line
 -}
-view : Subway.Map City.Station City.Line -> Station -> Line -> Html Msg
+view : City.Map -> Station -> Line -> Html Msg
 view map currentStation line =
     let
         lineInfo =
@@ -24,8 +24,10 @@ view map currentStation line =
                 , text <| lineInfo.name
                 ]
 
+        connections : City.Station -> List City.Line
         connections station =
-            Subway.connections City.config map station
+            SubwaySimple.connections map station
+                |> List.sortBy (City.lineInfo >> .number)
 
         stopView transferLine station =
             div
@@ -54,7 +56,7 @@ view map currentStation line =
                         , ( "Stop__name--current", station == currentStation )
                         ]
                     ]
-                    [ text <| .name <| stationInfo station ]
+                    [ text <| .name <| City.stationInfo station ]
                 ]
     in
     div [ class "Scene Platform" ]

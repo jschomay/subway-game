@@ -16,9 +16,6 @@ import Views.Station.Connections as Connections
 view : City.Map -> Manifest.WorldModel -> Station -> Html Msg
 view map worldModel currentStation =
     let
-        currentStationEntityID =
-            currentStation |> stationInfo |> .id |> String.fromInt
-
         stationName =
             (stationInfo currentStation |> .name) ++ " Station"
 
@@ -48,14 +45,14 @@ view map worldModel currentStation =
         characters =
             query
                 [ HasTag "character"
-                , HasLink "location" <| Match currentStationEntityID []
+                , HasLink "location" <| Match currentStation []
                 ]
                 worldModel
 
         items =
             query
                 [ HasTag "item"
-                , HasLink "location" <| Match currentStationEntityID []
+                , HasLink "location" <| Match currentStation []
                 ]
                 worldModel
 

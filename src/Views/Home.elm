@@ -32,7 +32,7 @@ view worldModel =
             if readyToLeave then
                 div
                     [ class "Home__leave"
-                    , onClick <| BoardTrain Red TwinBrooks
+                    , onClick <| BoardTrain Red "TwinBrooks"
                     ]
                     [ text "Go to the metro station" ]
 

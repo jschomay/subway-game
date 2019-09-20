@@ -1,6 +1,5 @@
 module Rules.General exposing (rules)
 
-import City exposing (Station(..))
 import Constants exposing (..)
 import LocalTypes
 import Narrative exposing (..)

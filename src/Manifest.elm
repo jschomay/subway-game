@@ -1,6 +1,6 @@
 module Manifest exposing (DisplayComponent, Entity, ID, WorldModel, entities, entity, initialWorldModel)
 
-import City exposing (Station(..), stationInfo)
+import City exposing (Station)
 import Constants
 import Dict exposing (Dict)
 import Narrative.WorldModel exposing (..)
@@ -21,18 +21,6 @@ type alias WorldModel =
 
 type alias ID =
     String
-
-
-station : Station -> String
-station station_ =
-    -- TODO remove this after removing graph
-    station_ |> stationInfo |> .id |> String.fromInt
-
-
-
--- TODO
--- Change subway graph as necessary to refer to stations by name (all stations are
--- coming through as stats currently)
 
 
 {-| note that this is different than the one in Rules.Parser! This one is for an
@@ -107,28 +95,28 @@ entities =
         "You still have an old school landline in your home office, though you rarely use it."
 
     --  TwinBrooks
-    , entity ("safteyWarningPoster.item.location=" ++ station TwinBrooks)
+    , entity "safteyWarningPoster.item.location=TwinBrooks"
         "Safety Message Poster"
         "A poster that warns you to watch out for pickpockets and report any suspicious activity. "
-    , entity ("mapPoster.item.location=" ++ station TwinBrooks)
+    , entity "mapPoster.item.location=TwinBrooks"
         "Map on the wall"
         "This shows the full map of the subway system."
 
     --  FederalTriangle
-    , entity ("policeOffice.item.location=" ++ station FederalTriangle)
+    , entity "policeOffice.item.location=FederalTriangle"
         "Police Office"
         "A small police office."
-    , entity ("ticketMachine.item.location=" ++ station FederalTriangle)
+    , entity "ticketMachine.item.location=FederalTriangle"
         "Ticket Machine"
         "You can buy tickets and passes here."
 
     --  ChurchStreet
-    , entity ("paperScrap.item.location=" ++ station ChurchStreet)
+    , entity "paperScrap.item.location=ChurchStreet"
         "Scrap of paper"
         "It's just trash."
 
     -- WestMulberry
-    , entity ("maintenanceDoor.item.location=" ++ station WestMulberry)
+    , entity "maintenanceDoor.item.location=WestMulberry"
         "Maintenance door"
         "The sign on it says \"Maintenance access only\"."
 
@@ -138,22 +126,22 @@ entities =
         "This will get you in to maintenance areas."
 
     -- characters
-    , entity ("maintenanceMan.character.location=" ++ station TwinBrooks)
+    , entity "maintenanceMan.character.location=TwinBrooks"
         "Maintenance man"
         "He's probably busy, you don't really have any reason to bother him."
-    , entity ("largeCrowd.character.location=" ++ station MetroCenter)
+    , entity "largeCrowd.character.location=MetroCenter"
         "A large crowd"
         "They ignore you for the most part, occupied with the situation at hand."
-    , entity ("securityOfficers.character.location=" ++ station MetroCenter)
+    , entity "securityOfficers.character.location=MetroCenter"
         "Security officers"
         "Two of them, looking official, but not really all that helpful over all."
-    , entity ("commuter1.character.location=" ++ station EastMulberry)
+    , entity "commuter1.character.location=EastMulberry"
         "Commuter"
         "Another commuter, waiting for the train."
-    , entity ("commuter2.character.location=" ++ station WestMulberry)
+    , entity "commuter2.character.location=WestMulberry"
         "Commuter"
         "Another commuter, waiting for the train."
-    , entity ("player.mainPlot=1.location=" ++ station TwinBrooks)
+    , entity "player.mainPlot=1.location=TwinBrooks"
         "Steve"
         "A guy just trying to get ahead by following the rules."
     , entity "home.location"
@@ -170,32 +158,32 @@ entities =
 
 lines : List ParsedEntity
 lines =
-    List.map
-        (City.lineInfo
-            >> (\info ->
-                    entity (info.id ++ ".line") info.name info.name
-               )
-        )
-        City.allLines
+    City.fullMap
+        |> List.map Tuple.first
+        |> List.map
+            (City.lineInfo
+                >> (\info ->
+                        entity (info.id ++ ".line") info.name info.name
+                   )
+            )
 
 
 stations : List ParsedEntity
 stations =
     let
         makeId id =
-            String.fromInt id
+            id
                 ++ ".loation.station"
-                ++ (if String.fromInt id == station MetroCenter then
+                ++ (if id == "MetroCenter" then
                         ".stevesWork"
 
                     else
                         ""
                    )
     in
-    List.map
-        (City.stationInfo
-            >> (\info ->
-                    entity (makeId info.id) info.name info.name
-               )
-        )
-        (List.concatMap (City.lineInfo >> .stations) City.allLines)
+    City.stations
+        |> Dict.toList
+        |> List.map
+            (\( id, { name } ) ->
+                entity (makeId id) name name
+            )

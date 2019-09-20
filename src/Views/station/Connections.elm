@@ -7,6 +7,7 @@ import Html.Events exposing (..)
 import LocalTypes exposing (..)
 import Murmur3
 import Subway exposing (..)
+import SubwaySimple exposing (Map, connections)
 import Views.Shared as Shared
 
 
@@ -36,4 +37,4 @@ forStation map currentStation =
     div [ class "Connections" ] <|
         List.map byLine <|
             List.sortBy (City.lineInfo >> .number) <|
-                Subway.connections City.config map currentStation
+                SubwaySimple.connections map currentStation

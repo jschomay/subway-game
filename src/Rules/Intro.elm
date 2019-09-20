@@ -1,6 +1,5 @@
 module Rules.Intro exposing (rules)
 
-import City exposing (Station(..))
 import Constants exposing (..)
 import LocalTypes
 import Narrative exposing (..)
@@ -84,7 +83,7 @@ You put them back in order and carefully stack them, then slip them into your br
                     }
                ]
             ++ [ rule "fall asleep"
-                    { trigger = Match (station TwinBrooks) []
+                    { trigger = Match "TwinBrooks" []
                     , conditions = [ Match "player" [ Not <| HasTag "late" ] ]
                     , changes = [ Update "player" [ AddTag "late" ] ]
                     , narrative = fallAsleep
@@ -100,7 +99,7 @@ You put them back in order and carefully stack them, then slip them into your br
                ]
             ++ -- stations
                [ rule "delayAhead"
-                    { trigger = Match (station MetroCenter) []
+                    { trigger = Match "MetroCenter" []
                     , conditions = []
                     , changes = []
                     , narrative = delayAhead
@@ -126,10 +125,10 @@ You put them back in order and carefully stack them, then slip them into your br
                     , changes =
                         [ Update "player" [ IncStat "mainPlot" 1 ]
                         , Update "briefcase" [ SetLink "location" "thief" ]
-                        , Update "thief" [ SetLink "location" (station WestMulberry) ]
-                        , Update (station ChurchStreet) [ AddTag "possibleThiefLocation" ]
-                        , Update (station EastMulberry) [ AddTag "possibleThiefLocation" ]
-                        , Update (station WestMulberry) [ AddTag "possibleThiefLocation" ]
+                        , Update "thief" [ SetLink "location" "WestMulberry" ]
+                        , Update "ChurchStreet" [ AddTag "possibleThiefLocation" ]
+                        , Update "EastMulberry" [ AddTag "possibleThiefLocation" ]
+                        , Update "WestMulberry" [ AddTag "possibleThiefLocation" ]
                         ]
                     , narrative = exitClosedBriefcaseStolen
                     }
