@@ -1,12 +1,12 @@
 module LocalTypes exposing (Model, Msg(..), Rule, Rules, Scene(..), TrainProps, TrainStatus(..))
 
-import City exposing (..)
 import Dict exposing (Dict)
 import Manifest
 import Narrative exposing (..)
 import Narrative.Rules as Rules exposing (..)
 import Narrative.WorldModel exposing (..)
 import Rules.Parser exposing (ParseError)
+import Subway exposing (..)
 
 
 type alias Model =

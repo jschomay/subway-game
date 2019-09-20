@@ -1,169 +1,148 @@
 module Subway exposing
-    ( Config
+    ( Line(..)
+    , LineInfo
     , Map
-    , connections
-    , getStation
-    , graphViz
-    , init
+    , Station
+    , StationInfo
+    , connectingLines
+    , fullMap
+    , lineInfo
+    , mapImage
+    , stationInfo
+    , stations
     )
 
-import Dict
-import Graph exposing (..)
-import Graph.DOT as Graph exposing (..)
-import IntDict
-import List.Extra as List
+import Color exposing (..)
+import Dict exposing (Dict)
 
 
-type
-    Map stationId lineId
-    -- the edge lables hold all of the "overlapping" lines between 2 stations
-    = Map (Graph stationId (List lineId))
+{-| A list of lines with all of the stops on each line
+-}
+type alias Map =
+    List ( Line, List Station )
 
 
-type alias Config station line =
-    { stationToId : station -> Int
-    , lineToId : line -> Int
+type Line
+    = Red
+    | Yellow
+    | Green
+
+
+type alias Station =
+    String
+
+
+type alias StationInfo =
+    { name : String
     }
 
 
-type alias StationsAlongLine lineId stationId =
-    -- all of the stations connected by a line
-    ( lineId, List stationId )
+stations : Dict Station StationInfo
+stations =
+    Dict.fromList
+        [ ( "MetroCenter", { name = "Metro Center" } )
+        , ( "FederalTriangle", { name = "Federal Triangle" } )
+        , ( "MacArthursPark", { name = "MacArthur's Park" } )
+        , ( "ChurchStreet", { name = "Church Street" } )
+        , ( "SpringHill", { name = "Spring Hill" } )
+        , ( "TwinBrooks", { name = "Twin Brooks" } )
+        , ( "CapitolHeights", { name = "Capitol Heights" } )
+        , ( "EastMulberry", { name = "East Mulberry" } )
+        , ( "WestMulberry", { name = "West Mulberry" } )
+        , ( "Burlington", { name = "Burlington" } )
+        , ( "SamualStreet", { name = "Samual Street" } )
+        ]
 
 
-init :
-    (station -> Int)
-    -> List (StationsAlongLine line station)
-    -> Map station line
-init stationToId lines =
-    let
-        stations =
-            List.concatMap Tuple.second lines
+stationInfo : Station -> StationInfo
+stationInfo station =
+    Dict.get station stations
+        |> Maybe.withDefault { name = "ERRORR getting station: " ++ station }
 
-        toNode station =
-            Node (stationToId station) station
 
-        lineToEdges : StationsAlongLine line station -> List (Edge line)
-        lineToEdges ( line, stops ) =
-            let
-                makeEdge currentStop ( maybePreviousStop, acc ) =
-                    case maybePreviousStop of
-                        Nothing ->
-                            ( Just currentStop, acc )
+type alias LineInfo =
+    { name : String
+    , id : String
+    , number : Int
+    , color : Color
+    , stations : List Station
+    }
 
-                        Just previousStop ->
-                            ( Just currentStop, Edge previousStop currentStop line :: acc )
-            in
-            stops
-                |> List.map stationToId
-                |> List.foldl makeEdge ( Nothing, [] )
-                |> Tuple.second
 
-        makeEdges :
-            List (StationsAlongLine line station)
-            -> List (Edge (List line))
-        makeEdges lines_ =
-            lines_
-                |> List.concatMap lineToEdges
-                -- would be done here, but different lines might connect the same 2 stations, so we need to "merge" overlapping edges
-                |> List.sortWith ordEdge
-                |> List.foldl mergeEdges []
+lineInfo : Line -> LineInfo
+lineInfo line =
+    case line of
+        Red ->
+            { number = 1
+            , name = "Red Line"
+            , id = "redLine"
+            , color = red
+            , stations =
+                [ "WestMulberry"
+                , "EastMulberry"
+                , "ChurchStreet"
+                , "MetroCenter"
+                , "FederalTriangle"
+                , "SpringHill"
+                , "TwinBrooks"
+                ]
+            }
 
-        ordEdge a b =
-            if a.from == b.from then
-                compare a.to b.to
+        Yellow ->
+            { number = 2
+            , name = "Yellow Line"
+            , id = "yellowLine"
+            , color = yellow
+            , stations =
+                [ "MetroCenter"
+                , "FederalTriangle"
+                , "CapitolHeights"
+                , "MacArthursPark"
+                ]
+            }
+
+        Green ->
+            { number = 3
+            , name = "Green Line"
+            , id = "greenLine"
+            , color = green
+            , stations =
+                [ "Burlington"
+                , "SamualStreet"
+                , "CapitolHeights"
+                , "FederalTriangle"
+                ]
+            }
+
+
+stationsOnLine : Line -> ( Line, List Station )
+stationsOnLine line =
+    ( line, lineInfo line |> .stations )
+
+
+fullMap : Map
+fullMap =
+    [ Red, Green, Yellow ]
+        |> List.map stationsOnLine
+
+
+mapImage : String
+mapImage =
+    "map-red-yellow-green.png"
+
+
+{-| Returns all lines servicing the supplied station. Does not specify an order
+(can't return a `Set` because `line` isn't comparable).
+-}
+connectingLines : Map -> Station -> List Line
+connectingLines map currentStation =
+    List.foldl
+        (\( line, stations_ ) acc ->
+            if List.member currentStation stations_ then
+                line :: acc
 
             else
-                compare a.from b.from
-
-        eqEdge a b =
-            a.from == b.from && a.to == b.to
-
-        mergeEdges :
-            Edge line
-            -> List (Edge (List line))
-            -> List (Edge (List line))
-        mergeEdges newEdge acc =
-            -- if the edge connecs the same stations as the previous edge (given they are sorted), throw it out, but append its label (line id) to the label of the previous one (list of line ids)
-            case acc of
-                [] ->
-                    -- wrap lable in list
-                    [ { from = newEdge.from, to = newEdge.to, label = [ newEdge.label ] } ]
-
-                prevEdge :: rest ->
-                    if eqEdge prevEdge newEdge then
-                        -- throw out new edge, adjust label of previous edge
-                        { from = prevEdge.from, to = prevEdge.to, label = newEdge.label :: prevEdge.label } :: rest
-
-                    else
-                        -- add new edge and wrap label in list
-                        { from = newEdge.from, to = newEdge.to, label = [ newEdge.label ] } :: acc
-
-        -- TODO use Graph.AcyclicGraph to verify there are no cycles
-    in
-    Map <| Graph.fromNodesAndEdges (List.map toNode stations) <| makeEdges lines
-
-
-getStation : Map station line -> Int -> Maybe station
-getStation (Map map) id =
-    Graph.get id map
-        |> Maybe.map (.node >> .label)
-
-
-{-| Given a map and a station, get all of the lines that stop at that station.
-
-Also requires some config helpers.
-
--}
-connections :
-    Config station line
-    -> Map station line
-    -> station
-    -> List line
-connections { stationToId, lineToId } (Map map) station =
-    let
-        toConnections stationContext =
-            (stationContext.outgoing |> IntDict.values)
-                ++ (stationContext.incoming |> IntDict.values)
-                |> List.concat
-                |> List.uniqueBy lineToId
-    in
-    Graph.get (stationToId station) map
-        |> Maybe.map toConnections
-        |> Maybe.withDefault []
-
-
-graphViz : (station -> String) -> (line -> String) -> Map station line -> String
-graphViz stationToString lineToString (Map graph) =
-    let
-        -- use dot, very loopy
-        graphStyles =
-            { defaultStyles
-                | rankdir = Graph.LR
-                , graph = "nodesep=1"
-                , node = "shape=box, style=rounded"
-                , edge = "penwidth=2"
-            }
-
-        -- use dot, more angular, collapses some lines
-        graphStyles2 =
-            { defaultStyles
-                | rankdir = Graph.LR
-                , graph = "nodesep=0.5, splines=false"
-                , node = "shape=box, style=rounded"
-                , edge = "penwidth=2, weight=1"
-            }
-
-        -- use circo style, most clear, hard to tell which labels go to which lines
-        graphStyles3 =
-            { defaultStyles
-                | rankdir = Graph.LR
-                , graph = "nodesep=0.3, mindist=4"
-                , node = "shape=box, style=rounded"
-                , edge = "penwidth=2"
-            }
-    in
-    Graph.outputWithStylesAndAttributes graphStyles3
-        (\n -> Dict.fromList [ ( "label", stationToString n ) ])
-        (\e -> Dict.fromList [ ( "label", String.join " / " <| List.map lineToString e ) ])
-        graph
+                acc
+        )
+        []
+        map

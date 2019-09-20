@@ -1,7 +1,6 @@
 port module Main exposing (main)
 
 import Browser
-import City exposing (..)
 import Constants exposing (..)
 import Dict exposing (Dict)
 import Html exposing (..)
@@ -18,7 +17,7 @@ import Narrative.WorldModel exposing (..)
 import Process
 import Rules
 import Rules.Parser
-import SubwaySimple
+import Subway exposing (..)
 import Task
 import Tuple
 import Views.Home as Home
@@ -221,13 +220,13 @@ changeTrainStatus newStatus trainProps =
     { trainProps | status = newStatus }
 
 
-getCurrentStation : City.Map -> Manifest.WorldModel -> Station
+getCurrentStation : Subway.Map -> Manifest.WorldModel -> Station
 getCurrentStation map worldModel =
     Narrative.WorldModel.getLink "player" "location" worldModel
         |> Maybe.withDefault "ERROR getting the current location of player from worldmodel"
 
 
-getCurrentLine : Model -> Maybe City.Line
+getCurrentLine : Model -> Maybe Subway.Line
 getCurrentLine model =
     case model.scene of
         Turnstile line ->
@@ -411,8 +410,6 @@ handleKey model key =
 view : Model -> Html Msg
 view model =
     let
-        --     showTheMap =
-        --         Debug.log (Subway.graphViz (stationInfo >> .name) (lineInfo >> .name) City.fullMap ++ "\n") "Copy and paste in http://viz-js.com/"
         currentStation =
             getCurrentStation map model.worldModel
 
@@ -424,7 +421,7 @@ view model =
                 model.scene
 
         map =
-            City.fullMap
+            Subway.fullMap
     in
     if not model.loaded then
         div [ class "Loading" ] [ text "Loading..." ]
@@ -546,5 +543,5 @@ storyView story =
 mapView : Html Msg
 mapView =
     div [ onClick ToggleMap, class "map" ]
-        [ img [ class "map__image", src <| "img/" ++ City.mapImage ] []
+        [ img [ class "map__image", src <| "img/" ++ Subway.mapImage ] []
         ]

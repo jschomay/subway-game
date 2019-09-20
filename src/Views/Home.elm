@@ -1,12 +1,12 @@
 module Views.Home exposing (view)
 
-import City exposing (..)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import LocalTypes exposing (..)
 import Manifest exposing (..)
 import Narrative.WorldModel exposing (..)
+import Subway exposing (..)
 import Views.Shared as Shared
 
 

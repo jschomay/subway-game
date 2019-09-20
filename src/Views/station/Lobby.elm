@@ -1,7 +1,6 @@
 module Views.Station.Lobby exposing (view)
 
 import Array
-import City exposing (..)
 import Constants
 import Html exposing (..)
 import Html.Attributes exposing (..)
@@ -9,11 +8,12 @@ import Html.Events exposing (..)
 import LocalTypes exposing (..)
 import Manifest exposing (..)
 import Narrative.WorldModel exposing (..)
+import Subway exposing (..)
 import Views.Shared as Shared
 import Views.Station.Connections as Connections
 
 
-view : City.Map -> Manifest.WorldModel -> Station -> Html Msg
+view : Subway.Map -> Manifest.WorldModel -> Station -> Html Msg
 view map worldModel currentStation =
     let
         stationName =

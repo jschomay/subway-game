@@ -1,10 +1,10 @@
 module Manifest exposing (DisplayComponent, Entity, ID, WorldModel, entities, entity, initialWorldModel)
 
-import City exposing (Station)
 import Constants
 import Dict exposing (Dict)
 import Narrative.WorldModel exposing (..)
 import Rules.Parser exposing (..)
+import Subway exposing (Station)
 
 
 type alias DisplayComponent a =
@@ -158,10 +158,10 @@ entities =
 
 lines : List ParsedEntity
 lines =
-    City.fullMap
+    Subway.fullMap
         |> List.map Tuple.first
         |> List.map
-            (City.lineInfo
+            (Subway.lineInfo
                 >> (\info ->
                         entity (info.id ++ ".line") info.name info.name
                    )
@@ -181,7 +181,7 @@ stations =
                         ""
                    )
     in
-    City.stations
+    Subway.stations
         |> Dict.toList
         |> List.map
             (\( id, { name } ) ->

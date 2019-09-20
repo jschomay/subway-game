@@ -1,12 +1,12 @@
 module Rules.Helpers exposing (location, plotLine, rule, rulesForScene)
 
-import City exposing (Station)
 import Constants exposing (..)
 import Dict exposing (Dict)
 import LocalTypes exposing (..)
 import Narrative exposing (..)
 import Narrative.Rules exposing (..)
 import Narrative.WorldModel exposing (..)
+import Subway exposing (Station)
 
 
 rule : RuleID -> LocalTypes.Rule -> ( RuleID, LocalTypes.Rule )

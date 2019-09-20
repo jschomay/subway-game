@@ -1,6 +1,5 @@
 module Views.Station.Turnstile exposing (view)
 
-import City exposing (..)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
@@ -17,7 +16,7 @@ view : Manifest.WorldModel -> Line -> Html Msg
 view worldModel line =
     let
         lineInfo =
-            City.lineInfo line
+            Subway.lineInfo line
 
         canEnter =
             query [ HasLink "validOn" (Match lineInfo.id []), HasLink "location" (Match "player" []) ] worldModel

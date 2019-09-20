@@ -1,22 +1,21 @@
 module Views.Station.Platform exposing (view)
 
-import City exposing (..)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import LocalTypes exposing (..)
-import SubwaySimple
+import Subway exposing (..)
 import Views.Shared as Shared
 import Views.Station.Connections as Connections
 
 
 {-| shows line map for a line
 -}
-view : City.Map -> Station -> Line -> Html Msg
+view : Subway.Map -> Station -> Line -> Html Msg
 view map currentStation line =
     let
         lineInfo =
-            City.lineInfo line
+            Subway.lineInfo line
 
         lineInfoView =
             div [ class "Line_map__info" ]
@@ -24,10 +23,10 @@ view map currentStation line =
                 , text <| lineInfo.name
                 ]
 
-        connections : City.Station -> List City.Line
+        connections : Subway.Station -> List Subway.Line
         connections station =
-            SubwaySimple.connections map station
-                |> List.sortBy (City.lineInfo >> .number)
+            Subway.connectingLines map station
+                |> List.sortBy (Subway.lineInfo >> .number)
 
         stopView transferLine station =
             div
@@ -45,7 +44,7 @@ view map currentStation line =
                 , div
                     [ classList
                         [ ( "Stop__dot", True )
-                        , ( line |> City.lineInfo |> .id, True )
+                        , ( line |> Subway.lineInfo |> .id, True )
                         , ( "Stop__dot--current", station == currentStation )
                         ]
                     ]
@@ -56,7 +55,7 @@ view map currentStation line =
                         , ( "Stop__name--current", station == currentStation )
                         ]
                     ]
-                    [ text <| .name <| City.stationInfo station ]
+                    [ text <| .name <| Subway.stationInfo station ]
                 ]
     in
     div [ class "Scene Platform" ]

@@ -1,12 +1,12 @@
 module Views.Train exposing (view)
 
-import City exposing (..)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Html.Keyed
 import LocalTypes exposing (..)
 import Markdown
+import Subway exposing (..)
 
 
 view :
