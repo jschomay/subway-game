@@ -3,13 +3,14 @@ module Tests.RulesParser exposing (all)
 import Expect
 import Narrative.WorldModel exposing (..)
 import Result
-import Rules.Parser exposing (parseEntity)
+import Rules.Parser exposing (parseEntity, parseMatcher)
 import Test exposing (..)
 
 
 all =
     describe "parsing narrative"
         [ worldDefinition
+        , matchers
         ]
 
 
@@ -22,6 +23,24 @@ makeEntity id =
     )
 
 
+{-| WORLD DEFINITION
+
+CAVE\_ENTRANCE.location
+CAVE.location.dark
+
+GOBLIN.character.sleeping.location=CAVE
+
+PLAYER
+.character
+.fear=0
+.treasure\_hunt\_plot=1
+.location=CAVE\_ENTRANCE
+
+LIGHTER.item.illumination=2.location=PLAYER
+TORCH.item.illumination=7.location=CAVE\_ENTRANCE
+BAG\_OF\_GOLD.item.quest\_item.location=CAVE.guarded\_by=GOBLIN
+
+-}
 worldDefinition =
     describe "world definition"
         [ test "just id" <|
@@ -169,8 +188,78 @@ worldDefinition =
                 Expect.equal
                     (makeEntity "A" |> Ok)
                     (parseEntity "A")
+        ]
 
-        -- remember to test $ in changes and conditionals
+
+{-| Matchers
+
+TODO:
+
+--stat
+PLAYER.fear>5
+PLAYER.fear>=5
+PLAYER.fear<5
+PLAYER.fear<=5
+PLAYER.fear=5
+
+--link (specific)
+PLAYER.location=CAVE
+
+-- not
+CAVE.!dark
+PLAYER.!fear>9
+PLAYER.!location=CAVE
+
+-- generic links
+PLAYER.location=CAVE -- "shortcut" syntax
+PLAYER.location=(CAVE) -- also valid
+PLAYER.location=(CAVE.dark) -- Player is in a dark CAVE
+PLAYER.location=CAVE.dark -- Player is in a CAVE and PLAYER is dark
+PLAYER.location=_.dark -- Player is in anything and PLAYER is dark
+PLAYER.location=(_.dark).blinded -- Player is in anything dark and PLAYER is blinded
+PLAYER.location=(\*.location.dark) -- Player is in anything dark
+
+-- reciprocal links (might not work in engine currently
+trigger: _.seeking->(_.avoiding->$)
+
+-- trigger matching (keeps "$")
+PLAYER.location=$
+
+-- multiline
+PLAYER
+.location=(\*.dark)
+.fear>2
+.!blinded
+
+-}
+matchers =
+    describe "matchers"
+        [ test "any" <|
+            \() ->
+                Expect.equal
+                    (Ok <| MatchAny [])
+                    (parseMatcher "*")
+        , test "id" <|
+            \() ->
+                Expect.equal
+                    (Ok <| Match "cave" [])
+                    (parseMatcher "cave")
+        , test "tag" <|
+            \() ->
+                Expect.equal
+                    (Ok <| MatchAny [ HasTag "dark" ])
+                    (parseMatcher "*.dark")
+        , test "TODO delete this and use \"all together\" test when ready" <|
+            \() ->
+                Expect.equal
+                    (Ok <| Match "cave" [ HasTag "dark", HasTag "location" ])
+                    (parseMatcher "cave.location.dark")
+        , skip <|
+            test "all together" <|
+                \() ->
+                    Expect.equal
+                        (Ok <| Match "cave" [ HasTag "dark", HasTag "location" ])
+                        (parseMatcher "cave.location.dark.todo  more here")
         ]
 
 
@@ -184,68 +273,96 @@ shouldFail message res =
 
 
 
-{- WORLD DEFINITION
+{-
+       Updates
+
+      `Update "Player" [ AddTag "happy" ]`
+      `UpdateAll [ HasTag "happy" ] [ RemoveTag "happy" ]`
 
 
-   CAVE_ENTRANCE.location
-   CAVE.location.dark
+      "PLAYER.happy"
+      "(*.happy).-happy" // kind of annoying, but can't think of another way
 
-   GOBLIN.character.sleeping.location=CAVE
+   --  updates
+   CAVE.explored
+   GOBLIN.-sleeping
+   PLAYER.location=CAVE
+   PLAYER.fear=9
+   PLAYER.fear-1
 
-   PLAYER
-   .character
-   .fear=0
-   .treasure_hunt_plot=1
-   .location=CAVE_ENTRANCE
+   -- generic
+   CAVE.explored -- shortcut
+   (CAVE).explored -- same
+   (\*.suspect).-suspect -- clears suspect tag from all entities with suspect tag
 
-   LIGHTER.item.illumination=2.location=PLAYER
-   TORCH.item.illumination=7.location=CAVE_ENTRANCE
-   BAG_OF_GOLD.item.quest_item.location=CAVE.guarded_by=GOBLIN
+   -- multiline
+   player
+   .location=cave
+   .fear+2
+   .blinded
+
+   -- trigger matching (keeps "$")
+   $.explored
+   PLAYER.location=$
 
 -}
-{- QUERY
+{-
+
+   ## QUERY exmaples (lists of matching entities)
+
    // Get a list of all of the locations:
-   *.location
+
+       *.location
 
    // Get all items in the player's inventory:
-   *.item.location=PLAYER
 
-   // Test if the player has any item with enough illumination:
-   *.item.location=PLAYER.illumination>5
+       *.item.location=PLAYER
 
--}
-{- RULES
+   // Test if the player has any item with enough illumination (if matches is not empty):
 
-   trigger: CAVE.!explored
-   conditions:
-   *.item.location=PLAYER.illumination>5
-   changes:
-   PLAYER.location=CAVE.fear+2
-   CAVE.explored
-   narrative: You can see a short ways into the cave, and bravely enter.  You hear an awful snoring sound...
+       *.item.location=PLAYER.illumination>5
 
+   // Test if any characters in the cave are afraid (if matches is not empty):
 
-   trigger: GOBLIN.sleeping
-   changes:
-   GOBLIN.-sleeping
-   PLAYER.fear=9
-   narrative: There's an old saying, "Let sleeping dogs lie."  That applies double when it comes to goblins.  Too late...
+       *.character.location=CAVE.fear>5
 
-   // trigger match in conditional
-   trigger: *.location
-   conditions: *.enemy.location=$
-   narrative: The {$.name} is too dangerous to enter now...
-   // note, there is no way to reference the name/description of the enemy matcher
+   // Test if the player is in the cave and afraid (either an empty query results, or the player entity)
+   // TODO this requires new matcher based query instead of asset
+
+       PLAYER.location=CAVE.fear>5
+
+   RULES examples
+
+      trigger: CAVE.!explored
+      conditions:
+      *.item.location=PLAYER.illumination>5
+      changes:
+      PLAYER.location=CAVE.fear+2
+      CAVE.explored
+      narrative: You can see a short ways into the cave, and bravely enter.  You hear an awful snoring sound...
 
 
-   // moving around
-   trigger: *.location
-   changes: PLAYER.location=$
+      trigger: GOBLIN.sleeping
+      changes:
+      GOBLIN.-sleeping
+      PLAYER.fear=9
+      narrative: There's an old saying, "Let sleeping dogs lie."  That applies double when it comes to goblins.  Too late...
 
-   // picking stuff up
-   trigger: *.item.!location=PLAYER
-   changes: $.location=PLAYER
-   narrative: This might be useful.
+      // trigger match in conditional
+      trigger: *.location
+      conditions: *.enemy.location=$
+      narrative: The {$.name} is too dangerous to enter now...
+      // note, there is no way to reference the name/description of the enemy matcher
 
-   nested (PLAYER.location=(*.dark))
+
+      // moving around
+      trigger: *.location
+      changes: PLAYER.location=$
+
+      // picking stuff up
+      trigger: *.item.!location=PLAYER
+      changes: $.location=PLAYER
+      narrative: This might be useful.
+
+      nested (PLAYER.location=(*.dark))
 -}

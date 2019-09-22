@@ -1,4 +1,4 @@
-module Rules.Parser exposing (ParseError, ParsedEntity, deadEndsToString, parseEntity)
+module Rules.Parser exposing (ParseError, ParsedEntity, deadEndsToString, parseEntity, parseMatcher)
 
 import Narrative.WorldModel exposing (..)
 import Parser exposing (..)
@@ -13,9 +13,18 @@ type alias ParsedEntity =
     Result ParseError ( ID, NarrativeComponent {} )
 
 
+type alias ParsedMatcher =
+    Result ParseError EntityMatcher
+
+
 parseEntity : String -> ParsedEntity
 parseEntity text =
     run entityParser text
+
+
+parseMatcher : String -> ParsedMatcher
+parseMatcher text =
+    run matcherParser text
 
 
 entityParser =
@@ -26,6 +35,20 @@ entityParser =
     succeed toEntity
         |= idParser
         |= propsParser
+        |. end
+
+
+matcherParser =
+    let
+        toMatcher selector queries =
+            selector queries
+    in
+    succeed toMatcher
+        |= oneOf
+            [ symbol "*" |> map (always MatchAny)
+            , idParser |> map Match
+            ]
+        |= queriesParser
         |. end
 
 
@@ -76,6 +99,27 @@ propsParser =
                 ]
     in
     loop emptyNarrativeComponent helper
+
+
+queriesParser : Parser (List Query)
+queriesParser =
+    let
+        toQuery propName queryConstructor =
+            queryConstructor propName
+
+        helper acc =
+            oneOf
+                [ succeed toQuery
+                    |. symbol "."
+                    |= propertyNameParser
+                    |= oneOf
+                        [ -- TODO parse stat and link variants here
+                          succeed (\t -> Loop <| HasTag t :: acc)
+                        ]
+                , succeed (Done acc)
+                ]
+    in
+    loop [] helper
 
 
 {-| Can't use `int` because a "." can follow the number ("X.a.b=1.c"), and `int`
