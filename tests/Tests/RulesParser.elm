@@ -156,12 +156,20 @@ worldDefinition =
                                 .value=99
                                 .location=CAVE"""
                     )
-        , todo "ids cannot start with ints"
+        , test "ids cannot start with ints" <|
+            \() ->
+                shouldFail "should fail because starts with int"
+                    (parseEntity "1ST_BASE.location")
+        , test "ids cannot start with ints (in links)" <|
+            \() ->
+                shouldFail "should fail because starts with int"
+                    (parseEntity "PLAYER.location=1ST_BASE")
+        , test "single letter id ok" <|
+            \() ->
+                Expect.equal
+                    (makeEntity "A" |> Ok)
+                    (parseEntity "A")
 
-        -- location=1st_base - should be link, but will be an error (because 1 int
-        -- parse matches, unless I make it backtrackable)
-        -- location=2 - cannot tell if this is a stat or link, would be
-        -- parsed as a stat
         -- remember to test $ in changes and conditionals
         ]
 

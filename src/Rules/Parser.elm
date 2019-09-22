@@ -29,6 +29,9 @@ entityParser =
         |. end
 
 
+{-| IDs must start with a letter, then optionally have more letters, digits, or
+special characters.
+-}
 idParser : Parser ID
 idParser =
     let
@@ -36,6 +39,7 @@ idParser =
             Char.isAlphaNum c || List.member c [ '_', '-', ':', '#', '+' ]
     in
     succeed ()
+        |. chompIf Char.isAlpha
         |. chompWhile valid
         |> getChompedString
         |> andThen notEmpty
@@ -63,8 +67,8 @@ propsParser =
                         [ succeed identity
                             |. symbol "="
                             |= oneOf
-                                [ numberParser |> map (\v -> \k -> Loop <| setStat k v acc)
-                                , idParser |> map (\v -> \k -> Loop <| setLink k v acc)
+                                [ idParser |> map (\v -> \k -> Loop <| setLink k v acc)
+                                , numberParser |> map (\v -> \k -> Loop <| setStat k v acc)
                                 ]
                         , succeed (\t -> Loop <| addTag t acc)
                         ]
