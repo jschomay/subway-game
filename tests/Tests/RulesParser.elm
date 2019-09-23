@@ -200,14 +200,6 @@ CAVE.!dark
 PLAYER.!fear>9
 PLAYER.!location=CAVE
 
--- generic links
-
-    PLAYER.location=*.dark -- Player is in anything and PLAYER is dark
-    PLAYER.location=(*.dark).blinded -- Player is in anything dark and PLAYER is blinded
-    PLAYER.location=(*.location.dark) -- Player is in any dark location
-    PLAYER.location=(*.location.homeTo=GOBLIN) -- Player is in goblins home
-    PLAYER.location=(*.location.homeTo=(*.enemy)) -- Player is in any enemy location
-
 -- reciprocal links (might not work in engine currently
 trigger: _.seeking->(_.avoiding->$)
 
@@ -233,6 +225,10 @@ matchers =
                 Expect.equal
                     (Ok <| Match "cave" [])
                     (parseMatcher "cave")
+        , test "uses full input" <|
+            \() ->
+                shouldFail "didn't parse full input"
+                    (parseMatcher "cave asdf*=$")
         , test "tag" <|
             \() ->
                 Expect.equal
@@ -263,16 +259,22 @@ matchers =
                 Expect.equal
                     (Ok <| Match "PLAYER" [ HasTag "dark", HasLink "location" (Match "CAVE" []) ])
                     (parseMatcher "PLAYER.location=CAVE.dark")
-        , skip <|
-            test "link with subquery" <|
-                \() ->
-                    Expect.equal
-                        (Ok <| Match "PLAYER" [ HasLink "location" (Match "CAVE" [ HasTag "dark" ]) ])
-                        (parseMatcher "PLAYER.location=(CAVE.dark)")
+        , test "link with subquery" <|
+            \() ->
+                Expect.equal
+                    (Ok <| Match "PLAYER" [ HasLink "location" (Match "CAVE" [ HasTag "dark" ]) ])
+                    (parseMatcher "PLAYER.location=(CAVE.dark)")
+        , test "link with nested subquery" <|
+            \() ->
+                Expect.equal
+                    (Ok <| Match "PLAYER" [ HasLink "location" (Match "CAVE" [ HasTag "dark" ]) ])
+                    (parseMatcher "PLAYER.location=(CAVE.dark)")
 
-        -- PLAYER.location=(CAVE) -- also valid
-        -- PLAYER.location=(CAVE.dark) -- Player is in a dark CAVE
-        -- PLAYER.location=CAVE.dark -- Player is in a CAVE and PLAYER is dark
+        -- more nested queries to test
+        --     PLAYER.location=(*.dark).blinded -- Player is in anything dark and PLAYER is blinded
+        --     PLAYER.location=(*.location.dark) -- Player is in any dark location
+        --     PLAYER.location=(*.location.homeTo=GOBLIN) -- Player is in goblins home
+        --     PLAYER.location=(*.location.homeTo=(*.enemy)) -- Player is in any enemy location
         , test "all together" <|
             \() ->
                 Expect.equal

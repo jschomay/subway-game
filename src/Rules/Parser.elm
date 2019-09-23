@@ -24,7 +24,7 @@ parseEntity text =
 
 parseMatcher : String -> ParsedMatcher
 parseMatcher text =
-    run matcherParser text
+    run (matcherParser |. end) text
 
 
 entityParser =
@@ -38,6 +38,7 @@ entityParser =
         |. end
 
 
+matcherParser : Parser EntityMatcher
 matcherParser =
     let
         toMatcher selector queries =
@@ -46,7 +47,6 @@ matcherParser =
     succeed toMatcher
         |= selectorParser
         |= queriesParser
-        |. end
 
 
 selectorParser : Parser (List Query -> EntityMatcher)
@@ -129,6 +129,10 @@ queriesParser =
                             |= oneOf
                                 [ numberParser |> map (\n -> \key -> Loop <| HasStat key EQ n :: acc)
                                 , idParser |> map (\id -> \key -> Loop <| HasLink key (Match id []) :: acc)
+                                , succeed identity
+                                    |. symbol "("
+                                    |= (matcherParser |> map (\matcher -> \key -> Loop <| HasLink key matcher :: acc))
+                                    |. symbol ")"
                                 ]
                         , succeed (\t -> Loop <| HasTag t :: acc)
                         ]
