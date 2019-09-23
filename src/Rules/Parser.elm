@@ -44,12 +44,17 @@ matcherParser =
             selector queries
     in
     succeed toMatcher
-        |= oneOf
-            [ symbol "*" |> map (always MatchAny)
-            , idParser |> map Match
-            ]
+        |= selectorParser
         |= queriesParser
         |. end
+
+
+selectorParser : Parser (List Query -> EntityMatcher)
+selectorParser =
+    oneOf
+        [ symbol "*" |> map (always MatchAny)
+        , idParser |> map Match
+        ]
 
 
 {-| IDs must start with a letter, then optionally have more letters, digits, or
@@ -113,8 +118,19 @@ queriesParser =
                     |. symbol "."
                     |= propertyNameParser
                     |= oneOf
-                        [ -- TODO parse stat and link variants here
-                          succeed (\t -> Loop <| HasTag t :: acc)
+                        [ succeed identity
+                            |. symbol ">"
+                            |= (numberParser |> map (\n -> \key -> Loop <| HasStat key GT n :: acc))
+                        , succeed identity
+                            |. symbol "<"
+                            |= (numberParser |> map (\n -> \key -> Loop <| HasStat key LT n :: acc))
+                        , succeed identity
+                            |. symbol "="
+                            |= oneOf
+                                [ numberParser |> map (\n -> \key -> Loop <| HasStat key EQ n :: acc)
+                                , idParser |> map (\id -> \key -> Loop <| HasLink key (Match id []) :: acc)
+                                ]
+                        , succeed (\t -> Loop <| HasTag t :: acc)
                         ]
                 , succeed (Done acc)
                 ]

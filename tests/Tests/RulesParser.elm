@@ -195,29 +195,18 @@ worldDefinition =
 
 TODO:
 
---stat
-PLAYER.fear>5
-PLAYER.fear>=5
-PLAYER.fear<5
-PLAYER.fear<=5
-PLAYER.fear=5
-
---link (specific)
-PLAYER.location=CAVE
-
 -- not
 CAVE.!dark
 PLAYER.!fear>9
 PLAYER.!location=CAVE
 
 -- generic links
-PLAYER.location=CAVE -- "shortcut" syntax
-PLAYER.location=(CAVE) -- also valid
-PLAYER.location=(CAVE.dark) -- Player is in a dark CAVE
-PLAYER.location=CAVE.dark -- Player is in a CAVE and PLAYER is dark
-PLAYER.location=_.dark -- Player is in anything and PLAYER is dark
-PLAYER.location=(_.dark).blinded -- Player is in anything dark and PLAYER is blinded
-PLAYER.location=(\*.location.dark) -- Player is in anything dark
+
+    PLAYER.location=*.dark -- Player is in anything and PLAYER is dark
+    PLAYER.location=(*.dark).blinded -- Player is in anything dark and PLAYER is blinded
+    PLAYER.location=(*.location.dark) -- Player is in any dark location
+    PLAYER.location=(*.location.homeTo=GOBLIN) -- Player is in goblins home
+    PLAYER.location=(*.location.homeTo=(*.enemy)) -- Player is in any enemy location
 
 -- reciprocal links (might not work in engine currently
 trigger: _.seeking->(_.avoiding->$)
@@ -249,17 +238,56 @@ matchers =
                 Expect.equal
                     (Ok <| MatchAny [ HasTag "dark" ])
                     (parseMatcher "*.dark")
-        , test "TODO delete this and use \"all together\" test when ready" <|
+        , test "stat =" <|
             \() ->
                 Expect.equal
-                    (Ok <| Match "cave" [ HasTag "dark", HasTag "location" ])
-                    (parseMatcher "cave.location.dark")
+                    (Ok <| Match "PLAYER" [ HasStat "fear" EQ 5 ])
+                    (parseMatcher "PLAYER.fear=5")
+        , test "stat >" <|
+            \() ->
+                Expect.equal
+                    (Ok <| Match "PLAYER" [ HasStat "fear" GT 5 ])
+                    (parseMatcher "PLAYER.fear>5")
+        , test "stat <" <|
+            \() ->
+                Expect.equal
+                    (Ok <| Match "PLAYER" [ HasStat "fear" LT 5 ])
+                    (parseMatcher "PLAYER.fear<5")
+        , test "link just id" <|
+            \() ->
+                Expect.equal
+                    (Ok <| Match "PLAYER" [ HasLink "location" (Match "CAVE" []) ])
+                    (parseMatcher "PLAYER.location=CAVE")
+        , test "link missing parens" <|
+            \() ->
+                Expect.equal
+                    (Ok <| Match "PLAYER" [ HasTag "dark", HasLink "location" (Match "CAVE" []) ])
+                    (parseMatcher "PLAYER.location=CAVE.dark")
         , skip <|
-            test "all together" <|
+            test "link with subquery" <|
                 \() ->
                     Expect.equal
-                        (Ok <| Match "cave" [ HasTag "dark", HasTag "location" ])
-                        (parseMatcher "cave.location.dark.todo  more here")
+                        (Ok <| Match "PLAYER" [ HasLink "location" (Match "CAVE" [ HasTag "dark" ]) ])
+                        (parseMatcher "PLAYER.location=(CAVE.dark)")
+
+        -- PLAYER.location=(CAVE) -- also valid
+        -- PLAYER.location=(CAVE.dark) -- Player is in a dark CAVE
+        -- PLAYER.location=CAVE.dark -- Player is in a CAVE and PLAYER is dark
+        , test "all together" <|
+            \() ->
+                Expect.equal
+                    (Ok <|
+                        Match "A"
+                            [ HasTag "tag3"
+                            , HasLink "link2" (Match "C" [])
+                            , HasLink "link1" (Match "B" [])
+                            , HasStat "stat2" GT 2
+                            , HasStat "stat1" EQ 1
+                            , HasTag "tag2"
+                            , HasTag "tag1"
+                            ]
+                    )
+                    (parseMatcher "A.tag1.tag2.stat1=1.stat2>2.link1=B.link2=C.tag3")
         ]
 
 
