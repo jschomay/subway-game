@@ -264,17 +264,37 @@ matchers =
                 Expect.equal
                     (Ok <| Match "PLAYER" [ HasLink "location" (Match "CAVE" [ HasTag "dark" ]) ])
                     (parseMatcher "PLAYER.location=(CAVE.dark)")
+        , test "link with subquery with MatchAny" <|
+            \() ->
+                Expect.equal
+                    (Ok <| Match "PLAYER" [ HasLink "location" (MatchAny [ HasTag "dark", HasTag "location" ]) ])
+                    (parseMatcher "PLAYER.location=(*.location.dark)")
+        , test "link with subquery and extra tag" <|
+            \() ->
+                Expect.equal
+                    (Ok <| Match "PLAYER" [ HasTag "blinded", HasLink "location" (Match "CAVE" [ HasTag "dark" ]) ])
+                    (parseMatcher "PLAYER.location=(CAVE.dark).blinded")
         , test "link with nested subquery" <|
             \() ->
                 Expect.equal
-                    (Ok <| Match "PLAYER" [ HasLink "location" (Match "CAVE" [ HasTag "dark" ]) ])
-                    (parseMatcher "PLAYER.location=(CAVE.dark)")
-
-        -- more nested queries to test
-        --     PLAYER.location=(*.dark).blinded -- Player is in anything dark and PLAYER is blinded
-        --     PLAYER.location=(*.location.dark) -- Player is in any dark location
-        --     PLAYER.location=(*.location.homeTo=GOBLIN) -- Player is in goblins home
-        --     PLAYER.location=(*.location.homeTo=(*.enemy)) -- Player is in any enemy location
+                    (Ok <| Match "PLAYER" [ HasLink "location" (MatchAny [ HasLink "homeTo" (Match "GOBLIN" []), HasTag "location" ]) ])
+                    (parseMatcher "PLAYER.location=(*.location.homeTo=GOBLIN)")
+        , test "link super nested" <|
+            \() ->
+                Expect.equal
+                    (Ok <|
+                        Match "PLAYER"
+                            [ HasTag "scared"
+                            , HasLink "location"
+                                (MatchAny
+                                    [ HasTag "dark"
+                                    , HasLink "homeTo" (MatchAny [ HasTag "enemy" ])
+                                    , HasTag "location"
+                                    ]
+                                )
+                            ]
+                    )
+                    (parseMatcher "PLAYER.location=(*.location.homeTo=(*.enemy).dark).scared")
         , test "all together" <|
             \() ->
                 Expect.equal
