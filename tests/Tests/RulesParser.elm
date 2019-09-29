@@ -195,14 +195,6 @@ worldDefinition =
 
 TODO:
 
--- not
-CAVE.!dark
-PLAYER.!fear>9
-PLAYER.!location=CAVE
-
--- reciprocal links (might not work in engine currently
-trigger: _.seeking->(_.avoiding->$)
-
 -- trigger matching (keeps "$")
 PLAYER.location=$
 
@@ -310,6 +302,16 @@ matchers =
                             ]
                     )
                     (parseMatcher "A.tag1.tag2.stat1=1.stat2>2.link1=B.link2=C.tag3")
+        , test "not" <|
+            \() ->
+                Expect.equal
+                    (Ok <| MatchAny [ HasTag "scary", Not (HasTag "dark"), HasTag "location" ])
+                    (parseMatcher "*.location.!dark.scary")
+        , test "not 2" <|
+            \() ->
+                Expect.equal
+                    (Ok <| Match "TORCH" [ Not (HasLink "location" (Match "PLAYER" [])) ])
+                    (parseMatcher "TORCH.!location=PLAYER")
         ]
 
 

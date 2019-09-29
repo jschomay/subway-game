@@ -109,32 +109,40 @@ propsParser =
 queriesParser : Parser (List Query)
 queriesParser =
     let
-        toQuery propName queryConstructor =
-            queryConstructor propName
+        toQuery acc negate propName queryConstructor =
+            if negate then
+                Loop <| (Not <| queryConstructor propName) :: acc
+
+            else
+                Loop <| queryConstructor propName :: acc
 
         helper acc =
             oneOf
-                [ succeed toQuery
+                [ succeed (toQuery acc)
                     |. symbol "."
+                    |= oneOf
+                        [ symbol "!" |> map (always True)
+                        , succeed False
+                        ]
                     |= propertyNameParser
                     |= oneOf
                         [ succeed identity
                             |. symbol ">"
-                            |= (numberParser |> map (\n -> \key -> Loop <| HasStat key GT n :: acc))
+                            |= (numberParser |> map (\n -> \key -> HasStat key GT n))
                         , succeed identity
                             |. symbol "<"
-                            |= (numberParser |> map (\n -> \key -> Loop <| HasStat key LT n :: acc))
+                            |= (numberParser |> map (\n -> \key -> HasStat key LT n))
                         , succeed identity
                             |. symbol "="
                             |= oneOf
-                                [ numberParser |> map (\n -> \key -> Loop <| HasStat key EQ n :: acc)
-                                , idParser |> map (\id -> \key -> Loop <| HasLink key (Match id []) :: acc)
+                                [ numberParser |> map (\n -> \key -> HasStat key EQ n)
+                                , idParser |> map (\id -> \key -> HasLink key (Match id []))
                                 , succeed identity
                                     |. symbol "("
-                                    |= (matcherParser |> map (\matcher -> \key -> Loop <| HasLink key matcher :: acc))
+                                    |= (matcherParser |> map (\matcher -> \key -> HasLink key matcher))
                                     |. symbol ")"
                                 ]
-                        , succeed (\t -> Loop <| HasTag t :: acc)
+                        , succeed (\t -> HasTag t)
                         ]
                 , succeed (Done acc)
                 ]
