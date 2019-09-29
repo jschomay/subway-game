@@ -193,11 +193,6 @@ worldDefinition =
 
 {-| Matchers
 
-TODO:
-
--- trigger matching (keeps "$")
-PLAYER.location=$
-
 -- multiline
 PLAYER
 .location=(\*.dark)
@@ -246,6 +241,15 @@ matchers =
                 Expect.equal
                     (Ok <| Match "PLAYER" [ HasLink "location" (Match "CAVE" []) ])
                     (parseMatcher "PLAYER.location=CAVE")
+        , test "link with $" <|
+            \() ->
+                Expect.equal
+                    (Ok <| Match "PLAYER" [ HasLink "location" (Match "$" []) ])
+                    (parseMatcher "PLAYER.location=$")
+        , test "$ doesn't work as selector" <|
+            \() ->
+                shouldFail "selector can't be $"
+                    (parseMatcher "$.dark")
         , test "link missing parens" <|
             \() ->
                 Expect.equal

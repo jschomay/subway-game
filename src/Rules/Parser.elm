@@ -136,6 +136,7 @@ queriesParser =
                             |. symbol "="
                             |= oneOf
                                 [ numberParser |> map (\n -> \key -> HasStat key EQ n)
+                                , symbol "$" |> map (\_ -> \key -> HasLink key (Match "$" []))
                                 , idParser |> map (\id -> \key -> HasLink key (Match id []))
                                 , succeed identity
                                     |. symbol "("
