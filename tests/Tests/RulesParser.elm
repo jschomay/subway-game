@@ -23,24 +23,6 @@ makeEntity id =
     )
 
 
-{-| WORLD DEFINITION
-
-CAVE\_ENTRANCE.location
-CAVE.location.dark
-
-GOBLIN.character.sleeping.location=CAVE
-
-PLAYER
-.character
-.fear=0
-.treasure\_hunt\_plot=1
-.location=CAVE\_ENTRANCE
-
-LIGHTER.item.illumination=2.location=PLAYER
-TORCH.item.illumination=7.location=CAVE\_ENTRANCE
-BAG\_OF\_GOLD.item.quest\_item.location=CAVE.guarded\_by=GOBLIN
-
--}
 worldDefinition =
     describe "world definition"
         [ test "just id" <|
@@ -191,15 +173,6 @@ worldDefinition =
         ]
 
 
-{-| Matchers
-
--- multiline
-PLAYER
-.location=(\*.dark)
-.fear>2
-.!blinded
-
--}
 matchers =
     describe "matchers"
         [ test "any" <|
@@ -316,6 +289,18 @@ matchers =
                 Expect.equal
                     (Ok <| Match "TORCH" [ Not (HasLink "location" (Match "PLAYER" [])) ])
                     (parseMatcher "TORCH.!location=PLAYER")
+        , test "with spaces" <|
+            \() ->
+                Expect.equal
+                    (Ok <| Match "PLAYER" [ HasTag "blinded", HasStat "fear" GT 2, HasLink "location" (Match "CAVE" []) ])
+                    (parseMatcher "PLAYER .location=CAVE .fear>2 .blinded")
+        , test "multiline" <|
+            \() ->
+                shouldFail "newlines not allowed"
+                    (parseMatcher """PLAYER
+                                        .location=CAVE
+                                        .fear>2
+                                        .blinded""")
         ]
 
 

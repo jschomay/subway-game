@@ -119,6 +119,7 @@ queriesParser =
         helper acc =
             oneOf
                 [ succeed (toQuery acc)
+                    |. chompWhile ((==) ' ')
                     |. symbol "."
                     |= oneOf
                         [ symbol "!" |> map (always True)
