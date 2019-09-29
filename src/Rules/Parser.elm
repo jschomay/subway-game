@@ -1,4 +1,4 @@
-module Rules.Parser exposing (ParseError, ParsedEntity, deadEndsToString, parseEntity, parseMatcher)
+module Rules.Parser exposing (ParseError, ParsedEntity, deadEndsToString, parseChanges, parseEntity, parseMatcher)
 
 import Narrative.WorldModel exposing (..)
 import Parser exposing (..)
@@ -17,6 +17,10 @@ type alias ParsedMatcher =
     Result ParseError EntityMatcher
 
 
+type alias ParsedChanges =
+    Result ParseError ChangeWorld
+
+
 parseEntity : String -> ParsedEntity
 parseEntity text =
     run entityParser text
@@ -25,6 +29,11 @@ parseEntity text =
 parseMatcher : String -> ParsedMatcher
 parseMatcher text =
     run (matcherParser |. end) text
+
+
+parseChanges : String -> ParsedChanges
+parseChanges text =
+    run (changesParser |. end) text
 
 
 entityParser =
@@ -49,11 +58,35 @@ matcherParser =
         |= queriesParser
 
 
+changesParser : Parser ChangeWorld
+changesParser =
+    let
+        toChange selector updates =
+            selector updates
+    in
+    succeed toChange
+        |= updateTargetParser
+        |= changeEntityParser
+
+
 selectorParser : Parser (List Query -> EntityMatcher)
 selectorParser =
     oneOf
         [ symbol "*" |> map (always MatchAny)
         , idParser |> map Match
+        ]
+
+
+updateTargetParser : Parser (List ChangeEntity -> ChangeWorld)
+updateTargetParser =
+    oneOf
+        [ symbol "$" |> map (always <| Update "$")
+        , idParser |> map Update
+        , succeed identity
+            |. symbol "("
+            |. symbol "*"
+            |= (queriesParser |> map (\queries -> UpdateAll queries))
+            |. symbol ")"
         ]
 
 
@@ -152,6 +185,46 @@ queriesParser =
     loop [] helper
 
 
+changeEntityParser : Parser (List ChangeEntity)
+changeEntityParser =
+    let
+        toUpdateEntity acc propName updateConstructor =
+            Loop <| updateConstructor propName :: acc
+
+        helper acc =
+            oneOf
+                [ succeed identity
+                    |. chompWhile ((==) ' ')
+                    |. symbol "."
+                    |= oneOf
+                        [ succeed (\t -> Loop <| RemoveTag t :: acc)
+                            |. symbol "-"
+                            |= propertyNameParser
+                        , succeed (toUpdateEntity acc)
+                            |= propertyNameParser
+                            |= oneOf
+                                [ succeed identity
+                                    |. symbol "+"
+                                    |= (numberParser |> map (\n -> \key -> IncStat key n))
+                                , succeed identity
+                                    |. symbol "-"
+                                    |= (numberParser |> map (\n -> \key -> DecStat key n))
+                                , succeed identity
+                                    |. symbol "="
+                                    |= oneOf
+                                        [ numberParser |> map (\n -> \key -> SetStat key n)
+                                        , symbol "$" |> map (\_ -> \key -> SetLink key "$")
+                                        , idParser |> map (\id -> \key -> SetLink key id)
+                                        ]
+                                , succeed (\t -> AddTag t)
+                                ]
+                        ]
+                , succeed (Done acc)
+                ]
+    in
+    loop [] helper
+
+
 {-| Can't use `int` because a "." can follow the number ("X.a.b=1.c"), and `int`
 doesn't allow a digit followed by a ".". This also handles negatives.
 -}
@@ -179,7 +252,7 @@ propertyNameParser : Parser String
 propertyNameParser =
     let
         valid c =
-            Char.isAlphaNum c || List.member c [ '_', '-', ':', '#' ]
+            Char.isAlphaNum c || List.member c [ '_', ':', '#' ]
     in
     succeed ()
         |. chompWhile valid

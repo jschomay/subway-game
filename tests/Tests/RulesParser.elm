@@ -3,7 +3,7 @@ module Tests.RulesParser exposing (all)
 import Expect
 import Narrative.WorldModel exposing (..)
 import Result
-import Rules.Parser exposing (parseEntity, parseMatcher)
+import Rules.Parser exposing (parseChanges, parseEntity, parseMatcher)
 import Test exposing (..)
 
 
@@ -11,6 +11,7 @@ all =
     describe "parsing narrative"
         [ worldDefinition
         , matchers
+        , changes
         ]
 
 
@@ -304,6 +305,84 @@ matchers =
         ]
 
 
+changes =
+    describe "changes"
+        [ test "add tag" <|
+            \() ->
+                Expect.equal
+                    (Ok <| Update "CAVE" [ AddTag "explored" ])
+                    (parseChanges "CAVE.explored")
+        , test "remove tag" <|
+            \() ->
+                Expect.equal
+                    (Ok <| Update "GOBLIN" [ RemoveTag "sleeping" ])
+                    (parseChanges "GOBLIN.-sleeping")
+        , test "link" <|
+            \() ->
+                Expect.equal
+                    (Ok <| Update "PLAYER" [ SetLink "location" "CAVE" ])
+                    (parseChanges "PLAYER.location=CAVE")
+        , test "set stat" <|
+            \() ->
+                Expect.equal
+                    (Ok <| Update "PLAYER" [ SetStat "fear" 9 ])
+                    (parseChanges "PLAYER.fear=9")
+        , test "inc stat" <|
+            \() ->
+                Expect.equal
+                    (Ok <| Update "PLAYER" [ IncStat "fear" 1 ])
+                    (parseChanges "PLAYER.fear+1")
+        , test "dec stat" <|
+            \() ->
+                Expect.equal
+                    (Ok <| Update "PLAYER" [ DecStat "fear" 1 ])
+                    (parseChanges "PLAYER.fear-1")
+        , test "all together" <|
+            \() ->
+                Expect.equal
+                    (Ok <|
+                        Update "PLAYER"
+                            [ AddTag "blinded"
+                            , IncStat "fear" 2
+                            , RemoveTag "safe"
+                            , SetLink "location" "CAVE"
+                            ]
+                    )
+                    (parseChanges "PLAYER.location=CAVE.-safe.fear+2.blinded")
+        , test "spaces" <|
+            \() ->
+                Expect.equal
+                    (Ok <|
+                        Update "PLAYER"
+                            [ AddTag "blinded"
+                            , SetLink "location" "CAVE"
+                            ]
+                    )
+                    (parseChanges "PLAYER  .location=CAVE  .blinded")
+        , test "multiline disabled" <|
+            \() ->
+                shouldFail "multiline not allowed for changes"
+                    (parseChanges """PLAYER
+                                        .location=CAVE
+                                        .blinded""")
+        , test "update trigger" <|
+            \() ->
+                Expect.equal
+                    (Ok <| Update "$" [ AddTag "explored" ])
+                    (parseChanges "$.explored")
+        , test "update link to trigger" <|
+            \() ->
+                Expect.equal
+                    (Ok <| Update "PLAYER" [ SetLink "location" "$" ])
+                    (parseChanges "PLAYER.location=$")
+        , test "UpdateAll" <|
+            \() ->
+                Expect.equal
+                    (Ok <| UpdateAll [ HasTag "suspect" ] [ RemoveTag "suspect" ])
+                    (parseChanges "(*.suspect).-suspect")
+        ]
+
+
 shouldFail message res =
     case res of
         Err _ ->
@@ -314,39 +393,6 @@ shouldFail message res =
 
 
 
-{-
-       Updates
-
-      `Update "Player" [ AddTag "happy" ]`
-      `UpdateAll [ HasTag "happy" ] [ RemoveTag "happy" ]`
-
-
-      "PLAYER.happy"
-      "(*.happy).-happy" // kind of annoying, but can't think of another way
-
-   --  updates
-   CAVE.explored
-   GOBLIN.-sleeping
-   PLAYER.location=CAVE
-   PLAYER.fear=9
-   PLAYER.fear-1
-
-   -- generic
-   CAVE.explored -- shortcut
-   (CAVE).explored -- same
-   (\*.suspect).-suspect -- clears suspect tag from all entities with suspect tag
-
-   -- multiline
-   player
-   .location=cave
-   .fear+2
-   .blinded
-
-   -- trigger matching (keeps "$")
-   $.explored
-   PLAYER.location=$
-
--}
 {-
 
    ## QUERY exmaples (lists of matching entities)
