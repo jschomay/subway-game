@@ -96,7 +96,7 @@ updateStory trigger model =
                     defaultUpdate trigger model.worldModel
 
                 defaultStory =
-                    if assert trigger [ HasTag "silent" ] model.worldModel then
+                    if Rules.assert (trigger ++ ".silent") model.worldModel then
                         []
 
                     else
@@ -202,9 +202,9 @@ defaultUpdate interactableId worldModel =
     -- TODO this messes up the graph (plus overriding wouldn't actually work, since you can't "undo" or "set to previous value"), fix with:
     --- *** make these actual rules and remember to add the change to any more specific rule (though you'll need the `@` to match the selected interactable in the change if it is generic)
     --- ~~add these as rules with manual triggers and call updateStory again with manual trigger~~
-    if assert interactableId [ HasTag "station" ] worldModel then
+    if Rules.assert (interactableId ++ ".station") worldModel then
         -- move to selected station
-        [ Update "player" [ SetLink "location" interactableId ] ]
+        "player.location=" ++ interactableId |> Rules.parseChanges |> List.singleton
 
     else
         []
@@ -414,7 +414,7 @@ view model =
             getCurrentStation map model.worldModel
 
         scene =
-            if assert "player" [ HasTag "caught" ] model.worldModel then
+            if Rules.assert "player.caught" model.worldModel then
                 CentralGuardOffice
 
             else
@@ -507,14 +507,14 @@ selectSceneView model =
             ( { model
                 | scene = Lobby
               }
-            , Tuple.second beginning ++ [ "cellPhone", "cellPhone", "briefcase", "presentation", "redLinePass", "6", "mapPoster", "1", "largeCrowd" ]
+            , Tuple.second beginning ++ [ "cellPhone", "cellPhone", "briefcase", "presentation", "redLinePass", "TwinBrooks", "mapPoster", "MetroCenter", "largeCrowd" ]
             )
 
         centralGuardOffice =
             ( { model
                 | scene = CentralGuardOffice
               }
-            , Tuple.second lostBriefcase ++ [ "2", "policeOffice", "yellowline" ]
+            , Tuple.second lostBriefcase ++ [ "FederalTriangle", "policeOffice", "yellowline" ]
             )
     in
     div [ class "SelectScene" ]

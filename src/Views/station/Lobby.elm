@@ -8,6 +8,7 @@ import Html.Events exposing (..)
 import LocalTypes exposing (..)
 import Manifest exposing (..)
 import Narrative.WorldModel exposing (..)
+import Rules
 import Subway exposing (..)
 import Views.Shared as Shared
 import Views.Station.Connections as Connections
@@ -43,24 +44,14 @@ view map worldModel currentStation =
                     )
 
         characters =
-            query
-                [ HasTag "character"
-                , HasLink "location" <| Match currentStation []
-                ]
-                worldModel
+            Rules.query ("*.item.character=" ++ currentStation) worldModel
 
         items =
-            query
-                [ HasTag "item"
-                , HasLink "location" <| Match currentStation []
-                ]
-                worldModel
+            Rules.query ("*.item.location=" ++ currentStation) worldModel
 
         inventory =
-            query
-                [ HasTag "item"
-                , HasLink "location" <| Match "player" []
-                ]
+            Rules.query
+                "*.item.location=player"
                 worldModel
 
         sectionView name list =

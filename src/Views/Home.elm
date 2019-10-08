@@ -5,7 +5,7 @@ import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import LocalTypes exposing (..)
 import Manifest exposing (..)
-import Narrative.WorldModel exposing (..)
+import Rules
 import Subway exposing (..)
 import Views.Shared as Shared
 
@@ -14,18 +14,14 @@ view : Manifest.WorldModel -> Html Msg
 view worldModel =
     let
         items =
-            query
-                [ HasTag "item"
-                , HasLink "location" <| Match "home" []
-                ]
-                worldModel
+            Rules.query "*.item.location=home" worldModel
 
         readyToLeave =
             List.all identity
-                [ assert "cellPhone" [ HasLink "location" (Match "player" []) ] worldModel
-                , assert "briefcase" [ HasLink "location" (Match "player" []) ] worldModel
-                , assert "redLinePass" [ HasLink "location" (Match "player" []) ] worldModel
-                , assert "presentation" [ HasLink "location" (Match "briefcase" []) ] worldModel
+                [ Rules.assert "cellPhone.location=player" worldModel
+                , Rules.assert "briefcase.location=player" worldModel
+                , Rules.assert "redLinePass.location=player" worldModel
+                , Rules.assert "presentation.location=briefcase" worldModel
                 ]
 
         leaveLink =

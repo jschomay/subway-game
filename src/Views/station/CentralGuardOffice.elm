@@ -5,7 +5,7 @@ import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import LocalTypes exposing (..)
 import Manifest exposing (..)
-import Narrative.WorldModel exposing (..)
+import Rules
 import Subway exposing (..)
 import Views.Shared as Shared
 
@@ -19,25 +19,13 @@ view worldmodel =
                 [ text name ]
 
         characters =
-            query
-                [ HasTag "character"
-                , HasLink "location" <| Match "centralGuardOffice" []
-                ]
-                worldmodel
+            Rules.query "*.character.location=centralGuardOffice" worldmodel
 
         items =
-            query
-                [ HasTag "item"
-                , HasLink "location" <| Match "centralGuardOffice" []
-                ]
-                worldmodel
+            Rules.query "*.item.location=centralGuardOffice" worldmodel
 
         inventory =
-            query
-                [ HasTag "item"
-                , HasLink "location" <| Match "player" []
-                ]
-                worldmodel
+            Rules.query "*.item.location=player" worldmodel
     in
     -- TODO this needs to be figured out
     div [ class "Scene CentralGuardOffice" ]

@@ -5,7 +5,7 @@ import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import LocalTypes exposing (..)
 import Manifest exposing (..)
-import Narrative.WorldModel exposing (..)
+import Rules
 import Subway exposing (..)
 import Views.Shared as Shared
 
@@ -18,8 +18,11 @@ view worldModel line =
         lineInfo =
             Subway.lineInfo line
 
+        canEnterQuery =
+            "*.validOn=" ++ lineInfo.id ++ ".location=player"
+
         canEnter =
-            query [ HasLink "validOn" (Match lineInfo.id []), HasLink "location" (Match "player" []) ] worldModel
+            Rules.query canEnterQuery worldModel
                 |> List.isEmpty
                 |> not
     in

@@ -1,4 +1,4 @@
-module Rules.Parser exposing (ParseError, ParsedEntity, deadEndsToString, parseChanges, parseEntity, parseMatcher)
+module Rules.Parser exposing (ParseError, ParsedChanges, ParsedEntity, ParsedMatcher, deadEndsToString, parseChanges, parseEntity, parseMatcher)
 
 import Narrative.WorldModel exposing (..)
 import Parser exposing (..)

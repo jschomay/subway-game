@@ -108,14 +108,14 @@ buildGraph model =
         breakMatcherIntoReqs matcher =
             case matcher of
                 WorldModel.MatchAny queries ->
-                    List.map (\query store -> WorldModel.query [ query ] store |> List.isEmpty |> not) queries
+                    List.map (\query store -> WorldModel.query (WorldModel.MatchAny [ query ]) store |> List.isEmpty |> not) queries
 
                 WorldModel.Match id queries ->
                     if List.isEmpty queries then
                         [ always True ]
 
                     else
-                        List.map (\query store -> WorldModel.assert id [ query ] store) queries
+                        List.map (\query store -> WorldModel.query (WorldModel.Match id [ query ]) store |> List.isEmpty |> not) queries
 
         applyRule : Rule -> WorldModel -> WorldModel
         applyRule rule state =
