@@ -44,7 +44,7 @@ view map worldModel currentStation =
                     )
 
         characters =
-            Rules.query ("*.item.character=" ++ currentStation) worldModel
+            Rules.query ("*.character.location=" ++ currentStation) worldModel
 
         items =
             Rules.query ("*.item.location=" ++ currentStation) worldModel

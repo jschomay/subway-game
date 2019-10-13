@@ -150,6 +150,8 @@ updateStory trigger model =
                 config =
                     { cycleIndex = cycleIndex
                     , propKeywords = propKeywords
+                    , trigger = trigger
+                    , worldModel = model.worldModel
                     }
 
                 currentNarrative =
