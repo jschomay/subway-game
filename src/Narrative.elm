@@ -2,8 +2,10 @@ module Narrative exposing (Narrative, parse)
 
 import Array
 import Dict exposing (Dict)
+import Narrative.WorldModel exposing (ID, WorldModel)
 import Parser exposing (..)
 import Result
+import Rules.Parser exposing (ParsedMatcher, deadEndsToString, parseMatcher)
 
 
 {-| A list of fully parsed strings. Each string will be displayed with a continue
@@ -19,16 +21,22 @@ type alias Narrative =
 
 `propKeywords` - a dictionary of valid keywords to match against, and the corresponding functions that will take an entity ID and return a property as a Result. For example "{stranger.description}" could be matched with a keyword of "description" and a corresponding function that takes "stranger" and returns a description. If it returns and Err, the match will fail.
 
+`worldModel` - the full world model. Used to query against for conditional text.
+
+`trigger` - an entity ID used to replace "$" in conditional text.
+
 -}
-type alias Config =
+type alias Config a =
     { cycleIndex : Int
     , propKeywords : Dict String (String -> Result String String)
+    , worldModel : WorldModel a
+    , trigger : ID
     }
 
 
 {-| Parses the text, then splits for continues.
 -}
-parse : Config -> String -> Narrative
+parse : Config a -> String -> Narrative
 parse config text =
     let
         parser =
@@ -78,7 +86,7 @@ Note that empty options are valid, like "{|a||}" which has 3 empty segments.
 -- TODO option for loop and maybe random
 
 -}
-cyclingText : Config -> Parser String
+cyclingText : Config a -> Parser String
 cyclingText config =
     let
         findCurrent : List String -> String
@@ -111,15 +119,17 @@ cyclingText config =
 {-| Parses text that looks like "{myEntity.name}".
 Takes a dict keyed by the acceptable keywords (Like "name") with values that take the id and return an appropriate string or error.
 
-Note that this means that entity ids cannot use any of the following four characters: `.{}|`
+You can also use `$.name` which will replace "$" with the value in `config.trigger`.
+
+Note that this means that entity ids cannot use any of the following characters: `.{}|`
 
 -}
-propertyText : Config -> Parser String
+propertyText : Config a -> Parser String
 propertyText config =
     let
         getProp : String -> (String -> Result String String) -> Result String String
         getProp id propFn =
-            propFn id
+            propFn <| String.replace "$" config.trigger id
 
         keywords =
             Dict.toList config.propKeywords
@@ -139,6 +149,56 @@ propertyText config =
         |> andThen fromResult
 
 
+{-| Parses text that looks like "{myEntity.query? Only shown if true|Optional text to show otherwise}", where "query" can be any syntax query.
+
+You can have multiple queries separated by "&" before the "?". You can also do `*.query` style queries. Any whitespace around after the "?" and around the "|" will be considered part of the text to display.
+
+-}
+conditionalText : Config a -> Parser String
+conditionalText config =
+    let
+        assert matcher =
+            Narrative.WorldModel.query matcher config.worldModel
+                |> List.isEmpty
+                |> not
+
+        process ( queryText, ifText, elseText ) =
+            String.split "&" queryText
+                |> List.map (String.trim >> parseMatcher)
+                |> sequence
+                |> Result.map
+                    (List.all
+                        (Narrative.WorldModel.replaceTrigger config.trigger >> assert)
+                    )
+                |> (\final ->
+                        case final of
+                            Ok True ->
+                                commit ifText
+
+                            Ok False ->
+                                commit elseText
+
+                            Err e ->
+                                problem (deadEndsToString e)
+                   )
+    in
+    succeed (\a b c -> ( a, b, c ))
+        |= (getChompedString (chompUntil "?") |> andThen notEmpty)
+        |. symbol "?"
+        -- NOTE add this in to allow whitespace after "?"
+        -- makes {x.tag ? yes|no} look nicer, but prevents conditional whitespace
+        -- |. chompWhile ((==) ' ')
+        |= staticText
+        |= oneOf
+            [ succeed identity
+                |. break
+                |= staticText
+                |. close
+            , close |> map (always "")
+            ]
+        |> andThen process
+
+
 fromResult res =
     case res of
         Ok s ->
@@ -146,6 +206,21 @@ fromResult res =
 
         Err e ->
             problem e
+
+
+sequence : List (Result e a) -> Result e (List a)
+sequence list =
+    List.foldl
+        (\r acc ->
+            case r of
+                Ok a ->
+                    Result.map ((::) a) acc
+
+                Err e ->
+                    Err e
+        )
+        (Ok [])
+        list
 
 
 open =
@@ -160,7 +235,7 @@ close =
     symbol "}"
 
 
-parseText : Config -> Parser String
+parseText : Config a -> Parser String
 parseText config =
     let
         topLevel =
@@ -170,7 +245,8 @@ parseText config =
                     |= oneOf
                         -- this order is important (because props are a more specific
                         -- version of cycles)
-                        [ backtrackable <| propertyText config
+                        [ backtrackable <| conditionalText config
+                        , backtrackable <| propertyText config
                         , backtrackable <| cyclingText config
                         ]
                 , staticText

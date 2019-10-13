@@ -3,6 +3,7 @@ module Tests.NarrativeParse exposing (all)
 import Dict
 import Expect
 import Narrative exposing (parse)
+import Narrative.WorldModel exposing (..)
 import Result
 import Test exposing (..)
 
@@ -14,12 +15,15 @@ all =
         , property
         , mixed
         , withContinues
+        , conditional
         ]
 
 
 config =
     { cycleIndex = 0
     , propKeywords = Dict.empty
+    , worldModel = Dict.empty
+    , trigger = ""
     }
 
 
@@ -30,7 +34,15 @@ configWithKeyword k f =
 
 
 configWithName =
-    configWithKeyword "name" (\s -> Ok <| "Mr. " ++ String.toUpper s)
+    configWithKeyword "name"
+        (\s ->
+            case s of
+                "MrX" ->
+                    Ok "Mr. X"
+
+                _ ->
+                    Err <| "Can't find " ++ ".name" ++ " for " ++ s
+        )
 
 
 configWithNameError =
@@ -126,15 +138,19 @@ property =
         [ test "happy path" <|
             \() ->
                 Expect.equal [ "Meet Mr. X." ] <|
-                    parse configWithName "Meet {x.name}."
+                    parse configWithName "Meet {MrX.name}."
         , test "looks like prop but really cycle" <|
             \() ->
-                Expect.equal [ "x.name" ] <|
-                    parse configWithName "{x.name|hi}"
+                Expect.equal [ "MrX.name" ] <|
+                    parse configWithName "{MrX.name|hi}"
         , test "if the keyword function returns an Err it doesn't match (will match as a cycle instead)" <|
             \() ->
-                Expect.equal [ "x.name" ] <|
-                    parse configWithNameError "{x.name}"
+                Expect.equal [ "MrX.name" ] <|
+                    parse configWithNameError "{MrX.name}"
+        , test "trigger ('$.name')" <|
+            \() ->
+                Expect.equal [ "Meet Mr. X" ] <|
+                    parse { configWithName | trigger = "MrX" } "Meet {$.name}"
         ]
 
 
@@ -152,24 +168,24 @@ mixed =
             [ test "cycle 0, prop 1" <|
                 \() ->
                     Expect.equal [ "a" ] <|
-                        parse configWithName "{a|{x.name}}"
+                        parse configWithName "{a|{MrX.name}}"
             , test "cycle 1, prop 1" <|
                 \() ->
                     Expect.equal [ "Mr. X" ] <|
-                        parse { configWithName | cycleIndex = 1 } "{a|{x.name}}"
+                        parse { configWithName | cycleIndex = 1 } "{a|{MrX.name}}"
             , test "cycle 0, prop 0" <|
                 \() ->
                     Expect.equal [ "Mr. X" ] <|
-                        parse configWithName "{{x.name}|a}"
+                        parse configWithName "{{MrX.name}|a}"
             , test "cycle 1, prop 0" <|
                 \() ->
                     Expect.equal [ "a" ] <|
-                        parse { configWithName | cycleIndex = 1 } "{{x.name}|a}"
+                        parse { configWithName | cycleIndex = 1 } "{{MrX.name}|a}"
             ]
         , describe "complete cycle and props example" <|
             let
                 text =
-                    "{Meet {x.name}|{x.nickname} says hi}.{  He says you can call him {x.nickname}.|}"
+                    "{Meet {MrX.name}|{MrX.nickname} says hi}.{  He says you can call him {MrX.nickname}.|}"
 
                 nestedConfig =
                     { config
@@ -206,6 +222,139 @@ withContinues =
             \() ->
                 Expect.equal [ "three" ] <|
                     parse { config | cycleIndex = 1 } "{one---two|three}"
+        ]
+
+
+entity id =
+    ( id
+    , { tags = emptyTags
+      , stats = emptyStats
+      , links = emptyLinks
+      }
+    )
+
+
+conditional =
+    describe "conditional" <|
+        let
+            configWithWorldModel =
+                { configWithName
+                    | worldModel =
+                        Dict.fromList
+                            [ entity "MrX"
+                                |> tag "known"
+                                |> tag "character"
+                            , entity "Player"
+                                |> tag "character"
+                                |> link "location" "House"
+                            , entity "House"
+                                |> tag "location"
+                            ]
+                }
+        in
+        [ test "if (true)" <|
+            \() ->
+                Expect.equal [ "A man walks by.  You recognize him as Mr. X." ] <|
+                    parse configWithWorldModel "A man walks by.{MrX.known?  You recognize him as Mr. X.}"
+        , test "if (false)" <|
+            \() ->
+                Expect.equal [ "A man walks by." ] <|
+                    parse configWithWorldModel "A man walks by.{MrX.!known? You don't recognize him.}"
+        , test "malformed query (get's parsed as a cycle)" <|
+            \() ->
+                Expect.equal [ "Entity.badstat>x? yes " ] <|
+                    parse configWithWorldModel "{Entity.badstat>x? yes | no}"
+        , test "if/else (else branch)" <|
+            \() ->
+                Expect.equal [ "A man walks by.  You recognize him as Mr. X." ] <|
+                    parse configWithWorldModel "A man walks by.  You {MrX.!known? don't recognize him|recognize him as Mr. X}."
+        , test "with nested query" <|
+            \() ->
+                Expect.equal [ "yes" ] <|
+                    parse configWithWorldModel "{Player.location=(House.location)?yes|no}"
+        , test "multiple conditions" <|
+            \() ->
+                Expect.equal [ "You are alone." ] <|
+                    parse configWithWorldModel "{MrX.known.location=House? You see Mr. X in your home.|You are alone.}"
+        , test "with whitespace" <|
+            \() ->
+                -- NOTE the spaces after ? and around | are part of the text
+                -- I could eat them, but then it wouldn't be possible to
+                -- conditionally all a new paragraph or spaces
+                Expect.equal [ " yes" ] <|
+                    parse configWithWorldModel """{ MrX.known ? yes|no}"""
+        , test "multiple queries (true)" <|
+            \() ->
+                Expect.equal [ "A man rings the bell.  You recognize him as Mr. X." ] <|
+                    parse configWithWorldModel "A man rings the bell.{MrX.known & Player.location=House ?  You recognize him as Mr. X.|  But you are not home.}"
+        , test "multiple queries (false)" <|
+            \() ->
+                Expect.equal [ "A man rings the bell.  But you are not home." ] <|
+                    parse configWithWorldModel "A man rings the bell.{MrX.known & Player.location=Other ?  You recognize him as Mr. X.|  But you are not home.}"
+        , test "with * (true)" <|
+            \() ->
+                Expect.equal [ "Someone is home." ] <|
+                    parse configWithWorldModel "{*.character.location=House?Someone|No one} is home."
+        , test "with * (false)" <|
+            \() ->
+                Expect.equal [ "No one is home." ] <|
+                    parse configWithWorldModel "{*.character.location=Other?Someone|No one} is home."
+        , test "matching trigger (in match)" <|
+            \() ->
+                Expect.equal [ "Home sweet home." ] <|
+                    parse { configWithWorldModel | trigger = "House" } "{Player.location=$ ?Home sweet home.|You miss your home.}"
+        , test "matching trigger (in match, nested)" <|
+            \() ->
+                Expect.equal [ "Home sweet home." ] <|
+                    parse { configWithWorldModel | trigger = "House" } "{Player.location=($.location) ?Home sweet home.|You miss your home.}"
+        , test "matching trigger (in selector)" <|
+            \() ->
+                Expect.equal [ "You know him." ] <|
+                    parse { configWithWorldModel | trigger = "MrX" } "{$.known?You know him.|You don't know him.}"
+        ]
+
+
+allTogether =
+    describe "all together" <|
+        let
+            text =
+                """You shout at {$.name}{| again}.
+"{What do you want?|Why do you keep bothering me?|Leave me alone!}"
+{$.suspicious>3 & Warrant.location=Player?"You're under arrest!"|"Never mind."}
+"""
+        in
+        [ test "cycle 1" <|
+            \() ->
+                Expect.equal
+                    [ """You shout at Mr. X.
+"What do you want?"
+"Never mind."
+"""
+                    ]
+                <|
+                    parse { configWithName | trigger = "MrX" } text
+        , test "cycle 2" <|
+            \() ->
+                Expect.equal
+                    [ """You shout at Mr. X again.
+"Why do you keep bothering me?"
+"You're under arrest!"
+""" ]
+                <|
+                    parse
+                        { configWithName
+                            | trigger = "MrX"
+                            , cycleIndex = 1
+                            , worldModel =
+                                Dict.fromList
+                                    [ entity "MrX"
+                                        |> stat "suspicious" 5
+                                    , entity "Warrant"
+                                        |> link "location" "Player"
+                                    , entity "Player"
+                                    ]
+                        }
+                        text
         ]
 
 

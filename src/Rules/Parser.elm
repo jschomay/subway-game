@@ -69,10 +69,14 @@ changesParser =
         |= changeEntityParser
 
 
+{-| A valid id, or "\*" for `MatchAny` or "$" to indicate the id should be replaced
+with a "trigger" (useful in conditional narratives for example).
+-}
 selectorParser : Parser (List Query -> EntityMatcher)
 selectorParser =
     oneOf
         [ symbol "*" |> map (always MatchAny)
+        , symbol "$" |> map (always <| Match "$")
         , idParser |> map Match
         ]
 

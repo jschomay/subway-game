@@ -220,9 +220,10 @@ matchers =
                 Expect.equal
                     (Ok <| Match "PLAYER" [ HasLink "location" (Match "$" []) ])
                     (parseMatcher "PLAYER.location=$")
-        , test "$ doesn't work as selector" <|
+        , test "$ as selector (needed for conditional text)" <|
             \() ->
-                shouldFail "selector can't be $"
+                Expect.equal
+                    (Ok <| Match "$" [ HasTag "dark" ])
                     (parseMatcher "$.dark")
         , test "link missing parens" <|
             \() ->
