@@ -19,8 +19,7 @@ module.exports = ({ mode, presets } = { mode: "production", presets: [] }) => {
       },
 
       entry: {
-        index: "./src/index.js",
-        graph: "./src/graph.js"
+        index: "./src/index.js"
       },
 
       module: {
@@ -43,13 +42,6 @@ module.exports = ({ mode, presets } = { mode: "production", presets: [] }) => {
           inject: "body",
           chunks: ["index"],
           filename: "index.html"
-        }),
-
-        new HtmlWebpackPlugin({
-          template: "src/graph.html",
-          inject: "body",
-          chunks: ["graph"],
-          filename: "graph.html"
         }),
 
         new StyleLintPlugin()
