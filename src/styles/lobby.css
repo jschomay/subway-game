@@ -4,7 +4,8 @@
 .Lobby:before {
   background: url(../img/subway-lobby.jpg);
   opacity: 0.8;
-  animation: flicker 0.3s cubic-bezier(0.840, 0.170, 0.540, 1.350) alternate infinite 0s;
+  animation: flicker 0.3s cubic-bezier(0.84, 0.17, 0.54, 1.35) alternate
+    infinite 0s;
 }
 
 .Lobby__scene {
@@ -15,8 +16,6 @@
   align-items: flex-start;
   position: relative;
 }
-
-
 
 /* Sign */
 
@@ -137,14 +136,14 @@
 
 /* Line colors */
 
-.redLine {
-  background: #E13915;
+.RED_LINE {
+  background: #e13915;
 }
-.yellowLine {
-  background: #D9AD02;
+.YELLOW_LINE {
+  background: #d9ad02;
   color: black;
 }
-.greenLine {
+.GREEN_LINE {
   background: #019966;
 }
 
@@ -162,11 +161,10 @@
   background-position: center center;
 }
 
-
 /* Media queries */
 
 @media (max-width: 1024px) {
- .Sign--chapter {
-   display: none;
- }
+  .Sign--chapter {
+    display: none;
+  }
 }

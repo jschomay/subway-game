@@ -5,7 +5,7 @@ import Dict exposing (Dict)
 import Narrative.WorldModel exposing (ID, WorldModel)
 import Parser exposing (..)
 import Result
-import Rules.Parser exposing (ParsedMatcher, deadEndsToString, parseMatcher)
+import Rules.Parser exposing (ParsedMatcher, deadEndsToString, parseMatcher, parseMultiple)
 
 
 {-| A list of fully parsed strings. Each string will be displayed with a continue
@@ -34,7 +34,7 @@ type alias Config a =
     }
 
 
-{-| Parses the text, then splits for continues.
+{-| Parses the text, then splits for continues. Removes empty strings.
 -}
 parse : Config a -> String -> Narrative
 parse config text =
@@ -47,6 +47,7 @@ parse config text =
     case run parser text of
         Ok parsed ->
             String.split "---" parsed
+                |> List.filter (not << String.isEmpty)
 
         Err e ->
             let
@@ -164,8 +165,8 @@ conditionalText config =
 
         process ( queryText, ifText, elseText ) =
             String.split "&" queryText
-                |> List.map (String.trim >> parseMatcher)
-                |> sequence
+                |> List.map String.trim
+                |> parseMultiple parseMatcher
                 |> Result.map
                     (List.all
                         (Narrative.WorldModel.replaceTrigger config.trigger >> assert)
@@ -206,21 +207,6 @@ fromResult res =
 
         Err e ->
             problem e
-
-
-sequence : List (Result e a) -> Result e (List a)
-sequence list =
-    List.foldl
-        (\r acc ->
-            case r of
-                Ok a ->
-                    Result.map ((::) a) acc
-
-                Err e ->
-                    Err e
-        )
-        (Ok [])
-        list
 
 
 open =

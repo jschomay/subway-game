@@ -67,84 +67,87 @@ addDisplayable name desc ( id, { tags, stats, links } ) =
 
 entities : List ParsedEntity
 entities =
-    [ entity "map.item.silent"
+    [ entity "MAP.item.map.silent"
         "Subway map"
         "A map of all of the subway lines you know about."
 
     -- home
-    , entity "briefcase.item.location=home"
+    , entity "BRIEFCASE.item.location=PLAYER"
         "Briefcase"
         "The tool of your trade, and more than that, a badge of honor.  Yours is a tasteful brown leather, perfectly organized (usually), and always by your side."
-    , entity "redLinePass.item.location=home.validOn=redLine"
+    , entity "RED_LINE_PASS.item.location=PLAYER.valid_on=RED_LINE"
         "Red Line metro pass"
         "This will get you to any station along the Red Line.  Expires in 8 months."
-    , entity "cellPhone.item.location=home"
+    , entity "CELL_PHONE.item.location=PLAYER"
         "Cell phone"
         "It's not one of those $800 ones, but it does everything you need."
-    , entity "coffeeCup.item.fixed.location=home"
+    , entity "COFFEE_CUP.item.fixed.location=HOME"
         "Empty coffee cup"
         "You've gone through a few of these while trying to finish the presentation."
-    , entity "presentation.item.location=home"
+    , entity "PRESENTATION.item.location=HOME"
         "Scattered papers"
         "Your desk is littered with the printed out copies of your presentation, covered in scribbles and sticky notes."
-    , entity "laptop.item.fixed.location=home"
+    , entity "LAPTOP.item.fixed.location=HOME"
         "Laptop"
         "Your laptop battery is almost dead, but you don't need it, you've got the hard copy of your presentation with your notes on it."
-    , entity "deskPhone.item.fixed.location=home"
+    , entity "DESK_PHONE.item.fixed.location=HOME"
         "Desk phone"
         "You still have an old school landline in your home office, though you rarely use it."
+    , entity "CENTRAL_GUARD_OFFICE.location"
+        "Central Guard Office"
+        "You know you're in trouble if you are here."
 
     --  TwinBrooks
-    , entity "safteyWarningPoster.item.location=TwinBrooks"
+    , entity "SAFTEY_WARNING_POSTER.item.location=TWIN_BROOKS"
         "Safety Message Poster"
         "A poster that warns you to watch out for pickpockets and report any suspicious activity. "
-    , entity "mapPoster.item.location=TwinBrooks"
+    , entity "MAP_POSTER.item.map.location=TWIN_BROOKS"
         "Map on the wall"
         "This shows the full map of the subway system."
 
     --  FederalTriangle
-    , entity "policeOffice.item.location=FederalTriangle"
+    , entity "POLICE_OFFICE.item.location=FEDERAL_TRIANGLE"
         "Police Office"
         "A small police office."
-    , entity "ticketMachine.item.location=FederalTriangle"
+    , entity "TICKET_MACHINE.item.location=FEDERAL_TRIANGLE"
         "Ticket Machine"
         "You can buy tickets and passes here."
 
     --  ChurchStreet
-    , entity "paperScrap.item.location=ChurchStreet"
+    , entity "PAPER_SCRAP.item.location=CHURCH_STREET"
         "Scrap of paper"
         "It's just trash."
 
     -- WestMulberry
-    , entity "maintenanceDoor.item.location=WestMulberry"
+    , entity "MAINTENANCE_DOOR.item.location=WEST_MULBERRY"
         "Maintenance door"
         "The sign on it says \"Maintenance access only\"."
 
     -- maintenanceMan
-    , entity "keyCard.item.location=maintenanceMan"
+    , entity "KEY_CARD.item.location=MAINTENANCE_MAN"
         "Maintenance Key Card"
         "This will get you in to maintenance areas."
 
     -- characters
-    , entity "maintenanceMan.character.location=TwinBrooks"
+    , entity "MAINTENANCE_MAN.character.location=TWIN_BROOKS"
         "Maintenance man"
         "He's probably busy, you don't really have any reason to bother him."
-    , entity "largeCrowd.character.location=MetroCenter"
+    , entity "LARGE_CROWD.character.location=METRO_CENTER"
         "A large crowd"
         "They ignore you for the most part, occupied with the situation at hand."
-    , entity "securityOfficers.character.location=MetroCenter"
+    , entity "SECURITY_OFFICERS.character.location=METRO_CENTER"
         "Security officers"
         "Two of them, looking official, but not really all that helpful over all."
-    , entity "commuter1.character.location=EastMulberry"
+    , entity "COMMUTER_1.character.location=EAST_MULBERRY"
         "Commuter"
         "Another commuter, waiting for the train."
-    , entity "commuter2.character.location=WestMulberry"
+    , entity "COMMUTER_2.character.location=WEST_MULBERRY"
         "Commuter"
         "Another commuter, waiting for the train."
-    , entity "player.mainPlot=1.location=TwinBrooks"
+    , entity "PLAYER.main_plot=1.location=TWIN_BROOKS"
         "Steve"
         "A guy just trying to get ahead by following the rules."
-    , entity "home.location"
+    , entity "HOME.location"
         "Home"
         "Your tiny apartment."
     ]
@@ -174,8 +177,8 @@ stations =
         makeId id =
             id
                 ++ ".loation.station"
-                ++ (if id == "MetroCenter" then
-                        ".stevesWork"
+                ++ (if id == "METRO_CENTER" then
+                        ".steves_work"
 
                     else
                         ""

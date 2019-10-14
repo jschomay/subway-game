@@ -1,4 +1,4 @@
-module Rules exposing (assert, parseChanges, parseMatcher, query, rules)
+module Rules exposing (parseErrors, rules, unsafeAssert, unsafeParseChanges, unsafeParseMatcher, unsafeQuery)
 
 import Dict exposing (Dict)
 import LocalTypes exposing (..)
@@ -6,16 +6,49 @@ import Manifest exposing (Entity, ID, WorldModel)
 import Narrative.WorldModel exposing (ChangeWorld(..), EntityMatcher(..))
 import Rules.General
 import Rules.Intro
-import Rules.LostBriefcase
-import Rules.Parser
+import Rules.Parser exposing (..)
 
 
-rules : Rules
 rules =
-    Rules.Intro.rules
-        ++ Rules.LostBriefcase.rules
-        ++ Rules.General.rules
-        |> Dict.fromList
+    Tuple.first rules_
+
+
+parseErrors =
+    Tuple.second rules_
+
+
+parseRule { trigger, conditions, changes, narrative } =
+    let
+        toRule trigger_ conditions_ changes_ narrative_ =
+            { trigger = trigger_
+            , conditions = conditions_
+            , changes = changes_
+            , narrative = narrative_
+            }
+    in
+    Result.map4 toRule
+        (parseMatcher trigger)
+        (parseMultiple parseMatcher conditions)
+        (parseMultiple parseChanges changes)
+        (Ok narrative)
+
+
+rules_ : ( Rules, List ( String, ParseError ) )
+rules_ =
+    let
+        separateErrors ( id, rule_ ) acc =
+            case parseRule rule_ of
+                Ok parsedRule ->
+                    Tuple.mapFirst (Dict.insert id parsedRule) acc
+
+                Err err ->
+                    Tuple.mapSecond ((::) ( id, err )) acc
+    in
+    -- Rules.Intro.rules
+    --     ++ Rules.LostBriefcase.rules
+    --     ++ Rules.General.rules
+    Rules.General.rules
+        |> List.foldl separateErrors ( Dict.empty, [] )
 
 
 {-| Parses an entity matcher. If there are errors, it will log to the console and default to an "empty" matcher.
@@ -23,8 +56,8 @@ rules =
 Warning, you can't optmize a production build with Debug.log.
 
 -}
-parseMatcher : String -> EntityMatcher
-parseMatcher s =
+unsafeParseMatcher : String -> EntityMatcher
+unsafeParseMatcher s =
     case Rules.Parser.parseMatcher s of
         Ok matcher ->
             matcher
@@ -39,8 +72,8 @@ parseMatcher s =
 Warning, you can't optmize a production build with Debug.log.
 
 -}
-parseChanges : String -> ChangeWorld
-parseChanges s =
+unsafeParseChanges : String -> ChangeWorld
+unsafeParseChanges s =
     case Rules.Parser.parseChanges s of
         Ok changes ->
             changes
@@ -52,15 +85,15 @@ parseChanges s =
 
 {-| "Unsafe" query
 -}
-query : String -> WorldModel -> List ( ID, Entity )
-query queryString store =
+unsafeQuery : String -> WorldModel -> List ( ID, Entity )
+unsafeQuery queryString store =
     queryString
-        |> parseMatcher
+        |> unsafeParseMatcher
         |> (\matcher -> Narrative.WorldModel.query matcher store)
 
 
 {-| "Unsafe" assert
 -}
-assert : String -> WorldModel -> Bool
-assert queryString store =
-    query queryString store |> List.isEmpty |> not
+unsafeAssert : String -> WorldModel -> Bool
+unsafeAssert queryString store =
+    unsafeQuery queryString store |> List.isEmpty |> not

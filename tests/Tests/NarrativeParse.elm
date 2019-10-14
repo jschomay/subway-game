@@ -53,7 +53,9 @@ static =
     describe "static"
         [ test "empty string" <|
             \() ->
-                Expect.equal [ "" ] <|
+                -- TODO this was an empty string in a list, but it should be an empty
+                -- list
+                Expect.equal [] <|
                     parse { config | cycleIndex = 0 } ""
         , test "static string" <|
             \() ->
@@ -84,7 +86,7 @@ cycle =
                     parse { config | cycleIndex = 9 } "{a|b|c}"
         , test "cycle with empties 1" <|
             \() ->
-                Expect.equal [ "" ] <|
+                Expect.equal [] <|
                     parse { config | cycleIndex = 1 } "{||ok|no}"
         , test "cycle with empties 2" <|
             \() ->

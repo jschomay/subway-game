@@ -40,17 +40,17 @@ type alias StationInfo =
 stations : Dict Station StationInfo
 stations =
     Dict.fromList
-        [ ( "MetroCenter", { name = "Metro Center" } )
-        , ( "FederalTriangle", { name = "Federal Triangle" } )
-        , ( "MacArthursPark", { name = "MacArthur's Park" } )
-        , ( "ChurchStreet", { name = "Church Street" } )
-        , ( "SpringHill", { name = "Spring Hill" } )
-        , ( "TwinBrooks", { name = "Twin Brooks" } )
-        , ( "CapitolHeights", { name = "Capitol Heights" } )
-        , ( "EastMulberry", { name = "East Mulberry" } )
-        , ( "WestMulberry", { name = "West Mulberry" } )
-        , ( "Burlington", { name = "Burlington" } )
-        , ( "SamualStreet", { name = "Samual Street" } )
+        [ ( "METRO_CENTER", { name = "Metro Center" } )
+        , ( "FEDERAL_TRIANGLE", { name = "Federal Triangle" } )
+        , ( "MACARTHURS_PARK", { name = "MacArthur's Park" } )
+        , ( "CHURCH_STREET", { name = "Church Street" } )
+        , ( "SPRING_HILL", { name = "Spring Hill" } )
+        , ( "TWIN_BROOKS", { name = "Twin Brooks" } )
+        , ( "CAPITOL_HEIGHTS", { name = "Capitol Heights" } )
+        , ( "EAST_MULBERRY", { name = "East Mulberry" } )
+        , ( "WEST_MULBERRY", { name = "West Mulberry" } )
+        , ( "BURLINGTON", { name = "Burlington" } )
+        , ( "SAMUAL_STREET", { name = "Samual Street" } )
         ]
 
 
@@ -75,42 +75,42 @@ lineInfo line =
         Red ->
             { number = 1
             , name = "Red Line"
-            , id = "redLine"
+            , id = "RED_LINE"
             , color = red
             , stations =
-                [ "WestMulberry"
-                , "EastMulberry"
-                , "ChurchStreet"
-                , "MetroCenter"
-                , "FederalTriangle"
-                , "SpringHill"
-                , "TwinBrooks"
+                [ "WEST_MULBERRY"
+                , "EAST_MULBERRY"
+                , "CHURCH_STREET"
+                , "METRO_CENTER"
+                , "FEDERAL_TRIANGLE"
+                , "SPRING_HILL"
+                , "TWIN_BROOKS"
                 ]
             }
 
         Yellow ->
             { number = 2
             , name = "Yellow Line"
-            , id = "yellowLine"
+            , id = "YELLOW_LINE"
             , color = yellow
             , stations =
-                [ "MetroCenter"
-                , "FederalTriangle"
-                , "CapitolHeights"
-                , "MacArthursPark"
+                [ "METRO_CENTER"
+                , "FEDERAL_TRIANGLE"
+                , "CAPITOL_HEIGHTS"
+                , "MACARTHURS_PARK"
                 ]
             }
 
         Green ->
             { number = 3
             , name = "Green Line"
-            , id = "greenLine"
+            , id = "GREEN_LINE"
             , color = green
             , stations =
-                [ "Burlington"
-                , "SamualStreet"
-                , "CapitolHeights"
-                , "FederalTriangle"
+                [ "BURLINGTON"
+                , "SAMUAL_STREET"
+                , "CAPITOL_HEIGHTS"
+                , "FEDERAL_TRIANGLE"
                 ]
             }
 

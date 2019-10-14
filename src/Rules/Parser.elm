@@ -1,4 +1,4 @@
-module Rules.Parser exposing (ParseError, ParsedChanges, ParsedEntity, ParsedMatcher, deadEndsToString, parseChanges, parseEntity, parseMatcher)
+module Rules.Parser exposing (ParseError, ParsedChanges, ParsedEntity, ParsedMatcher, deadEndsToString, parseChanges, parseEntity, parseMatcher, parseMultiple)
 
 import Narrative.WorldModel exposing (..)
 import Parser exposing (..)
@@ -34,6 +34,14 @@ parseMatcher text =
 parseChanges : String -> ParsedChanges
 parseChanges text =
     run (changesParser |. end) text
+
+
+{-| Generic helper to parse a list against a supplied parse function. Will be `Err`
+if any items fail to parse, or an `Ok` of the list of parsed results. Useful for parsing a rules conditions and changes for example.
+-}
+parseMultiple : (String -> Result ParseError a) -> List String -> Result ParseError (List a)
+parseMultiple parser strings =
+    List.map parser strings |> sequence
 
 
 entityParser =
@@ -270,6 +278,23 @@ notEmpty s =
 
     else
         succeed s
+
+
+{-| "Switches" a higher-order "kind"
+-}
+sequence : List (Result e a) -> Result e (List a)
+sequence list =
+    List.foldl
+        (\r acc ->
+            case r of
+                Ok a ->
+                    Result.map ((::) a) acc
+
+                Err e ->
+                    Err e
+        )
+        (Ok [])
+        list
 
 
 

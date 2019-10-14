@@ -3,7 +3,14 @@ module Tests.RulesParser exposing (all)
 import Expect
 import Narrative.WorldModel exposing (..)
 import Result
-import Rules.Parser exposing (parseChanges, parseEntity, parseMatcher)
+import Rules.Parser
+    exposing
+        ( deadEndsToString
+        , parseChanges
+        , parseEntity
+        , parseMatcher
+        , parseMultiple
+        )
 import Test exposing (..)
 
 
@@ -12,6 +19,7 @@ all =
         [ worldDefinition
         , matchers
         , changes
+        , multiple
         ]
 
 
@@ -384,6 +392,34 @@ changes =
         ]
 
 
+multiple =
+    describe "multiple"
+        [ test "with parseMatcher (successful)" <|
+            \() ->
+                Expect.equal
+                    (Ok <|
+                        [ MatchAny [ HasLink "location" (Match "PLAYER" []), HasTag "light" ]
+                        , Match "CAVE" [ HasTag "dark" ]
+                        ]
+                    )
+                    (parseMultiple parseMatcher
+                        [ "CAVE.dark"
+                        , "*.light.location=PLAYER"
+                        ]
+                    )
+        , test "unsuccessful" <|
+            \() ->
+                Expect.equal
+                    (Err "expecting end at row 1, col 2")
+                    (parseMultiple parseMatcher
+                        [ "CAVE.dark"
+                        , "*zzz.light.location=PLAYER"
+                        ]
+                        |> Result.mapError deadEndsToString
+                    )
+        ]
+
+
 shouldFail message res =
     case res of
         Err _ ->
@@ -415,7 +451,6 @@ shouldFail message res =
        *.character.location=CAVE.fear>5
 
    // Test if the player is in the cave and afraid (either an empty query results, or the player entity)
-   // TODO this requires new matcher based query instead of asset
 
        PLAYER.location=CAVE.fear>5
 

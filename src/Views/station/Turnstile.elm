@@ -19,10 +19,10 @@ view worldModel line =
             Subway.lineInfo line
 
         canEnterQuery =
-            "*.validOn=" ++ lineInfo.id ++ ".location=player"
+            "*.valid_on=" ++ lineInfo.id ++ ".location=PLAYER"
 
         canEnter =
-            Rules.query canEnterQuery worldModel
+            Rules.unsafeQuery canEnterQuery worldModel
                 |> List.isEmpty
                 |> not
     in

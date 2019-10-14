@@ -19,13 +19,13 @@ view worldmodel =
                 [ text name ]
 
         characters =
-            Rules.query "*.character.location=centralGuardOffice" worldmodel
+            Rules.unsafeQuery "*.character.location=CENTRAL_GUARD_OFFICE" worldmodel
 
         items =
-            Rules.query "*.item.location=centralGuardOffice" worldmodel
+            Rules.unsafeQuery "*.item.location=CENTRAL_GUARD_OFFICE" worldmodel
 
         inventory =
-            Rules.query "*.item.location=player" worldmodel
+            Rules.unsafeQuery "*.item.location=PLAYER" worldmodel
     in
     -- TODO this needs to be figured out
     div [ class "Scene CentralGuardOffice" ]

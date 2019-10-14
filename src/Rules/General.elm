@@ -8,46 +8,35 @@ import Narrative.WorldModel exposing (..)
 import Rules.Helpers exposing (..)
 
 
-rules : List ( String, LocalTypes.Rule )
+rules : List ( String, TextRule )
 rules =
     []
-        -- ++ [ rule "pickingThingsUp"
-        --         { trigger = MatchAny [ HasTag "item", Not <| HasTag "fixed", Not <| HasLink "location" (Match "player" []) ]
-        --         , conditions = []
-        --         , changes = [ Update "$" [ SetLink "location" "player" ] ]
-        --         , narrative =   "You take it."
-        --         }
         ++ [ rule "ridingTheTrain"
-                { trigger = MatchAny [ HasTag "station" ]
+                { trigger = "*.station"
                 , conditions = []
-                , changes = []
+                , changes = [ "PLAYER.location=$" ]
                 , narrative = ridingTheTrain
                 }
            , rule "goToLinePlatform"
-                { trigger = MatchAny [ HasTag "line" ]
-                , conditions =
-                    [ MatchAny
-                        [ HasLink "validOn" (Match "$" [])
-                        , HasLink "location" (Match "player" [])
-                        ]
-                    ]
-                , changes = [ Update "player" [ SetLink "line" "$" ] ]
+                { trigger = "*.line"
+                , conditions = [ "*.valid_on=$.location=PLAYER" ]
+                , changes = [ "PLAYER.line=$" ]
                 , narrative = ""
                 }
            , rule "jumpTurnstileFail"
-                { trigger = MatchAny [ HasTag "line" ]
+                { trigger = "*.line"
                 , conditions = []
                 , changes = []
                 , narrative = jumpTurnstileFail
                 }
            , rule "getMap"
-                { trigger = Match "mapPoster" []
-                , conditions = [ Match "map" [ Not <| HasLink "location" <| Match "player" [] ] ]
-                , changes = [ Update "map" [ SetLink "location" "player" ] ]
+                { trigger = "MAP_POSTER"
+                , conditions = [ "MAP.!location=PLAYER" ]
+                , changes = [ "MAP.location=PLAYER" ]
                 , narrative = getMap
                 }
            , rule "checkMap"
-                { trigger = Match "mapPoster" []
+                { trigger = "*.map"
                 , conditions = []
                 , changes = []
                 , narrative = ""

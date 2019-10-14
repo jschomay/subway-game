@@ -21,7 +21,7 @@ view map worldModel currentStation =
             (stationInfo currentStation |> .name) ++ " Station"
 
         ( chapterNumber, chapterName, goals ) =
-            getStat "player" "mainPlot" worldModel
+            getStat "PLAYER" "main_plot" worldModel
                 |> Maybe.andThen
                     (\plotLevel ->
                         Array.get (plotLevel - 1) Constants.chapters
@@ -39,19 +39,19 @@ view map worldModel currentStation =
             Constants.distractions
                 |> List.filterMap
                     (\distraction ->
-                        getStat "player" distraction.id worldModel
+                        getStat "PLAYER" distraction.id worldModel
                             |> Maybe.map (always distraction.name)
                     )
 
         characters =
-            Rules.query ("*.character.location=" ++ currentStation) worldModel
+            Rules.unsafeQuery ("*.character.location=" ++ currentStation) worldModel
 
         items =
-            Rules.query ("*.item.location=" ++ currentStation) worldModel
+            Rules.unsafeQuery ("*.item.location=" ++ currentStation) worldModel
 
         inventory =
-            Rules.query
-                "*.item.location=player"
+            Rules.unsafeQuery
+                "*.item.location=PLAYER"
                 worldModel
 
         sectionView name list =

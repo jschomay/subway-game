@@ -7,15 +7,13 @@ import Array
 -}
 scenes =
     { intro = 1
-    , lostBriefcase = 2
-    , wildGooseChase = 3
-    , endOfDemo = 4
+    , endOfDemo = 99
     }
 
 
 characterStats =
     [ { id = "bravery", name = "Bravery", starting = 0 }
-    , { id = "ruleBreaker", name = "Rule breaker", starting = 0 }
+    , { id = "rule_reaker", name = "Rule breaker", starting = 0 }
     ]
 
 
@@ -41,7 +39,7 @@ chapters =
 
 
 distractions =
-    [ { id = "downTheRabbitHole"
+    [ { id = "down_the_rabbit_hole"
       , name = "Down the rabbit hole"
       , chapters =
             Array.fromList

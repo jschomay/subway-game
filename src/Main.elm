@@ -53,13 +53,16 @@ init flags =
     let
         ( initialWorldModel, entityParseErrors ) =
             Manifest.initialWorldModel
+
+        ruleParseErrors =
+            Rules.parseErrors
     in
     ( { worldModel = initialWorldModel
-      , parseErrors = entityParseErrors
+      , parseErrors = entityParseErrors ++ ruleParseErrors
       , loaded = False
       , story = []
       , ruleMatchCounts = Dict.empty
-      , scene = Home
+      , scene = Lobby
       , showMap = False
       , gameOver = False
       , selectScene = flags.selectScene
@@ -92,11 +95,8 @@ updateStory trigger model =
     case Narrative.Rules.findMatchingRule trigger Rules.rules model.worldModel of
         Nothing ->
             let
-                defaultChanges =
-                    defaultUpdate trigger model.worldModel
-
                 defaultStory =
-                    if Rules.assert (trigger ++ ".silent") model.worldModel then
+                    if Rules.unsafeAssert (trigger ++ ".silent") model.worldModel then
                         []
 
                     else
@@ -108,7 +108,6 @@ updateStory trigger model =
             in
             { model
                 | story = defaultStory
-                , pendingChanges = Just ( trigger, defaultChanges )
             }
                 |> specialEvents trigger
 
@@ -116,9 +115,6 @@ updateStory trigger model =
             let
                 debug =
                     Debug.log "Matched rule:" matchedRuleID
-
-                defaultChanges =
-                    defaultUpdate trigger model.worldModel
 
                 cycleIndex =
                     Dict.get matchedRuleID model.ruleMatchCounts
@@ -169,8 +165,7 @@ updateStory trigger model =
                         model.ruleMatchCounts
             in
             { model
-              -- make sure rule changes are second so that they can overrite default changes if needed
-                | pendingChanges = Just <| ( trigger, defaultChanges ++ matchedRule.changes )
+                | pendingChanges = Just <| ( trigger, matchedRule.changes )
                 , story = currentNarrative
                 , ruleMatchCounts = newMatchCounts
             }
@@ -180,9 +175,6 @@ updateStory trigger model =
 specialEvents : String -> Model -> Model
 specialEvents ruleId model =
     case ruleId of
-        "map" ->
-            { model | showMap = not model.showMap }
-
         "checkMap" ->
             { model | showMap = not model.showMap }
 
@@ -193,23 +185,6 @@ specialEvents ruleId model =
 
             else
                 model
-
-
-{-| Sometimes you need to react to an interaction regardless of which rule matches. For example, things like moving to a locaiton, or taking an item.
-This happens before `updateStory`, so you can always override these changes in the rules if need.
-Warning, this should be used sparingly!
--}
-defaultUpdate : String -> Manifest.WorldModel -> List ChangeWorld
-defaultUpdate interactableId worldModel =
-    -- TODO this messes up the graph (plus overriding wouldn't actually work, since you can't "undo" or "set to previous value"), fix with:
-    --- *** make these actual rules and remember to add the change to any more specific rule (though you'll need the `@` to match the selected interactable in the change if it is generic)
-    --- ~~add these as rules with manual triggers and call updateStory again with manual trigger~~
-    if Rules.assert (interactableId ++ ".station") worldModel then
-        -- move to selected station
-        "player.location=" ++ interactableId |> Rules.parseChanges |> List.singleton
-
-    else
-        []
 
 
 noop : Model -> ( Model, Cmd Msg )
@@ -224,7 +199,7 @@ changeTrainStatus newStatus trainProps =
 
 getCurrentStation : Subway.Map -> Manifest.WorldModel -> Station
 getCurrentStation map worldModel =
-    Narrative.WorldModel.getLink "player" "location" worldModel
+    Narrative.WorldModel.getLink "PLAYER" "location" worldModel
         |> Maybe.withDefault "ERROR getting the current location of player from worldmodel"
 
 
@@ -260,7 +235,7 @@ update msg model =
                     Cmd.none
 
                   else
-                    delay introDelay (Interact "player")
+                    delay introDelay (Interact "PLAYER")
                 )
 
             LoadScene ( model_, history ) ->
@@ -416,7 +391,7 @@ view model =
             getCurrentStation map model.worldModel
 
         scene =
-            if Rules.assert "player.caught" model.worldModel then
+            if Rules.unsafeAssert "PLAYER.caught" model.worldModel then
                 CentralGuardOffice
 
             else
@@ -503,28 +478,19 @@ selectSceneView : Model -> Html Msg
 selectSceneView model =
     let
         beginning =
-            ( model, [ "player" ] )
+            ( model, [ "PLAYER" ] )
 
-        lostBriefcase =
-            ( { model
-                | scene = Lobby
-              }
-            , Tuple.second beginning ++ [ "cellPhone", "cellPhone", "briefcase", "presentation", "redLinePass", "TwinBrooks", "mapPoster", "MetroCenter", "largeCrowd" ]
-            )
-
-        centralGuardOffice =
-            ( { model
-                | scene = CentralGuardOffice
-              }
-            , Tuple.second lostBriefcase ++ [ "FederalTriangle", "policeOffice", "yellowline" ]
-            )
+        -- lostBriefcase =
+        --     ( { model
+        --         | scene = Lobby
+        --       }
+        --     , Tuple.second beginning ++ [ "cellPhone", "cellPhone", "briefcase", "presentation", "redLinePass", "TwinBrooks", "mapPoster", "MetroCenter", "largeCrowd" ]
+        --     )
     in
     div [ class "SelectScene" ]
         [ h1 [] [ text "Select a scene to jump to:" ]
         , ul []
             [ li [ onClick <| LoadScene beginning ] [ text "Beginning" ]
-            , li [ onClick <| LoadScene lostBriefcase ] [ text "Losing briefcase" ]
-            , li [ onClick <| LoadScene centralGuardOffice ] [ text "In the central guard office" ]
             ]
         ]
 

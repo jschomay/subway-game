@@ -14,21 +14,21 @@ view : Manifest.WorldModel -> Html Msg
 view worldModel =
     let
         items =
-            Rules.query "*.item.location=home" worldModel
+            Rules.unsafeQuery "*.item.location=home" worldModel
 
         readyToLeave =
             List.all identity
-                [ Rules.assert "cellPhone.location=player" worldModel
-                , Rules.assert "briefcase.location=player" worldModel
-                , Rules.assert "redLinePass.location=player" worldModel
-                , Rules.assert "presentation.location=briefcase" worldModel
+                [ Rules.unsafeAssert "CELL_PHONE.location=PLAYER" worldModel
+                , Rules.unsafeAssert "BRIEFCASE.location=PLAYER" worldModel
+                , Rules.unsafeAssert "RED_LINE_PASS.location=PLAYER" worldModel
+                , Rules.unsafeAssert "PRESENTATION.location=briefcase" worldModel
                 ]
 
         leaveLink =
             if readyToLeave then
                 div
                     [ class "Home__leave"
-                    , onClick <| BoardTrain Red "TwinBrooks"
+                    , onClick <| BoardTrain Red "TWIN_BROOKS"
                     ]
                     [ text "Go to the metro station" ]
 
