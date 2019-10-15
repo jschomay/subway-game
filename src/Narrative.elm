@@ -189,11 +189,11 @@ conditionalText config =
         -- NOTE add this in to allow whitespace after "?"
         -- makes {x.tag ? yes|no} look nicer, but prevents conditional whitespace
         -- |. chompWhile ((==) ' ')
-        |= staticText
+        |= lazy (\_ -> parseText config)
         |= oneOf
             [ succeed identity
                 |. break
-                |= staticText
+                |= lazy (\_ -> parseText config)
                 |. close
             , close |> map (always "")
             ]

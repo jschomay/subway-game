@@ -45,8 +45,33 @@ configWithName =
         )
 
 
+entity id =
+    ( id
+    , { tags = emptyTags
+      , stats = emptyStats
+      , links = emptyLinks
+      }
+    )
+
+
 configWithNameError =
     configWithKeyword "name" (always <| Err "test error")
+
+
+configWithWorldModel =
+    { configWithName
+        | worldModel =
+            Dict.fromList
+                [ entity "MrX"
+                    |> tag "known"
+                    |> tag "character"
+                , entity "Player"
+                    |> tag "character"
+                    |> link "location" "House"
+                , entity "House"
+                    |> tag "location"
+                ]
+    }
 
 
 static =
@@ -207,6 +232,10 @@ mixed =
                     Expect.equal [ "Henry says hi." ] <|
                         parse { nestedConfig | cycleIndex = 1 } text
             ]
+        , test "nested cycle with conditional" <|
+            \() ->
+                Expect.equal [ "ayesb" ] <|
+                    parse { configWithWorldModel | cycleIndex = 1 } "a{one|{MrX.known?yes|no}}b"
         ]
 
 
@@ -227,33 +256,8 @@ withContinues =
         ]
 
 
-entity id =
-    ( id
-    , { tags = emptyTags
-      , stats = emptyStats
-      , links = emptyLinks
-      }
-    )
-
-
 conditional =
     describe "conditional" <|
-        let
-            configWithWorldModel =
-                { configWithName
-                    | worldModel =
-                        Dict.fromList
-                            [ entity "MrX"
-                                |> tag "known"
-                                |> tag "character"
-                            , entity "Player"
-                                |> tag "character"
-                                |> link "location" "House"
-                            , entity "House"
-                                |> tag "location"
-                            ]
-                }
-        in
         [ test "if (true)" <|
             \() ->
                 Expect.equal [ "A man walks by.  You recognize him as Mr. X." ] <|
@@ -313,6 +317,10 @@ conditional =
             \() ->
                 Expect.equal [ "You know him." ] <|
                     parse { configWithWorldModel | trigger = "MrX" } "{$.known?You know him.|You don't know him.}"
+        , test "with nested cycle" <|
+            \() ->
+                Expect.equal [ "You are still home." ] <|
+                    parse { configWithWorldModel | cycleIndex = 1 } "{Player.location=House?You are {|still} home.}"
         ]
 
 
