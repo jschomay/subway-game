@@ -44,9 +44,7 @@ rules_ =
                 Err err ->
                     Tuple.mapSecond ((::) ( id, err )) acc
     in
-    -- Rules.Intro.rules
-    --     ++ Rules.LostBriefcase.rules
-    --     ++ Rules.General.rules
+    -- Rules.Intro.rules ++
     Rules.General.rules
         |> List.foldl separateErrors ( Dict.empty, [] )
 

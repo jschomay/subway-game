@@ -59,8 +59,7 @@ type alias TrainProps =
 
 
 type Scene
-    = Home
-    | Lobby
+    = Lobby
     | Turnstile Line
     | Platform Line
     | Train TrainProps

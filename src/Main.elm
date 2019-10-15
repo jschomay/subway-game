@@ -20,7 +20,6 @@ import Rules.Parser
 import Subway exposing (..)
 import Task
 import Tuple
-import Views.Home as Home
 import Views.Station.CentralGuardOffice as CentralGuardOffice
 import Views.Station.Lobby as Lobby
 import Views.Station.Platform as Platform
@@ -425,9 +424,6 @@ view model =
         Html.Keyed.node "div"
             [ class "game" ]
             [ case scene of
-                Home ->
-                    ( "home", Home.view model.worldModel )
-
                 CentralGuardOffice ->
                     ( "centralGuardOffice", CentralGuardOffice.view model.worldModel )
 

@@ -44,26 +44,19 @@ rules =
            ]
 
 
-jumpToLostBriefcase : String
-jumpToLostBriefcase =
-    """
-    After missing your stop, you go back, only to find the exits sealed.  During the confusion, someone steals your briefcase!  You notice the thief disappear down the tunnel for the Red line trains towards West Mulberry...
-    """
-
-
 ridingTheTrain : String
 ridingTheTrain =
-    "{ The train hurtles through the dark tunnel towards the next stop.| You stare at the floor, avoiding the gaze of the other passengers, waiting for your next stop.}"
+    "The train hurtles through the dark tunnel towards the next stop."
 
 
 jumpTurnstileFail =
-    "{You've never jumped a turnstile in your life, and you're not about to start now.|Better to stick to the lines you have passes for.|You're too afraid you'll get caught.}"
+    "{I've never jumped a turnstile in my life, and I'm not about to start now.|I don't want to get caught.|Better to stick to the lines I have passes for.}"
 
 
 getMap : String
 getMap =
     """
-You pick up a subway map.
+{I might need the full subway map.  They have a printed one I can take.
 
-(It is now in your inventory and you can view it at any time by clicking on it or pressing 'M')
+(Press "M" to view the map)|}
 """
