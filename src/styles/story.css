@@ -13,7 +13,17 @@
   animation: fadeIn 0.3s linear forwards;
 }
 
+/* shim (prevent clicking on other interatables) */
 .StoryLine::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+
+.StoryLine::after {
   content: "";
   position: absolute;
   top: 0.6em;
@@ -25,6 +35,7 @@
 
 .StoryLine__content {
   width: 100%;
+  position: relative;
 }
 
 .StoryLine__content code {
