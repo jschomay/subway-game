@@ -14,6 +14,7 @@
     "webpack": "webpack",
     "webpack-dev-server": "webpack-dev-server",
     "prod": "npm run webpack -- --env.mode production",
+    "deploy": "npm run prod && gh-pages -d dist",
     "prod:analyze": "npm run prod -- --env.presets analyze",
     "prod:compress": "npm run prod -- --env.presets compress",
     "dev": "npm run webpack-dev-server -- --env.mode development",
