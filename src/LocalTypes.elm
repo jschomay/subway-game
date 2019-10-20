@@ -20,7 +20,7 @@ type alias Model =
     , gameOver : Bool
     , selectScene : Bool
     , history : List String
-    , pendingChanges : Maybe ( Narrative.WorldModel.ID, List ChangeWorld )
+    , pendingChanges : Maybe ( Narrative.WorldModel.ID, List ChangeWorld, RuleID )
     }
 
 
@@ -59,7 +59,8 @@ type alias TrainProps =
 
 
 type Scene
-    = Lobby
+    = Title String
+    | Lobby
     | Turnstile Line
     | Platform Line
     | Train TrainProps

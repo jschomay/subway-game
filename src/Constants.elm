@@ -26,9 +26,11 @@ characterStats =
 -}
 chapters =
     Array.fromList
-        [ ( "Deadline", [ "Give your 9AM presentation" ] )
-        , ( "Stop, Thief!", [ "Retrieve your briefcase", "Get to work in time to present" ] )
-        , ( "Stuck underground", [ "Track the thief", "END OF DEMO!", "THANK YOU FOR PLAYING!" ] )
+        [ ( "The daily grind", [ "Go to work" ] )
+        , ( "Deadline", [ "Get back to the office in time", "Give your presentation" ] )
+
+        -- , ( "Stop, Thief!", [ "Retrieve your briefcase", "Get to work in time to present" ] )
+        -- , ( "Stuck underground", [ "Track the thief", "END OF DEMO!", "THANK YOU FOR PLAYING!" ] )
         ]
 
 

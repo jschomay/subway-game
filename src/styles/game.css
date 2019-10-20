@@ -39,6 +39,8 @@ body {
   margin: 0px;
   padding: 0px;
   background-color: black;
+  font-family: sans-serif;
+  font-family: helvetica;
 }
 
 .Loading {
@@ -48,7 +50,6 @@ body {
   align-items: center;
   justify-content: center;
   color: #555;
-  font-family: helvetica;
   font-size: 48px;
   font-weight: normal;
   color: white;
@@ -56,8 +57,22 @@ body {
 }
 
 .SelectScene {
+  font-size: 1.8em;
   color: white;
   padding: 10% 30%;
+}
+
+.Scene.TitleScene {
+  color: white;
+  font-size: 1.8em;
+  animation: fadeIn 2.0s ease-out forwards;
+}
+
+.TitleContent {
+  position: relative;
+}
+.Title {
+  font-size: 3em;
 }
 
 .SelectScene li {
@@ -68,8 +83,6 @@ body {
 }
 
 .game {
-  font-family: sans-serif;
-  font-family: helvetica;
   position: relative;
   background: black;
   width: 100%;

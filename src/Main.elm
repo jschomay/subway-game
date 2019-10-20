@@ -61,7 +61,7 @@ init flags =
       , loaded = False
       , story = []
       , ruleMatchCounts = Dict.empty
-      , scene = Lobby
+      , scene = Title (dayText initialWorldModel)
       , showMap = False
       , gameOver = False
       , selectScene = flags.selectScene
@@ -87,9 +87,10 @@ arrivingDelay =
     0.9 * 1000
 
 
-{-| "Ticks" the narrative engine, and displays the story content
+{-| "Ticks" the narrative engine, and displays the story content. Also preps changes
+(to be applied when story has finished). Handles cases for a matched rule and no match.
 -}
-updateStory : String -> Model -> Model
+updateStory : String -> Model -> ( Model, Cmd Msg )
 updateStory trigger model =
     case Narrative.Rules.findMatchingRule trigger Rules.rules model.worldModel of
         Nothing ->
@@ -105,10 +106,9 @@ updateStory trigger model =
                             -- TODO make sure to update ruleMatchCounts with trigger
                             |> Maybe.withDefault []
             in
-            { model
-                | story = defaultStory
-            }
-                |> specialEvents trigger
+            -- no need to apply special events or pending changes (no changes,
+            -- and no rule id to match).
+            ( { model | story = defaultStory }, Cmd.none )
 
         Just ( matchedRuleID, matchedRule ) ->
             let
@@ -163,27 +163,69 @@ updateStory trigger model =
                         )
                         model.ruleMatchCounts
             in
-            { model
-                | pendingChanges = Just <| ( trigger, matchedRule.changes )
+            ( { model
+                | pendingChanges = Just ( trigger, matchedRule.changes, matchedRuleID )
                 , story = currentNarrative
                 , ruleMatchCounts = newMatchCounts
-            }
-                |> specialEvents matchedRuleID
+              }
+            , Cmd.none
+            )
+                |> updateAndThen
+                    (if List.isEmpty currentNarrative then
+                        applyPendingChanges
+
+                     else
+                        noop
+                    )
 
 
-specialEvents : String -> Model -> Model
+dayText : Manifest.WorldModel -> String
+dayText worldModel =
+    case getStat "PLAYER" "day" worldModel of
+        Just 1 ->
+            "Monday morning"
+
+        Just 2 ->
+            "Tuesday morning"
+
+        Just 3 ->
+            "Wednesday morning"
+
+        Just 4 ->
+            "Thursday morning"
+
+        Just 5 ->
+            "Friday morning"
+
+        _ ->
+            "ERROR can't get PLAYER.day"
+
+
+{-| Changes the model based on the matched rule id. This shouldn't change fields
+based on teh world model or rules (story, pendingChanges, worldModel).
+
+This should run at the same time the model updates from a rule or from pending changes.
+
+Note that this only runs when a rule has matched. In other words, you won't get the
+id of an entity as a ruleId to match against.
+
+-}
+specialEvents : String -> Model -> ( Model, Cmd Msg )
 specialEvents ruleId model =
     case ruleId of
         "checkMap" ->
-            { model | showMap = not model.showMap }
+            ( { model | showMap = not model.showMap }, Cmd.none )
+
+        "goToWorkAndResetToNextDay" ->
+            ( { model | scene = Title (dayText model.worldModel) }, Cmd.none )
 
         other ->
             if List.member other [ "goToLinePlatform", "jumpYellowLineTurnstile" ] then
                 -- This is kind of janky, but it works for now
-                { model | scene = Platform <| Maybe.withDefault Red <| getCurrentLine model }
+                ( { model | scene = Platform <| Maybe.withDefault Red <| getCurrentLine model }, Cmd.none )
 
             else
-                model
+                ( model, Cmd.none )
 
 
 noop : Model -> ( Model, Cmd Msg )
@@ -234,7 +276,9 @@ update msg model =
                     Cmd.none
 
                   else
-                    delay introDelay (Interact "PLAYER")
+                    -- doesn't need anything special to start events now (starts at
+                    -- title screen)
+                    Cmd.none
                 )
 
             LoadScene ( model_, history ) ->
@@ -242,30 +286,16 @@ update msg model =
                     (\id modelTuple ->
                         modelTuple
                             |> updateAndThen (update <| Interact id)
-                            |> updateAndThen
-                                (\m ->
-                                    let
-                                        ( trigger, changes ) =
-                                            m.pendingChanges
-                                                |> Maybe.map identity
-                                                |> Maybe.withDefault ( "", [] )
-                                    in
-                                    ( { m
-                                        | pendingChanges = Nothing
-                                        , worldModel = applyChanges changes trigger m.worldModel
-                                      }
-                                    , Cmd.none
-                                    )
-                                )
+                            |> updateAndThen applyPendingChanges
                     )
                     ( { model_ | selectScene = False }, Cmd.none )
                     history
 
             Interact interactableId ->
                 ( { model | history = model.history ++ [ interactableId ] |> Debug.log "history\n" }
-                    |> updateStory interactableId
                 , Cmd.none
                 )
+                    |> updateAndThen (updateStory interactableId)
 
             Delay duration delayedMsg ->
                 ( model
@@ -288,40 +318,51 @@ update msg model =
                 )
 
             Continue ->
+                -- reduces the story and applies the pending changes when the story
+                -- has completed (this avoids having the background change before the
+                -- player has finished reading the story)
                 if List.length model.story > 1 then
                     ( { model | story = List.drop 1 model.story }, Cmd.none )
 
                 else
-                    (case model.scene of
-                        Train train ->
-                            ( { model | scene = Train <| changeTrainStatus Arriving train }
-                            , delay arrivingDelay <| Disembark
-                            )
-
-                        _ ->
-                            ( model, Cmd.none )
-                    )
+                    ( { model | story = [] }, Cmd.none )
+                        |> updateAndThen applyPendingChanges
                         |> updateAndThen
                             (\m ->
-                                let
-                                    ( trigger, changes ) =
-                                        m.pendingChanges
-                                            |> Maybe.map identity
-                                            |> Maybe.withDefault ( "", [] )
-                                in
-                                ( { m
-                                    | worldModel = applyChanges changes trigger model.worldModel
-                                    , pendingChanges = Nothing
-                                    , story = []
-                                  }
-                                , Cmd.none
-                                )
+                                -- special case when riding the train
+                                case m.scene of
+                                    Train train ->
+                                        ( { m | scene = Train <| changeTrainStatus Arriving train }
+                                        , delay arrivingDelay <| Disembark
+                                        )
+
+                                    _ ->
+                                        ( m, Cmd.none )
                             )
 
             Disembark ->
                 ( { model | scene = Lobby }
                 , Cmd.none
                 )
+
+
+{-| Applies pending changes and special events. This is used to make sure the view
+doesn't change in the background until the story modal has closed.
+-}
+applyPendingChanges : Model -> ( Model, Cmd Msg )
+applyPendingChanges model =
+    case model.pendingChanges of
+        Just ( trigger, changes, matchedRuleID ) ->
+            ( { model
+                | worldModel = applyChanges changes trigger model.worldModel
+                , pendingChanges = Nothing
+              }
+            , Cmd.none
+            )
+                |> updateAndThen (specialEvents matchedRuleID)
+
+        _ ->
+            ( model, Cmd.none )
 
 
 delay : Float -> Msg -> Cmd Msg
@@ -346,41 +387,38 @@ subscriptions model =
 handleKey : Model -> String -> Msg
 handleKey model key =
     let
-        atTurnstile =
+        showingTitle =
             case model.scene of
-                Turnstile _ ->
+                Title _ ->
                     True
 
                 _ ->
                     False
-
-        turnStileMessage =
-            case model.scene of
-                Turnstile line ->
-                    Interact <| .id <| lineInfo line
-
-                _ ->
-                    NoOp
     in
-    case key of
-        " " ->
-            if model.showMap then
+    if not model.loaded || model.selectScene then
+        NoOp
+
+    else
+        case key of
+            " " ->
+                if showingTitle then
+                    -- TODO might need to parameterize the Title with a msg
+                    Go Lobby
+
+                else if model.showMap then
+                    ToggleMap
+
+                else if not <| List.isEmpty model.story then
+                    Continue
+
+                else
+                    NoOp
+
+            "m" ->
                 ToggleMap
 
-            else if not <| List.isEmpty model.story then
-                Continue
-
-            else if atTurnstile then
-                turnStileMessage
-
-            else
+            _ ->
                 NoOp
-
-        "m" ->
-            ToggleMap
-
-        _ ->
-            NoOp
 
 
 view : Model -> Html Msg
@@ -424,6 +462,9 @@ view model =
         Html.Keyed.node "div"
             [ class "game" ]
             [ case scene of
+                Title title ->
+                    ( "title", titleView title )
+
                 CentralGuardOffice ->
                     ( "centralGuardOffice", CentralGuardOffice.view model.worldModel )
 
@@ -474,7 +515,7 @@ selectSceneView : Model -> Html Msg
 selectSceneView model =
     let
         beginning =
-            ( model, [ "PLAYER" ] )
+            ( model, [] )
 
         -- lostBriefcase =
         --     ( { model
@@ -487,6 +528,16 @@ selectSceneView model =
         [ h1 [] [ text "Select a scene to jump to:" ]
         , ul []
             [ li [ onClick <| LoadScene beginning ] [ text "Beginning" ]
+            ]
+        ]
+
+
+titleView : String -> Html Msg
+titleView title =
+    div [ class "Scene TitleScene" ]
+        [ div [ class "TitleContent" ]
+            [ h1 [ class "Title" ] [ text title ]
+            , span [ class "StoryLine__continue", onClick (Go Lobby) ] [ text "Continue..." ]
             ]
         ]
 
