@@ -11,8 +11,8 @@ import Views.Station.Connections as Connections
 
 {-| shows line map for a line
 -}
-view : Subway.Map -> Station -> Line -> Html Msg
-view map currentStation line =
+view : Subway.Map -> Station -> Line -> Maybe Station -> Html Msg
+view map currentStation line restrictDestination =
     let
         lineInfo =
             Subway.lineInfo line
@@ -32,11 +32,21 @@ view map currentStation line =
             div
                 [ class "Stop"
                 , onClick <|
-                    if station /= currentStation then
+                    -- This dance is necessary because of the order boarding a train
+                    -- and applying the rule happens in Main
+                    -- It's not great, but the best I can think of now
+                    if station == currentStation then
+                        NoOp
+
+                    else if restrictDestination == Nothing then
+                        BoardTrain line station
+
+                    else if restrictDestination == Just station then
                         BoardTrain line station
 
                     else
-                        NoOp
+                        -- let the matching rule control what happens and don't board
+                        Interact station
                 ]
             <|
                 [ div [ class "Stop__connections" ] <|

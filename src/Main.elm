@@ -196,8 +196,8 @@ changeTrainStatus newStatus trainProps =
     { trainProps | status = newStatus }
 
 
-getCurrentStation : Subway.Map -> Manifest.WorldModel -> Station
-getCurrentStation map worldModel =
+getCurrentStation : Manifest.WorldModel -> Station
+getCurrentStation worldModel =
     Narrative.WorldModel.getLink "PLAYER" "location" worldModel
         |> Maybe.withDefault "ERROR getting the current location of player from worldmodel"
 
@@ -387,7 +387,7 @@ view : Model -> Html Msg
 view model =
     let
         currentStation =
-            getCurrentStation map model.worldModel
+            getCurrentStation model.worldModel
 
         scene =
             if Rules.unsafeAssert "PLAYER.caught" model.worldModel then
@@ -431,7 +431,7 @@ view model =
                     ( "lobby", Lobby.view map model.worldModel currentStation )
 
                 Platform line ->
-                    ( "platform", Platform.view map currentStation line )
+                    ( "platform", Platform.view map currentStation line (getLink "PLAYER" "destination" model.worldModel) )
 
                 Turnstile line ->
                     ( "turnstile", Turnstile.view model.worldModel line )

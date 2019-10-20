@@ -67,9 +67,9 @@ addDisplayable name desc ( id, { tags, stats, links } ) =
 
 entities : List ParsedEntity
 entities =
-    [ entity "PLAYER.main_plot=1.location=TWIN_BROOKS"
+    [ entity "PLAYER.chapter=1.day=1.location=WEST_MULBERRY.destination=METRO_CENTER"
         "Steve"
-        ""
+        "Here I am."
 
     -- inventory
     , entity "BRIEFCASE.item.location=PLAYER"

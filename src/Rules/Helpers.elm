@@ -27,5 +27,5 @@ rulesForScene scene rules_ =
     rules_
         |> List.map
             (\( id, { conditions } as r ) ->
-                ( id, { r | conditions = ("PLAYER.main_plot=" ++ String.fromInt scene) :: conditions } )
+                ( id, { r | conditions = ("PLAYER.chapter=" ++ String.fromInt scene) :: conditions } )
             )

@@ -21,7 +21,7 @@ view map worldModel currentStation =
             (stationInfo currentStation |> .name) ++ " Station"
 
         ( chapterNumber, chapterName, goals ) =
-            getStat "PLAYER" "main_plot" worldModel
+            getStat "PLAYER" "chapter" worldModel
                 |> Maybe.andThen
                     (\plotLevel ->
                         Array.get (plotLevel - 1) Constants.chapters
