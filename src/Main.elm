@@ -95,88 +95,95 @@ updateStory trigger model =
     case Narrative.Rules.findMatchingRule trigger Rules.rules model.worldModel of
         Nothing ->
             let
-                defaultStory =
+                ( newStory, newMatchCounts ) =
+                    -- TODO might not need this check  (use rules to return empty narrative)
                     if Rules.unsafeAssert (trigger ++ ".silent") model.worldModel then
-                        []
+                        ( [], model.ruleMatchCounts )
 
                     else
                         Dict.get trigger model.worldModel
-                            |> Maybe.map (.description >> List.singleton)
-                            -- TODO Narrative.parse this too (when Ink syntax is implemented) to allow for continuing descriptions
-                            -- TODO make sure to update ruleMatchCounts with trigger
-                            |> Maybe.withDefault []
+                            |> Maybe.map (.description >> parseNarrative model trigger trigger)
+                            |> Maybe.withDefault ( [ "ERROR: unablle to find entity for " ++ trigger ], model.ruleMatchCounts )
             in
             -- no need to apply special events or pending changes (no changes,
             -- and no rule id to match).
-            ( { model | story = defaultStory }, Cmd.none )
+            ( { model | story = newStory, ruleMatchCounts = newMatchCounts }, Cmd.none )
 
         Just ( matchedRuleID, matchedRule ) ->
             let
                 debug =
                     Debug.log "Matched rule:" matchedRuleID
 
-                cycleIndex =
-                    Dict.get matchedRuleID model.ruleMatchCounts
-                        |> Maybe.withDefault 0
-
-                replaceTrigger id =
-                    if id == "$" then
-                        trigger
-
-                    else
-                        id
-
-                propFn keyword fn =
-                    ( keyword
-                    , replaceTrigger
-                        >> (\id ->
-                                Dict.get id model.worldModel
-                                    |> Maybe.map (fn >> Ok)
-                                    |> Maybe.withDefault (Err <| "Unable to find entity for id: " ++ id)
-                           )
-                    )
-
-                propKeywords =
-                    Dict.fromList
-                        [ propFn "name" .name
-                        , propFn "description" .description
-                        ]
-
-                config =
-                    { cycleIndex = cycleIndex
-                    , propKeywords = propKeywords
-                    , trigger = trigger
-                    , worldModel = model.worldModel
-                    }
-
-                currentNarrative =
-                    Narrative.parse config matchedRule.narrative
-
-                newMatchCounts =
-                    Dict.update
-                        matchedRuleID
-                        (\i ->
-                            i
-                                |> Maybe.map ((+) 1)
-                                |> Maybe.withDefault 1
-                                |> Just
-                        )
-                        model.ruleMatchCounts
+                ( newStory, newMatchCounts ) =
+                    parseNarrative model matchedRuleID trigger matchedRule.narrative
             in
             ( { model
                 | pendingChanges = Just ( trigger, matchedRule.changes, matchedRuleID )
-                , story = currentNarrative
+                , story = newStory
                 , ruleMatchCounts = newMatchCounts
               }
             , Cmd.none
             )
                 |> updateAndThen
-                    (if List.isEmpty currentNarrative then
+                    (if List.isEmpty newStory then
                         applyPendingChanges
 
                      else
                         noop
                     )
+
+
+parseNarrative model matchedRuleID trigger rawNarrative =
+    let
+        cycleIndex =
+            Dict.get matchedRuleID model.ruleMatchCounts
+                |> Maybe.withDefault 0
+
+        replaceTrigger id =
+            if id == "$" then
+                trigger
+
+            else
+                id
+
+        propFn keyword fn =
+            ( keyword
+            , replaceTrigger
+                >> (\id ->
+                        Dict.get id model.worldModel
+                            |> Maybe.map (fn >> Ok)
+                            |> Maybe.withDefault (Err <| "Unable to find entity for id: " ++ id)
+                   )
+            )
+
+        propKeywords =
+            Dict.fromList
+                [ propFn "name" .name
+                , propFn "description" .description
+                ]
+
+        config =
+            { cycleIndex = cycleIndex
+            , propKeywords = propKeywords
+            , trigger = trigger
+            , worldModel = model.worldModel
+            }
+
+        narrative =
+            Narrative.parse config rawNarrative
+
+        newMatchCounts =
+            Dict.update
+                matchedRuleID
+                (\i ->
+                    i
+                        |> Maybe.map ((+) 1)
+                        |> Maybe.withDefault 1
+                        |> Just
+                )
+                model.ruleMatchCounts
+    in
+    ( narrative, newMatchCounts )
 
 
 dayText : Manifest.WorldModel -> String
