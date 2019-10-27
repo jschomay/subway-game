@@ -105,12 +105,13 @@ body {
   bottom: 0;
   right: 0;
   left: 0;
+  padding: 1em;
   margin: auto;
   max-height: 90%;
-  background: #aaaaaa;
-  border: 1em solid #e2e2e2;
+  background: #fff;
+  border: 1px solid black;
   box-shadow: 0 0 100px 0px black;
-  border-radius: 1em;
+  border-radius: 2px;
 }
 
 .Scene {

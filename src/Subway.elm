@@ -94,7 +94,8 @@ lineInfo line =
             , id = "YELLOW_LINE"
             , color = yellow
             , stations =
-                [ "METRO_CENTER"
+                [ "RIVERSIDE"
+                , "METRO_CENTER"
                 , "FEDERAL_TRIANGLE"
                 , "CAPITOL_HEIGHTS"
                 , "MACARTHURS_PARK"
@@ -128,7 +129,7 @@ fullMap =
 
 mapImage : String
 mapImage =
-    "map-red-yellow-green.png"
+    "map-red-yellow-green.jpg"
 
 
 {-| Returns all lines servicing the supplied station. Does not specify an order

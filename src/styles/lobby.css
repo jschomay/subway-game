@@ -137,15 +137,34 @@
 /* Line colors */
 
 .RED_LINE {
-  background: #e13915;
+  background: #FD0000;
 }
 .YELLOW_LINE {
-  background: #d9ad02;
-  color: black;
+  background: #FFD107;
 }
 .GREEN_LINE {
-  background: #019966;
+  background: #08A84E;
 }
+.ORANGE_LINE {
+  background: #FE8200;
+}
+.BLUE_LINE {
+  background: #0487F6;
+}
+.DARK_BLUE_LINE {
+  background: #4352A2;
+}
+.PURPLE_LINE {
+  background: #9547AA;
+}
+.BROWN_LINE {
+  background: #9E4F2F;
+}
+.GRAY_LINE {
+  background: #A5A5A5;
+}
+
+
 
 .Inventory {
   display: flex;
