@@ -17,16 +17,31 @@ rules =
                 , changes = [ "PLAYER.location=$" ]
                 , narrative = ridingTheTrain
                 }
+           , rule "goToLobby"
+                { trigger = "LOBBY"
+                , conditions = []
+                , changes = [ "PLAYER.-at_turnstile" ]
+                , narrative = ""
+                }
+           , rule "goToLineTurnstile"
+                { trigger = "*.line"
+                , conditions = [ "PLAYER.!at_turnstile" ]
+                , changes = [ "PLAYER.line=$", "PLAYER.at_turnstile" ]
+                , narrative = ""
+                }
            , rule "goToLinePlatform"
                 { trigger = "*.line"
-                , conditions = [ "*.valid_on=$.location=PLAYER" ]
-                , changes = [ "PLAYER.line=$" ]
+                , conditions =
+                    [ "PLAYER.at_turnstile"
+                    , "*.valid_on=$.location=PLAYER"
+                    ]
+                , changes = [ "PLAYER.-at_turnstile" ]
                 , narrative = ""
                 }
            , rule "jumpTurnstileFail"
                 { trigger = "*.line"
                 , conditions = []
-                , changes = []
+                , changes = [ "PLAYER.-at_turnstile" ]
                 , narrative = jumpTurnstileFail
                 }
            , rule "getMap"
@@ -38,7 +53,7 @@ rules =
            , rule "checkMap"
                 { trigger = "*.map"
                 , conditions = []
-                , changes = []
+                , changes = [ "PLAYER.-at_turnstile" ]
                 , narrative = ""
                 }
            ]

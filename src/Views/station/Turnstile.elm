@@ -50,7 +50,7 @@ view worldModel line =
                 , div [ class "Turnstile__buttons" ]
                     [ div
                         [ class "Turnstile__button"
-                        , onClick <| Go <| Lobby
+                        , onClick <| Interact "LOBBY"
                         ]
                         [ text "Go back" ]
                     , div

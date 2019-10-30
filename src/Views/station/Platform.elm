@@ -69,7 +69,7 @@ view map currentStation line restrictDestination =
                 ]
     in
     div [ class "Scene Platform" ]
-        [ Shared.exit (Go Lobby)
+        [ Shared.exit (Interact "LOBBY")
         , div
             [ class "Line_map" ]
             [ lineInfoView

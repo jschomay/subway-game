@@ -6,6 +6,7 @@ module Subway exposing
     , StationInfo
     , connectingLines
     , fullMap
+    , idToLine
     , lineInfo
     , mapImage
     , stationInfo
@@ -67,6 +68,22 @@ type alias LineInfo =
     , color : Color
     , stations : List Station
     }
+
+
+idToLine : String -> Maybe Line
+idToLine id =
+    case id of
+        "RED_LINE" ->
+            Just Red
+
+        "YELLOW_LINE" ->
+            Just Yellow
+
+        "GREEN_LINE" ->
+            Just Green
+
+        _ ->
+            Nothing
 
 
 lineInfo : Line -> LineInfo

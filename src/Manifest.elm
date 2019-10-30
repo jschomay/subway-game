@@ -89,6 +89,9 @@ entities =
     , entity "CENTRAL_GUARD_OFFICE.location"
         "Central Guard Office"
         ""
+    , entity "LOBBY.location"
+        "Station Lobby"
+        ""
 
     --  TwinBrooks
     , entity "SAFTEY_WARNING_POSTER.item.location=TWIN_BROOKS"

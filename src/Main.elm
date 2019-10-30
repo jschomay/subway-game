@@ -226,10 +226,17 @@ specialEvents ruleId model =
         "goToWorkAndResetToNextDay" ->
             ( { model | scene = Title (dayText model.worldModel) }, Cmd.none )
 
+        "goToLineTurnstile" ->
+            ( { model | scene = Turnstile <| Maybe.withDefault Red <| getCurrentLine model.worldModel }, Cmd.none )
+
+        "goToLobby" ->
+            ( { model | scene = Lobby }, Cmd.none )
+
         other ->
-            if List.member other [ "goToLinePlatform", "jumpYellowLineTurnstile" ] then
-                -- This is kind of janky, but it works for now
-                ( { model | scene = Platform <| Maybe.withDefault Red <| getCurrentLine model }, Cmd.none )
+            if List.member other [ "goToLinePlatform" ] then
+                -- Remember, if you add another matcher to jump the turnstile, remove
+                -- the at_turnstile tag!!!!!!!!
+                ( { model | scene = Platform <| Maybe.withDefault Red <| getCurrentLine model.worldModel }, Cmd.none )
 
             else
                 ( model, Cmd.none )
@@ -251,14 +258,10 @@ getCurrentStation worldModel =
         |> Maybe.withDefault "ERROR getting the current location of player from worldmodel"
 
 
-getCurrentLine : Model -> Maybe Subway.Line
-getCurrentLine model =
-    case model.scene of
-        Turnstile line ->
-            Just line
-
-        _ ->
-            Nothing
+getCurrentLine : Manifest.WorldModel -> Maybe Subway.Line
+getCurrentLine worldModel =
+    Narrative.WorldModel.getLink "PLAYER" "line" worldModel
+        |> Maybe.andThen Subway.idToLine
 
 
 updateAndThen : (m -> ( m, Cmd c )) -> ( m, Cmd c ) -> ( m, Cmd c )
@@ -410,7 +413,7 @@ handleKey model key =
             " " ->
                 if showingTitle then
                     -- TODO might need to parameterize the Title with a msg
-                    Go Lobby
+                    Interact "LOBBY"
 
                 else if model.showMap then
                     ToggleMap
@@ -544,7 +547,7 @@ titleView title =
     div [ class "Scene TitleScene" ]
         [ div [ class "TitleContent" ]
             [ h1 [ class "Title" ] [ text title ]
-            , span [ class "StoryLine__continue", onClick (Go Lobby) ] [ text "Continue..." ]
+            , span [ class "StoryLine__continue", onClick (Interact "LOBBY") ] [ text "Continue..." ]
             ]
         ]
 
