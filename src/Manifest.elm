@@ -78,9 +78,9 @@ entities =
     , entity "RED_LINE_PASS.item.location=PLAYER.valid_on=RED_LINE"
         "Red Line metro pass"
         "This gets me anywhere on the Red Line, but I really only use it to get to work and back home."
-    , entity "CELL_PHONE.item.location=PLAYER"
+    , entity "CELL_PHONE.item.location=PLAYER.unread"
         "Cell phone"
-        "Keeps me connected where ever I am.  As long as I have power.  And service."
+        "I'm never more than a call or email way."
 
     --
     , entity "MAP.item.map.silent"

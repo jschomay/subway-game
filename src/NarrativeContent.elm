@@ -1,0 +1,231 @@
+module NarrativeContent exposing (t)
+
+import Dict exposing (Dict)
+
+
+{-| This is a little nicer than having to export every string.
+TODO Also allows preparsing all content to find any parse errors,
+which can be shown similar to rules and manifest parse errors.
+This can also catch bad keys that way
+Map would still have all originals, since they have to be parsed at
+runtime.
+NOTE this could be used for i18n too kind of
+-}
+t : String -> String
+t key =
+    Dict.get key all
+        |> Maybe.withDefault ("ERROR: can't find content for key " ++ key)
+
+
+for =
+    Dict.insert
+
+
+all : Dict String String
+all =
+    Dict.empty
+        |> for "CELL_PHONE"
+            """
+{There's no service, but I can view my emails.
+---
+|}
+{PLAYER.day=1?
+    From: Dennis Ferbs
+    To: Steve Kerry
+    Sent: Sunday, 4:00 pm
+    Subject: I've Got a Job for You
+
+    Steve,
+    Just got word that some very important clients are coming in in the next few weeks.
+    The boys up stairs want me to put together a new proposal to bring to them. 
+    Steve, you're one of our senior agents and you've been in the department for, what, 6 years?
+    I need you to work on this and really make it shine.
+    Be at my office at 6:30 am Monday and we can talk over the details.
+
+    Dennis Ferbs
+    District Sales Manager
+    In Your Hands Insurance, Inc.  All rights reserved.
+---
+    -Reply -
+
+    From: Steve Kerry
+    To: Dennis Ferbs
+    Sent: Sunday, 4:01 pm
+    Subject: RE: I've Got a Job for You
+    
+    Dear Mr. Ferbs,
+    I've actually been with the company for eight years, but no need to worry, sir. I'm happy for the 
+    opportunity. I've got a few big ideas that I've been wanting to try out.
+    I'll be there bright and early, sir.
+    
+    Steve Kerry
+    Insurance Agent
+    In Your Hands Insurance
+---
+    From: Janice Franz
+    To: Steve Kerry
+    Sent: Monday, 6:05am
+    Subject: Job Opportunity
+    
+    Hi Mr. Steve Kerry
+
+    My name is Janis and I'm reaching out on behalf of Embrace Insurance. I came across your resume
+    in our system and I believe you would make a perfect fit for our team here at Embrace Insurance.
+    If you're looking for a job change or would just simply like to see what your options are we would
+    love to set up a meeting with you and see what your future could hold.
+
+    We look forward to your response!
+    
+    Janis Franz
+    Assistant Director
+    Embrace Insurance
+}
+{PLAYER.day=2?
+    From: Dennis Ferbs
+    To: Steve Kerry
+    Sent: Monday, 6:26pm
+    Subject: Good Things!
+
+    Steve,
+
+    I like a few of the ideas that you brought to me this morning.  But I just got word that our clients are
+    pushing up the meeting and will be here on Friday! You're going to have to put this thing in high gear, Steve.
+    I can't hand them half assed work.
+
+    Don't let me down.
+
+    Dennis Ferbs
+    District Sales Manager
+    In Your Hands Insurance, Inc.  All rights reserved.
+---
+    -Reply-
+
+    From: Steve Kerry
+    To: Dennis Ferbs
+    Sent: Monday, 6:32pm
+    Subject: RE: Good Things!
+
+    Dear Mr. Ferbs,
+
+    Thank you for the update.  I'll do my best, but Friday is a little soon isn't it? I just want to be able to
+    put together something that will really help our customers.  I'll have to cut a lot of the ideas we spoke about.
+    But I'll do my best, sir.
+
+    See you tomorrow, Mr. Ferbs
+
+    Steve Kerry
+    Insurance Agent
+    In Your Hands Insurance
+---
+    From: Henry Thorne
+    To: Steve Kerry
+    Sent: Monday, 8:25pm
+    Subject: Stevey!
+
+    Hey Steve!
+
+    How's it going? Long time no talk! Just checking in with you and letting you know I'm going to be
+    in the city in a few days. It's supposed to be a business trip and it's just for a day, but I
+    thought it's be nice to drop by and see how things were and maybe grab a few drinks somewhere.
+    I know things have been difficult since we last talked. Just let me know when you're free and I'll
+    make something work.
+
+    See you soon!
+
+    Henry
+
+}
+{PLAYER.day=3?
+
+    From: Dennis Ferbs
+    To: Steve Kerry
+    Sent: Tuesday, 4:48pm
+    Subject: No good
+
+    Steve,
+
+    What you handed me today WON'T work. The Premiums we offer will NOT cover these plans. Half of these
+    seem like life quality expenses. We need to think about the bottom dollar here, Steve. "Pet Insurance
+    Plan", "Kidnap/Ransom Insurance", "Divorce Insurance"? These benefits not only expose us to
+    unwarranted risk of loss, but also far out weigh our customers premiums. You've got to do better than
+    this, Steve. We're two two days from the proposal meeting. Do NOT fuck this up.
+
+    Put something better together tonight and get it to me in the morning. You're running out of time.
+
+    Dennis Ferbs
+    District Sales Manager
+    In Your Hands Insurance, Inc.  All rights reserved.
+---
+    -Reply- (unsent)
+
+    From: Steve Kerry
+    To: Dennis Ferbs
+    Sent: Tuesday, 5:00pm
+    Subject: RE: No good
+
+    Dear Mr. Ferbs,
+
+    Sir, I have to disagree. I feel that these plans are essential for our customers. If you'd just
+    look over the papers I sent you about the
+}
+{PLAYER.day=4?
+    From: Dennis Ferbs
+    To: Steve Kerry
+    Sent: Wednesday, 4:27pm
+    Subject: (Subject)
+
+    Steve, our clients are going to be here tomorrow whether you're ready or not. You're going to need
+    to push harder. I don't care what you have to do to put this thing together, just get it done.
+
+    Bring me what you have in the morning.
+
+    Dennis Ferbs
+    District Sales Manager
+    In Your Hands Insurance, Inc.  All rights reserved.
+---
+    From: Henry Thorne
+    To: Steve Kerry
+    Sent: Thursday, 5:45am
+    Subject: Today?
+
+    Hey Steve,
+    I'm in the city today and I haven't heard back from you. I'm sure you're busy, but it would 
+    really be nice to see you while I'm down. My plane leaves tomorrow, so today is probably it. You 
+    can call me at my old number if you get this in time and we can plan something out. It hasn't 
+    changed.
+
+    Hope to talk to you soon.
+}
+{PLAYER.day=5?
+    From: Dennis Ferbs
+    To: Steve Kerry
+    Sent: Friday, 6:00am
+    Subject: where the hell are you?
+
+    I want to run through the presentation once before the clients are here.
+    Get your ass down here right away.
+
+    Dennis Ferbs
+    District Sales Manager
+    In Your Hands Insurance, Inc.  All rights reserved.
+---
+    From: Janice Franz
+    To: Steve Kerry
+    Sent: Friday, 6:09am
+    Subject: RE: Job Opportunity
+
+    Hi Steve!
+
+    Hope you're having a great day!  I just wanted to reach out to you one more time to set up a 
+    quick chat.  How's Tuesday morning next week?  Let me know either way.  I'm excited to talk
+    to you!
+
+    Have a wonderful weekend.
+    
+    Janis Franz
+    Assistant Director
+    Embrace Insurance
+}
+"""
+        |> for "MAP"
+            "sf as fs fa sf dsa"

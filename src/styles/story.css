@@ -51,6 +51,15 @@
   display: block;
 }
 
+.StoryLine pre {
+  font-size: 0.7em;
+  font-family: "serif";
+  line-height: 1.2em;
+}
+
+.StoryLine blockquote {
+}
+
 @keyframes fadeIn {
   from {
     opacity: 0;

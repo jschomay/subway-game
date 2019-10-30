@@ -53,7 +53,7 @@ rules =
            , rule "checkMap"
                 { trigger = "*.map"
                 , conditions = []
-                , changes = [ "PLAYER.-at_turnstile" ]
+                , changes = []
                 , narrative = ""
                 }
            ]

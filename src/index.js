@@ -10,10 +10,11 @@ require("./styles/icons.css");
 require("./styles/game.css");
 
 // inject bundled Elm app
-const { Elm } = require("./Main.elm");
+const {Elm} = require("./Main.elm");
+const selectScene = location.pathname === "/debug";
 const app = Elm.Main.init({
   node: document.getElementById("main"),
-  flags: { selectScene: true }
+  flags: {selectScene: selectScene}
 });
 
 var imagesToLoad = require.context("./img/", true, /\.*$/).keys();
@@ -47,7 +48,7 @@ function loaded() {
   console.log("loaded");
 }
 
-document.addEventListener("keydown", function(e) {
+document.addEventListener("keydown", function (e) {
   app.ports.keyPress.send(e.key);
   if (e.key == " " || e.key === "Backspace") {
     e.preventDefault();
