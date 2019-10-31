@@ -313,10 +313,13 @@ update msg model =
                 )
 
             ToggleMap ->
-                -- TODO check if allowed to show map (ie. map in inventory, scene lobby, etc)
-                ( { model | showMap = not model.showMap }
-                , Cmd.none
-                )
+                if Rules.unsafeAssert "MAP.location=PLAYER" model.worldModel then
+                    ( { model | showMap = not model.showMap }
+                    , Cmd.none
+                    )
+
+                else
+                    ( model, Cmd.none )
 
             Go area ->
                 -- TODO would be best to move all of `model.scene` into the world model, but for now, just duplicate the line color there
