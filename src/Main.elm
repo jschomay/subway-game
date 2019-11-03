@@ -531,21 +531,22 @@ view model =
 selectSceneView : Model -> Html Msg
 selectSceneView model =
     let
-        beginning =
-            ( model, [] )
-
-        -- lostBriefcase =
-        --     ( { model
-        --         | scene = Lobby
-        --       }
-        --     , Tuple.second beginning ++ [ "cellPhone", "cellPhone", "briefcase", "presentation", "redLinePass", "TwinBrooks", "mapPoster", "MetroCenter", "largeCrowd" ]
-        --     )
+        scenes =
+            [ ( "Intro", ( model, [] ) )
+            , ( "Arrive at Twin Brooks"
+                -- TODO this can be optimized
+              , ( model, [ "LOBBY", "COFFEE_CART", "COFFEE_CART", "COFFEE_CART", "COFFEE_CART", "COFFEE_CART", "CELL_PHONE", "RED_LINE", "RED_LINE", "METRO_CENTER", "LOBBY", "COFFEE_CART", "COFFEE_CART", "COFFEE_CART", "COFFEE_CART", "COFFEE_CART", "CELL_PHONE", "RED_LINE", "RED_LINE", "METRO_CENTER", "LOBBY", "COFFEE_CART", "COFFEE_CART", "COFFEE_CART", "CELL_PHONE", "COFFEE_CART", "RED_LINE", "RED_LINE", "METRO_CENTER", "LOBBY", "RED_LINE", "CELL_PHONE", "COFFEE_CART", "COFFEE_CART", "COFFEE_CART", "COFFEE_CART", "COFFEE_CART", "CELL_PHONE", "RED_LINE", "RED_LINE", "METRO_CENTER", "LOBBY", "COFFEE_CART", "COFFEE_CART", "COFFEE_CART", "COFFEE_CART", "COFFEE_CART", "CELL_PHONE", "RED_LINE", "RED_LINE", "METRO_CENTER", "MAP_POSTER", "MAP", "LOBBY" ] )
+              )
+            ]
     in
     div [ class "SelectScene" ]
         [ h1 [] [ text "Select a scene to jump to:" ]
-        , ul []
-            [ li [ onClick <| LoadScene beginning ] [ text "Beginning" ]
-            ]
+        , ul [] <|
+            List.map
+                (\( k, v ) ->
+                    li [ onClick <| LoadScene v ] [ text k ]
+                )
+                scenes
         ]
 
 
