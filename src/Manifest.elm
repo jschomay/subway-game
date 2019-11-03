@@ -50,7 +50,7 @@ entity : String -> String -> String -> ParsedEntity
 entity entityString name desc =
     parseEntity entityString
         |> Result.map (addDisplayable name desc)
-        |> Result.mapError (\e -> ( entityString, e ))
+        |> Result.mapError (\e -> ( "Entity def: " ++ entityString, e ))
 
 
 addDisplayable : String -> String -> ( ID, NarrativeComponent {} ) -> ( ID, Entity )

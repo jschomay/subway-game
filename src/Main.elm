@@ -14,6 +14,7 @@ import Markdown
 import Narrative
 import Narrative.Rules exposing (..)
 import Narrative.WorldModel exposing (..)
+import NarrativeContent
 import Process
 import Rules
 import Rules.Parser
@@ -55,9 +56,12 @@ init flags =
 
         ruleParseErrors =
             Rules.parseErrors
+
+        narrativeParseErrors =
+            NarrativeContent.parseErrors
     in
     ( { worldModel = initialWorldModel
-      , parseErrors = entityParseErrors ++ ruleParseErrors
+      , parseErrors = entityParseErrors ++ ruleParseErrors ++ narrativeParseErrors
       , loaded = False
       , story = []
       , ruleMatchCounts = Dict.empty
@@ -454,13 +458,13 @@ view model =
         div [ class "Loading" ] [ text "Loading..." ]
 
     else if not <| List.isEmpty model.parseErrors then
-        div [ class "SelectScene" ]
+        div [ class "SelectScene Errors" ]
             [ h1 [] [ text "Errors when parsing!  Please fix:" ]
             , ul [] <|
                 List.map
                     (\( s, e ) ->
                         li []
-                            [ h3 [] [ text s ]
+                            [ pre [] [ code [] [ text s ] ]
                             , text <| Rules.Parser.deadEndsToString e
                             ]
                     )

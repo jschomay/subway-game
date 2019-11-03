@@ -141,3 +141,12 @@ body {
   background-position: center;
   max-height: 100vh;
 }
+
+.Errors {
+  font-size: 1em;
+}
+
+.Errors code {
+  font-size: 1em;
+  font-family: monospace, monospace;
+}

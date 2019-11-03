@@ -1,14 +1,11 @@
-module NarrativeContent exposing (t)
+module NarrativeContent exposing (parseErrors, t)
 
 import Dict exposing (Dict)
+import Narrative
+import Rules.Parser exposing (ParseError)
 
 
 {-| This is a little nicer than having to export every string.
-TODO Also allows preparsing all content to find any parse errors,
-which can be shown similar to rules and manifest parse errors.
-This can also catch bad keys that way
-Map would still have all originals, since they have to be parsed at
-runtime.
 NOTE this could be used for i18n too kind of
 -}
 t : String -> String
@@ -17,15 +14,39 @@ t key =
         |> Maybe.withDefault ("ERROR: can't find content for key " ++ key)
 
 
-for =
+emptyConfig =
+    { cycleIndex = 0
+    , propKeywords = Dict.empty
+    , trigger = ""
+    , worldModel = Dict.empty
+    }
+
+
+{-| Pre-parses everything at run time to find errors to display.
+-}
+parseErrors : List ( String, ParseError )
+parseErrors =
+    Dict.foldl
+        (\k v acc ->
+            case Narrative.parsible emptyConfig v of
+                Err e ->
+                    ( "Narrative content: " ++ k ++ " " ++ v ++ " ", e ) :: acc
+
+                _ ->
+                    acc
+        )
+        []
+        all
+
+
+content__________________________________ =
     Dict.insert
 
 
 all : Dict String String
 all =
     Dict.empty
-        |> for "CELL_PHONE"
-            """
+        |> content__________________________________ "CELL_PHONE" """
 {There's no service, but I can view my emails.
 ---
 |}

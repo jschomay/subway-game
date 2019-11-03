@@ -36,13 +36,20 @@ parseRule { trigger, conditions, changes, narrative } =
 rules_ : ( Rules, List ( String, ParseError ) )
 rules_ =
     let
+        printRule { trigger, conditions, changes } =
+            trigger
+                ++ " | "
+                ++ String.join ", " conditions
+                ++ " | "
+                ++ String.join ", " changes
+
         separateErrors ( id, rule_ ) acc =
             case parseRule rule_ of
                 Ok parsedRule ->
                     Tuple.mapFirst (Dict.insert id parsedRule) acc
 
                 Err err ->
-                    Tuple.mapSecond ((::) ( id, err )) acc
+                    Tuple.mapSecond ((::) ( "Rule: " ++ id ++ " " ++ printRule rule_ ++ " ", err )) acc
     in
     Rules.Intro.rules
         ++ Rules.General.rules

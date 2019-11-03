@@ -1,11 +1,11 @@
-module Narrative exposing (Narrative, parse)
+module Narrative exposing (Narrative, parse, parsible)
 
 import Array
 import Dict exposing (Dict)
 import Narrative.WorldModel exposing (ID, WorldModel)
 import Parser exposing (..)
 import Result
-import Rules.Parser exposing (ParsedMatcher, deadEndsToString, parseMatcher, parseMultiple)
+import Rules.Parser exposing (ParseError, ParsedMatcher, deadEndsToString, parseMatcher, parseMultiple)
 
 
 {-| A list of fully parsed strings. Each string will be displayed with a continue
@@ -55,6 +55,18 @@ parse config text =
                     Debug.log ("Unable to parse: " ++ text) e
             in
             [ "ERROR could not parse: " ++ text ++ "\n(see console for specific error)" ]
+
+
+parsible : Config a -> String -> Result ParseError ()
+parsible config text =
+    let
+        parser =
+            -- make sure the entire line is used
+            parseText config
+                |. end
+    in
+    run parser text
+        |> Result.map (always ())
 
 
 notReserved char =
