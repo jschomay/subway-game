@@ -248,5 +248,49 @@ all =
     Embrace Insurance
 }
 """
-        |> for "MAP"
-            "sf as fs fa sf dsa"
+        |> content__________________________________ "coffeeCartMonday" """
+{Carl runs the little coffee stand at my local station.  The coffee is decent, and it's nice to see his smiling face each morning.
+
+Morning, Carl! Can I just get the usual?"
+
+"Sure thing, Steve. That'll be a buck twenty five."
+
+"Here you go, Carl, exact change. Thanks. Have a good one."
+|"See you tomorrow."|"See you tomorrow."|"Don't miss your train."}
+"""
+        |> content__________________________________ "coffeeCartTuesday" """
+{"The usual for you today, Steve?"
+
+"Yes please."
+
+"Enjoy."
+|"Need anything else?"
+
+"No, I'm fine."}
+"""
+        |> content__________________________________ "coffeeCartWednesday" """
+{"Morning Steve.  You alright?"
+
+"Fill it up to the top, Carl. I'm going to need every last drop today."
+
+"You got it.  Take it easy Steve. Don't want to work too hard."
+
+"Easy for you to say, Carl. But I'll try. Thanks!"
+|I've got plenty already, and plenty of work to do too.}
+"""
+        |> content__________________________________ "coffeeCartThursday" """
+{Instead of Carl, there's some young lady behind the stand, looking at her phone.
+
+"You're not Carl."
+
+"Nope. Was called in last minute. Guess his wife just went into labor or somethin'. Can I get you anything?"
+
+"Carl's married?"
+
+"Guess so,  I don't know the guy. You getting something or not?"
+
+"Sure. Coffee. Black."
+
+"Here you go. See ya."
+|I miss Carl.}
+"""

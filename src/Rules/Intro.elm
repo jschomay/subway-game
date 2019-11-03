@@ -42,6 +42,30 @@ rules =
                     ]
                 , narrative = "Another day at the office..."
                 }
+           , rule "coffeeCartMonday"
+                { trigger = "COFFEE_CART"
+                , conditions = [ "PLAYER.day=1" ]
+                , changes = []
+                , narrative = t "coffeeCartMonday"
+                }
+           , rule "coffeeCartTuesday"
+                { trigger = "COFFEE_CART"
+                , conditions = [ "PLAYER.day=2" ]
+                , changes = []
+                , narrative = t "coffeeCartTuesday"
+                }
+           , rule "coffeeCartWednesday"
+                { trigger = "COFFEE_CART"
+                , conditions = [ "PLAYER.day=3" ]
+                , changes = []
+                , narrative = t "coffeeCartWednesday"
+                }
+           , rule "coffeeCartThursday"
+                { trigger = "COFFEE_CART"
+                , conditions = [ "PLAYER.day=4" ]
+                , changes = []
+                , narrative = t "coffeeCartThursday"
+                }
            , rule "fallAsleep"
                 { trigger = "METRO_CENTER"
                 , conditions = [ "PLAYER.day=5.chapter=1" ]

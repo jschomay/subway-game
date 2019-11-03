@@ -3,6 +3,7 @@ module Manifest exposing (DisplayComponent, Entity, ID, WorldModel, entities, en
 import Constants
 import Dict exposing (Dict)
 import Narrative.WorldModel exposing (..)
+import NarrativeContent exposing (t)
 import Rules.Parser exposing (..)
 import Subway exposing (Station)
 
@@ -81,11 +82,11 @@ entities =
     , entity "CELL_PHONE.item.location=PLAYER.unread"
         "Cell phone"
         "I'm never more than a call or email way."
-
-    --
     , entity "MAP.item.map.silent"
         "Subway map"
         "The full subway map."
+
+    -- other locations
     , entity "CENTRAL_GUARD_OFFICE.location"
         "Central Guard Office"
         ""
@@ -93,7 +94,12 @@ entities =
         "Station Lobby"
         ""
 
-    --  TwinBrooks
+    -- WEST_MULBERRY
+    , entity "COFFEE_CART.character.location=WEST_MULBERRY"
+        "Coffee cart"
+        "{Huh, that's strange. |}It's closed.{  I really need my coffee.  Today of all days!|  I wonder where Carl is?|  I hope Carl comes back.|}"
+
+    --  TWIN_BROOKS
     , entity "SAFTEY_WARNING_POSTER.item.location=TWIN_BROOKS"
         "Safety Message Poster"
         "It says to watch out for pickpockets and report any suspicious activity."
