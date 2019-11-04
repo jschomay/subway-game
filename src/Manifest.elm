@@ -97,7 +97,10 @@ entities =
     -- WEST_MULBERRY
     , entity "COFFEE_CART.character.location=WEST_MULBERRY"
         "Coffee cart"
-        "{Huh, that's strange. |}It's closed.{  I really need my coffee.  Today of all days!|  I wonder where Carl is?|  I hope Carl comes back.|}"
+        "I've been getting Carl's Coffee for years."
+    , entity "COFFEE.item.location=offscreen"
+        "Coffee"
+        "My morning Joe."
 
     --  TWIN_BROOKS
     , entity "SAFTEY_WARNING_POSTER.item.location=TWIN_BROOKS"

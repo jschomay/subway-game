@@ -39,37 +39,53 @@ rules =
                 , changes =
                     [ "PLAYER.location=WEST_MULBERRY.day+1"
                     , "CELL_PHONE.unread"
+                    , "COFFEE.location=offscreen"
                     ]
                 , narrative = "Another day at the office..."
                 }
            , rule "coffeeCartMonday"
                 { trigger = "COFFEE_CART"
                 , conditions = [ "PLAYER.day=1" ]
-                , changes = []
+                , changes = [ "COFFEE.location=PLAYER" ]
                 , narrative = t "coffeeCartMonday"
                 }
            , rule "coffeeCartTuesday"
                 { trigger = "COFFEE_CART"
                 , conditions = [ "PLAYER.day=2" ]
-                , changes = []
+                , changes = [ "COFFEE.location=PLAYER" ]
                 , narrative = t "coffeeCartTuesday"
                 }
            , rule "coffeeCartWednesday"
                 { trigger = "COFFEE_CART"
                 , conditions = [ "PLAYER.day=3" ]
-                , changes = []
+                , changes = [ "COFFEE.location=PLAYER" ]
                 , narrative = t "coffeeCartWednesday"
                 }
            , rule "coffeeCartThursday"
                 { trigger = "COFFEE_CART"
                 , conditions = [ "PLAYER.day=4" ]
-                , changes = []
+                , changes = [ "COFFEE.location=PLAYER" ]
                 , narrative = t "coffeeCartThursday"
+                }
+           , rule "coffeeCartFriday"
+                { trigger = "COFFEE_CART"
+                , conditions = [ "PLAYER.day=5" ]
+                , changes = []
+                , narrative = t "coffeeCartFriday"
+                }
+           , rule "sipCoffee"
+                { trigger = "COFFEE"
+                , conditions = []
+                , changes = []
+                , narrative = t "COFFEE"
                 }
            , rule "fallAsleep"
                 { trigger = "METRO_CENTER"
                 , conditions = [ "PLAYER.day=5.chapter=1" ]
-                , changes = [ "PLAYER.location=TWIN_BROOKS.chapter+1.destination=xxx" ]
+                , changes =
+                    [ "PLAYER.location=TWIN_BROOKS.chapter+1.destination=xxx"
+                    , "COFFEE.location=offscreen"
+                    ]
                 , narrative = "So tired... fall alseep!"
                 }
            ]

@@ -280,7 +280,7 @@ Morning, Carl! Can I just get the usual?"
 """
         |> content__________________________________ "coffeeCartThursday" """
 {Instead of Carl, there's some young lady behind the stand, looking at her phone.
-
+---
 "You're not Carl."
 
 "Nope. Was called in last minute. Guess his wife just went into labor or somethin'. Can I get you anything?"
@@ -293,4 +293,13 @@ Morning, Carl! Can I just get the usual?"
 
 "Here you go. See ya."
 |I miss Carl.}
+"""
+        |> content__________________________________ "coffeeCartFriday" """
+{Huh, that's strange. |}It's closed.{  I really need my coffee.  Today of all days!|  I wonder where Carl is?|  I hope Carl comes back.|}
+"""
+        |> content__________________________________ "COFFEE" """
+{PLAYER.day=1?  Carl's Coffee has been fueling me for years. Can't imagine surviving a Monday without it.}
+{PLAYER.day=2?  Mmm, that's good coffee.}
+{PLAYER.day=3?  I'm going to need a barrel of this if I'm going to get this proposal done by Friday. What is Mr. Ferbs thinking?  }
+{PLAYER.day=4?  It tastes bitter.}
 """
