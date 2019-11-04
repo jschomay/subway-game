@@ -11,7 +11,7 @@ require("./styles/game.css");
 
 // inject bundled Elm app
 const {Elm} = require("./Main.elm");
-const selectScene = location.pathname === "/debug";
+const selectScene = location.hash === "#debug";
 const app = Elm.Main.init({
   node: document.getElementById("main"),
   flags: {selectScene: selectScene}

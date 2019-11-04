@@ -296,6 +296,7 @@ update msg model =
                 )
 
             LoadScene ( model_, history ) ->
+                -- TODO maybe this can use a recursive `Process.sleep 0 (Replay id)` to create debuggable history
                 List.foldl
                     (\id modelTuple ->
                         modelTuple
