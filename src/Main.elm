@@ -227,9 +227,6 @@ specialEvents ruleId model =
         "checkMap" ->
             ( { model | showMap = not model.showMap }, Cmd.none )
 
-        "goToWorkAndResetToNextDay" ->
-            ( { model | scene = Title (dayText model.worldModel) }, Cmd.none )
-
         "goToLineTurnstile" ->
             ( { model | scene = Turnstile <| Maybe.withDefault Red <| getCurrentLine model.worldModel }, Cmd.none )
 
@@ -241,6 +238,9 @@ specialEvents ruleId model =
                 -- Remember, if you add another matcher to jump the turnstile, remove
                 -- the at_turnstile tag!!!!!!!!
                 ( { model | scene = Platform <| Maybe.withDefault Red <| getCurrentLine model.worldModel }, Cmd.none )
+
+            else if List.member other [ "endMonday", "endTuesday", "endWednesday", "endThursday" ] then
+                ( { model | scene = Title (dayText model.worldModel) }, Cmd.none )
 
             else
                 ( model, Cmd.none )
@@ -532,17 +532,20 @@ view model =
 selectSceneView : Model -> Html Msg
 selectSceneView model =
     let
+        skeleton =
+            [ "LOBBY", "CELL_PHONE", "RED_LINE", "RED_LINE", "METRO_CENTER", "LOBBY", "CELL_PHONE", "RED_LINE", "RED_LINE", "METRO_CENTER", "LOBBY", "CELL_PHONE", "RED_LINE", "RED_LINE", "METRO_CENTER", "LOBBY", "CELL_PHONE", "RED_LINE", "RED_LINE", "METRO_CENTER", "LOBBY", "CELL_PHONE", "RED_LINE", "RED_LINE", "METRO_CENTER" ]
+
+        skip i =
+            ( model, skeleton |> List.take i )
+
         scenes =
-            [ ( "Intro", ( model, [] ) )
-            , ( "Thursday"
-              , ( model, [ "LOBBY", "COFFEE_CART", "COFFEE", "COFFEE", "CELL_PHONE", "RED_LINE", "RED_LINE", "METRO_CENTER", "LOBBY", "COFFEE_CART", "COFFEE", "COFFEE", "CELL_PHONE", "RED_LINE", "RED_LINE", "METRO_CENTER", "LOBBY", "COFFEE_CART", "COFFEE", "COFFEE", "CELL_PHONE", "RED_LINE", "RED_LINE", "METRO_CENTER", "LOBBY" ] )
-              )
-            , ( "Friday"
-              , ( model, [ "LOBBY", "COFFEE_CART", "COFFEE", "COFFEE", "CELL_PHONE", "RED_LINE", "RED_LINE", "METRO_CENTER", "LOBBY", "COFFEE_CART", "COFFEE", "COFFEE", "CELL_PHONE", "RED_LINE", "RED_LINE", "METRO_CENTER", "LOBBY", "COFFEE_CART", "COFFEE", "COFFEE", "CELL_PHONE", "RED_LINE", "RED_LINE", "METRO_CENTER", "LOBBY", "COFFEE_CART", "COFFEE_CART", "COFFEE", "CELL_PHONE", "RED_LINE", "RED_LINE", "METRO_CENTER", "LOBBY" ] )
-              )
+            [ ( "Beginning", ( model, [] ) )
+            , ( "Tuesday", skip <| 6 )
+            , ( "Wednesday", skip <| 11 )
+            , ( "Thursday", skip <| 16 )
+            , ( "Friday", skip <| 21 )
             , ( "Arrive at Twin Brooks"
-                -- TODO this can be optimized
-              , ( model, [ "LOBBY", "COFFEE_CART", "COFFEE_CART", "COFFEE_CART", "COFFEE_CART", "COFFEE_CART", "CELL_PHONE", "RED_LINE", "RED_LINE", "METRO_CENTER", "LOBBY", "COFFEE_CART", "COFFEE_CART", "COFFEE_CART", "COFFEE_CART", "COFFEE_CART", "CELL_PHONE", "RED_LINE", "RED_LINE", "METRO_CENTER", "LOBBY", "COFFEE_CART", "COFFEE_CART", "COFFEE_CART", "CELL_PHONE", "COFFEE_CART", "RED_LINE", "RED_LINE", "METRO_CENTER", "LOBBY", "RED_LINE", "CELL_PHONE", "COFFEE_CART", "COFFEE_CART", "COFFEE_CART", "COFFEE_CART", "COFFEE_CART", "CELL_PHONE", "RED_LINE", "RED_LINE", "METRO_CENTER", "LOBBY", "COFFEE_CART", "COFFEE_CART", "COFFEE_CART", "COFFEE_CART", "COFFEE_CART", "CELL_PHONE", "RED_LINE", "RED_LINE", "METRO_CENTER", "MAP_POSTER", "MAP", "LOBBY" ] )
+              , ( model, skeleton )
               )
             ]
     in

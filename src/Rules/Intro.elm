@@ -33,16 +33,6 @@ rules =
                 , changes = []
                 , narrative = "{I have a few minutes before my train arrives.  I could check my emails while I wait.|It's kind of my routine to reread my emails before heading in.}"
                 }
-           , rule "goToWorkAndResetToNextDay"
-                { trigger = "METRO_CENTER"
-                , conditions = [ "PLAYER.day<5.chapter=1" ]
-                , changes =
-                    [ "PLAYER.location=WEST_MULBERRY.day+1"
-                    , "CELL_PHONE.unread"
-                    , "COFFEE.location=offscreen"
-                    ]
-                , narrative = "Another day at the office..."
-                }
            , rule "coffeeCartMonday"
                 { trigger = "COFFEE_CART"
                 , conditions = [ "PLAYER.day=1" ]
@@ -78,6 +68,59 @@ rules =
                 , conditions = []
                 , changes = []
                 , narrative = t "COFFEE"
+                }
+           , rule "firstMeetSkaterDude"
+                { trigger = "SKATER_DUDE"
+                , conditions = [ "PLAYER.chapter=1" ]
+                , changes = [ "SKATER_DUDE.location=offscreen" ]
+                , narrative = t "firstMeetSkaterDude"
+                }
+
+           -- day transitions
+           , rule "endMonday"
+                { trigger = "METRO_CENTER"
+                , conditions = [ "PLAYER.day=1" ]
+                , changes =
+                    [ "PLAYER.location=WEST_MULBERRY.day+1"
+                    , "CELL_PHONE.unread"
+                    , "COFFEE.location=offscreen"
+                    , "COMMUTER_1.location=offscreen"
+                    , "LOUD_PAYPHONE_LADY.location=offscreen"
+                    , "TRASH_DIGGER.location=WEST_MULBERRY"
+                    ]
+                , narrative = "Another day at the office..."
+                }
+           , rule "endTuesday"
+                { trigger = "METRO_CENTER"
+                , conditions = [ "PLAYER.day=2" ]
+                , changes =
+                    [ "PLAYER.location=WEST_MULBERRY.day+1"
+                    , "CELL_PHONE.unread"
+                    , "COFFEE.location=offscreen"
+                    , "TRASH_DIGGER.location=offscreen"
+                    , "SKATER_DUDE.location=WEST_MULBERRY"
+                    ]
+                , narrative = "Another day at the office..."
+                }
+           , rule "endWednesday"
+                { trigger = "METRO_CENTER"
+                , conditions = [ "PLAYER.day=3" ]
+                , changes =
+                    [ "PLAYER.location=WEST_MULBERRY.day+1"
+                    , "CELL_PHONE.unread"
+                    , "COFFEE.location=offscreen"
+                    ]
+                , narrative = "Another day at the office..."
+                }
+           , rule "endThursday"
+                { trigger = "METRO_CENTER"
+                , conditions = [ "PLAYER.day=4" ]
+                , changes =
+                    [ "PLAYER.location=WEST_MULBERRY.day+1"
+                    , "CELL_PHONE.unread"
+                    , "COFFEE.location=offscreen"
+                    ]
+                , narrative = "Another day at the office..."
                 }
            , rule "fallAsleep"
                 { trigger = "METRO_CENTER"

@@ -101,9 +101,24 @@ entities =
     , entity "COFFEE.item.location=offscreen"
         "Coffee"
         "My morning Joe."
+    , entity "COMMUTER_1.character.location=WEST_MULBERRY"
+        "Plainly dressed commuter"
+        "{Another commuter waiting on the train.  I say hello and she says hello back.|I think one hello is enough when talking to complete strangers.}"
+    , entity "LOUD_PAYPHONE_LADY.character.location=WEST_MULBERRY"
+        "Loud Woman on Pay Phone"
+        (t "LOUD_PAYPHONE_LADY")
+    , entity "TRASH_DIGGER.character.location=offscreen"
+        "Man Digging in the Trash"
+        (t "TRASH_DIGGER")
+    , entity "SKATER_DUDE.character.location=offscreen"
+        "Skater dude"
+        (t "SKATER_DUDE")
+    , entity "GRAFFITI.item.location=WEST_MULBERRY"
+        "Graffiti on the wall"
+        "That's just vulgar.  Why do people have to mess things up?"
 
     --  TWIN_BROOKS
-    , entity "SAFTEY_WARNING_POSTER.item.location=TWIN_BROOKS"
+    , entity "SAFETY_WARNING_POSTER.item.location=TWIN_BROOKS"
         "Safety Message Poster"
         "It says to watch out for pickpockets and report any suspicious activity."
     , entity "MAP_POSTER.item.map.location=TWIN_BROOKS"

@@ -251,7 +251,7 @@ all =
         |> content__________________________________ "coffeeCartMonday" """
 {Carl runs the little coffee stand at my local station.  The coffee is decent, and it's nice to see his smiling face each morning.
 
-Morning, Carl! Can I just get the usual?"
+"Morning, Carl! Can I just get the usual?"
 
 "Sure thing, Steve. That'll be a buck twenty five."
 
@@ -302,4 +302,30 @@ Morning, Carl! Can I just get the usual?"
 {PLAYER.day=2?  Mmm, that's good coffee.}
 {PLAYER.day=3?  I'm going to need a barrel of this if I'm going to get this proposal done by Friday. What is Mr. Ferbs thinking?  }
 {PLAYER.day=4?  It tastes bitter.}
+"""
+        |> content__________________________________ "LOUD_PAYPHONE_LADY" """
+{
+"I've been here for 30 damn minutes!  When the hell are you going to help me out?!"
+---
+She sure seems upset.
+---
+"HOW THE FUCK ARE YOU GOING TO CALL ME BACK?! I'M ON A FUCKING PAYPHONE, YOU IDIOT!"
+---
+Wow, you'd think people would try to take care of these matters at home. Yeesh.
+|
+I want to stay very far away from her.
+}
+"""
+        |> content__________________________________ "TRASH_DIGGER" """
+{"Spare some change?"
+---
+I've seen that guy almost every day for years.  He always asks for money.  I used to give him some, but eventually stopped.  I work very hard to make a living.
+|
+He's still at it.  Wonder what he thinks he'll find.
+}
+"""
+        |> content__________________________________ "firstMeetSkaterDude" """
+I've seen this young punk before, riding his skateboard up and down the platform.  He almost ran into me once.  The signs clearly say "No skateboarding allowed."
+---
+Oh great, now he's jumping the turnstile.  He probably doesn't even have a ticket.  You know, we've got rules for a reason.  When people like him disrespect them, it's the rest of us who have to pay.
 """
