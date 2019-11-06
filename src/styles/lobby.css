@@ -104,6 +104,11 @@
   cursor: pointer;
 }
 
+.Sign__item--list {
+  list-style: circle;
+  margin-left: 1em;
+}
+
 /* Connections */
 
 .Connections {

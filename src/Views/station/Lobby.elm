@@ -10,7 +10,6 @@ import Manifest exposing (..)
 import Narrative.WorldModel exposing (..)
 import Rules
 import Subway exposing (..)
-import Views.Shared as Shared
 import Views.Station.Connections as Connections
 
 
@@ -61,20 +60,27 @@ view map worldModel currentStation =
             else
                 div [ class "Sign__section" ]
                     [ div [ class "Sign__header3" ] [ text name ]
-                    , div [ class "Sign__list" ] list
+                    , ul [ class "Sign__list" ] list
                     ]
 
         inventoryItemView : ( Manifest.ID, Entity ) -> Html Msg
         inventoryItemView ( id, entity ) =
             div [ class <| "Inventory__item icon--" ++ id, onClick <| Interact id ] []
 
+        nonInteractableItemView name =
+            li [ class "Sign__item Sign__item--list" ] [ text name ]
+
+        interactableItemView ( id, name ) =
+            div [ class "Sign__item Sign__item--interactable", onClick <| Interact id ]
+                [ text name ]
+
         chapterInfoView =
             div [ class "Sign Sign--chapter" ]
                 [ div [ class "Sign__header2" ] [ text fullChapterName ]
 
                 -- TODO make goals/distractions clickable with narrative
-                , sectionView "Goals" <| List.map Shared.nonInteractableItemView goals
-                , sectionView "Distractions" <| List.map Shared.nonInteractableItemView distractions
+                , sectionView "Goals:" <| List.map nonInteractableItemView goals
+                , sectionView "Distractions:" <| List.map nonInteractableItemView distractions
                 ]
 
         stationInfoView =
@@ -82,7 +88,7 @@ view map worldModel currentStation =
                 [ div [ class "Sign__header1" ] [ text stationName ]
                 , div [ class "Sign__split" ]
                     [ div [ class "Sign__left" ] [ Connections.forStation map currentStation ]
-                    , div [ class "Sign__right" ] <| List.map (Tuple.mapSecond .name >> Shared.interactableItemView) (characters ++ items)
+                    , div [ class "Sign__right" ] <| List.map (Tuple.mapSecond .name >> interactableItemView) (characters ++ items)
                     ]
                 ]
 
