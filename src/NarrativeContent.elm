@@ -39,24 +39,60 @@ parseErrors =
         all
 
 
+all : Dict String String
+all =
+    List.foldl Dict.union
+        Dict.empty
+        [ silent, general, intro ]
+
+
 content__________________________________ =
     Dict.insert
 
 
-all : Dict String String
-all =
+{-| rules that shouldn't show any text
+-}
+silent : Dict String String
+silent =
+    Dict.empty
+        |> content__________________________________ "goToLobby" ""
+        |> content__________________________________ "goToLineTurnstile" ""
+        |> content__________________________________ "goToLinePlatform" ""
+        |> content__________________________________ "checkMap" ""
+
+
+general : Dict String String
+general =
     Dict.empty
         |> content__________________________________ "BRIEFCASE"
             "My portable office, all my work is in it."
         |> content__________________________________ "RED_LINE_PASS"
             "This gets me anywhere on the Red Line, but I really only use it to get to work and back home."
+        |> content__________________________________ "GRAFFITI"
+            "That's just vulgar.  Why do people have to mess things up?"
+        |> content__________________________________ "COFFEE" """
+{PLAYER.day=1?  Carl's Coffee has been fueling me for years. Can't imagine surviving a Monday without it.}
+{PLAYER.day=2?  Mmm, that's good coffee.}
+{PLAYER.day=3?  I'm going to need a barrel of this if I'm going to get this proposal done by Friday. What is Mr. Ferbs thinking?  }
+{PLAYER.day=4?  It tastes bitter.}
+"""
+        |> content__________________________________ "SAFETY_WARNING_POSTER"
+            "It says to watch out for pickpockets and report any suspicious activity."
+        |> content__________________________________ "ridingTheTrain"
+            "The train hurtles through the dark tunnel towards the next stop."
+        |> content__________________________________ "jumpTurnstileFail"
+            "{I've never jumped a turnstile in my life, and I'm not about to start now.|I don't want to get caught.|Better to stick to the lines I have passes for.}"
+
+
+intro : Dict String String
+intro =
+    Dict.empty
         |> content__________________________________ "COMMUTER_1" """
 {Another commuter waiting on the train.  I say hello and she says hello back.
 |I think one hello is enough when talking to complete strangers.}
 """
-        |> content__________________________________ "GRAFFITI"
-            "That's just vulgar.  Why do people have to mess things up?"
-        |> content__________________________________ "CELL_PHONE" """
+        -- (NOTE this rule is general)
+        |> content__________________________________ "checkEmails" """
 {There's no service, but I can view my emails.
 ---
 |}
@@ -304,14 +340,9 @@ all =
 "Here you go. See ya."
 |I miss Carl.}
 """
+        -- (NOTE this rule is general)
         |> content__________________________________ "coffeeCartFriday" """
 {Huh, that's strange. |}It's closed.{  I really need my coffee.  Today of all days!|  I wonder where Carl is?|  I hope Carl comes back.|}
-"""
-        |> content__________________________________ "COFFEE" """
-{PLAYER.day=1?  Carl's Coffee has been fueling me for years. Can't imagine surviving a Monday without it.}
-{PLAYER.day=2?  Mmm, that's good coffee.}
-{PLAYER.day=3?  I'm going to need a barrel of this if I'm going to get this proposal done by Friday. What is Mr. Ferbs thinking?  }
-{PLAYER.day=4?  It tastes bitter.}
 """
         |> content__________________________________ "LOUD_PAYPHONE_LADY" """
 {
@@ -339,5 +370,15 @@ I've seen this young punk before, riding his skateboard up and down the platform
 ---
 Oh great, now he's jumping the turnstile.  He probably doesn't even have a ticket.  You know, we've got rules for a reason.  When people like him disrespect them, it's the rest of us who have to pay.
 """
-        |> content__________________________________ "SAFETY_WARNING_POSTER"
-            "It says to watch out for pickpockets and report any suspicious activity."
+        |> content__________________________________ "notGoingToWork" """
+ { That's not my station. |}I have to go to {the office|work}{ at Metro Center Station|}.
+ """
+        |> content__________________________________ "forcePlayerToReadEmails" """
+{I have a few minutes before my train arrives.  I could check my emails while I wait.|It's kind of my routine to reread my emails before heading in.}
+"""
+        |> content__________________________________ "getMap"
+            """
+{I might need the full subway map.  They have a printed one I can take.
+
+(Press "M" to view the map)|}
+"""

@@ -13,7 +13,6 @@ type alias TextRule =
     { trigger : String
     , conditions : List String
     , changes : List String
-    , narrative : String
     }
 
 

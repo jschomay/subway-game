@@ -17,20 +17,18 @@ parseErrors =
     Tuple.second rules_
 
 
-parseRule { trigger, conditions, changes, narrative } =
+parseRule { trigger, conditions, changes } =
     let
-        toRule trigger_ conditions_ changes_ narrative_ =
+        toRule trigger_ conditions_ changes_ =
             { trigger = trigger_
             , conditions = conditions_
             , changes = changes_
-            , narrative = narrative_
             }
     in
-    Result.map4 toRule
+    Result.map3 toRule
         (parseMatcher trigger)
         (parseMultiple parseMatcher conditions)
         (parseMultiple parseChanges changes)
-        (Ok narrative)
 
 
 rules_ : ( Rules, List ( String, ParseError ) )

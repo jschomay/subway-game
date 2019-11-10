@@ -38,9 +38,7 @@ type Msg
 
 
 type alias Rule =
-    Rules.Rule
-        { narrative : String
-        }
+    Rules.Rule {}
 
 
 type alias Rules =

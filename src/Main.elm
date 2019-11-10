@@ -118,7 +118,7 @@ updateStory trigger model =
                     Debug.log "Matched rule:" matchedRuleID
 
                 ( newStory, newMatchCounts ) =
-                    parseNarrative model matchedRuleID trigger matchedRule.narrative
+                    parseNarrative model matchedRuleID trigger (NarrativeContent.t matchedRuleID)
             in
             ( { model
                 | pendingChanges = Just ( trigger, matchedRule.changes, matchedRuleID )
@@ -136,6 +136,7 @@ updateStory trigger model =
                     )
 
 
+parseNarrative : Model -> RuleID -> ID -> String -> ( Narrative.Narrative, Dict String Int )
 parseNarrative model matchedRuleID trigger rawNarrative =
     let
         cycleIndex =
@@ -530,6 +531,10 @@ selectSceneView model =
     let
         skeleton =
             [ "LOBBY", "CELL_PHONE", "RED_LINE", "RED_LINE", "METRO_CENTER", "LOBBY", "CELL_PHONE", "RED_LINE", "RED_LINE", "METRO_CENTER", "LOBBY", "CELL_PHONE", "RED_LINE", "RED_LINE", "METRO_CENTER", "LOBBY", "CELL_PHONE", "RED_LINE", "RED_LINE", "METRO_CENTER", "LOBBY", "CELL_PHONE", "RED_LINE", "RED_LINE", "METRO_CENTER" ]
+
+        -- missing some interactions in intro
+        fullPlay =
+            [ "LOBBY", "BRIEFCASE", "RED_LINE_PASS", "RED_LINE_PASS", "RED_LINE", "CELL_PHONE", "CELL_PHONE", "CELL_PHONE", "COFFEE_CART", "COFFEE", "COFFEE_CART", "COMMUTER_1", "COMMUTER_1", "LOUD_PAYPHONE_LADY", "COFFEE_CART", "LOUD_PAYPHONE_LADY", "GRAFFITI", "RED_LINE", "RED_LINE", "METRO_CENTER", "LOBBY", "RED_LINE_PASS", "COFFEE_CART", "COFFEE_CART", "TRASH_DIGGER", "TRASH_DIGGER", "GRAFFITI", "COFFEE", "CELL_PHONE", "CELL_PHONE", "RED_LINE", "RED_LINE", "FEDERAL_TRIANGLE", "METRO_CENTER", "LOBBY", "RED_LINE", "SKATER_DUDE", "COFFEE_CART", "COFFEE_CART", "COFFEE", "CELL_PHONE", "CELL_PHONE", "COFFEE", "RED_LINE", "RED_LINE", "METRO_CENTER", "LOBBY", "CELL_PHONE", "COFFEE_CART", "COFFEE_CART", "COFFEE_CART", "COFFEE", "RED_LINE", "RED_LINE", "CHURCH_STREET", "METRO_CENTER", "LOBBY", "CELL_PHONE", "COFFEE_CART", "RED_LINE", "RED_LINE", "LOBBY", "RED_LINE", "RED_LINE", "METRO_CENTER", "MAP_POSTER", "MAP", "MAP_POSTER", "SAFETY_WARNING_POSTER", "RED_LINE", "RED_LINE", "FEDERAL_TRIANGLE", "MAP", "GREEN_LINE", "GREEN_LINE", "LOBBY", "RED_LINE", "RED_LINE", "LOBBY", "YELLOW_LINE", "LOBBY", "CELL_PHONE", "BRIEFCASE", "RED_LINE_PASS" ]
 
         skip i =
             ( model, skeleton |> List.take i )
