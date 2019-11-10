@@ -105,9 +105,8 @@ updateStory trigger model =
                         ( [], model.ruleMatchCounts )
 
                     else
-                        Dict.get trigger model.worldModel
-                            |> Maybe.map (.description >> parseNarrative model trigger trigger)
-                            |> Maybe.withDefault ( [ "ERROR: unablle to find entity for " ++ trigger ], model.ruleMatchCounts )
+                        NarrativeContent.t trigger
+                            |> parseNarrative model trigger trigger
             in
             -- no need to apply special events or pending changes (no changes,
             -- and no rule id to match).
@@ -150,20 +149,17 @@ parseNarrative model matchedRuleID trigger rawNarrative =
             else
                 id
 
-        propFn keyword fn =
-            ( keyword
-            , replaceTrigger
-                >> (\id ->
-                        Dict.get id model.worldModel
-                            |> Maybe.map (fn >> Ok)
-                            |> Maybe.withDefault (Err <| "Unable to find entity for id: " ++ id)
-                   )
-            )
-
         propKeywords =
             Dict.fromList
-                [ propFn "name" .name
-                , propFn "description" .description
+                [ ( "name"
+                  , replaceTrigger
+                        >> (\id ->
+                                Dict.get id model.worldModel
+                                    |> Result.fromMaybe ("Unable to find entity for id: " ++ id)
+                                    |> Result.map .name
+                           )
+                  )
+                , ( "description", replaceTrigger >> NarrativeContent.t >> Ok )
                 ]
 
         config =

@@ -46,6 +46,16 @@ content__________________________________ =
 all : Dict String String
 all =
     Dict.empty
+        |> content__________________________________ "BRIEFCASE"
+            "My portable office, all my work is in it."
+        |> content__________________________________ "RED_LINE_PASS"
+            "This gets me anywhere on the Red Line, but I really only use it to get to work and back home."
+        |> content__________________________________ "COMMUTER_1" """
+{Another commuter waiting on the train.  I say hello and she says hello back.
+|I think one hello is enough when talking to complete strangers.}
+"""
+        |> content__________________________________ "GRAFFITI"
+            "That's just vulgar.  Why do people have to mess things up?"
         |> content__________________________________ "CELL_PHONE" """
 {There's no service, but I can view my emails.
 ---
@@ -329,3 +339,5 @@ I've seen this young punk before, riding his skateboard up and down the platform
 ---
 Oh great, now he's jumping the turnstile.  He probably doesn't even have a ticket.  You know, we've got rules for a reason.  When people like him disrespect them, it's the rest of us who have to pay.
 """
+        |> content__________________________________ "SAFETY_WARNING_POSTER"
+            "It says to watch out for pickpockets and report any suspicious activity."

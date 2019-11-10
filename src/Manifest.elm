@@ -9,7 +9,7 @@ import Subway exposing (Station)
 
 
 type alias DisplayComponent a =
-    { a | name : String, description : String }
+    { a | name : String }
 
 
 type alias Entity =
@@ -47,21 +47,20 @@ initialWorldModel =
         |> List.foldl separateErrors ( Dict.empty, [] )
 
 
-entity : String -> String -> String -> ParsedEntity
-entity entityString name desc =
+entity : String -> String -> ParsedEntity
+entity entityString name =
     parseEntity entityString
-        |> Result.map (addDisplayable name desc)
+        |> Result.map (addDisplayable name)
         |> Result.mapError (\e -> ( "Entity def: " ++ entityString, e ))
 
 
-addDisplayable : String -> String -> ( ID, NarrativeComponent {} ) -> ( ID, Entity )
-addDisplayable name desc ( id, { tags, stats, links } ) =
+addDisplayable : String -> ( ID, NarrativeComponent {} ) -> ( ID, Entity )
+addDisplayable name ( id, { tags, stats, links } ) =
     ( id
     , { tags = tags
       , stats = stats
       , links = links
       , name = name
-      , description = desc
       }
     )
 
@@ -70,60 +69,44 @@ entities : List ParsedEntity
 entities =
     [ entity "PLAYER.chapter=1.day=1.location=WEST_MULBERRY.destination=METRO_CENTER"
         "Steve"
-        "Here I am."
 
     -- inventory
     , entity "BRIEFCASE.item.location=PLAYER"
         "Briefcase"
-        "My portable office, all my work is in it."
     , entity "RED_LINE_PASS.item.location=PLAYER.valid_on=RED_LINE"
         "Red Line metro pass"
-        "This gets me anywhere on the Red Line, but I really only use it to get to work and back home."
     , entity "CELL_PHONE.item.location=PLAYER.unread"
         "Cell phone"
-        "I'm never more than a call or email way."
     , entity "MAP.item.map.silent"
         "Subway map"
-        "The full subway map."
 
     -- other locations
     , entity "CENTRAL_GUARD_OFFICE.location"
         "Central Guard Office"
-        ""
     , entity "LOBBY.location"
         "Station Lobby"
-        ""
 
     -- WEST_MULBERRY
     , entity "COFFEE_CART.character.location=WEST_MULBERRY"
         "Coffee cart"
-        "I've been getting Carl's Coffee for years."
     , entity "COFFEE.item.location=offscreen"
         "Coffee"
-        "My morning Joe."
     , entity "COMMUTER_1.character.location=WEST_MULBERRY"
         "Plainly dressed commuter"
-        "{Another commuter waiting on the train.  I say hello and she says hello back.|I think one hello is enough when talking to complete strangers.}"
     , entity "LOUD_PAYPHONE_LADY.character.location=WEST_MULBERRY"
         "Loud Woman on Pay Phone"
-        (t "LOUD_PAYPHONE_LADY")
     , entity "TRASH_DIGGER.character.location=offscreen"
         "Man Digging in the Trash"
-        (t "TRASH_DIGGER")
     , entity "SKATER_DUDE.character.location=offscreen"
         "Skater dude"
-        (t "SKATER_DUDE")
     , entity "GRAFFITI.item.location=WEST_MULBERRY"
         "Graffiti on the wall"
-        "That's just vulgar.  Why do people have to mess things up?"
 
     --  TWIN_BROOKS
     , entity "SAFETY_WARNING_POSTER.item.location=TWIN_BROOKS"
         "Safety Message Poster"
-        "It says to watch out for pickpockets and report any suspicious activity."
     , entity "MAP_POSTER.item.map.location=TWIN_BROOKS"
         "Map on the wall"
-        "This shows the full map of the subway system."
     ]
         ++ lines
         ++ stations
@@ -140,7 +123,7 @@ lines =
         |> List.map
             (Subway.lineInfo
                 >> (\info ->
-                        entity (info.id ++ ".line") info.name info.name
+                        entity (info.id ++ ".line") info.name
                    )
             )
 
@@ -162,5 +145,5 @@ stations =
         |> Dict.toList
         |> List.map
             (\( id, { name } ) ->
-                entity (makeId id) name name
+                entity (makeId id) name
             )
