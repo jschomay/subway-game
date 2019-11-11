@@ -89,7 +89,6 @@
 
 .Sign__right {
   flex: 1 0 auto;
-  text-align: right;
 }
 
 .Sign__left {
@@ -97,11 +96,15 @@
 }
 
 .Sign__item {
-  padding: 0.2em 0;
+  padding: 0.3em 0;
 }
 
 .Sign__item--interactable {
   cursor: pointer;
+}
+
+.Sign__item--interactable:last-child {
+  padding-bottom: initial;
 }
 
 .Sign__item--list {
