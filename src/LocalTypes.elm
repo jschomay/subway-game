@@ -35,6 +35,7 @@ type Msg
     | BoardTrain Line Station
     | Disembark
     | Continue
+    | Achievement String
 
 
 type alias Rule =

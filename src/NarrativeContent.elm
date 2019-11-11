@@ -397,6 +397,10 @@ A soda dropped out!  Yes!
 Ugh, this tastes disgusting.  How long has it been in there?
 }
 """
+        |> content__________________________________ "get_caffeinated_plot_achievement" """
+_Achievement unlocked:_  
+Get caffeinated
+"""
         |> content__________________________________ "get_caffeinated_plot_3" """
 No thank you.
 """

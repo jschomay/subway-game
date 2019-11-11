@@ -62,7 +62,12 @@
   line-height: 1.2em;
 }
 
-.StoryLine blockquote {
+.StoryLine strong {
+  font-weight: bold;
+}
+
+.StoryLine em {
+  font-style: italic;
 }
 
 @keyframes fadeIn {

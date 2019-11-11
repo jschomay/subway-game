@@ -230,6 +230,10 @@ specialEvents ruleId model =
         "goToLobby" ->
             ( { model | scene = Lobby }, Cmd.none )
 
+        -- achievements
+        "get_caffeinated_plot_2" ->
+            ( model, Process.sleep 300 |> Task.perform (\_ -> Achievement "get_caffeinated_plot_achievement") )
+
         other ->
             if List.member other [ "goToLinePlatform" ] then
                 -- Remember, if you add another matcher to jump the turnstile, remove
@@ -354,6 +358,12 @@ update msg model =
                                     _ ->
                                         ( m, Cmd.none )
                             )
+
+            Achievement key ->
+                -- TODO probably make a better UI for this
+                ( { model | story = [ NarrativeContent.t key ] }
+                , Cmd.none
+                )
 
             Disembark ->
                 ( { model | scene = Lobby }
