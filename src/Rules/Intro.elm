@@ -52,20 +52,47 @@ rules =
                 , conditions = [ "PLAYER.day=4" ]
                 , changes = [ "COFFEE.location=PLAYER" ]
                 }
-
-           -- (NOTE this rule is general)
            , rule "coffeeCartFriday"
                 { trigger = "COFFEE_CART"
-                , conditions = [ "PLAYER.day=5" ]
+                , conditions =
+                    [ "PLAYER.day=5.chapter=1"
+                    , "SODA_MACHINE.get_caffeinated_plot<1"
+                    ]
+                , changes = [ "SODA_MACHINE.get_caffeinated_plot=1" ]
+                }
+           , rule "sodaMachineBroken"
+                { trigger = "SODA_MACHINE.broken"
+                , conditions = []
+                , changes = []
+                }
+           , rule "sodaMachineFixed"
+                { trigger = "SODA_MACHINE.!broken"
+                , conditions = [ "PLAYER.chapter=1" ]
+                , changes = []
+                }
+           , rule "get_caffeinated_plot_1"
+                { trigger = "SODA_MACHINE.!broken.get_caffeinated_plot=1"
+                , conditions = [ "PLAYER.chapter=1" ]
+                , changes = [ "$.get_caffeinated_plot+1" ]
+                }
+           , rule "get_caffeinated_plot_2"
+                { trigger = "SODA_MACHINE.!broken.get_caffeinated_plot=2"
+                , conditions = [ "PLAYER.chapter=1" ]
+                , changes =
+                    [ "$.get_caffeinated_plot+1"
+                    , "PLAYER.persistent+1"
+                    ]
+                }
+           , rule "get_caffeinated_plot_3"
+                { trigger = "SODA_MACHINE.!broken.get_caffeinated_plot=3"
+                , conditions = [ "PLAYER.chapter=1" ]
                 , changes = []
                 }
            , rule "firstMeetSkaterDude"
                 { trigger = "SKATER_DUDE"
                 , conditions = [ "PLAYER.chapter=1" ]
-                , changes = [ "SKATER_DUDE.location=offscreen" ]
+                , changes = [ "$.location=offscreen" ]
                 }
-
-           -- day transitions
            , rule "endMonday"
                 { trigger = "METRO_CENTER"
                 , conditions = [ "PLAYER.day=1" ]
@@ -96,6 +123,9 @@ rules =
                     [ "PLAYER.location=WEST_MULBERRY.day+1"
                     , "CELL_PHONE.unread"
                     , "COFFEE.location=offscreen"
+                    , "SKATER_DUDE.location=offscreen"
+                    , "TRASH_DIGGER.location=WEST_MULBERRY"
+                    , "BENCH_BUM.location=WEST_MULBERRY"
                     ]
                 }
            , rule "endThursday"
@@ -105,6 +135,9 @@ rules =
                     [ "PLAYER.location=WEST_MULBERRY.day+1"
                     , "CELL_PHONE.unread"
                     , "COFFEE.location=offscreen"
+                    , "TRASH_DIGGER.location=offscreen"
+                    , "BENCH_BUM.location=offscreen"
+                    , "SODA_MACHINE.-broken"
                     ]
                 }
            , rule "fallAsleep"

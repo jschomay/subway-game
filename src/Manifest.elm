@@ -94,19 +94,27 @@ entities =
     , entity "COMMUTER_1.character.location=WEST_MULBERRY"
         "Plainly dressed commuter"
     , entity "LOUD_PAYPHONE_LADY.character.location=WEST_MULBERRY"
-        "Loud Woman on Pay Phone"
+        "Loud woman on pay phone"
     , entity "TRASH_DIGGER.character.location=offscreen"
-        "Man Digging in the Trash"
+        "Man digging in the trash"
     , entity "SKATER_DUDE.character.location=offscreen"
         "Skater dude"
     , entity "GRAFFITI.item.location=WEST_MULBERRY"
         "Graffiti on the wall"
+    , entity "BENCH_BUM.character.location=offscreen"
+        "Guy sleeping on a bench"
+    , entity "SODA_MACHINE.item.broken.location=WEST_MULBERRY"
+        "Soda vending machine"
 
     --  TWIN_BROOKS
     , entity "SAFETY_WARNING_POSTER.item.location=TWIN_BROOKS"
-        "Safety Message Poster"
+        "Safety message poster"
     , entity "MAP_POSTER.item.map.location=TWIN_BROOKS"
         "Map on the wall"
+
+    --  METRO_CENTER
+    , entity "MUSICIAN.character.location=METRO_CENTER"
+        "Man playing violin"
     ]
         ++ lines
         ++ stations

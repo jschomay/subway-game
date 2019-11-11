@@ -283,9 +283,9 @@ intro =
 
     Hi Steve!
 
-    Hope you're having a great day!  I just wanted to reach out to you one more time to set up a 
-    quick chat.  How's Tuesday morning next week?  Let me know either way.  I'm excited to talk
-    to you!
+    Hope you're having a great day!  I didn't hear back from you.  I just wanted to reach out to you
+    one more time to set up a quick chat.  How's Tuesday morning next week?  Let me know either
+    way.  I'm excited to talk to you!
 
     Have a wonderful weekend.
     
@@ -340,9 +340,11 @@ intro =
 "Here you go. See ya."
 |I miss Carl.}
 """
-        -- (NOTE this rule is general)
         |> content__________________________________ "coffeeCartFriday" """
-{Huh, that's strange. |}It's closed.{  I really need my coffee.  Today of all days!|  I wonder where Carl is?|  I hope Carl comes back.|}
+Huh, that's strange.  It's closed.  I really need my coffee.  Today of all days!
+"""
+        |> content__________________________________ "COFFEE_CART" """
+It's closed. I hope Carl comes back.
 """
         |> content__________________________________ "LOUD_PAYPHONE_LADY" """
 {
@@ -357,12 +359,69 @@ Wow, you'd think people would try to take care of these matters at home. Yeesh.
 I want to stay very far away from her.
 }
 """
+        |> content__________________________________ "SODA_MACHINE" """
+I wonder how long the cans have been in that old thing?
+"""
+        |> content__________________________________ "sodaMachineBroken" """
+{An "Out of Order" sign is stuck to the front.  This thing has been broken since I moved here.
+
+Not that I've had a real hankering for a soda, but it's just kind of annoying.
+|
+It's out of order.
+}
+"""
+        |> content__________________________________ "sodaMachineFixed" """
+Wow, the "Out of Order" sign is gone. Did they actually fix it?
+"""
+        |> content__________________________________ "get_caffeinated_plot_1" """
+{The "Out of Order" sign is gone. Maybe it will work?
+
+Since I can't get my coffee, I might as well get my caffeine fix from somewhere.
+---
+Great, the button doesn't work and it's not giving my change back. Damn.
+|
+The "Out of Order" sign might be gone, but I know better.
+}
+"""
+        |> content__________________________________ "get_caffeinated_plot_2" """
+{This thing stole my quarters.  I want my soda!
+
+I know it's dumb, but I kick the machine so hard my foot hurts.
+---
+OK, calm down Steve.  The hard part is done, just focus on the getting to work.
+---
+Wait, I think I hear something...
+---
+A soda dropped out!  Yes!
+
+Ugh, this tastes disgusting.  How long has it been in there?
+}
+"""
+        |> content__________________________________ "get_caffeinated_plot_3" """
+No thank you.
+"""
         |> content__________________________________ "TRASH_DIGGER" """
 {"Spare some change?"
 ---
 I've seen that guy almost every day for years.  He always asks for money.  I used to give him some, but eventually stopped.  I work very hard to make a living.
 |
 He's still at it.  Wonder what he thinks he'll find.
+}
+"""
+        |> content__________________________________ "BENCH_BUM" """
+{Some college kid is sprawled out across the whole bench. I wished he'd move. I'd like to just sit down.
+---
+"Hi there. Could you sit up please? I'd like to sit while I wait for my train."
+---
+He just ignores me.  Maybe he didn't hear me?
+|
+"Hey!  I'd like to sit down, please."
+---
+"Fuck off... I.. arghhh..."
+---
+He must be drunk.  I don't think he's getting up.
+|
+I guess I'm standing.
 }
 """
         |> content__________________________________ "firstMeetSkaterDude" """
@@ -375,6 +434,47 @@ Oh great, now he's jumping the turnstile.  He probably doesn't even have a ticke
  """
         |> content__________________________________ "forcePlayerToReadEmails" """
 {I have a few minutes before my train arrives.  I could check my emails while I wait.|It's kind of my routine to reread my emails before heading in.}
+"""
+        |> content__________________________________ "endMonday" """
+I'm curious what my boss has in mind for this proposal.  It's nice he thought of me.  Maybe this will finally get me the promotion he's been promising.
+"""
+        |> content__________________________________ "endTuesday" """
+It's going to be tough getting this proposal put together by Friday, but I've got to do it.  I just wish I had more time to make it good.
+---
+Also, It would be great to see Henry again. I've got to remember to get back to him.  
+"""
+        |> content__________________________________ "endWednesday" """
+This train is two minutes late again.  This is becoming more and more of a problem lately.  They've got to do something about it.
+---
+I'm not looking forward to talking to Mr. Ferbs this morning.  This proposal is going to be a disaster.  Figures I get stuck with it.
+---
+But I've got to make it work.
+"""
+        |> content__________________________________ "endThursday" """
+I'm so tired.  I've been up all night working on this damn proposal, and there's still a lot more work to be done. I hope Mr. Ferbs appreciates it.
+"""
+        |> content__________________________________ "fallAsleep" """
+Today's the day.  I busted my ass, but I think it will work.  I better get my damn promotion.
+
+I just wish I wasn't so tired.
+---
+Three more stops. Maybe I can steal a wink or two before I get to the station. I'll just close my eyes for a minute.
+---
+...
+---
+"Sir. Sir!"
+---
+Whoa... what?  What's going on?
+
+A janitor is shaking my shoulder.
+
+"We're almost at the end of the line, sir. You have to wake up."
+---
+End of the line?
+
+Shit, I feel asleep!  I missed my stop!  What station is this?
+
+Oh my God, I'm in so much trouble!  I have to get back to my stop.
 """
         |> content__________________________________ "getMap"
             """

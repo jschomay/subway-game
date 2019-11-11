@@ -530,7 +530,7 @@ selectSceneView : Model -> Html Msg
 selectSceneView model =
     let
         skeleton =
-            [ "LOBBY", "CELL_PHONE", "RED_LINE", "RED_LINE", "METRO_CENTER", "LOBBY", "CELL_PHONE", "RED_LINE", "RED_LINE", "METRO_CENTER", "LOBBY", "CELL_PHONE", "RED_LINE", "RED_LINE", "METRO_CENTER", "LOBBY", "CELL_PHONE", "RED_LINE", "RED_LINE", "METRO_CENTER", "LOBBY", "CELL_PHONE", "RED_LINE", "RED_LINE", "METRO_CENTER" ]
+            [ "LOBBY", "CELL_PHONE", "RED_LINE", "RED_LINE", "METRO_CENTER", "LOBBY", "CELL_PHONE", "RED_LINE", "RED_LINE", "METRO_CENTER", "LOBBY", "CELL_PHONE", "RED_LINE", "RED_LINE", "METRO_CENTER", "LOBBY", "CELL_PHONE", "RED_LINE", "RED_LINE", "METRO_CENTER", "LOBBY", "CELL_PHONE", "RED_LINE", "RED_LINE", "METRO_CENTER", "LOBBY" ]
 
         -- missing some interactions in intro
         fullPlay =
