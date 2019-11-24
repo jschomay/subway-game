@@ -67,7 +67,7 @@ addDisplayable name ( id, { tags, stats, links } ) =
 
 entities : List ParsedEntity
 entities =
-    [ entity "PLAYER.chapter=1.day=1.location=WEST_MULBERRY.destination=METRO_CENTER"
+    [ entity "PLAYER.chapter=1.day=1.location=WEST_MULBERRY.destination=BROADWAY_STREET"
         "Steve"
 
     -- inventory
@@ -112,8 +112,8 @@ entities =
     , entity "MAP_POSTER.item.map.location=TWIN_BROOKS"
         "Map on the wall"
 
-    --  METRO_CENTER
-    , entity "MUSICIAN.character.location=METRO_CENTER"
+    --  BROADWAY_STREET
+    , entity "MUSICIAN.character.location=BROADWAY_STREET"
         "Man playing violin"
     ]
         ++ lines
@@ -142,7 +142,7 @@ stations =
         makeId id =
             id
                 ++ ".loation.station"
-                ++ (if id == "METRO_CENTER" then
+                ++ (if id == "BROADWAY_STREET" then
                         ".steves_work"
 
                     else

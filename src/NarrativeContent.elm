@@ -434,7 +434,7 @@ I've seen this young punk before, riding his skateboard up and down the platform
 Oh great, now he's jumping the turnstile.  He probably doesn't even have a ticket.  You know, we've got rules for a reason.  When people like him disrespect them, it's the rest of us who have to pay.
 """
         |> content__________________________________ "notGoingToWork" """
- { That's not my station. |}I have to go to {the office|work}{ at Metro Center Station|}.
+ { That's not my station. |}I have to go to {the office|work}{ at Broadway Street Station|}.
  """
         |> content__________________________________ "forcePlayerToReadEmails" """
 {I have a few minutes before my train arrives.  I could check my emails while I wait.|It's kind of my routine to reread my emails before heading in.}

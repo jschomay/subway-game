@@ -14,7 +14,7 @@ rules =
     []
         ++ [ rule "notGoingToWork"
                 { trigger = "*.station"
-                , conditions = [ "PLAYER.destination=METRO_CENTER.chapter=1" ]
+                , conditions = [ "PLAYER.destination=BROADWAY_STREET.chapter=1" ]
                 , changes = []
                 }
 
@@ -94,7 +94,7 @@ rules =
                 , changes = [ "$.location=offscreen" ]
                 }
            , rule "endMonday"
-                { trigger = "METRO_CENTER"
+                { trigger = "BROADWAY_STREET"
                 , conditions = [ "PLAYER.day=1" ]
                 , changes =
                     [ "PLAYER.location=WEST_MULBERRY.day+1"
@@ -106,7 +106,7 @@ rules =
                     ]
                 }
            , rule "endTuesday"
-                { trigger = "METRO_CENTER"
+                { trigger = "BROADWAY_STREET"
                 , conditions = [ "PLAYER.day=2" ]
                 , changes =
                     [ "PLAYER.location=WEST_MULBERRY.day+1"
@@ -117,7 +117,7 @@ rules =
                     ]
                 }
            , rule "endWednesday"
-                { trigger = "METRO_CENTER"
+                { trigger = "BROADWAY_STREET"
                 , conditions = [ "PLAYER.day=3" ]
                 , changes =
                     [ "PLAYER.location=WEST_MULBERRY.day+1"
@@ -129,7 +129,7 @@ rules =
                     ]
                 }
            , rule "endThursday"
-                { trigger = "METRO_CENTER"
+                { trigger = "BROADWAY_STREET"
                 , conditions = [ "PLAYER.day=4" ]
                 , changes =
                     [ "PLAYER.location=WEST_MULBERRY.day+1"
@@ -141,7 +141,7 @@ rules =
                     ]
                 }
            , rule "fallAsleep"
-                { trigger = "METRO_CENTER"
+                { trigger = "BROADWAY_STREET"
                 , conditions = [ "PLAYER.day=5.chapter=1" ]
                 , changes =
                     [ "PLAYER.location=TWIN_BROOKS.chapter+1.destination=xxx"

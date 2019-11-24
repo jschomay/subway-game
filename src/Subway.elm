@@ -41,8 +41,8 @@ type alias StationInfo =
 stations : Dict Station StationInfo
 stations =
     Dict.fromList
-        [ ( "METRO_CENTER", { name = "Metro Center" } )
-        , ( "FEDERAL_TRIANGLE", { name = "Federal Triangle" } )
+        [ ( "BROADWAY_STREET", { name = "Broadway Street" } )
+        , ( "CONVENTION_CENTER", { name = "Convention Center" } )
         , ( "MACARTHURS_PARK", { name = "MacArthur's Park" } )
         , ( "CHURCH_STREET", { name = "Church Street" } )
         , ( "SPRING_HILL", { name = "Spring Hill" } )
@@ -98,8 +98,8 @@ lineInfo line =
                 [ "WEST_MULBERRY"
                 , "EAST_MULBERRY"
                 , "CHURCH_STREET"
-                , "METRO_CENTER"
-                , "FEDERAL_TRIANGLE"
+                , "BROADWAY_STREET"
+                , "CONVENTION_CENTER"
                 , "SPRING_HILL"
                 , "TWIN_BROOKS"
                 ]
@@ -112,8 +112,8 @@ lineInfo line =
             , color = yellow
             , stations =
                 [ "RIVERSIDE"
-                , "METRO_CENTER"
-                , "FEDERAL_TRIANGLE"
+                , "BROADWAY_STREET"
+                , "CONVENTION_CENTER"
                 , "CAPITOL_HEIGHTS"
                 , "MACARTHURS_PARK"
                 ]
@@ -128,7 +128,7 @@ lineInfo line =
                 [ "BURLINGTON"
                 , "SAMUAL_STREET"
                 , "CAPITOL_HEIGHTS"
-                , "FEDERAL_TRIANGLE"
+                , "CONVENTION_CENTER"
                 ]
             }
 
