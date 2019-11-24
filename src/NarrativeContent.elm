@@ -73,7 +73,7 @@ general =
         |> content__________________________________ "COFFEE" """
 {PLAYER.day=1?  Carl's Coffee has been fueling me for years. Can't imagine surviving a Monday without it.}
 {PLAYER.day=2?  Mmm, that's good coffee.}
-{PLAYER.day=3?  I'm going to need a barrel of this if I'm going to get this proposal done by Friday. What is Mr. Ferbs thinking?  }
+{PLAYER.day=3?  I'm going to need a barrel of this if I'm going to get this proposal done by Friday. What is Mr. Harris thinking?  }
 {PLAYER.day=4?  It tastes bitter.}
 """
         |> content__________________________________ "SAFETY_WARNING_POSTER"
@@ -97,8 +97,8 @@ intro =
 ---
 |}
 {PLAYER.day=1?
-    From: Dennis Ferbs
-    To: Steve Kerry
+    From: Jason Harris
+    To: Steve Perkins
     Sent: Sunday, 4:00 pm
     Subject: I've Got a Job for You
 
@@ -109,32 +109,32 @@ intro =
     I need you to work on this and really make it shine.
     Be at my office at 6:30 am Monday and we can talk over the details.
 
-    Dennis Ferbs
+    Jason Harris
     District Sales Manager
     In Your Hands Insurance, Inc.  All rights reserved.
 ---
     -Reply -
 
-    From: Steve Kerry
-    To: Dennis Ferbs
+    From: Steve Perkins
+    To: Jason Harris
     Sent: Sunday, 4:01 pm
     Subject: RE: I've Got a Job for You
     
-    Dear Mr. Ferbs,
+    Dear Mr. Harris,
     I've actually been with the company for eight years, but no need to worry, sir. I'm happy for the 
     opportunity. I've got a few big ideas that I've been wanting to try out.
     I'll be there bright and early, sir.
     
-    Steve Kerry
+    Steve Perkins
     Insurance Agent
     In Your Hands Insurance
 ---
     From: Janice Franz
-    To: Steve Kerry
+    To: Steve Perkins
     Sent: Monday, 6:05am
     Subject: Job Opportunity
     
-    Hi Mr. Steve Kerry
+    Hi Mr. Steve Perkins
 
     My name is Janis and I'm reaching out on behalf of Embrace Insurance. I came across your resume
     in our system and I believe you would make a perfect fit for our team here at Embrace Insurance.
@@ -148,8 +148,8 @@ intro =
     Embrace Insurance
 }
 {PLAYER.day=2?
-    From: Dennis Ferbs
-    To: Steve Kerry
+    From: Jason Harris
+    To: Steve Perkins
     Sent: Monday, 6:26pm
     Subject: Good Things!
 
@@ -161,31 +161,31 @@ intro =
 
     Don't let me down.
 
-    Dennis Ferbs
+    Jason Harris
     District Sales Manager
     In Your Hands Insurance, Inc.  All rights reserved.
 ---
     -Reply-
 
-    From: Steve Kerry
-    To: Dennis Ferbs
+    From: Steve Perkins
+    To: Jason Harris
     Sent: Monday, 6:32pm
     Subject: RE: Good Things!
 
-    Dear Mr. Ferbs,
+    eear Mr. Harris,
 
     Thank you for the update.  I'll do my best, but Friday is a little soon isn't it? I just want to be able to
     put together something that will really help our customers.  I'll have to cut a lot of the ideas we spoke about.
     But I'll do my best, sir.
 
-    See you tomorrow, Mr. Ferbs
+    See you tomorrow, Mr. Harris
 
-    Steve Kerry
+    Steve Perkins
     Insurance Agent
     In Your Hands Insurance
 ---
     From: Henry Thorne
-    To: Steve Kerry
+    To: Steve Perkins
     Sent: Monday, 8:25pm
     Subject: Stevey!
 
@@ -204,8 +204,8 @@ intro =
 }
 {PLAYER.day=3?
 
-    From: Dennis Ferbs
-    To: Steve Kerry
+    From: Jason Harris
+    To: Steve Perkins
     Sent: Tuesday, 4:48pm
     Subject: No good
 
@@ -219,25 +219,25 @@ intro =
 
     Put something better together tonight and get it to me in the morning. You're running out of time.
 
-    Dennis Ferbs
+    Jason Harris
     District Sales Manager
     In Your Hands Insurance, Inc.  All rights reserved.
 ---
     -Reply- (unsent)
 
-    From: Steve Kerry
-    To: Dennis Ferbs
+    From: Steve Perkins
+    To: Jason Harris
     Sent: Tuesday, 5:00pm
     Subject: RE: No good
 
-    Dear Mr. Ferbs,
+    Dear Mr. Harris,
 
     Sir, I have to disagree. I feel that these plans are essential for our customers. If you'd just
     look over the papers I sent you about the
 }
 {PLAYER.day=4?
-    From: Dennis Ferbs
-    To: Steve Kerry
+    From: Jason Harris
+    To: Steve Perkins
     Sent: Wednesday, 4:27pm
     Subject: (Subject)
 
@@ -246,12 +246,12 @@ intro =
 
     Bring me what you have in the morning.
 
-    Dennis Ferbs
+    Jason Harris
     District Sales Manager
     In Your Hands Insurance, Inc.  All rights reserved.
 ---
     From: Henry Thorne
-    To: Steve Kerry
+    To: Steve Perkins
     Sent: Thursday, 5:45am
     Subject: Today?
 
@@ -264,20 +264,20 @@ intro =
     Hope to talk to you soon.
 }
 {PLAYER.day=5?
-    From: Dennis Ferbs
-    To: Steve Kerry
+    From: Jason Harris
+    To: Steve Perkins
     Sent: Friday, 6:00am
     Subject: where the hell are you?
 
     I want to run through the presentation once before the clients are here.
     Get your ass down here right away.
 
-    Dennis Ferbs
+    Jason Harris
     District Sales Manager
     In Your Hands Insurance, Inc.  All rights reserved.
 ---
     From: Janice Franz
-    To: Steve Kerry
+    To: Steve Perkins
     Sent: Friday, 6:09am
     Subject: RE: Job Opportunity
 
@@ -450,12 +450,12 @@ Also, It would be great to see Henry again. I've got to remember to get back to 
         |> content__________________________________ "endWednesday" """
 This train is two minutes late again.  This is becoming more and more of a problem lately.  They've got to do something about it.
 ---
-I'm not looking forward to talking to Mr. Ferbs this morning.  This proposal is going to be a disaster.  Figures I get stuck with it.
+I'm not looking forward to talking to Mr. Harris this morning.  This proposal is going to be a disaster.  Figures I get stuck with it.
 ---
 But I've got to make it work.
 """
         |> content__________________________________ "endThursday" """
-I'm so tired.  I've been up all night working on this damn proposal, and there's still a lot more work to be done. I hope Mr. Ferbs appreciates it.
+I'm so tired.  I've been up all night working on this damn proposal, and there's still a lot more work to be done. I hope Mr. Harris appreciates it.
 """
         |> content__________________________________ "fallAsleep" """
 Today's the day.  I busted my ass, but I think it will work.  I better get my damn promotion.
