@@ -115,9 +115,42 @@ entities =
     --  BROADWAY_STREET
     , entity "MUSICIAN.character.location=BROADWAY_STREET"
         "Man playing violin"
+
+    -- Stations
+    , entity "ONE_HUNDRED_FOURTH_STREET.station" "104th Street"
+    , entity "FOURTY_SECOND_STREET.station" "42nd Street"
+    , entity "SEVENTY_THIRD_STREET.station" "73rd Street"
+    , entity "BROADWAY_STREET.station" "Broadway Street"
+    , entity "BURLINGTON.station" "Burlington"
+    , entity "CAPITOL_HEIGHTS.station" "Capitol Heights"
+    , entity "CHURCH_STREET.station" "Church Street"
+    , entity "CONVENTION_CENTER.station" "Convention Center"
+    , entity "EAST_MULBERRY.station" "East Mulberry"
+    , entity "FAIRVIEW.station" "Fairview"
+    , entity "HIGHLAND.station" "Highland"
+    , entity "IRIS_LAKE.station" "Iris Lake"
+    , entity "MACARTHURS_PARK.station" "MacArthur's Park"
+    , entity "MUSEUM.station" "Museum"
+    , entity "NORWOOD.station" "Norwood"
+    , entity "PARK_AVE.station" "Park Street"
+    , entity "RIVERSIDE.station" "Riverside"
+    , entity "SAMUAL_STREET.station" "Samual Street"
+    , entity "SPRING_HILL.station" "Spring Hill"
+    , entity "ST_MARKS.station" "St. Mark's"
+    , entity "TWIN_BROOKS.station" "Twin Brooks"
+    , entity "UNIVERSITY.station" "University"
+    , entity "WALTER_HILL.station" "Walter Hill"
+    , entity "WESTGATE.station" "Westgate"
+    , entity "WEST_MULBERRY.station" "West Mulberry"
+
+    -- Lines
+    , entity "RED_LINE.line" "Red line"
+    , entity "YELLOW_LINE.line" "Yellow line"
+    , entity "GREEN_LINE.line" "Green line"
+    , entity "ORANGE_LINE.line" "Orange line"
+    , entity "BLUE_LINE.line" "Blue line"
+    , entity "PURPLE_LINE.line" "Purple line"
     ]
-        ++ lines
-        ++ stations
 
 
 
@@ -133,25 +166,4 @@ lines =
                 >> (\info ->
                         entity (info.id ++ ".line") info.name
                    )
-            )
-
-
-stations : List ParsedEntity
-stations =
-    let
-        makeId id =
-            id
-                ++ ".station"
-                ++ (if id == "BROADWAY_STREET" then
-                        ".steves_work"
-
-                    else
-                        ""
-                   )
-    in
-    Subway.stations
-        |> Dict.toList
-        |> List.map
-            (\( id, { name } ) ->
-                entity (makeId id) name
             )

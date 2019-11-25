@@ -497,7 +497,7 @@ view model =
                     ( "lobby", Lobby.view map model.worldModel currentStation )
 
                 Platform line ->
-                    ( "platform", Platform.view map currentStation line (getLink "PLAYER" "destination" model.worldModel) )
+                    ( "platform", Platform.view map currentStation line model.worldModel )
 
                 Turnstile line ->
                     ( "turnstile", Turnstile.view model.worldModel line )
@@ -512,6 +512,7 @@ view model =
 
                             else
                                 Nothing
+                        , worldModel = model.worldModel
                         }
                     )
             , ( "story"

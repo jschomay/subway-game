@@ -2,6 +2,7 @@ module Views.Station.Lobby exposing (view)
 
 import Array
 import Constants
+import Dict
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
@@ -17,7 +18,10 @@ view : Subway.Map -> Manifest.WorldModel -> Station -> Html Msg
 view map worldModel currentStation =
     let
         stationName =
-            (stationInfo currentStation |> .name) ++ " Station"
+            worldModel
+                |> Dict.get currentStation
+                |> Maybe.map (\s -> s.name ++ " Station")
+                |> Maybe.withDefault ("ERRORR getting station: " ++ currentStation)
 
         ( chapterNumber, chapterName, goals ) =
             getStat "PLAYER" "chapter" worldModel

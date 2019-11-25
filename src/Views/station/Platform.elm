@@ -1,9 +1,12 @@
 module Views.Station.Platform exposing (view)
 
+import Dict
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import LocalTypes exposing (..)
+import Manifest exposing (WorldModel)
+import Narrative.WorldModel exposing (getLink)
 import Subway exposing (..)
 import Views.Shared as Shared
 import Views.Station.Connections as Connections
@@ -11,8 +14,8 @@ import Views.Station.Connections as Connections
 
 {-| shows line map for a line
 -}
-view : Subway.Map -> Station -> Line -> Maybe Station -> Html Msg
-view map currentStation line restrictDestination =
+view : Subway.Map -> Station -> Line -> WorldModel -> Html Msg
+view map currentStation line worldModel =
     let
         lineInfo =
             Subway.lineInfo line
@@ -23,10 +26,19 @@ view map currentStation line restrictDestination =
                 , text <| lineInfo.name
                 ]
 
+        restrictDestination =
+            getLink "PLAYER" "destination" worldModel
+
         connections : Subway.Station -> List Subway.Line
         connections station =
             Subway.connectingLines map station
                 |> List.sortBy (Subway.lineInfo >> .number)
+
+        stationName station =
+            worldModel
+                |> Dict.get station
+                |> Maybe.map (\s -> s.name ++ " Station")
+                |> Maybe.withDefault ("ERRORR getting station: " ++ currentStation)
 
         stopView transferLine station =
             div
@@ -65,7 +77,7 @@ view map currentStation line restrictDestination =
                         , ( "Stop__name--current", station == currentStation )
                         ]
                     ]
-                    [ text <| .name <| Subway.stationInfo station ]
+                    [ text <| stationName station ]
                 ]
     in
     div [ class "Scene Platform" ]
