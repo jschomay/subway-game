@@ -141,7 +141,7 @@ stations =
     let
         makeId id =
             id
-                ++ ".loation.station"
+                ++ ".station"
                 ++ (if id == "BROADWAY_STREET" then
                         ".steves_work"
 
