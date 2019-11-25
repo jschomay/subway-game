@@ -113,14 +113,17 @@
 }
 
 .Stop__connections {
-  width: 4em;
+  width: 6em;
+  font-size: 0.7em;
   text-align: right;
   display: flex;
   justify-content: flex-end;
   margin-right: 0.7em;
+  flex: 0 0 auto;
 }
 
 .Stop__name {
+  flex: 0 1 auto;
 }
 
 .Stop__name--current {
@@ -133,6 +136,7 @@
   height: 20px;
   margin-right: 1em;
   border-radius: 50%;
+  flex: 0 0 auto;
 }
 
 .Stop__dot::before {
