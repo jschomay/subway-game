@@ -4,6 +4,7 @@ import Dict exposing (Dict)
 import LocalTypes exposing (..)
 import Manifest exposing (Entity, ID, WorldModel)
 import Narrative.WorldModel exposing (ChangeWorld(..), EntityMatcher(..))
+import Rules.Chapter1
 import Rules.General
 import Rules.Intro
 import Rules.Parser exposing (..)
@@ -51,6 +52,7 @@ rules_ =
     in
     Rules.Intro.rules
         ++ Rules.General.rules
+        ++ Rules.Chapter1.rules
         |> List.foldl separateErrors ( Dict.empty, [] )
 
 

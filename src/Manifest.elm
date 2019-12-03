@@ -67,7 +67,7 @@ addDisplayable name ( id, { tags, stats, links } ) =
 
 entities : List ParsedEntity
 entities =
-    [ entity "PLAYER.chapter=1.day=1.location=WEST_MULBERRY.destination=BROADWAY_STREET"
+    [ entity "PLAYER.chapter=0.day=1.location=WEST_MULBERRY.destination=BROADWAY_STREET"
         "Steve"
 
     -- inventory
@@ -111,6 +111,8 @@ entities =
         "Safety message poster"
     , entity "MAP_POSTER.item.map.location=TWIN_BROOKS"
         "Map on the wall"
+    , entity "MAINTENANCE_MAN.character.location=TWIN_BROOKS"
+        "Maintenance man"
 
     --  BROADWAY_STREET
     , entity "MUSICIAN.character.location=BROADWAY_STREET"

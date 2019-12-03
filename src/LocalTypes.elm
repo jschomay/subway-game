@@ -1,4 +1,4 @@
-module LocalTypes exposing (Model, Msg(..), Rule, Rules, Scene(..), TrainProps, TrainStatus(..))
+module LocalTypes exposing (Debug, Model, Msg(..), Rule, Rules, Scene(..), TrainProps, TrainStatus(..))
 
 import Dict exposing (Dict)
 import Manifest
@@ -18,9 +18,17 @@ type alias Model =
     , ruleMatchCounts : Dict RuleID Int
     , showMap : Bool
     , gameOver : Bool
-    , selectScene : Bool
+    , debug : Maybe Debug
+    , showSelectScene : Bool
     , history : List String
     , pendingChanges : Maybe ( Narrative.WorldModel.ID, List ChangeWorld, RuleID )
+    }
+
+
+type alias Debug =
+    { debugSearchWorldModelText : String
+    , lastMatchedRule : String
+    , lastInteraction : String
     }
 
 
@@ -36,6 +44,7 @@ type Msg
     | Disembark
     | Continue
     | Achievement String
+    | DebugSeachWorldModel String
 
 
 type alias Rule =

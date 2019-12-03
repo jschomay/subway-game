@@ -27,7 +27,7 @@ view map worldModel currentStation =
             getStat "PLAYER" "chapter" worldModel
                 |> Maybe.andThen
                     (\plotLevel ->
-                        Array.get (plotLevel - 1) Constants.chapters
+                        Array.get plotLevel Constants.chapters
                             |> Maybe.map (\( chapterName_, goals_ ) -> ( plotLevel, chapterName_, goals_ ))
                     )
                 |> Maybe.withDefault ( 0, "Error, can't find current chapter", [] )

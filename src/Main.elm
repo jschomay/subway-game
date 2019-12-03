@@ -7,6 +7,7 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Html.Keyed
+import Json.Decode as Json
 import List.Extra
 import LocalTypes exposing (..)
 import Manifest
@@ -18,6 +19,7 @@ import NarrativeContent
 import Process
 import Rules
 import Rules.Parser
+import Set
 import Subway exposing (..)
 import Task
 import Tuple
@@ -35,7 +37,7 @@ import Views.Train as Train
 
 
 type alias Flags =
-    { selectScene : Bool }
+    { debug : Bool }
 
 
 main : Program Flags Model Msg
@@ -59,6 +61,17 @@ init flags =
 
         narrativeParseErrors =
             NarrativeContent.parseErrors
+
+        debug =
+            if flags.debug then
+                Just
+                    { debugSearchWorldModelText = ""
+                    , lastMatchedRule = "Game started"
+                    , lastInteraction = "begin game"
+                    }
+
+            else
+                Nothing
     in
     ( { worldModel = initialWorldModel
       , parseErrors = entityParseErrors ++ ruleParseErrors ++ narrativeParseErrors
@@ -68,7 +81,8 @@ init flags =
       , scene = Title (dayText initialWorldModel)
       , showMap = False
       , gameOver = False
-      , selectScene = flags.selectScene
+      , debug = debug
+      , showSelectScene = flags.debug
       , history = []
       , pendingChanges = Nothing
       }
@@ -114,8 +128,8 @@ updateStory trigger model =
 
         Just ( matchedRuleID, matchedRule ) ->
             let
-                debug =
-                    Debug.log "Matched rule:" matchedRuleID
+                newDebug =
+                    Maybe.map (\debug -> { debug | lastMatchedRule = matchedRuleID, lastInteraction = trigger }) model.debug
 
                 ( newStory, newMatchCounts ) =
                     parseNarrative model matchedRuleID trigger (NarrativeContent.t matchedRuleID)
@@ -123,6 +137,7 @@ updateStory trigger model =
             ( { model
                 | pendingChanges = Just ( trigger, matchedRule.changes, matchedRuleID )
                 , story = newStory
+                , debug = newDebug
                 , ruleMatchCounts = newMatchCounts
               }
             , Cmd.none
@@ -287,7 +302,7 @@ update msg model =
 
             Loaded ->
                 ( { model | loaded = True }
-                , if model.selectScene then
+                , if model.showSelectScene then
                     Cmd.none
 
                   else
@@ -304,7 +319,7 @@ update msg model =
                             |> updateAndThen (update <| Interact id)
                             |> updateAndThen applyPendingChanges
                     )
-                    ( { model_ | selectScene = False }, Cmd.none )
+                    ( { model_ | showSelectScene = False }, Cmd.none )
                     history
 
             Interact interactableId ->
@@ -370,6 +385,15 @@ update msg model =
                 , Cmd.none
                 )
 
+            DebugSeachWorldModel text ->
+                let
+                    newDebug =
+                        Maybe.map (\debug -> { debug | debugSearchWorldModelText = text }) model.debug
+                in
+                ( { model | debug = newDebug }
+                , Cmd.none
+                )
+
 
 {-| Applies pending changes and special events. This is used to make sure the view
 doesn't change in the background until the story modal has closed.
@@ -420,7 +444,7 @@ handleKey model key =
                 _ ->
                     False
     in
-    if not model.loaded || model.selectScene then
+    if not model.loaded || model.showSelectScene then
         NoOp
 
     else
@@ -448,20 +472,6 @@ handleKey model key =
 
 view : Model -> Html Msg
 view model =
-    let
-        currentStation =
-            getCurrentStation model.worldModel
-
-        scene =
-            if Rules.unsafeAssert "PLAYER.caught" model.worldModel then
-                CentralGuardOffice
-
-            else
-                model.scene
-
-        map =
-            Subway.fullMap
-    in
     if not model.loaded then
         div [ class "Loading" ] [ text "Loading..." ]
 
@@ -479,62 +489,154 @@ view model =
                     model.parseErrors
             ]
 
-    else if model.selectScene then
+    else if model.showSelectScene then
         selectSceneView model
 
     else
-        -- keyed so fade in animations play
-        Html.Keyed.node "div"
-            [ class "game" ]
-            [ case scene of
-                Title title ->
-                    ( "title", titleView title )
+        div []
+            [ case model.debug of
+                Just debug ->
+                    debugView model.worldModel debug
 
-                CentralGuardOffice ->
-                    ( "centralGuardOffice", CentralGuardOffice.view model.worldModel )
-
-                Lobby ->
-                    ( "lobby", Lobby.view map model.worldModel currentStation )
-
-                Platform line ->
-                    ( "platform", Platform.view map currentStation line model.worldModel )
-
-                Turnstile line ->
-                    ( "turnstile", Turnstile.view model.worldModel line )
-
-                Train { line, status } ->
-                    ( "train"
-                    , Train.view
-                        { line = line
-                        , arrivingAtStation =
-                            if status == Arriving then
-                                Just currentStation
-
-                            else
-                                Nothing
-                        , worldModel = model.worldModel
-                        }
-                    )
-            , ( "story"
-              , model.story
-                    |> List.head
-                    |> Maybe.withDefault ""
-                    |> (\t ->
-                            if String.isEmpty t then
-                                text ""
-
-                            else
-                                storyView t
-                       )
-              )
-            , ( "map"
-              , if model.showMap then
-                    mapView
-
-                else
+                Nothing ->
                     text ""
-              )
+            , mainView model
             ]
+
+
+debugView : Manifest.WorldModel -> Debug -> Html Msg
+debugView worldModel debug =
+    let
+        displayWorldModel =
+            worldModel
+                |> Dict.toList
+                |> List.map displayEntity
+
+        displayEntity ( id, { tags, stats, links } ) =
+            String.join "." <|
+                List.filter (not << String.isEmpty) <|
+                    List.map (String.join ".")
+                        [ [ id ]
+                        , Set.toList tags
+                        , Dict.toList stats |> List.map (\( key, value ) -> String.join "=" [ key, String.fromInt value ])
+                        , Dict.toList links |> List.map (\( key, value ) -> String.join "=" [ key, value ])
+                        ]
+
+        filteredDisplayWorldModel =
+            if String.isEmpty debug.debugSearchWorldModelText then
+                []
+
+            else
+                List.filter (fuzzyMatch debug.debugSearchWorldModelText) displayWorldModel
+                    |> List.sortBy
+                        (\text ->
+                            if String.startsWith (String.toLower debug.debugSearchWorldModelText) (String.toLower text) then
+                                -1
+
+                            else
+                                0
+                        )
+
+        fuzzyMatch search text =
+            String.contains (String.toLower search) (String.toLower text)
+
+        stopPropKeydowns tagger =
+            stopPropagationOn "keydown" <|
+                Json.map alwaysStop (Json.map tagger targetValue)
+
+        alwaysStop x =
+            ( x, True )
+    in
+    div
+        [ style "color" "yellow"
+        , style "background" "black"
+        , style "opacity" "0.9"
+        , style "lineHeight" "1.5em"
+        , style "zIndex" "99"
+        , style "position" "absolute"
+        ]
+        [ text "Debug mode"
+        , input
+            [ onInput DebugSeachWorldModel
+            , stopPropKeydowns (always NoOp)
+            , value debug.debugSearchWorldModelText
+            , placeholder "Search world model"
+            , style "margin" "0 10px"
+            ]
+            []
+        , span [] [ text <| "Last triggered rule: " ++ debug.lastInteraction ++ " - " ++ debug.lastMatchedRule ]
+        , ul [ style "borderTop" "1px solid #333" ] <| List.map (\e -> li [] [ text e ]) filteredDisplayWorldModel
+        ]
+
+
+mainView : Model -> Html Msg
+mainView model =
+    let
+        currentStation =
+            getCurrentStation model.worldModel
+
+        scene =
+            if Rules.unsafeAssert "PLAYER.caught" model.worldModel then
+                CentralGuardOffice
+
+            else
+                model.scene
+
+        map =
+            Subway.fullMap
+    in
+    -- keyed so fade in animations play
+    Html.Keyed.node "div"
+        [ class "game" ]
+        [ case scene of
+            Title title ->
+                ( "title", titleView title )
+
+            CentralGuardOffice ->
+                ( "centralGuardOffice", CentralGuardOffice.view model.worldModel )
+
+            Lobby ->
+                ( "lobby", Lobby.view map model.worldModel currentStation )
+
+            Platform line ->
+                ( "platform", Platform.view map currentStation line model.worldModel )
+
+            Turnstile line ->
+                ( "turnstile", Turnstile.view model.worldModel line )
+
+            Train { line, status } ->
+                ( "train"
+                , Train.view
+                    { line = line
+                    , arrivingAtStation =
+                        if status == Arriving then
+                            Just currentStation
+
+                        else
+                            Nothing
+                    , worldModel = model.worldModel
+                    }
+                )
+        , ( "story"
+          , model.story
+                |> List.head
+                |> Maybe.withDefault ""
+                |> (\t ->
+                        if String.isEmpty t then
+                            text ""
+
+                        else
+                            storyView t
+                   )
+          )
+        , ( "map"
+          , if model.showMap then
+                mapView
+
+            else
+                text ""
+          )
+        ]
 
 
 selectSceneView : Model -> Html Msg

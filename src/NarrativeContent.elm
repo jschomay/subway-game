@@ -43,7 +43,11 @@ all : Dict String String
 all =
     List.foldl Dict.union
         Dict.empty
-        [ silent, general, intro ]
+        [ silent
+        , general
+        , intro
+        , chapter1
+        ]
 
 
 content__________________________________ =
@@ -76,8 +80,12 @@ general =
 {PLAYER.day=3?  I'm going to need a barrel of this if I'm going to get this proposal done by Friday. What is Mr. Harris thinking?  }
 {PLAYER.day=4?  It tastes bitter.}
 """
-        |> content__________________________________ "SAFETY_WARNING_POSTER"
-            "It says to watch out for pickpockets and report any suspicious activity."
+        |> content__________________________________ "SAFETY_WARNING_POSTER" """
+"ATTENTION: Pickpockets and thieves operate in this area. Report any suspicious behavior to your nearest Security Guard Station"
+{---
+That's just great.  I wish people would just follow the rules.
+|}
+"""
         |> content__________________________________ "ridingTheTrain"
             "The train hurtles through the dark tunnel towards the next stop."
         |> content__________________________________ "jumpTurnstileFail"
@@ -480,9 +488,39 @@ Shit, I feel asleep!  I missed my stop!  What station is this?
 
 Oh my God, I'm in so much trouble!  I have to get back to my stop.
 """
+
+
+chapter1 : Dict String String
+chapter1 =
+    Dict.empty
+        |> content__________________________________ "MAINTENANCE_MAN" """
+{"Excuse me, sir! How can I get to Broadway Street Station as quickly as possible?"
+---
+"Damn it, can't you see I'm busy?  Go and check the damn map if you're lost. It's that big map looking thing on the wall over there."
+---
+"Uh, okay. Thank you."
+|
+He's busy and I don't want to get yelled at again.
+}
+"""
         |> content__________________________________ "getMap"
             """
-{I might need the full subway map.  They have a printed one I can take.
+{It's a map of the whole subway.{BRIEFCASE.location=PLAYER?   It's only 6:15. If I leave here now I should be able to make it to work on time.}
+---
+There's also little map pamphlets here as well.  I'll take one with me just in case. Don't want to get lost again!
 
-(Press "M" to view the map)|}
+(check MAP by pressing "M")
+|}
+"""
+        |> content__________________________________ "notGoingToWorkAgain" """
+I've got to get to Broadway Street Station.  Any more wrong stops and I'm really going to be late.
+"""
+        |> content__________________________________ "delaysAtBroadwayStreetStation" """
+Everything's fine. It was just a little detour, I've still got time. At least I'm wide awake now.
+---
+The loud speaker buzzes.
+
+"Attention passengers, due to some unforeseen events you may experience delays at Broadway Street Station.  Thank you for your understanding and have a nice day."
+---
+What? What do they mean "delays?"
 """

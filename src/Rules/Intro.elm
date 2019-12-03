@@ -14,7 +14,7 @@ rules =
     []
         ++ [ rule "notGoingToWork"
                 { trigger = "*.station"
-                , conditions = [ "PLAYER.destination=BROADWAY_STREET.chapter=1" ]
+                , conditions = [ "PLAYER.destination=BROADWAY_STREET.chapter=0" ]
                 , changes = []
                 }
 
@@ -28,7 +28,7 @@ rules =
                 { trigger = "*.line"
                 , conditions =
                     [ "CELL_PHONE.unread"
-                    , "PLAYER.chapter=1"
+                    , "PLAYER.chapter=0"
                     ]
                 , changes = []
                 }
@@ -55,7 +55,7 @@ rules =
            , rule "coffeeCartFriday"
                 { trigger = "COFFEE_CART"
                 , conditions =
-                    [ "PLAYER.day=5.chapter=1"
+                    [ "PLAYER.day=5.chapter=0"
                     , "SODA_MACHINE.get_caffeinated_plot<1"
                     ]
                 , changes = [ "SODA_MACHINE.get_caffeinated_plot=1" ]
@@ -67,17 +67,17 @@ rules =
                 }
            , rule "sodaMachineFixed"
                 { trigger = "SODA_MACHINE.!broken"
-                , conditions = [ "PLAYER.chapter=1" ]
+                , conditions = [ "PLAYER.chapter=0" ]
                 , changes = []
                 }
            , rule "get_caffeinated_plot_1"
                 { trigger = "SODA_MACHINE.!broken.get_caffeinated_plot=1"
-                , conditions = [ "PLAYER.chapter=1" ]
+                , conditions = [ "PLAYER.chapter=0" ]
                 , changes = [ "$.get_caffeinated_plot+1" ]
                 }
            , rule "get_caffeinated_plot_2"
                 { trigger = "SODA_MACHINE.!broken.get_caffeinated_plot=2"
-                , conditions = [ "PLAYER.chapter=1" ]
+                , conditions = [ "PLAYER.chapter=0" ]
                 , changes =
                     [ "$.get_caffeinated_plot+1"
                     , "PLAYER.persistent+1"
@@ -85,12 +85,12 @@ rules =
                 }
            , rule "get_caffeinated_plot_3"
                 { trigger = "SODA_MACHINE.!broken.get_caffeinated_plot=3"
-                , conditions = [ "PLAYER.chapter=1" ]
+                , conditions = [ "PLAYER.chapter=0" ]
                 , changes = []
                 }
            , rule "firstMeetSkaterDude"
                 { trigger = "SKATER_DUDE"
-                , conditions = [ "PLAYER.chapter=1" ]
+                , conditions = [ "PLAYER.chapter=0" ]
                 , changes = [ "$.location=offscreen" ]
                 }
            , rule "endMonday"
@@ -142,15 +142,10 @@ rules =
                 }
            , rule "fallAsleep"
                 { trigger = "BROADWAY_STREET"
-                , conditions = [ "PLAYER.day=5.chapter=1" ]
+                , conditions = [ "PLAYER.day=5.chapter=0" ]
                 , changes =
-                    [ "PLAYER.location=TWIN_BROOKS.chapter+1.destination=xxx"
+                    [ "PLAYER.location=TWIN_BROOKS.chapter+1"
                     , "COFFEE.location=offscreen"
                     ]
-                }
-           , rule "getMap"
-                { trigger = "MAP_POSTER"
-                , conditions = [ "MAP.!location=PLAYER" ]
-                , changes = [ "MAP.location=PLAYER" ]
                 }
            ]
