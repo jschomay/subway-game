@@ -327,6 +327,19 @@ update msg model =
                 , Cmd.none
                 )
                     |> updateAndThen (updateStory interactableId)
+                    |> updateAndThen
+                        -- Need to continue automaticaly when riding on the train if
+                        -- there is no story, otherwise the train never arrives
+                        (\m ->
+                            ( m
+                            , case ( m.scene, m.story ) of
+                                ( Train _, [] ) ->
+                                    delay 2000 Continue
+
+                                _ ->
+                                    Cmd.none
+                            )
+                        )
 
             Delay duration delayedMsg ->
                 ( model

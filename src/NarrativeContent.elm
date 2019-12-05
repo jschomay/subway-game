@@ -86,8 +86,7 @@ general =
 That's just great.  I wish people would just follow the rules.
 |}
 """
-        |> content__________________________________ "ridingTheTrain"
-            "The train hurtles through the dark tunnel towards the next stop."
+        |> content__________________________________ "ridingTheTrain" ""
         |> content__________________________________ "jumpTurnstileFail"
             "{I've never jumped a turnstile in my life, and I'm not about to start now.|I don't want to get caught.|Better to stick to the lines I have passes for.}"
 
