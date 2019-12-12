@@ -11,7 +11,6 @@ import Subway exposing (..)
 
 type alias Model =
     { worldModel : Manifest.WorldModel
-    , parseErrors : List ( String, ParseError )
     , loaded : Bool
     , story : List String
     , scene : Scene

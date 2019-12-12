@@ -40,19 +40,11 @@ type alias Flags =
     { debug : Bool }
 
 
-main : Program Flags Model Msg
+main : Program Flags (Result (List ( String, Rules.Parser.ParseError )) Model) Msg
 main =
-    Browser.document
-        { init = init
-        , view = \model -> { title = "Subway!", body = [ view model ] }
-        , update = update
-        , subscriptions = subscriptions
-        }
-
-
-init : Flags -> ( Model, Cmd Msg )
-init flags =
     let
+        -- TODO pull this code out to encapsulate the types and view
+        -- TODO make these return a Result instead of this tuple
         ( initialWorldModel, entityParseErrors ) =
             Manifest.initialWorldModel
 
@@ -62,6 +54,86 @@ init flags =
         narrativeParseErrors =
             NarrativeContent.parseErrors
 
+        parsedData =
+            -- TODO use Result.map3 (or fold of something) instead of this
+            -- The question is if I want only the first parse error to render, or all errors
+            -- to render
+            case entityParseErrors ++ ruleParseErrors ++ narrativeParseErrors of
+                [] ->
+                    Ok initialWorldModel
+
+                errors ->
+                    Err errors
+    in
+    Browser.document
+        { init =
+            \flags ->
+                case parsedData of
+                    Ok data ->
+                        init data flags |> Tuple.mapFirst Ok
+
+                    Err errors ->
+                        ( Err errors, Cmd.none )
+        , view =
+            \model ->
+                case model of
+                    Ok m ->
+                        { title = "Subway!", body = [ view m ] }
+
+                    Err errors ->
+                        { title = "Errors found"
+                        , body =
+                            [ div
+                                [ style "background" "black"
+                                , style "color" "red"
+                                , style "padding" "4em"
+                                , style "display" "flex"
+                                , style "flex-direction" "column"
+                                , style "align-items" "center"
+                                , style "justify-content" "center"
+                                ]
+                                [ h1 [] [ text "Errors when parsing!  Please fix:" ]
+                                , ul [ style "width" "100%" ] <|
+                                    List.map
+                                        -- TODO this should already be a nice string or
+                                        -- tuple
+                                        (\( s, e ) ->
+                                            li
+                                                [ style "margin-bottom" "2em"
+                                                ]
+                                                [ text <| Rules.Parser.deadEndsToString e
+                                                , pre
+                                                    [ style "background" "white"
+                                                    , style "padding" "1em"
+                                                    , style "color" "black"
+                                                    , style "overflow" " auto"
+                                                    , style "width" "100%"
+                                                    ]
+                                                    [ code [] [ text s ] ]
+                                                ]
+                                        )
+                                        errors
+                                ]
+                            ]
+                        }
+        , update =
+            \msg model ->
+                case model of
+                    Ok m ->
+                        update msg m |> Tuple.mapFirst Ok
+
+                    Err e ->
+                        ( Err e, Cmd.none )
+        , subscriptions =
+            \model ->
+                Result.map subscriptions model
+                    |> Result.withDefault Sub.none
+        }
+
+
+init : Manifest.WorldModel -> Flags -> ( Model, Cmd Msg )
+init initialWorldModel flags =
+    let
         debug =
             if flags.debug then
                 Just
@@ -74,7 +146,6 @@ init flags =
                 Nothing
     in
     ( { worldModel = initialWorldModel
-      , parseErrors = entityParseErrors ++ ruleParseErrors ++ narrativeParseErrors
       , loaded = False
       , story = []
       , ruleMatchCounts = Dict.empty
@@ -487,20 +558,6 @@ view : Model -> Html Msg
 view model =
     if not model.loaded then
         div [ class "Loading" ] [ text "Loading..." ]
-
-    else if not <| List.isEmpty model.parseErrors then
-        div [ class "SelectScene Errors" ]
-            [ h1 [] [ text "Errors when parsing!  Please fix:" ]
-            , ul [] <|
-                List.map
-                    (\( s, e ) ->
-                        li []
-                            [ pre [] [ code [] [ text s ] ]
-                            , text <| Rules.Parser.deadEndsToString e
-                            ]
-                    )
-                    model.parseErrors
-            ]
 
     else if model.showSelectScene then
         selectSceneView model
