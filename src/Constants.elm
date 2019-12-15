@@ -27,7 +27,7 @@ characterStats =
 chapters =
     Array.fromList
         [ ( "The daily grind", [ "Go to work" ] )
-        , ( "Deadline", [ "Get back to the office in time", "Give your presentation" ] )
+        , ( "Deadline", [ "Get back to the office in time", "Give my presentation" ] )
 
         -- , ( "Stop, Thief!", [ "Retrieve your briefcase", "Get to work in time to present" ] )
         -- , ( "Stuck underground", [ "Track the thief", "END OF DEMO!", "THANK YOU FOR PLAYING!" ] )

@@ -47,7 +47,7 @@ parse config text =
     case run parser text of
         Ok parsed ->
             String.split "---" parsed
-                |> List.filter (not << String.isEmpty)
+                |> List.filter (not << String.isEmpty << String.trim)
 
         Err e ->
             let

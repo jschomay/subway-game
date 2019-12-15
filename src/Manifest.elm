@@ -92,7 +92,7 @@ entities =
     , entity "COFFEE.item.location=offscreen"
         "Coffee"
     , entity "COMMUTER_1.character.location=WEST_MULBERRY"
-        "Plainly dressed commuter"
+        "Woman in a maroon jacket"
     , entity "LOUD_PAYPHONE_LADY.character.location=WEST_MULBERRY"
         "Loud woman on pay phone"
     , entity "TRASH_DIGGER.character.location=offscreen"
@@ -115,8 +115,20 @@ entities =
         "Maintenance man"
 
     --  BROADWAY_STREET
-    , entity "MUSICIAN.character.location=BROADWAY_STREET"
+    , entity "EXIT.item.location=BROADWAY_STREET"
+        "Exit"
+    , entity "SECURITY_OFFICERS.character.location=BROADWAY_STREET"
+        "Security officers"
+    , entity "ANGRY_CROWD.character.location=BROADWAY_STREET"
+        "A large crowd of people"
+    , entity "GIRL_IN_YELLOW.character.location=BROADWAY_STREET"
+        "Girl in yellow"
+
+    -- CONVENTION_CENTER
+    , entity "MUSICIAN.character.location=CONVENTION_CENTER"
         "Man playing violin"
+    , entity "SECURITY_DEPOT.item.location=SPRING_HILL"
+        "Spring Hill Station Security Depot"
 
     -- Stations
     , entity "ONE_HUNDRED_FOURTH_STREET.station" "104th Street"

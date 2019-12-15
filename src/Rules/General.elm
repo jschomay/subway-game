@@ -16,6 +16,11 @@ rules =
                 , conditions = []
                 , changes = [ "PLAYER.location=$" ]
                 }
+           , rule "outOfServiceStations"
+                { trigger = "*.station.out_of_service"
+                , conditions = []
+                , changes = []
+                }
            , rule "goToLobby"
                 { trigger = "LOBBY"
                 , conditions = []

@@ -93,6 +93,11 @@ rules =
                 , conditions = [ "PLAYER.chapter=0" ]
                 , changes = [ "$.location=offscreen" ]
                 }
+           , rule "firstInteractionWithCommuter1"
+                { trigger = "COMMUTER_1"
+                , conditions = [ "PLAYER.chapter=0" ]
+                , changes = [ "COMMUTER_1.friendliness=1" ]
+                }
            , rule "endMonday"
                 { trigger = "BROADWAY_STREET"
                 , conditions = [ "PLAYER.day=1" ]

@@ -89,12 +89,19 @@ That's just great.  I wish people would just follow the rules.
         |> content__________________________________ "ridingTheTrain" ""
         |> content__________________________________ "jumpTurnstileFail"
             "{I've never jumped a turnstile in my life, and I'm not about to start now.|I don't want to get caught.|Better to stick to the lines I have passes for.}"
+        |> content__________________________________ "outOfServiceStations" """
+PLEASE NOTICE: Normal service disruption is in effect.
+
+{$.name} Station is temporarily out of service.  Please use alternative options.
+
+Thank you and we apologize for the inconvenience.
+"""
 
 
 intro : Dict String String
 intro =
     Dict.empty
-        |> content__________________________________ "COMMUTER_1" """
+        |> content__________________________________ "firstInteractionWithCommuter1" """
 {Another commuter waiting on the train.  I say hello and she says hello back.
 |I think one hello is enough when talking to complete strangers.}
 """
@@ -522,4 +529,169 @@ The loud speaker buzzes.
 "Attention passengers, due to some unforeseen events you may experience delays at Broadway Street Station.  Thank you for your understanding and have a nice day."
 ---
 What? What do they mean "delays?"
+"""
+        |> content__________________________________ "EXIT" """
+{ANGRY_CROWD.location=BROADWAY_STREET? There's a big crowd of people blocking my view, but it looks like the exits have their shutters down.  What the hell is going on here?|It's still locked.}
+"""
+        |> content__________________________________ "MUSICIAN" """
+He's playing an old cracked violin with a hat out in front of him for spare change.
+
+The music sounds nice, but I wouldn't call that a real job.
+"""
+        |> content__________________________________ "ANGRY_CROWD" """
+{BRIEFCASE.location=PLAYER?
+{What's going on over here? No one seems to be moving and everyone seems pretty angry.
+
+Some people are shouting about the doors being locked.
+---
+|}
+I can't seem to push my way through all these angry people.  Now what?
+|
+{They haven't budged.  Apparently no one saw me get robbed.  Or they just don't care.
+---
+The mob seems to be getting angrier. I hope they open those doors soon or this could get ugly.}
+}
+"""
+        |> content__________________________________ "leavingBroadwayStationPrematurely" """
+This is my stop, where else would I need to go?
+"""
+        |> content__________________________________ "askOfficersAboutDelay" """
+{
+Oh good, some officers are here.  I can find out what the hold up is.
+
+"Excuse me, officers? I--"
+
+They cut me off mid sentence.
+---
+"This exit is closed sir. There's an incident going on above ground and we're not letting anyone through 'till we get the all clear. You will have to wait like all the others."
+---
+"But I work up there! I'm going to be late if I don't--"
+
+Again they cut me off.
+|}
+"If you are unable to wait, take the train to the next stop and walk from there."
+
+"But I--"
+
+"Have a nice day sir."
+"""
+        |> content__________________________________ "askCommuter1AboutDelay" """
+{COMMUTER_1.friendliness>0?
+{It's that woman I saw on Monday.
+
+"Excuse me, miss? What's going on? Why isn't anyone moving?"
+
+"Oh, Hi! Those security guards locked the gates. They're not budging. All they'll say is that there is some incident above ground and they're not letting anyone through."
+---
+"But I can't stay here. I have to get to work.  I have an important presentation today."
+
+"I know.  If I'm late one more time I'm bound to get fired.  I've got to figure out some other way out of here."
+|
+Looks like she's just as stuck as I am.
+}
+|
+{"Excuse me, miss?"
+|
+She's ignoring me. The nerve of some people.}
+}
+"""
+        |> content__________________________________ "noticeGirlInYellow" """
+I can't help noticing this girl.  There's something about her, like she doesn't belong.  Her dress is the brightest thing down here.  She sticks out like a dandelion growing through the cracks in the sidewalk.
+---
+The crowd closes around her for a second, blocking my view.  I wait for a minute, but she seems to have disappeared.
+---
+I only saw her for a split second.  Did I imagine her?
+"""
+        |> content__________________________________ "briefcaseStolen" """
+Jeez!  Someone just ran into me.
+
+"Ow! Hey! Watch where you're going!"
+---
+Wait. Where's my briefcase?
+---
+No. No no no no no no no no no. No.
+---
+I've been robbed... My presentation... It's gone!  I... I need to get help. Now.
+"""
+        |> content__________________________________ "tellOfficersAboutStolenBriefcase" """
+{
+"Help! Help! I've been robbed! Some crook just took my briefcase!"
+
+"I'm sorry, but the exit is closed sir--"
+---
+"I don't care about that! My presentation is gone!  I need you to do something!"
+
+"Please calm down, sir. We need people to clear this station. Please take any concerns you have to the Security Depot at Spring Hill Station. We apologize for any inconvenience and hope you have a nice day."
+---
+"But I can't go to work with out it. My life will be over!"
+
+"Have a nice day, sir."
+---
+They aren't even listening to me.  Why aren't they helping me?
+
+I guess I can check out the Security Depot.  Maybe they'll actually do something.
+|
+"Have a nice day sir."
+}
+"""
+        |> content__________________________________ "tellCommuter1AboutStolenBriefcase" """
+{COMMUTER_1.friendliness>0?
+{"Did you see a man run by with my briefcase I was carrying? He just robbed me."
+---
+"Oh my God, that's terrible! I think I saw someone with a briefcase like yours head for the trains. But it's hard to tell, there's so many of you business types with similar briefcases."
+
+"Oh man, I've got to get it back somehow.  I'm so screwed."
+
+"I hope you find it!"
+|
+"Did you find it yet?"
+}
+|
+{"Pardon me, miss! Did you see a man run through here with a briefcase?"
+
+"Um, yes? There's a lot of those around."
+---
+"No, he was a thief! He took my briefcase!"
+
+"Sorry, sir. I can't help you."
+---
+Useless!
+|
+She's no help.
+}
+}
+"""
+        |> content__________________________________ "SECURITY_OFFICERS" """
+"Have a nice day sir."
+"""
+        |> content__________________________________ "followGuardsAdvice" """
+{"Some one at the Security Depot better be able to help me. I have to get my proposal back!"|}
+"""
+        |> content__________________________________ "ignoreGuardsAdvice" """
+If those guards at Metro Center can't help me, what are the chances that any of the other guards will be any better? Maybe I can find the thief on my own and make a citizens arrest. Or something.
+---
+This is a bad idea.
+"""
+        |> content__________________________________ "panic" """
+Why is this happening to me?!  I always follow the rules.  I work hard.  But I get walked over all my life.  And now some crook is going to make me miss my presentation and my promotion!  It's just not fair.
+---
+I'm going to have to take matters into my own hands.  Maybe I can find the thief and arrest him or something.
+---
+This is a bad idea.
+
+I better just report this to the authorities somewhere.
+"""
+        |> content__________________________________ "findingSecurityDepotClosed" """
+It's closed. Of course it's closed! The one time I need the subway security and they're off doing God knows what.
+---
+What am I going to do? Everything was in that Briefcase.  My wallet, my reports, and worst of all my proposal! The key to finally turning my life around. Without it I may as well just walk in front of the next train.
+---
+I followed the rules. I pay my taxes on time. I make sure to do everything right. And people can still just up and break the law and nobody does a thing about it. Shitty people run rampant while people like me are left to suffer.
+---
+Mr. Harris is going to kill me. What the hell am I going to do?
+---
+END OF DEMO!  Thank you for playing.
+"""
+        |> content__________________________________ "SECURITY_DEPOT" """
+END OF DEMO!  Thank you for playing.
 """

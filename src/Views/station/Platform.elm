@@ -7,6 +7,7 @@ import Html.Events exposing (..)
 import LocalTypes exposing (..)
 import Manifest exposing (WorldModel)
 import Narrative.WorldModel exposing (getLink)
+import Rules
 import Subway exposing (..)
 import Views.Shared as Shared
 import Views.Station.Connections as Connections
@@ -40,6 +41,9 @@ view map currentStation line worldModel =
                 |> Maybe.map (\s -> s.name ++ " Station")
                 |> Maybe.withDefault ("ERRORR getting station: " ++ currentStation)
 
+        stationIsOutOfService station =
+            Rules.unsafeAssert (station ++ ".out_of_service") worldModel
+
         stopView transferLine station =
             div
                 [ class "Stop"
@@ -49,6 +53,9 @@ view map currentStation line worldModel =
                     -- It's not great, but the best I can think of now
                     if station == currentStation then
                         NoOp
+
+                    else if stationIsOutOfService station then
+                        Interact station
 
                     else if restrictDestination == Nothing then
                         BoardTrain line station

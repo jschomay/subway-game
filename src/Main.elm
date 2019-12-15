@@ -192,10 +192,19 @@ updateStory trigger model =
                     else
                         NarrativeContent.t trigger
                             |> parseNarrative model trigger trigger
+
+                newDebug =
+                    Maybe.map (\debug -> { debug | lastMatchedRule = trigger, lastInteraction = trigger }) model.debug
             in
             -- no need to apply special events or pending changes (no changes,
             -- and no rule id to match).
-            ( { model | story = newStory, ruleMatchCounts = newMatchCounts }, Cmd.none )
+            ( { model
+                | story = newStory
+                , ruleMatchCounts = newMatchCounts
+                , debug = newDebug
+              }
+            , Cmd.none
+            )
 
         Just ( matchedRuleID, matchedRule ) ->
             let
@@ -712,25 +721,60 @@ mainView model =
 selectSceneView : Model -> Html Msg
 selectSceneView model =
     let
-        skeleton =
-            [ "LOBBY", "CELL_PHONE", "RED_LINE", "RED_LINE", "BROADWAY_STREET", "LOBBY", "CELL_PHONE", "RED_LINE", "RED_LINE", "BROADWAY_STREET", "LOBBY", "CELL_PHONE", "RED_LINE", "RED_LINE", "BROADWAY_STREET", "LOBBY", "CELL_PHONE", "RED_LINE", "RED_LINE", "BROADWAY_STREET", "LOBBY", "CELL_PHONE", "RED_LINE", "RED_LINE", "BROADWAY_STREET", "LOBBY" ]
-
         -- missing some interactions in intro
         fullPlay =
-            [ "LOBBY", "BRIEFCASE", "RED_LINE_PASS", "RED_LINE_PASS", "RED_LINE", "CELL_PHONE", "CELL_PHONE", "CELL_PHONE", "COFFEE_CART", "COFFEE", "COFFEE_CART", "COMMUTER_1", "COMMUTER_1", "LOUD_PAYPHONE_LADY", "COFFEE_CART", "LOUD_PAYPHONE_LADY", "GRAFFITI", "RED_LINE", "RED_LINE", "BROADWAY_STREET", "LOBBY", "RED_LINE_PASS", "COFFEE_CART", "COFFEE_CART", "TRASH_DIGGER", "TRASH_DIGGER", "GRAFFITI", "COFFEE", "CELL_PHONE", "CELL_PHONE", "RED_LINE", "RED_LINE", "CONVENTION_CENTER", "BROADWAY_STREET", "LOBBY", "RED_LINE", "SKATER_DUDE", "COFFEE_CART", "COFFEE_CART", "COFFEE", "CELL_PHONE", "CELL_PHONE", "COFFEE", "RED_LINE", "RED_LINE", "BROADWAY_STREET", "LOBBY", "CELL_PHONE", "COFFEE_CART", "COFFEE_CART", "COFFEE_CART", "COFFEE", "RED_LINE", "RED_LINE", "CHURCH_STREET", "BROADWAY_STREET", "LOBBY", "CELL_PHONE", "COFFEE_CART", "RED_LINE", "RED_LINE", "LOBBY", "RED_LINE", "RED_LINE", "BROADWAY_STREET", "MAP_POSTER", "MAP", "MAP_POSTER", "SAFETY_WARNING_POSTER", "RED_LINE", "RED_LINE", "CONVENTION_CENTER", "MAP", "GREEN_LINE", "GREEN_LINE", "LOBBY", "RED_LINE", "RED_LINE", "LOBBY", "YELLOW_LINE", "LOBBY", "CELL_PHONE", "BRIEFCASE", "RED_LINE_PASS" ]
+            [ "LOBBY", "BRIEFCASE", "RED_LINE_PASS", "RED_LINE_PASS", "RED_LINE", "CELL_PHONE", "CELL_PHONE", "CELL_PHONE", "COFFEE_CART", "COFFEE", "COFFEE_CART", "COMMUTER_1", "COMMUTER_1", "LOUD_PAYPHONE_LADY", "COFFEE_CART", "LOUD_PAYPHONE_LADY", "GRAFFITI", "RED_LINE", "RED_LINE", "BROADWAY_STREET", "LOBBY", "RED_LINE_PASS", "COFFEE_CART", "COFFEE_CART", "TRASH_DIGGER", "TRASH_DIGGER", "GRAFFITI", "COFFEE", "CELL_PHONE", "CELL_PHONE", "RED_LINE", "RED_LINE", "CONVENTION_CENTER", "BROADWAY_STREET", "LOBBY", "RED_LINE", "SKATER_DUDE", "COFFEE_CART", "COFFEE_CART", "COFFEE", "CELL_PHONE", "CELL_PHONE", "COFFEE", "RED_LINE", "RED_LINE", "BROADWAY_STREET", "LOBBY", "CELL_PHONE", "COFFEE_CART", "COFFEE_CART", "COFFEE_CART", "COFFEE", "RED_LINE", "RED_LINE", "CHURCH_STREET", "BROADWAY_STREET", "LOBBY", "CELL_PHONE", "COFFEE_CART", "RED_LINE", "RED_LINE", "LOBBY", "RED_LINE", "RED_LINE", "BROADWAY_STREET", "MAP_POSTER", "SAFETY_WARNING_POSTER", "CONVENTION_CENTER", "BROADWAY_STREET", "LOBBY", "EXIT", "ANGRY_CROWD", "YELLOW_LINE", "RED_LINE", "COMMUTER_1", "COMMUTER_1", "SECURITY_OFFICERS", "RED_LINE", "ANGRY_CROWD", "COMMUTER_1", "SECURITY_OFFICERS", "RED_LINE", "RED_LINE", "SPRING_HILL", "LOBBY", "SECURITY_DEPOT" ]
+
+        skeleton =
+            [ "LOBBY"
+            , "CELL_PHONE"
+            , "RED_LINE"
+            , "RED_LINE"
+            , "BROADWAY_STREET"
+            , "LOBBY"
+            , "CELL_PHONE"
+            , "RED_LINE"
+            , "RED_LINE"
+            , "BROADWAY_STREET"
+            , "LOBBY"
+            , "CELL_PHONE"
+            , "RED_LINE"
+            , "RED_LINE"
+            , "BROADWAY_STREET"
+            , "LOBBY"
+            , "CELL_PHONE"
+            , "RED_LINE"
+            , "RED_LINE"
+            , "BROADWAY_STREET"
+            , "LOBBY"
+
+            --20
+            , "CELL_PHONE"
+            , "RED_LINE"
+            , "RED_LINE"
+            , "BROADWAY_STREET"
+            , "LOBBY"
+            , "MAP_POSTER"
+            , "RED_LINE"
+            , "RED_LINE"
+            , "BROADWAY_STREET"
+            , "LOBBY"
+            , "SECURITY_OFFICERS"
+            , "RED_LINE"
+            ]
 
         skip i =
             ( model, skeleton |> List.take i )
 
         scenes =
             [ ( "Beginning", ( model, [] ) )
-            , ( "Tuesday", skip <| 6 )
-            , ( "Wednesday", skip <| 11 )
-            , ( "Thursday", skip <| 16 )
-            , ( "Friday", skip <| 21 )
-            , ( "Arrive at Twin Brooks"
-              , ( model, skeleton )
-              )
+            , ( "Tuesday", skip 6 )
+            , ( "Wednesday", skip 11 )
+            , ( "Thursday", skip 16 )
+            , ( "Friday", skip 21 )
+            , ( "Arrive at Twin Brooks", skip 26 )
+            , ( "Briefcase stolen", skip 33 )
+            , ( "(Interact with everything)", ( model, fullPlay ) )
             ]
     in
     div [ class "SelectScene" ]
