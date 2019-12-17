@@ -1,6 +1,5 @@
 module Rules.Chapter1 exposing (rules)
 
-import Constants exposing (..)
 import LocalTypes
 import Narrative exposing (..)
 import Narrative.Rules exposing (..)
@@ -42,7 +41,10 @@ rules =
            , rule "askOfficersAboutDelay"
                 { trigger = "SECURITY_OFFICERS"
                 , conditions = [ "BROADWAY_STREET.leaving_broadway_street_station_plot<2" ]
-                , changes = [ "BROADWAY_STREET.leaving_broadway_street_station_plot=1" ]
+                , changes =
+                    [ "BROADWAY_STREET.leaving_broadway_street_station_plot=1"
+                    , "PLAYER.present_proposal+1"
+                    ]
                 }
            , rule "askCommuter1AboutDelay"
                 { trigger = "COMMUTER_1"
@@ -52,7 +54,7 @@ rules =
            , rule "noticeGirlInYellow"
                 { trigger = "GIRL_IN_YELLOW"
                 , conditions = [ "PLAYER.chapter=1" ]
-                , changes = [ "PLAYER.who_was_girl_in_yellow", "GIRL_IN_YELLOW.location=offscreen" ]
+                , changes = [ "PLAYER.who_was_girl_in_yellow=1", "GIRL_IN_YELLOW.location=offscreen" ]
                 }
            , rule "briefcaseStolen"
                 { trigger = "*.line"
@@ -64,6 +66,7 @@ rules =
                     [ "BRIEFCASE.location=THIEF"
                     , "BROADWAY_STREET.leaving_broadway_street_station_plot=2"
                     , "GIRL_IN_YELLOW.location=offscreen"
+                    , "PLAYER.find_briefcase=1.present_proposal+1"
                     ]
                 }
            , rule "tellOfficersAboutStolenBriefcase"

@@ -1,6 +1,5 @@
 module Rules.Intro exposing (rules)
 
-import Constants exposing (..)
 import LocalTypes
 import Narrative exposing (..)
 import Narrative.Rules exposing (..)
@@ -137,7 +136,7 @@ rules =
                 { trigger = "BROADWAY_STREET"
                 , conditions = [ "PLAYER.day=4" ]
                 , changes =
-                    [ "PLAYER.location=WEST_MULBERRY.day+1"
+                    [ "PLAYER.location=WEST_MULBERRY.day+1.present_proposal=1"
                     , "CELL_PHONE.unread"
                     , "COFFEE.location=offscreen"
                     , "TRASH_DIGGER.location=offscreen"
@@ -149,7 +148,7 @@ rules =
                 { trigger = "BROADWAY_STREET"
                 , conditions = [ "PLAYER.day=5.chapter=0" ]
                 , changes =
-                    [ "PLAYER.location=TWIN_BROOKS.chapter+1"
+                    [ "PLAYER.location=TWIN_BROOKS.chapter+1.present_proposal+1"
                     , "COFFEE.location=offscreen"
                     ]
                 }

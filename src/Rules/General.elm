@@ -1,6 +1,5 @@
 module Rules.General exposing (rules)
 
-import Constants exposing (..)
 import LocalTypes
 import Narrative exposing (..)
 import Narrative.Rules exposing (..)

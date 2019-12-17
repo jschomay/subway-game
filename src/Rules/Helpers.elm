@@ -1,6 +1,5 @@
-module Rules.Helpers exposing (TextRule, rule, rulesForScene)
+module Rules.Helpers exposing (TextRule, rule)
 
-import Constants exposing (..)
 import Dict exposing (Dict)
 import LocalTypes exposing (..)
 import Narrative exposing (..)
@@ -19,12 +18,3 @@ type alias TextRule =
 rule : RuleID -> TextRule -> ( RuleID, TextRule )
 rule =
     Tuple.pair
-
-
-rulesForScene : Int -> List ( String, TextRule ) -> List ( String, TextRule )
-rulesForScene scene rules_ =
-    rules_
-        |> List.map
-            (\( id, { conditions } as r ) ->
-                ( id, { r | conditions = ("PLAYER.chapter=" ++ String.fromInt scene) :: conditions } )
-            )

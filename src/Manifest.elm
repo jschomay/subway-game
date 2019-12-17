@@ -1,6 +1,5 @@
 module Manifest exposing (DisplayComponent, Entity, ID, WorldModel, entities, entity, initialWorldModel)
 
-import Constants
 import Dict exposing (Dict)
 import Narrative.WorldModel exposing (..)
 import NarrativeContent exposing (t)

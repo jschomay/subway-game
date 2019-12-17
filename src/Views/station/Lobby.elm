@@ -1,7 +1,5 @@
 module Views.Station.Lobby exposing (view)
 
-import Array
-import Constants
 import Dict
 import Html exposing (..)
 import Html.Attributes exposing (..)
@@ -11,6 +9,7 @@ import Manifest exposing (..)
 import Narrative.WorldModel exposing (..)
 import Rules
 import Subway exposing (..)
+import Views.Goals as Goals
 import Views.Station.Connections as Connections
 
 
@@ -22,29 +21,6 @@ view map worldModel currentStation =
                 |> Dict.get currentStation
                 |> Maybe.map (\s -> s.name ++ " Station")
                 |> Maybe.withDefault ("ERRORR getting station: " ++ currentStation)
-
-        ( chapterNumber, chapterName, goals ) =
-            getStat "PLAYER" "chapter" worldModel
-                |> Maybe.andThen
-                    (\plotLevel ->
-                        Array.get plotLevel Constants.chapters
-                            |> Maybe.map (\( chapterName_, goals_ ) -> ( plotLevel, chapterName_, goals_ ))
-                    )
-                |> Maybe.withDefault ( 0, "Error, can't find current chapter", [] )
-
-        fullChapterName =
-            "Chapter "
-                ++ String.fromInt chapterNumber
-                ++ ": "
-                ++ chapterName
-
-        distractions =
-            Constants.distractions
-                |> List.filterMap
-                    (\distraction ->
-                        getStat "PLAYER" distraction.id worldModel
-                            |> Maybe.map (always distraction.name)
-                    )
 
         characters =
             Rules.unsafeQuery ("*.character.location=" ++ currentStation) worldModel
@@ -78,15 +54,6 @@ view map worldModel currentStation =
             div [ class "Sign__item Sign__item--interactable", onClick <| Interact id ]
                 [ text name ]
 
-        chapterInfoView =
-            div [ class "Sign Sign--chapter" ]
-                [ div [ class "Sign__header2" ] [ text fullChapterName ]
-
-                -- TODO make goals/distractions clickable with narrative
-                , sectionView "Goals:" <| List.map nonInteractableItemView goals
-                , sectionView "Distractions:" <| List.map nonInteractableItemView distractions
-                ]
-
         stationInfoView =
             div [ class "Sign Sign--station" ]
                 [ div [ class "Sign__header1" ] [ text stationName ]
@@ -105,7 +72,7 @@ view map worldModel currentStation =
     div [ class "Scene Lobby" ]
         [ div [ class "Lobby__scene" ]
             [ stationInfoView
-            , chapterInfoView
+            , Goals.view worldModel
             , inventoryView
             ]
         ]
