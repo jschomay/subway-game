@@ -186,7 +186,7 @@ intro =
     Sent: Monday, 6:32pm
     Subject: RE: Good Things!
 
-    eear Mr. Harris,
+    Dear Mr. Harris,
 
     Thank you for the update.  I'll do my best, but Friday is a little soon isn't it? I just want to be able to
     put together something that will really help our customers.  I'll have to cut a lot of the ideas we spoke about.
