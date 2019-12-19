@@ -671,7 +671,7 @@ She's no help.
 "Have a nice day sir."
 """
         |> content__________________________________ "followGuardsAdvice" """
-{"Some one at the Security Depot better be able to help me. I have to get my proposal back!"|}
+{"Someone at the Security Depot better be able to help me. I have to get my proposal back!"|}
 """
         |> content__________________________________ "ignoreGuardsAdvice" """
 If those guards at Metro Center can't help me, what are the chances that any of the other guards will be any better? Maybe I can find the thief on my own and make a citizens arrest. Or something.
@@ -698,6 +698,6 @@ Mr. Harris is going to kill me. What the hell am I going to do?
 ---
 END OF DEMO!  Thank you for playing.
 """
-        |> content__________________________________ "SECURITY_DEPOT" """
+        |> content__________________________________ "SECURITY_DEPOT_SPRING_HILL_STATION" """
 END OF DEMO!  Thank you for playing.
 """

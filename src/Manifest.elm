@@ -128,8 +128,10 @@ entities =
     -- CONVENTION_CENTER
     , entity "MUSICIAN.character.location=CONVENTION_CENTER"
         "Man playing violin"
-    , entity "SECURITY_DEPOT.item.location=SPRING_HILL"
-        "Spring Hill Station Security Depot"
+
+    -- SPRING HILL
+    , entity "SECURITY_DEPOT_SPRING_HILL_STATION.item.location=SPRING_HILL"
+        "Security Depot"
 
     -- Stations
     , entity "ONE_HUNDRED_FOURTH_STREET.station" "104th Street"

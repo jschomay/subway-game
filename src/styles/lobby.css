@@ -29,7 +29,7 @@
 .Sign--station::before {
   content: "";
   position: absolute;
-  top: 0.6em;
+  top: 3.7em;
   left: 0;
   right: 0;
   height: 1px;
@@ -55,7 +55,7 @@
 .Sign__header1 {
   font-size: 2.4em;
   font-weight: bold;
-  margin-bottom: 0.2em;
+  margin-bottom: 0.5em;
 }
 
 .Sign__header2 {
@@ -88,15 +88,22 @@
 }
 
 .Sign__right {
-  flex: 1 0 auto;
+  flex: 0 0 auto;
+  display: flex;
+  width: 28em;
+  flex-wrap: wrap;
+  justify-content: space-between;
 }
 
 .Sign__left {
-  width: 12em;
+  width: 14em;
+  flex: 0 0 auto;
 }
 
 .Sign__item {
   padding: 0.3em 0;
+  width: 14em;
+  flex: 0 0 auto;
 }
 
 .Sign__item--interactable {

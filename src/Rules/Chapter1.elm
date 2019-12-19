@@ -111,7 +111,7 @@ rules =
                     [ "PLAYER.location=$", "BROADWAY_STREET.leaving_broadway_street_station_plot=4" ]
                 }
            , rule "findingSecurityDepotClosed"
-                { trigger = "SECURITY_DEPOT"
+                { trigger = "SECURITY_DEPOT_SPRING_HILL_STATION"
                 , conditions =
                     [ "BROADWAY_STREET.leaving_broadway_street_station_plot<5"
                     , "PLAYER.chapter=1"
