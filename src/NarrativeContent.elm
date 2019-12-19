@@ -70,6 +70,12 @@ general =
     Dict.empty
         |> content__________________________________ "BRIEFCASE"
             "My portable office, all my work is in it."
+        |> content__________________________________ "notebookInstructions" """
+{I have my notebook with me to day to keep track of everything.
+
+(Click the notebook icon or press 'n' to toggle the notebook from now on)
+|}
+"""
         |> content__________________________________ "RED_LINE_PASS"
             "This gets me anywhere on the Red Line, but I really only use it to get to work and back home."
         |> content__________________________________ "GRAFFITI"

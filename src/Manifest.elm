@@ -78,6 +78,8 @@ entities =
         "Cell phone"
     , entity "MAP.item.map.silent"
         "Subway map"
+    , entity "NOTEBOOK.item.new"
+        "I keep track of my daily plans in this."
 
     -- other locations
     , entity "CENTRAL_GUARD_OFFICE.location"

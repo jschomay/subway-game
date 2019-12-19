@@ -22,6 +22,7 @@ import Set
 import Subway exposing (..)
 import Task
 import Tuple
+import Views.Goals as Goals
 import Views.Station.CentralGuardOffice as CentralGuardOffice
 import Views.Station.Lobby as Lobby
 import Views.Station.Platform as Platform
@@ -150,6 +151,7 @@ init initialWorldModel flags =
       , ruleMatchCounts = Dict.empty
       , scene = Title (dayText initialWorldModel)
       , showMap = False
+      , showNotebook = False
       , gameOver = False
       , debug = debug
       , showSelectScene = flags.debug
@@ -204,6 +206,7 @@ updateStory trigger model =
               }
             , Cmd.none
             )
+                |> updateAndThen (specialEvents trigger)
 
         Just ( matchedRuleID, matchedRule ) ->
             let
@@ -315,6 +318,12 @@ id of an entity as a ruleId to match against.
 specialEvents : String -> Model -> ( Model, Cmd Msg )
 specialEvents ruleId model =
     case ruleId of
+        "notebookInstructions" ->
+            ( { model | showNotebook = True }, Cmd.none )
+
+        "NOTEBOOK" ->
+            ( { model | showNotebook = not model.showNotebook }, Cmd.none )
+
         "checkMap" ->
             ( { model | showMap = not model.showMap }, Cmd.none )
 
@@ -398,8 +407,21 @@ update msg model =
                             |> updateAndThen (update <| Interact id)
                             |> updateAndThen applyPendingChanges
                     )
-                    ( { model_ | showSelectScene = False }, Cmd.none )
+                    ( model_, Cmd.none )
                     history
+                    |> updateAndThen
+                        (\m ->
+                            -- Ensure the UI is in the right place after all interactions
+                            ( { m
+                                | showSelectScene = False
+                                , showMap = False
+                                , showNotebook = False
+                                , scene = Lobby
+                                , story = []
+                              }
+                            , Cmd.none
+                            )
+                        )
 
             Interact interactableId ->
                 ( { model | history = model.history ++ [ interactableId ] |> Debug.log "history\n" }
@@ -424,6 +446,15 @@ update msg model =
                 ( model
                 , Task.perform (always delayedMsg) <| Process.sleep duration
                 )
+
+            ToggleNotebook ->
+                if Rules.unsafeAssert "NOTEBOOK.!new" model.worldModel then
+                    ( { model | showNotebook = not model.showNotebook }
+                    , Cmd.none
+                    )
+
+                else
+                    ( model, Cmd.none )
 
             ToggleMap ->
                 if Rules.unsafeAssert "MAP.location=PLAYER" model.worldModel then
@@ -549,6 +580,9 @@ handleKey model key =
                 else if model.showMap then
                     ToggleMap
 
+                else if model.showNotebook then
+                    ToggleNotebook
+
                 else if not <| List.isEmpty model.story then
                     Continue
 
@@ -557,6 +591,9 @@ handleKey model key =
 
             "m" ->
                 ToggleMap
+
+            "n" ->
+                ToggleNotebook
 
             _ ->
                 NoOp
@@ -707,6 +744,13 @@ mainView model =
                             storyView t
                    )
           )
+        , ( "notebook"
+          , if model.showNotebook then
+                notebookView model.worldModel
+
+            else
+                text ""
+          )
         , ( "map"
           , if model.showMap then
                 mapView
@@ -722,7 +766,7 @@ selectSceneView model =
     let
         -- missing some interactions in intro
         fullPlay =
-            [ "LOBBY", "BRIEFCASE", "RED_LINE_PASS", "RED_LINE_PASS", "RED_LINE", "CELL_PHONE", "CELL_PHONE", "CELL_PHONE", "COFFEE_CART", "COFFEE", "COFFEE_CART", "COMMUTER_1", "COMMUTER_1", "LOUD_PAYPHONE_LADY", "COFFEE_CART", "LOUD_PAYPHONE_LADY", "GRAFFITI", "RED_LINE", "RED_LINE", "BROADWAY_STREET", "LOBBY", "RED_LINE_PASS", "COFFEE_CART", "COFFEE_CART", "TRASH_DIGGER", "TRASH_DIGGER", "GRAFFITI", "COFFEE", "CELL_PHONE", "CELL_PHONE", "RED_LINE", "RED_LINE", "CONVENTION_CENTER", "BROADWAY_STREET", "LOBBY", "RED_LINE", "SKATER_DUDE", "COFFEE_CART", "COFFEE_CART", "COFFEE", "CELL_PHONE", "CELL_PHONE", "COFFEE", "RED_LINE", "RED_LINE", "BROADWAY_STREET", "LOBBY", "CELL_PHONE", "COFFEE_CART", "COFFEE_CART", "COFFEE_CART", "COFFEE", "RED_LINE", "RED_LINE", "CHURCH_STREET", "BROADWAY_STREET", "LOBBY", "CELL_PHONE", "COFFEE_CART", "RED_LINE", "RED_LINE", "LOBBY", "RED_LINE", "RED_LINE", "BROADWAY_STREET", "MAP_POSTER", "SAFETY_WARNING_POSTER", "CONVENTION_CENTER", "BROADWAY_STREET", "LOBBY", "EXIT", "ANGRY_CROWD", "YELLOW_LINE", "RED_LINE", "COMMUTER_1", "COMMUTER_1", "GIRL_IN_YELLOW", "SECURITY_OFFICERS", "RED_LINE", "ANGRY_CROWD", "COMMUTER_1", "SECURITY_OFFICERS", "RED_LINE", "RED_LINE", "SPRING_HILL", "LOBBY", "SECURITY_DEPOT" ]
+            [ "LOBBY", "BRIEFCASE", "RED_LINE_PASS", "RED_LINE_PASS", "RED_LINE", "CELL_PHONE", "CELL_PHONE", "CELL_PHONE", "COFFEE_CART", "COFFEE", "COFFEE_CART", "COMMUTER_1", "COMMUTER_1", "LOUD_PAYPHONE_LADY", "COFFEE_CART", "LOUD_PAYPHONE_LADY", "GRAFFITI", "RED_LINE", "RED_LINE", "BROADWAY_STREET", "LOBBY", "RED_LINE_PASS", "COFFEE_CART", "COFFEE_CART", "TRASH_DIGGER", "TRASH_DIGGER", "GRAFFITI", "COFFEE", "CELL_PHONE", "CELL_PHONE", "RED_LINE", "RED_LINE", "CONVENTION_CENTER", "BROADWAY_STREET", "LOBBY", "RED_LINE", "SKATER_DUDE", "COFFEE_CART", "COFFEE_CART", "COFFEE", "CELL_PHONE", "CELL_PHONE", "COFFEE", "RED_LINE", "RED_LINE", "BROADWAY_STREET", "LOBBY", "CELL_PHONE", "COFFEE_CART", "COFFEE_CART", "COFFEE_CART", "COFFEE", "RED_LINE", "RED_LINE", "CHURCH_STREET", "BROADWAY_STREET", "LOBBY", "CELL_PHONE", "COFFEE_CART", "RED_LINE", "RED_LINE", "LOBBY", "RED_LINE", "RED_LINE", "BROADWAY_STREET", "MAP_POSTER", "MAP", "SAFETY_WARNING_POSTER", "CONVENTION_CENTER", "BROADWAY_STREET", "LOBBY", "EXIT", "ANGRY_CROWD", "YELLOW_LINE", "RED_LINE", "COMMUTER_1", "COMMUTER_1", "GIRL_IN_YELLOW", "NOTEBOOK", "SECURITY_OFFICERS", "RED_LINE", "ANGRY_CROWD", "COMMUTER_1", "SECURITY_OFFICERS", "RED_LINE", "RED_LINE", "SPRING_HILL", "LOBBY", "SECURITY_DEPOT" ]
 
         skeleton =
             [ "LOBBY"
@@ -815,3 +859,8 @@ mapView =
     div [ onClick ToggleMap, class "map" ]
         [ img [ class "map__image", src <| "img/" ++ Subway.mapImage ] []
         ]
+
+
+notebookView : Manifest.WorldModel -> Html Msg
+notebookView worldModel =
+    div [ onClick ToggleNotebook ] [ Goals.view worldModel ]

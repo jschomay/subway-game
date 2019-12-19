@@ -16,6 +16,7 @@ type alias Model =
     , scene : Scene
     , ruleMatchCounts : Dict RuleID Int
     , showMap : Bool
+    , showNotebook : Bool
     , gameOver : Bool
     , debug : Maybe Debug
     , showSelectScene : Bool
@@ -38,6 +39,7 @@ type Msg
     | Loaded
     | Delay Float Msg
     | ToggleMap
+    | ToggleNotebook
     | Go Scene
     | BoardTrain Line Station
     | Disembark

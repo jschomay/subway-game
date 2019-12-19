@@ -14,16 +14,15 @@ view : Manifest.WorldModel -> Html Msg
 view worldModel =
     let
         goalListItemView title subGoals level =
-            li [ class "Sign__section" ]
-                [ div [ class "Sign__header3" ] [ text title ]
-                , List.drop (level - 1) subGoals
-                    |> List.head
-                    |> Maybe.map
-                        (\t ->
-                            ul [ class "Sign__list" ]
-                                [ li [ class "Sign__item--list" ] [ text t ] ]
-                        )
-                    |> Maybe.withDefault (text "")
+            li [ class "Notebook__item" ]
+                [ div [ class "Notebook__subheading" ] [ text title ]
+                , ul [ class "Notebook__sublist" ]
+                    (List.take level subGoals
+                        |> List.map
+                            (\t ->
+                                li [ class "Notebook__subitem" ] [ text t ]
+                            )
+                    )
                 ]
 
         goalListView goals_ =
@@ -43,13 +42,17 @@ view worldModel =
                 []
                 goals_
                 |> List.reverse
-                |> ul [ class "Sign__goals_group" ]
+                |> ul [ class "Notebook__content" ]
     in
-    div [ class "Sign Sign--chapter" ]
-        [ h3 [ class "Sign__header2" ] [ text "Goals:" ]
-        , goalListView goals
-        , h3 [ class "Sign__header2" ] [ text "Distractions:" ]
-        , goalListView distractions
+    div [ class "Notebook" ]
+        [ div [ class "Notebook__page" ]
+            [ h3 [ class "Notebook__header" ] [ text "Goals:" ]
+            , goalListView goals
+            ]
+        , div [ class "Notebook__page" ]
+            [ h3 [ class "Notebook__header" ] [ text "Distractions:" ]
+            , goalListView distractions
+            ]
         ]
 
 
@@ -60,6 +63,7 @@ goals =
       , [ "Get to work by 6:30am"
         , "Get to work by 6:45am"
         , "Get to work by 7:00am"
+        , ""
         ]
       )
     , ( "find_briefcase"

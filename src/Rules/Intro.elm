@@ -142,6 +142,7 @@ rules =
                     , "TRASH_DIGGER.location=offscreen"
                     , "BENCH_BUM.location=offscreen"
                     , "SODA_MACHINE.-broken"
+                    , "NOTEBOOK.location=PLAYER"
                     ]
                 }
            , rule "fallAsleep"

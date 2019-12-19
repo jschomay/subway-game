@@ -6,7 +6,7 @@ require("./styles/platform.css");
 require("./styles/lobby.css");
 require("./styles/turnstile.css");
 require("./styles/guard-office.css");
-require("./styles/icons.css");
+require("./styles/goals.css");
 require("./styles/game.css");
 
 // inject bundled Elm app

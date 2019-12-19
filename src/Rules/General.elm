@@ -48,4 +48,9 @@ rules =
                 , conditions = []
                 , changes = []
                 }
+           , rule "notebookInstructions"
+                { trigger = "NOTEBOOK.new"
+                , conditions = []
+                , changes = [ "NOTEBOOK.-new.silent" ]
+                }
            ]
