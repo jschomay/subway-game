@@ -1,3 +1,13 @@
+if(btoa(localStorage.getItem("password")) !== "c3Vid2F5") {
+  var pass = prompt("Please enter the password to play the demo.");
+  if(btoa(pass) !== "c3Vid2F5") {
+    alert("Sorry, incorrect password");
+    throw "Wrong password";
+  } else {
+    localStorage.setItem("password", pass);
+  }
+}
+
 require("./styles/reset.css");
 require("./styles/effects.css");
 require("./styles/story.css");
