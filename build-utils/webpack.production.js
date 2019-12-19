@@ -46,7 +46,8 @@ module.exports = () => ({
       {from: 'src/img', to: 'img/'}
     ]),
 
-    new ImageminPlugin({test: /\.(jpe?g|png|gif|svg)$/i}),
+    // including svg here requires svgo 0.3.0 which has a bug, so removed for now
+    new ImageminPlugin({test: /\.(jpe?g|png|gif)$/i}),
 
     new UglifyJsPlugin({
       cache: true,
