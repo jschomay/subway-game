@@ -4,7 +4,6 @@ import Dict exposing (Dict)
 import Manifest
 import NarrativeEngine.Core.Rules as Rules exposing (..)
 import NarrativeEngine.Core.WorldModel exposing (..)
-import NarrativeEngine.Utils.Helpers exposing (ParseError)
 import NarrativeEngine.Utils.NarrativeParser exposing (..)
 import Subway exposing (..)
 

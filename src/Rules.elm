@@ -37,7 +37,7 @@ parseRule { trigger, conditions, changes } =
 -- TODO move this into ENE and change to a Result
 
 
-rules_ : ( Rules, List ( String, ParseError ) )
+rules_ : ( Rules, List ( String, String ) )
 rules_ =
     let
         printRule { trigger, conditions, changes } =
@@ -73,7 +73,7 @@ unsafeParseMatcher s =
             matcher
 
         Err e ->
-            Debug.log ("ERROR parsing matcher:" ++ s ++ "\n" ++ deadEndsToString e)
+            Debug.log ("ERROR parsing matcher:" ++ s ++ "\n" ++ e)
                 (Match "PARSING_ERROR" [])
 
 
@@ -89,7 +89,7 @@ unsafeParseChanges s =
             changes
 
         Err e ->
-            Debug.log ("ERROR parsing changes:" ++ s ++ "\n" ++ deadEndsToString e)
+            Debug.log ("ERROR parsing changes:" ++ s ++ "\n" ++ e)
                 (Update "PARSING_ERROR" [])
 
 

@@ -1,7 +1,6 @@
 module NarrativeContent exposing (parseErrors, t)
 
 import Dict exposing (Dict)
-import NarrativeEngine.Utils.Helpers exposing (ParseError)
 import NarrativeEngine.Utils.NarrativeParser exposing (..)
 
 
@@ -24,7 +23,7 @@ emptyConfig =
 
 {-| Pre-parses everything at run time to find errors to display.
 -}
-parseErrors : List ( String, ParseError )
+parseErrors : List ( String, String )
 parseErrors =
     Dict.foldl
         (\k v acc ->

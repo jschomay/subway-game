@@ -29,10 +29,10 @@ type alias ID =
 the error
 -}
 type alias ParsedEntity =
-    Result ( String, ParseError ) ( ID, Entity )
+    Result ( String, String ) ( ID, Entity )
 
 
-initialWorldModel : ( WorldModel, List ( String, ParseError ) )
+initialWorldModel : ( WorldModel, List ( String, String ) )
 initialWorldModel =
     let
         separateErrors parsedEntity acc =

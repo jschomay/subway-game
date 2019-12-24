@@ -14,7 +14,7 @@ import Markdown
 import NarrativeContent
 import NarrativeEngine.Core.Rules exposing (..)
 import NarrativeEngine.Core.WorldModel exposing (..)
-import NarrativeEngine.Utils.Helpers exposing (ParseError, deadEndsToString)
+import NarrativeEngine.Utils.Helpers exposing (parseErrorsView)
 import NarrativeEngine.Utils.NarrativeParser as NarrativeParser exposing (Narrative)
 import Process
 import Rules
@@ -40,7 +40,7 @@ type alias Flags =
     { debug : Bool }
 
 
-main : Program Flags (Result (List ( String, ParseError )) Model) Msg
+main : Program Flags (Result (List ( String, String )) Model) Msg
 main =
     let
         -- TODO pull this code out to encapsulate the types and view
@@ -82,39 +82,7 @@ main =
 
                     Err errors ->
                         { title = "Errors found"
-                        , body =
-                            [ div
-                                [ style "background" "black"
-                                , style "color" "red"
-                                , style "padding" "4em"
-                                , style "display" "flex"
-                                , style "flex-direction" "column"
-                                , style "align-items" "center"
-                                , style "justify-content" "center"
-                                ]
-                                [ h1 [] [ text "Errors when parsing!  Please fix:" ]
-                                , ul [ style "width" "100%" ] <|
-                                    List.map
-                                        -- TODO this should already be a nice string or
-                                        -- tuple
-                                        (\( s, e ) ->
-                                            li
-                                                [ style "margin-bottom" "2em"
-                                                ]
-                                                [ text <| deadEndsToString e
-                                                , pre
-                                                    [ style "background" "white"
-                                                    , style "padding" "1em"
-                                                    , style "color" "black"
-                                                    , style "overflow" " auto"
-                                                    , style "width" "100%"
-                                                    ]
-                                                    [ code [] [ text s ] ]
-                                                ]
-                                        )
-                                        errors
-                                ]
-                            ]
+                        , body = [ parseErrorsView errors ]
                         }
         , update =
             \msg model ->
