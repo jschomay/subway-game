@@ -11,13 +11,13 @@ import List.Extra
 import LocalTypes exposing (..)
 import Manifest
 import Markdown
-import Narrative
-import Narrative.Rules exposing (..)
-import Narrative.WorldModel exposing (..)
 import NarrativeContent
+import NarrativeEngine.Core.Rules exposing (..)
+import NarrativeEngine.Core.WorldModel exposing (..)
+import NarrativeEngine.Utils.Helpers exposing (ParseError, deadEndsToString)
+import NarrativeEngine.Utils.NarrativeParser as NarrativeParser exposing (Narrative)
 import Process
 import Rules
-import Rules.Parser
 import Set
 import Subway exposing (..)
 import Task
@@ -40,7 +40,7 @@ type alias Flags =
     { debug : Bool }
 
 
-main : Program Flags (Result (List ( String, Rules.Parser.ParseError )) Model) Msg
+main : Program Flags (Result (List ( String, ParseError )) Model) Msg
 main =
     let
         -- TODO pull this code out to encapsulate the types and view
@@ -101,7 +101,7 @@ main =
                                             li
                                                 [ style "margin-bottom" "2em"
                                                 ]
-                                                [ text <| Rules.Parser.deadEndsToString e
+                                                [ text <| deadEndsToString e
                                                 , pre
                                                     [ style "background" "white"
                                                     , style "padding" "1em"
@@ -182,7 +182,7 @@ arrivingDelay =
 -}
 updateStory : String -> Model -> ( Model, Cmd Msg )
 updateStory trigger model =
-    case Narrative.Rules.findMatchingRule trigger Rules.rules model.worldModel of
+    case findMatchingRule trigger Rules.rules model.worldModel of
         Nothing ->
             let
                 ( newStory, newMatchCounts ) =
@@ -233,7 +233,7 @@ updateStory trigger model =
                     )
 
 
-parseNarrative : Model -> RuleID -> ID -> String -> ( Narrative.Narrative, Dict String Int )
+parseNarrative : Model -> RuleID -> ID -> String -> ( Narrative, Dict String Int )
 parseNarrative model matchedRuleID trigger rawNarrative =
     let
         cycleIndex =
@@ -268,7 +268,7 @@ parseNarrative model matchedRuleID trigger rawNarrative =
             }
 
         narrative =
-            Narrative.parse config rawNarrative
+            NarrativeParser.parse config rawNarrative
 
         newMatchCounts =
             Dict.update
@@ -362,13 +362,13 @@ changeTrainStatus newStatus trainProps =
 
 getCurrentStation : Manifest.WorldModel -> Station
 getCurrentStation worldModel =
-    Narrative.WorldModel.getLink "PLAYER" "location" worldModel
+    getLink "PLAYER" "location" worldModel
         |> Maybe.withDefault "ERROR getting the current location of player from worldmodel"
 
 
 getCurrentLine : Manifest.WorldModel -> Maybe Subway.Line
 getCurrentLine worldModel =
-    Narrative.WorldModel.getLink "PLAYER" "line" worldModel
+    getLink "PLAYER" "line" worldModel
         |> Maybe.andThen Subway.idToLine
 
 

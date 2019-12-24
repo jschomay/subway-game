@@ -1,8 +1,8 @@
 module NarrativeContent exposing (parseErrors, t)
 
 import Dict exposing (Dict)
-import Narrative
-import Rules.Parser exposing (ParseError)
+import NarrativeEngine.Utils.Helpers exposing (ParseError)
+import NarrativeEngine.Utils.NarrativeParser exposing (..)
 
 
 {-| This is a little nicer than having to export every string.
@@ -28,7 +28,7 @@ parseErrors : List ( String, ParseError )
 parseErrors =
     Dict.foldl
         (\k v acc ->
-            case Narrative.parsible emptyConfig v of
+            case parsible emptyConfig v of
                 Err e ->
                     ( "Narrative content: " ++ k ++ " " ++ v ++ " ", e ) :: acc
 

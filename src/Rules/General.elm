@@ -1,9 +1,9 @@
 module Rules.General exposing (rules)
 
 import LocalTypes
-import Narrative exposing (..)
-import Narrative.Rules exposing (..)
-import Narrative.WorldModel exposing (..)
+import NarrativeEngine.Core.Rules exposing (..)
+import NarrativeEngine.Core.WorldModel exposing (..)
+import NarrativeEngine.Utils.NarrativeParser exposing (..)
 import Rules.Helpers exposing (..)
 
 

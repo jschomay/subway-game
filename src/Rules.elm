@@ -3,11 +3,12 @@ module Rules exposing (parseErrors, rules, unsafeAssert, unsafeParseChanges, uns
 import Dict exposing (Dict)
 import LocalTypes exposing (..)
 import Manifest exposing (Entity, ID, WorldModel)
-import Narrative.WorldModel exposing (ChangeWorld(..), EntityMatcher(..))
+import NarrativeEngine.Core.WorldModel exposing (ChangeWorld(..), EntityMatcher(..), query)
+import NarrativeEngine.Utils.Helpers exposing (..)
+import NarrativeEngine.Utils.RuleParser exposing (..)
 import Rules.Chapter1
 import Rules.General
 import Rules.Intro
-import Rules.Parser exposing (..)
 
 
 rules =
@@ -30,6 +31,10 @@ parseRule { trigger, conditions, changes } =
         (parseMatcher trigger)
         (parseMultiple parseMatcher conditions)
         (parseMultiple parseChanges changes)
+
+
+
+-- TODO move this into ENE and change to a Result
 
 
 rules_ : ( Rules, List ( String, ParseError ) )
@@ -63,12 +68,12 @@ Warning, you can't optmize a production build with Debug.log.
 -}
 unsafeParseMatcher : String -> EntityMatcher
 unsafeParseMatcher s =
-    case Rules.Parser.parseMatcher s of
+    case parseMatcher s of
         Ok matcher ->
             matcher
 
         Err e ->
-            Debug.log ("ERROR parsing matcher:" ++ s ++ "\n" ++ Rules.Parser.deadEndsToString e)
+            Debug.log ("ERROR parsing matcher:" ++ s ++ "\n" ++ deadEndsToString e)
                 (Match "PARSING_ERROR" [])
 
 
@@ -79,12 +84,12 @@ Warning, you can't optmize a production build with Debug.log.
 -}
 unsafeParseChanges : String -> ChangeWorld
 unsafeParseChanges s =
-    case Rules.Parser.parseChanges s of
+    case parseChanges s of
         Ok changes ->
             changes
 
         Err e ->
-            Debug.log ("ERROR parsing changes:" ++ s ++ "\n" ++ Rules.Parser.deadEndsToString e)
+            Debug.log ("ERROR parsing changes:" ++ s ++ "\n" ++ deadEndsToString e)
                 (Update "PARSING_ERROR" [])
 
 
@@ -94,7 +99,7 @@ unsafeQuery : String -> WorldModel -> List ( ID, Entity )
 unsafeQuery queryString store =
     queryString
         |> unsafeParseMatcher
-        |> (\matcher -> Narrative.WorldModel.query matcher store)
+        |> (\matcher -> query matcher store)
 
 
 {-| "Unsafe" assert

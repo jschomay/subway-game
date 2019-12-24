@@ -2,10 +2,10 @@ module LocalTypes exposing (Debug, Model, Msg(..), Rule, Rules, Scene(..), Train
 
 import Dict exposing (Dict)
 import Manifest
-import Narrative exposing (..)
-import Narrative.Rules as Rules exposing (..)
-import Narrative.WorldModel exposing (..)
-import Rules.Parser exposing (ParseError)
+import NarrativeEngine.Core.Rules as Rules exposing (..)
+import NarrativeEngine.Core.WorldModel exposing (..)
+import NarrativeEngine.Utils.Helpers exposing (ParseError)
+import NarrativeEngine.Utils.NarrativeParser exposing (..)
 import Subway exposing (..)
 
 
@@ -21,7 +21,7 @@ type alias Model =
     , debug : Maybe Debug
     , showSelectScene : Bool
     , history : List String
-    , pendingChanges : Maybe ( Narrative.WorldModel.ID, List ChangeWorld, RuleID )
+    , pendingChanges : Maybe ( ID, List ChangeWorld, RuleID )
     }
 
 

@@ -6,7 +6,7 @@ import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import LocalTypes exposing (..)
 import Manifest exposing (..)
-import Narrative.WorldModel exposing (..)
+import NarrativeEngine.Core.WorldModel exposing (..)
 import Rules
 
 

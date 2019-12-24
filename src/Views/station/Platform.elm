@@ -6,7 +6,7 @@ import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import LocalTypes exposing (..)
 import Manifest exposing (WorldModel)
-import Narrative.WorldModel exposing (getLink)
+import NarrativeEngine.Core.WorldModel exposing (getLink)
 import Rules
 import Subway exposing (..)
 import Views.Shared as Shared

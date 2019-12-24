@@ -2,9 +2,9 @@ module Rules.Helpers exposing (TextRule, rule)
 
 import Dict exposing (Dict)
 import LocalTypes exposing (..)
-import Narrative exposing (..)
-import Narrative.Rules exposing (..)
-import Narrative.WorldModel exposing (..)
+import NarrativeEngine.Core.Rules exposing (..)
+import NarrativeEngine.Core.WorldModel exposing (..)
+import NarrativeEngine.Utils.NarrativeParser exposing (..)
 import Subway exposing (Station)
 
 
