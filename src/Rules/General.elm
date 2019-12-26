@@ -7,7 +7,7 @@ import NarrativeEngine.Utils.NarrativeParser exposing (..)
 import Rules.Helpers exposing (..)
 
 
-rules : List ( String, TextRule )
+rules : List ( String, StringRule )
 rules =
     []
         ++ [ rule "ridingTheTrain"

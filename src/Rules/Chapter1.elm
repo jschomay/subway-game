@@ -8,7 +8,7 @@ import NarrativeEngine.Utils.NarrativeParser exposing (..)
 import Rules.Helpers exposing (..)
 
 
-rules : List ( String, TextRule )
+rules : List ( String, StringRule )
 rules =
     []
         ++ [ rule "getMap"
@@ -119,8 +119,3 @@ rules =
                 , changes = [ "BROADWAY_STREET.leaving_broadway_street_station_plot=5" ]
                 }
            ]
-
-
-
--- TODO deal with out_of_service stations on line map (can't go back to
--- BROADWAY_STREET)

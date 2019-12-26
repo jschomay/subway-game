@@ -1,4 +1,4 @@
-module Rules.Helpers exposing (TextRule, rule)
+module Rules.Helpers exposing (StringRule, rule)
 
 import Dict exposing (Dict)
 import LocalTypes exposing (..)
@@ -8,13 +8,13 @@ import NarrativeEngine.Utils.NarrativeParser exposing (..)
 import Subway exposing (Station)
 
 
-type alias TextRule =
+type alias StringRule =
     { trigger : String
     , conditions : List String
     , changes : List String
     }
 
 
-rule : RuleID -> TextRule -> ( RuleID, TextRule )
+rule : RuleID -> StringRule -> ( RuleID, StringRule )
 rule =
     Tuple.pair

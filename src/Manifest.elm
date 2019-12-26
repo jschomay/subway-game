@@ -1,10 +1,10 @@
-module Manifest exposing (DisplayComponent, Entity, ID, WorldModel, entities, entity, initialWorldModel)
+module Manifest exposing (DisplayComponent, Entity, ID, WorldModel, initialWorldModel)
 
 import Dict exposing (Dict)
 import NarrativeContent exposing (t)
 import NarrativeEngine.Core.WorldModel exposing (..)
+import NarrativeEngine.Utils.EntityParser exposing (..)
 import NarrativeEngine.Utils.Helpers exposing (..)
-import NarrativeEngine.Utils.RuleParser exposing (..)
 import Subway exposing (Station)
 
 
@@ -12,8 +12,12 @@ type alias DisplayComponent a =
     { a | name : String }
 
 
+type alias ExtraFields =
+    DisplayComponent {}
+
+
 type alias Entity =
-    NarrativeComponent (DisplayComponent {})
+    NarrativeComponent ExtraFields
 
 
 type alias WorldModel =
@@ -24,48 +28,30 @@ type alias ID =
     String
 
 
-{-| note that this is different than the one in Rules.Parser! This one is for an
-`Entity`, not a `NarrativeComponent {}`, and this one shows the original string in
-the error
--}
-type alias ParsedEntity =
-    Result ( String, String ) ( ID, Entity )
-
-
-initialWorldModel : ( WorldModel, List ( String, String ) )
+initialWorldModel : Result ParseErrors WorldModel
 initialWorldModel =
-    let
-        separateErrors parsedEntity acc =
-            case parsedEntity of
-                Ok ( id, components ) ->
-                    Tuple.mapFirst (Dict.insert id components) acc
-
-                Err err ->
-                    Tuple.mapSecond ((::) err) acc
-    in
-    entities
-        |> List.foldl separateErrors ( Dict.empty, [] )
+    parseMany addExtraFields entities
 
 
-entity : String -> String -> ParsedEntity
+{-| This is the `ExtendFn a` function for the parser to "merge in" the extra fields (name).
+-}
+addExtraFields : ExtraFields -> NarrativeComponent {} -> Entity
+addExtraFields { name } { tags, stats, links } =
+    { tags = tags
+    , stats = stats
+    , links = links
+    , name = name
+    }
+
+
+{-| A simple helper to easily define entities that builds the extra fiields record.
+-}
+entity : String -> String -> ( String, ExtraFields )
 entity entityString name =
-    parseEntity entityString
-        |> Result.map (addDisplayable name)
-        |> Result.mapError (\e -> ( "Entity def: " ++ entityString, e ))
+    ( entityString, { name = name } )
 
 
-addDisplayable : String -> ( ID, NarrativeComponent {} ) -> ( ID, Entity )
-addDisplayable name ( id, { tags, stats, links } ) =
-    ( id
-    , { tags = tags
-      , stats = stats
-      , links = links
-      , name = name
-      }
-    )
-
-
-entities : List ParsedEntity
+entities : List ( String, ExtraFields )
 entities =
     [ entity "PLAYER.chapter=0.day=1.location=WEST_MULBERRY.destination=BROADWAY_STREET"
         "Steve"
@@ -175,7 +161,7 @@ entities =
 -- lines and stations are easier to build from the data at the moment
 
 
-lines : List ParsedEntity
+lines : List ( String, ExtraFields )
 lines =
     Subway.fullMap
         |> List.map Tuple.first

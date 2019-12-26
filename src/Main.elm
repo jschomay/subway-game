@@ -40,62 +40,37 @@ type alias Flags =
     { debug : Bool }
 
 
-main : Program Flags (Result (List ( String, String )) Model) Msg
+main : Program Flags Model Msg
 main =
+    -- This does all parsing up front.  If there are errors, a different view is displayed.
     let
-        -- TODO pull this code out to encapsulate the types and view
-        -- TODO make these return a Result instead of this tuple
-        ( initialWorldModel, entityParseErrors ) =
-            Manifest.initialWorldModel
-
-        ruleParseErrors =
-            Rules.parseErrors
-
-        narrativeParseErrors =
-            NarrativeContent.parseErrors
-
         parsedData =
-            -- TODO use Result.map3 (or fold of something) instead of this
-            -- The question is if I want only the first parse error to render, or all errors
-            -- to render
-            case entityParseErrors ++ ruleParseErrors ++ narrativeParseErrors of
-                [] ->
-                    Ok initialWorldModel
-
-                errors ->
-                    Err errors
+            Result.map3 (\initialWorldModel narrative rules -> ( initialWorldModel, rules ))
+                Manifest.initialWorldModel
+                NarrativeContent.parseAll
+                Rules.rules
     in
     Browser.document
         { init =
-            \flags ->
-                case parsedData of
-                    Ok data ->
-                        init data flags |> Tuple.mapFirst Ok
-
-                    Err errors ->
-                        ( Err errors, Cmd.none )
+            parsedData
+                |> Result.map Tuple.first
+                |> Result.withDefault Dict.empty
+                |> init
         , view =
             \model ->
-                case model of
-                    Ok m ->
-                        { title = "Subway!", body = [ view m ] }
+                case parsedData of
+                    Ok _ ->
+                        { title = "Subway!", body = [ view model ] }
 
                     Err errors ->
-                        { title = "Errors found"
-                        , body = [ parseErrorsView errors ]
-                        }
+                        -- Just show the errors, model is ignored
+                        { title = "Errors found", body = [ parseErrorsView errors ] }
         , update =
-            \msg model ->
-                case model of
-                    Ok m ->
-                        update msg m |> Tuple.mapFirst Ok
-
-                    Err e ->
-                        ( Err e, Cmd.none )
-        , subscriptions =
-            \model ->
-                Result.map subscriptions model
-                    |> Result.withDefault Sub.none
+            parsedData
+                |> Result.map Tuple.second
+                |> Result.withDefault Dict.empty
+                |> update
+        , subscriptions = subscriptions
         }
 
 
@@ -148,9 +123,9 @@ arrivingDelay =
 {-| "Ticks" the narrative engine, and displays the story content. Also preps changes
 (to be applied when story has finished). Handles cases for a matched rule and no match.
 -}
-updateStory : String -> Model -> ( Model, Cmd Msg )
-updateStory trigger model =
-    case findMatchingRule trigger Rules.rules model.worldModel of
+updateStory : LocalTypes.Rules -> String -> Model -> ( Model, Cmd Msg )
+updateStory rules trigger model =
+    case findMatchingRule trigger rules model.worldModel of
         Nothing ->
             let
                 ( newStory, newMatchCounts ) =
@@ -233,6 +208,7 @@ parseNarrative model matchedRuleID trigger rawNarrative =
             , propKeywords = propKeywords
             , trigger = trigger
             , worldModel = model.worldModel
+            , randomIndex = 0
             }
 
         narrative =
@@ -345,8 +321,8 @@ updateAndThen f ( model, cmds ) =
     f model |> Tuple.mapSecond (\cmd -> Cmd.batch [ cmd, cmds ])
 
 
-update : Msg -> Model -> ( Model, Cmd Msg )
-update msg model =
+update : LocalTypes.Rules -> Msg -> Model -> ( Model, Cmd Msg )
+update rules msg model =
     if model.gameOver then
         -- no-op if story has ended
         noop model
@@ -372,7 +348,7 @@ update msg model =
                 List.foldl
                     (\id modelTuple ->
                         modelTuple
-                            |> updateAndThen (update <| Interact id)
+                            |> updateAndThen (update rules <| Interact id)
                             |> updateAndThen applyPendingChanges
                     )
                     ( model_, Cmd.none )
@@ -395,7 +371,7 @@ update msg model =
                 ( { model | history = model.history ++ [ interactableId ] |> Debug.log "history\n" }
                 , Cmd.none
                 )
-                    |> updateAndThen (updateStory interactableId)
+                    |> updateAndThen (updateStory rules interactableId)
                     |> updateAndThen
                         -- Need to continue automaticaly when riding on the train if
                         -- there is no story, otherwise the train never arrives

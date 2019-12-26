@@ -1,7 +1,8 @@
-module NarrativeContent exposing (parseErrors, t)
+module NarrativeContent exposing (parseAll, t)
 
 import Dict exposing (Dict)
-import NarrativeEngine.Utils.NarrativeParser exposing (..)
+import NarrativeEngine.Utils.Helpers exposing (ParseErrors)
+import NarrativeEngine.Utils.NarrativeParser as NarrativeParser
 
 
 {-| This is a little nicer than having to export every string.
@@ -13,29 +14,11 @@ t key =
         |> Maybe.withDefault ("ERROR: can't find content for key " ++ key)
 
 
-emptyConfig =
-    { cycleIndex = 0
-    , propKeywords = Dict.empty
-    , trigger = ""
-    , worldModel = Dict.empty
-    }
-
-
 {-| Pre-parses everything at run time to find errors to display.
 -}
-parseErrors : List ( String, String )
-parseErrors =
-    Dict.foldl
-        (\k v acc ->
-            case parsible emptyConfig v of
-                Err e ->
-                    ( "Narrative content: " ++ k ++ " " ++ v ++ " ", e ) :: acc
-
-                _ ->
-                    acc
-        )
-        []
-        all
+parseAll : Result ParseErrors ()
+parseAll =
+    NarrativeParser.parseMany all
 
 
 all : Dict String String

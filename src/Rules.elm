@@ -1,4 +1,4 @@
-module Rules exposing (parseErrors, rules, unsafeAssert, unsafeParseChanges, unsafeParseMatcher, unsafeQuery)
+module Rules exposing (rules, unsafeAssert, unsafeParseChanges, unsafeParseMatcher, unsafeQuery)
 
 import Dict exposing (Dict)
 import LocalTypes exposing (..)
@@ -11,54 +11,15 @@ import Rules.General
 import Rules.Intro
 
 
+rules : Result ParseErrors Rules
 rules =
-    Tuple.first rules_
-
-
-parseErrors =
-    Tuple.second rules_
-
-
-parseRule { trigger, conditions, changes } =
-    let
-        toRule trigger_ conditions_ changes_ =
-            { trigger = trigger_
-            , conditions = conditions_
-            , changes = changes_
-            }
-    in
-    Result.map3 toRule
-        (parseMatcher trigger)
-        (parseMultiple parseMatcher conditions)
-        (parseMultiple parseChanges changes)
-
-
-
--- TODO move this into ENE and change to a Result
-
-
-rules_ : ( Rules, List ( String, String ) )
-rules_ =
-    let
-        printRule { trigger, conditions, changes } =
-            trigger
-                ++ " | "
-                ++ String.join ", " conditions
-                ++ " | "
-                ++ String.join ", " changes
-
-        separateErrors ( id, rule_ ) acc =
-            case parseRule rule_ of
-                Ok parsedRule ->
-                    Tuple.mapFirst (Dict.insert id parsedRule) acc
-
-                Err err ->
-                    Tuple.mapSecond ((::) ( "Rule: " ++ id ++ " " ++ printRule rule_ ++ " ", err )) acc
-    in
-    Rules.Intro.rules
-        ++ Rules.General.rules
-        ++ Rules.Chapter1.rules
-        |> List.foldl separateErrors ( Dict.empty, [] )
+    -- The rules do not use custom fields, so the extender function is `always identity`
+    parseRules (always identity) <|
+        Dict.fromList <|
+            []
+                ++ Rules.Intro.rules
+                ++ Rules.General.rules
+                ++ Rules.Chapter1.rules
 
 
 {-| Parses an entity matcher. If there are errors, it will log to the console and default to an "empty" matcher.
