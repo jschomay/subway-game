@@ -14,6 +14,7 @@ import Markdown
 import NarrativeContent
 import NarrativeEngine.Core.Rules exposing (..)
 import NarrativeEngine.Core.WorldModel exposing (..)
+import NarrativeEngine.Debug as Debug
 import NarrativeEngine.Utils.Helpers exposing (parseErrorsView)
 import NarrativeEngine.Utils.NarrativeParser as NarrativeParser exposing (Narrative)
 import Process
@@ -77,13 +78,9 @@ main =
 init : Manifest.WorldModel -> Flags -> ( Model, Cmd Msg )
 init initialWorldModel flags =
     let
-        debug =
+        debugState =
             if flags.debug then
-                Just
-                    { debugSearchWorldModelText = ""
-                    , lastMatchedRule = "Game started"
-                    , lastInteraction = "begin game"
-                    }
+                Just Debug.init
 
             else
                 Nothing
@@ -96,7 +93,7 @@ init initialWorldModel flags =
       , showMap = False
       , showNotebook = False
       , gameOver = False
-      , debug = debug
+      , debugState = debugState
       , showSelectScene = flags.debug
       , history = []
       , pendingChanges = Nothing
@@ -137,15 +134,15 @@ updateStory rules trigger model =
                         NarrativeContent.t trigger
                             |> parseNarrative model trigger trigger
 
-                newDebug =
-                    Maybe.map (\debug -> { debug | lastMatchedRule = trigger, lastInteraction = trigger }) model.debug
+                newDebugState =
+                    Maybe.map (Debug.setLastMatchedRuleId trigger >> Debug.setLastInteractionId trigger) model.debugState
             in
             -- no need to apply special events or pending changes (no changes,
             -- and no rule id to match).
             ( { model
                 | story = newStory
                 , ruleMatchCounts = newMatchCounts
-                , debug = newDebug
+                , debugState = newDebugState
               }
             , Cmd.none
             )
@@ -153,8 +150,8 @@ updateStory rules trigger model =
 
         Just ( matchedRuleID, matchedRule ) ->
             let
-                newDebug =
-                    Maybe.map (\debug -> { debug | lastMatchedRule = matchedRuleID, lastInteraction = trigger }) model.debug
+                newDebugState =
+                    Maybe.map (Debug.setLastMatchedRuleId matchedRuleID >> Debug.setLastInteractionId trigger) model.debugState
 
                 ( newStory, newMatchCounts ) =
                     parseNarrative model matchedRuleID trigger (NarrativeContent.t matchedRuleID)
@@ -162,7 +159,7 @@ updateStory rules trigger model =
             ( { model
                 | pendingChanges = Just ( trigger, matchedRule.changes, matchedRuleID )
                 , story = newStory
-                , debug = newDebug
+                , debugState = newDebugState
                 , ruleMatchCounts = newMatchCounts
               }
             , Cmd.none
@@ -453,10 +450,10 @@ update rules msg model =
 
             DebugSeachWorldModel text ->
                 let
-                    newDebug =
-                        Maybe.map (\debug -> { debug | debugSearchWorldModelText = text }) model.debug
+                    newDebugState =
+                        Maybe.map (Debug.updateSearch text) model.debugState
                 in
-                ( { model | debug = newDebug }
+                ( { model | debugState = newDebugState }
                 , Cmd.none
                 )
 
@@ -551,80 +548,11 @@ view model =
         selectSceneView model
 
     else
-        div []
-            [ case model.debug of
-                Just debug ->
-                    debugView model.worldModel debug
-
-                Nothing ->
-                    text ""
+        div [ stopPropagationOn "keydown" <| Json.succeed ( NoOp, True ) ]
+            [ Maybe.map (Debug.debugBar DebugSeachWorldModel model.worldModel) model.debugState
+                |> Maybe.withDefault (text "")
             , mainView model
             ]
-
-
-debugView : Manifest.WorldModel -> Debug -> Html Msg
-debugView worldModel debug =
-    let
-        displayWorldModel =
-            worldModel
-                |> Dict.toList
-                |> List.map displayEntity
-
-        displayEntity ( id, { tags, stats, links } ) =
-            String.join "." <|
-                List.filter (not << String.isEmpty) <|
-                    List.map (String.join ".")
-                        [ [ id ]
-                        , Set.toList tags
-                        , Dict.toList stats |> List.map (\( key, value ) -> String.join "=" [ key, String.fromInt value ])
-                        , Dict.toList links |> List.map (\( key, value ) -> String.join "=" [ key, value ])
-                        ]
-
-        filteredDisplayWorldModel =
-            if String.isEmpty debug.debugSearchWorldModelText then
-                []
-
-            else
-                List.filter (fuzzyMatch debug.debugSearchWorldModelText) displayWorldModel
-                    |> List.sortBy
-                        (\text ->
-                            if String.startsWith (String.toLower debug.debugSearchWorldModelText) (String.toLower text) then
-                                -1
-
-                            else
-                                0
-                        )
-
-        fuzzyMatch search text =
-            String.contains (String.toLower search) (String.toLower text)
-
-        stopPropKeydowns tagger =
-            stopPropagationOn "keydown" <|
-                Json.map alwaysStop (Json.map tagger targetValue)
-
-        alwaysStop x =
-            ( x, True )
-    in
-    div
-        [ style "color" "yellow"
-        , style "background" "black"
-        , style "opacity" "0.9"
-        , style "lineHeight" "1.5em"
-        , style "zIndex" "99"
-        , style "position" "absolute"
-        ]
-        [ text "Debug mode"
-        , input
-            [ onInput DebugSeachWorldModel
-            , stopPropKeydowns (always NoOp)
-            , value debug.debugSearchWorldModelText
-            , placeholder "Search world model"
-            , style "margin" "0 10px"
-            ]
-            []
-        , span [] [ text <| "Last triggered rule: " ++ debug.lastInteraction ++ " - " ++ debug.lastMatchedRule ]
-        , ul [ style "borderTop" "1px solid #333" ] <| List.map (\e -> li [] [ text e ]) filteredDisplayWorldModel
-        ]
 
 
 mainView : Model -> Html Msg

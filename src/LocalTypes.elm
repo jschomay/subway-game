@@ -1,9 +1,10 @@
-module LocalTypes exposing (Debug, Model, Msg(..), Rule, Rules, Scene(..), TrainProps, TrainStatus(..))
+module LocalTypes exposing (Model, Msg(..), Rule, Rules, Scene(..), TrainProps, TrainStatus(..))
 
 import Dict exposing (Dict)
 import Manifest
 import NarrativeEngine.Core.Rules as Rules exposing (..)
 import NarrativeEngine.Core.WorldModel exposing (..)
+import NarrativeEngine.Debug as Debug
 import NarrativeEngine.Utils.NarrativeParser exposing (..)
 import Subway exposing (..)
 
@@ -17,17 +18,10 @@ type alias Model =
     , showMap : Bool
     , showNotebook : Bool
     , gameOver : Bool
-    , debug : Maybe Debug
+    , debugState : Maybe Debug.State
     , showSelectScene : Bool
     , history : List String
     , pendingChanges : Maybe ( ID, List ChangeWorld, RuleID )
-    }
-
-
-type alias Debug =
-    { debugSearchWorldModelText : String
-    , lastMatchedRule : String
-    , lastInteraction : String
     }
 
 
