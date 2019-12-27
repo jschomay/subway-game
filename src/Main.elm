@@ -208,7 +208,6 @@ parseNarrative model matchedRuleID trigger rawNarrative =
             , propKeywords = propKeywords
             , trigger = trigger
             , worldModel = model.worldModel
-            , randomIndex = 0
             }
 
         narrative =
