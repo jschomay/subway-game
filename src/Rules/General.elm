@@ -1,56 +1,51 @@
 module Rules.General exposing (rules)
 
-import LocalTypes
-import NarrativeEngine.Core.Rules exposing (..)
-import NarrativeEngine.Core.WorldModel exposing (..)
-import NarrativeEngine.Utils.NarrativeParser exposing (..)
+import Dict
 import Rules.Helpers exposing (..)
 
 
-rules : List ( String, StringRule )
+rules : RulesSpec
 rules =
-    []
-        ++ [ rule "ridingTheTrain"
-                { trigger = "*.station"
-                , conditions = []
-                , changes = [ "PLAYER.location=$" ]
-                }
-           , rule "outOfServiceStations"
-                { trigger = "*.station.out_of_service"
-                , conditions = []
-                , changes = []
-                }
-           , rule "goToLobby"
-                { trigger = "LOBBY"
-                , conditions = []
-                , changes = [ "PLAYER.-at_turnstile" ]
-                }
-           , rule "goToLineTurnstile"
-                { trigger = "*.line"
-                , conditions = [ "PLAYER.!at_turnstile" ]
-                , changes = [ "PLAYER.line=$", "PLAYER.at_turnstile" ]
-                }
-           , rule "goToLinePlatform"
-                { trigger = "*.line"
-                , conditions =
-                    [ "PLAYER.at_turnstile"
-                    , "*.valid_on=$.location=PLAYER"
-                    ]
-                , changes = [ "PLAYER.-at_turnstile" ]
-                }
-           , rule "jumpTurnstileFail"
-                { trigger = "*.line"
-                , conditions = []
-                , changes = [ "PLAYER.-at_turnstile" ]
-                }
-           , rule "checkMap"
-                { trigger = "*.map"
-                , conditions = []
-                , changes = []
-                }
-           , rule "notebookInstructions"
-                { trigger = "NOTEBOOK.new"
-                , conditions = []
-                , changes = [ "NOTEBOOK.-new.silent" ]
-                }
-           ]
+    Dict.empty
+        |> rule_______________________ "ridingTheTrain"
+            """
+            ON: *.station
+            DO: PLAYER.location=$
+            """
+        |> rule_______________________ "outOfServiceStations"
+            """
+            ON: *.station.out_of_service
+            """
+        |> rule_______________________ "goToLobby"
+            """
+            ON: LOBBY
+            DO: PLAYER.-at_turnstile
+            """
+        |> rule_______________________ "goToLineTurnstile"
+            """
+            ON: *.line
+            IF: PLAYER.!at_turnstile
+            DO: PLAYER.line=$
+                PLAYER.at_turnstile
+            """
+        |> rule_______________________ "goToLinePlatform"
+            """
+            ON: *.line
+            IF: PLAYER.at_turnstile
+                *.valid_on=$.location=PLAYER
+            DO: PLAYER.-at_turnstile
+            """
+        |> rule_______________________ "jumpTurnstileFail"
+            """
+            ON: *.line
+            DO: PLAYER.-at_turnstile
+            """
+        |> rule_______________________ "checkMap"
+            """
+            ON: *.map
+            """
+        |> rule_______________________ "notebookInstructions"
+            """
+            ON: NOTEBOOK.new
+            DO: NOTEBOOK.-new.silent
+            """

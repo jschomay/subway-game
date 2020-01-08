@@ -1,20 +1,12 @@
-module Rules.Helpers exposing (StringRule, rule)
+module Rules.Helpers exposing (RulesSpec, rule_______________________)
 
 import Dict exposing (Dict)
-import LocalTypes exposing (..)
-import NarrativeEngine.Core.Rules exposing (..)
-import NarrativeEngine.Core.WorldModel exposing (..)
-import NarrativeEngine.Utils.NarrativeParser exposing (..)
-import Subway exposing (Station)
 
 
-type alias StringRule =
-    { trigger : String
-    , conditions : List String
-    , changes : List String
-    }
+type alias RulesSpec =
+    Dict String ( String, {} )
 
 
-rule : RuleID -> StringRule -> ( RuleID, StringRule )
-rule =
-    Tuple.pair
+rule_______________________ : String -> String -> RulesSpec -> RulesSpec
+rule_______________________ k v dict =
+    Dict.insert k ( v, {} ) dict

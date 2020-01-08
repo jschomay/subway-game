@@ -8,18 +8,23 @@ import NarrativeEngine.Utils.Helpers exposing (..)
 import NarrativeEngine.Utils.RuleParser exposing (..)
 import Rules.Chapter1
 import Rules.General
+import Rules.Helpers exposing (RulesSpec)
 import Rules.Intro
 
 
 rules : Result ParseErrors Rules
 rules =
     -- The rules do not use custom fields, so the extender function is `always identity`
-    parseRules (always identity) <|
-        Dict.fromList <|
-            []
-                ++ Rules.Intro.rules
-                ++ Rules.General.rules
-                ++ Rules.Chapter1.rules
+    parseRules (always identity) allRuleSpecs
+
+
+allRuleSpecs : RulesSpec
+allRuleSpecs =
+    List.foldl Dict.union
+        Rules.General.rules
+        [ Rules.Intro.rules
+        , Rules.Chapter1.rules
+        ]
 
 
 {-| Parses an entity matcher. If there are errors, it will log to the console and default to an "empty" matcher.
