@@ -17,10 +17,12 @@ type alias Model =
     , ruleMatchCounts : Dict RuleID Int
     , showMap : Bool
     , showNotebook : Bool
+    , showTranscript : Bool
     , gameOver : Bool
     , debugState : Maybe Debug.State
     , showSelectScene : Bool
     , history : List String
+    , transcript : List String
     , pendingChanges : Maybe ( ID, List ChangeWorld, RuleID )
     }
 
@@ -38,6 +40,7 @@ type Msg
     | Disembark
     | Continue
     | Achievement String
+    | ToggleTranscript
     | DebugSeachWorldModel String
 
 

@@ -92,10 +92,12 @@ init initialWorldModel flags =
       , scene = Title (dayText initialWorldModel)
       , showMap = False
       , showNotebook = False
+      , showTranscript = False
       , gameOver = False
       , debugState = debugState
       , showSelectScene = flags.debug
       , history = []
+      , transcript = []
       , pendingChanges = Nothing
       }
     , Cmd.none
@@ -346,6 +348,14 @@ update rules msg model =
                         modelTuple
                             |> updateAndThen (update rules <| Interact id)
                             |> updateAndThen applyPendingChanges
+                            |> updateAndThen
+                                (\m ->
+                                    if m.debugState == Nothing then
+                                        ( m, Cmd.none )
+
+                                    else
+                                        ( { m | transcript = m.transcript ++ (id :: m.story) }, Cmd.none )
+                                )
                     )
                     ( model_, Cmd.none )
                     history
@@ -368,6 +378,14 @@ update rules msg model =
                 , Cmd.none
                 )
                     |> updateAndThen (updateStory rules interactableId)
+                    |> updateAndThen
+                        (\m ->
+                            if m.debugState == Nothing then
+                                ( m, Cmd.none )
+
+                            else
+                                ( { m | transcript = m.transcript ++ (interactableId :: m.story) }, Cmd.none )
+                        )
                     |> updateAndThen
                         -- Need to continue automaticaly when riding on the train if
                         -- there is no story, otherwise the train never arrives
@@ -404,6 +422,11 @@ update rules msg model =
 
                 else
                     ( model, Cmd.none )
+
+            ToggleTranscript ->
+                ( { model | showTranscript = not model.showTranscript }
+                , Cmd.none
+                )
 
             Go area ->
                 -- TODO would be best to move all of `model.scene` into the world model, but for now, just duplicate the line color there
@@ -552,7 +575,45 @@ view model =
             [ Maybe.map (Debug.debugBar DebugSeachWorldModel model.worldModel) model.debugState
                 |> Maybe.withDefault (text "")
             , mainView model
+            , if model.debugState == Nothing then
+                text ""
+
+              else
+                transcriptView model
             ]
+
+
+transcriptView : Model -> Html Msg
+transcriptView model =
+    div []
+        [ div
+            [ style "color" "green"
+            , style "display" "block"
+            , style "position" "absolute"
+            , style "z-index" "99"
+            , style "padding" "2px"
+            , style "bottom" "0"
+            , style "left" "1em"
+            , style "cursor" "pointer"
+            , onClick ToggleTranscript
+            ]
+            [ text "transcript" ]
+        , if model.showTranscript then
+            textarea
+                [ style "color" "green"
+                , style "position" "absolute"
+                , style "z-index" "99"
+                , style "width" "50%"
+                , style "height" "70%"
+                , style "top" "3em"
+                , style "left" "1em"
+                , readonly True
+                ]
+                [ text (model.transcript |> String.join "\n") ]
+
+          else
+            text ""
+        ]
 
 
 mainView : Model -> Html Msg
