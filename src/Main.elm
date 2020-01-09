@@ -15,8 +15,8 @@ import NarrativeContent
 import NarrativeEngine.Core.Rules exposing (..)
 import NarrativeEngine.Core.WorldModel exposing (..)
 import NarrativeEngine.Debug as Debug
-import NarrativeEngine.Utils.Helpers exposing (parseErrorsView)
-import NarrativeEngine.Utils.NarrativeParser as NarrativeParser exposing (Narrative)
+import NarrativeEngine.Syntax.Helpers exposing (parseErrorsView)
+import NarrativeEngine.Syntax.NarrativeParser as NarrativeParser exposing (Narrative)
 import Process
 import Rules
 import Set

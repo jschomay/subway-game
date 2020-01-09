@@ -1,8 +1,8 @@
 module NarrativeContent exposing (parseAll, t)
 
 import Dict exposing (Dict)
-import NarrativeEngine.Utils.Helpers exposing (ParseErrors)
-import NarrativeEngine.Utils.NarrativeParser as NarrativeParser
+import NarrativeEngine.Syntax.Helpers exposing (ParseErrors)
+import NarrativeEngine.Syntax.NarrativeParser as NarrativeParser
 
 
 {-| This is a little nicer than having to export every string.

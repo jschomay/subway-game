@@ -5,7 +5,7 @@ import Manifest
 import NarrativeEngine.Core.Rules as Rules exposing (..)
 import NarrativeEngine.Core.WorldModel exposing (..)
 import NarrativeEngine.Debug as Debug
-import NarrativeEngine.Utils.NarrativeParser exposing (..)
+import NarrativeEngine.Syntax.NarrativeParser exposing (..)
 import Subway exposing (..)
 
 

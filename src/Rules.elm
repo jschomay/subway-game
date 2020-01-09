@@ -4,8 +4,8 @@ import Dict exposing (Dict)
 import LocalTypes exposing (..)
 import Manifest exposing (Entity, ID, WorldModel)
 import NarrativeEngine.Core.WorldModel exposing (ChangeWorld(..), EntityMatcher(..), query)
-import NarrativeEngine.Utils.Helpers exposing (..)
-import NarrativeEngine.Utils.RuleParser exposing (..)
+import NarrativeEngine.Syntax.Helpers exposing (..)
+import NarrativeEngine.Syntax.RuleParser exposing (..)
 import Rules.Chapter1
 import Rules.General
 import Rules.Helpers exposing (RulesSpec)

@@ -3,8 +3,8 @@ module Manifest exposing (DisplayComponent, Entity, ID, WorldModel, initialWorld
 import Dict exposing (Dict)
 import NarrativeContent exposing (t)
 import NarrativeEngine.Core.WorldModel exposing (..)
-import NarrativeEngine.Utils.EntityParser exposing (..)
-import NarrativeEngine.Utils.Helpers exposing (..)
+import NarrativeEngine.Syntax.EntityParser exposing (..)
+import NarrativeEngine.Syntax.Helpers exposing (..)
 import Subway exposing (Station)
 
 
