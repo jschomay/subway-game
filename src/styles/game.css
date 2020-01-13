@@ -4,7 +4,8 @@
   padding: 0;
 }
 
-ul, li {
+ul,
+li {
   list-style: none;
 }
 
@@ -33,7 +34,10 @@ h3 {
   padding: 3px;
 }
 
-html, body { height: 100%; }
+html,
+body {
+  height: 100%;
+}
 
 body {
   margin: 0px;
@@ -65,7 +69,7 @@ body {
 .Scene.TitleScene {
   color: white;
   font-size: 1.8em;
-  animation: fadeIn 2.0s ease-out forwards;
+  animation: fadeIn 2s ease-out forwards;
 }
 
 .TitleContent {
@@ -149,4 +153,10 @@ body {
 .Errors code {
   font-size: 1em;
   font-family: monospace, monospace;
+}
+
+.Debug {
+  position: absolute;
+  top: 0;
+  opacity: 0.8;
 }

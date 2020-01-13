@@ -571,10 +571,15 @@ view model =
         selectSceneView model
 
     else
-        div [ stopPropagationOn "keydown" <| Json.succeed ( NoOp, True ) ]
-            [ Maybe.map (Debug.debugBar DebugSeachWorldModel model.worldModel) model.debugState
-                |> Maybe.withDefault (text "")
-            , mainView model
+        div []
+            [ mainView model
+            , div
+                [ class "Debug"
+                , stopPropagationOn "keydown" <| Json.succeed ( NoOp, True )
+                ]
+                [ Maybe.map (Debug.debugBar DebugSeachWorldModel model.worldModel) model.debugState
+                    |> Maybe.withDefault (text "")
+                ]
             , if model.debugState == Nothing then
                 text ""
 
