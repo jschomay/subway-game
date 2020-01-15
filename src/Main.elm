@@ -348,14 +348,6 @@ update rules msg model =
                         modelTuple
                             |> updateAndThen (update rules <| Interact id)
                             |> updateAndThen applyPendingChanges
-                            |> updateAndThen
-                                (\m ->
-                                    if m.debugState == Nothing then
-                                        ( m, Cmd.none )
-
-                                    else
-                                        ( { m | transcript = m.transcript ++ (id :: m.story) }, Cmd.none )
-                                )
                     )
                     ( model_, Cmd.none )
                     history
