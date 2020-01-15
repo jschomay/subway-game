@@ -98,39 +98,39 @@ rules =
             """
             ON: BROADWAY_STREET
             IF: PLAYER.day=1
-            DO: PLAYER.location=WEST_MULBERRY.day+1
+            DO: PLAYER.location=EAST_MULBERRY.day+1
                 CELL_PHONE.unread
                 COFFEE.location=offscreen
                 COMMUTER_1.location=offscreen
                 LOUD_PAYPHONE_LADY.location=offscreen
-                TRASH_DIGGER.location=WEST_MULBERRY
+                TRASH_DIGGER.location=EAST_MULBERRY
             """
         |> rule_______________________ "endTuesday"
             """
             ON: BROADWAY_STREET
             IF: PLAYER.day=2
-            DO: PLAYER.location=WEST_MULBERRY.day+1
+            DO: PLAYER.location=EAST_MULBERRY.day+1
                 CELL_PHONE.unread
                 COFFEE.location=offscreen
                 TRASH_DIGGER.location=offscreen
-                SKATER_DUDE.location=WEST_MULBERRY
+                SKATER_DUDE.location=EAST_MULBERRY
             """
         |> rule_______________________ "endWednesday"
             """
             ON: BROADWAY_STREET
             IF: PLAYER.day=3
-            DO: PLAYER.location=WEST_MULBERRY.day+1
+            DO: PLAYER.location=EAST_MULBERRY.day+1
                 CELL_PHONE.unread
                 COFFEE.location=offscreen
                 SKATER_DUDE.location=offscreen
-                TRASH_DIGGER.location=WEST_MULBERRY
-                BENCH_BUM.location=WEST_MULBERRY
+                TRASH_DIGGER.location=EAST_MULBERRY
+                BENCH_BUM.location=EAST_MULBERRY
             """
         |> rule_______________________ "endThursday"
             """
             ON: BROADWAY_STREET
             IF: PLAYER.day=4
-            DO: PLAYER.location=WEST_MULBERRY.day+1.present_proposal=1
+            DO: PLAYER.location=EAST_MULBERRY.day+1.present_proposal=1
                 CELL_PHONE.unread
                 COFFEE.location=offscreen
                 TRASH_DIGGER.location=offscreen

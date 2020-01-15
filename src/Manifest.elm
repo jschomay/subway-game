@@ -53,7 +53,7 @@ entity entityString name =
 
 entities : List ( String, ExtraFields )
 entities =
-    [ entity "PLAYER.chapter=0.day=1.location=WEST_MULBERRY.destination=BROADWAY_STREET"
+    [ entity "PLAYER.chapter=0.day=1.location=EAST_MULBERRY.destination=BROADWAY_STREET"
         "Steve"
 
     -- inventory
@@ -74,24 +74,24 @@ entities =
     , entity "LOBBY.location"
         "Station Lobby"
 
-    -- WEST_MULBERRY
-    , entity "COFFEE_CART.character.location=WEST_MULBERRY"
+    -- EAST_MULBERRY
+    , entity "COFFEE_CART.character.location=EAST_MULBERRY"
         "Coffee cart"
     , entity "COFFEE.item.location=offscreen"
         "Coffee"
-    , entity "COMMUTER_1.character.location=WEST_MULBERRY"
+    , entity "COMMUTER_1.character.location=EAST_MULBERRY"
         "Woman in a maroon jacket"
-    , entity "LOUD_PAYPHONE_LADY.character.location=WEST_MULBERRY"
+    , entity "LOUD_PAYPHONE_LADY.character.location=EAST_MULBERRY"
         "Loud woman on pay phone"
     , entity "TRASH_DIGGER.character.location=offscreen"
         "Man digging in the trash"
     , entity "SKATER_DUDE.character.location=offscreen"
         "Skater dude"
-    , entity "GRAFFITI.item.location=WEST_MULBERRY"
+    , entity "GRAFFITI.item.location=EAST_MULBERRY"
         "Graffiti on the wall"
     , entity "BENCH_BUM.character.location=offscreen"
         "Guy sleeping on a bench"
-    , entity "SODA_MACHINE.item.broken.location=WEST_MULBERRY"
+    , entity "SODA_MACHINE.item.broken.location=EAST_MULBERRY"
         "Soda vending machine"
 
     --  TWIN_BROOKS
