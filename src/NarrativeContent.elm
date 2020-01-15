@@ -84,6 +84,86 @@ PLEASE NOTICE: Normal service disruption is in effect.
 
 Thank you and we apologize for the inconvenience.
 """
+        |> content__________________________________ "SOGGY_JACKET" """
+{I don't really have time to look at every piece of discarded junk in the subway. My proposal is gone, my life is falling apart.  Maybe I should focus on that.|Gross.}
+"""
+        |> content__________________________________ "BULLETIN_BOARD" """
+{Maybe somebody has posted about my missing briefcase.
+---
+Nope, nothing.  Darn.|
+Still nothing about my briefcase, but if I'm ever in need of a house cleaner or want to join a lame garage band, I know where to look.}
+"""
+        |> content__________________________________ "TRASH_CAN" """
+{?I'm not about to rummage through the trash.
+|
+I've got a weird feeling about this can. Maybe it wouldn't hurt to take a quick look.
+---
+...
+---
+Nothing but trash.
+|
+Waste of time.
+|
+Wonder who takes out the garbage down here.
+|
+Just garbage.
+}
+"""
+        |> content__________________________________ "MISSIONARIES" """
+{
+One of them tries to get my attention.
+
+"You look like you've lost something important."
+---
+"Uh... yeah. How did you guess?"
+---
+"You look like all the others, so many people wandering around in this world, looking for themselves.  Well I can help you, I've got this wonderful pamphlet that I'd like to share with you..."
+---
+"Oh, sorry. I've got to run. My, uh, my train is about to leave."
+---
+"Just take a pamphlet with you!"
+|
+I should have known. I fell right into that.
+}
+"""
+        |> content__________________________________ "DRINKING_FOUNTAIN" """
+{?
+No.
+|
+Not in a million years.
+|
+I'll never be thirsty enough to risk drinking from that.
+|
+I can see a piece of chewed bubble gum stuck to the spout.
+}
+"""
+        |> content__________________________________ "WOMAN_IN_ODD_HAT" """
+{She's dressed very finely and has an air about her that seems to scream "High class." Her hat resembles some kind of bird or a very angry fern.
+---
+"Pardon me, Ma'am. I--"
+
+"I haven't got any change."
+
+"No, I was actually--"
+
+"I haven't a clue of the time either. Please leave me alone."
+---
+"I just--"
+
+"Leave me be" she snorts as she turns her back to me.
+
+I guess that's that.
+|
+I'm not going to try to talk to her again.
+}
+"""
+        |> content__________________________________ "SCHOOL_CHILDREN" """
+{A few children play some kind of game on one of the benches. One kid stands tall on the bench laughing and jeering while the other children scamper around below, clawing and grabbing at him.
+---
+An unspoken rule seems to keep them from just climbing on the bench and pushing him off. But after a few attempts, one of the kids manages to grab his arm and tugs hard, bringing the standing boy down on top of him. A scream, a crash, then laughter and the kids are picking themselves up and scurrying towards the bench again, fighting to see who gets to stand on the bench next.
+---|}
+Children aren't supposed to be down here unsupervised. And that game looks dangerous. Where are their parents?
+"""
 
 
 intro : Dict String String

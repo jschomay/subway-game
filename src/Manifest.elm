@@ -74,25 +74,45 @@ entities =
     , entity "LOBBY.location"
         "Station Lobby"
 
-    -- EAST_MULBERRY
-    , entity "COFFEE_CART.character.location=EAST_MULBERRY"
-        "Coffee cart"
+    -- offscreen
     , entity "COFFEE.item.location=offscreen"
         "Coffee"
-    , entity "COMMUTER_1.character.location=EAST_MULBERRY"
-        "Woman in a maroon jacket"
-    , entity "LOUD_PAYPHONE_LADY.character.location=EAST_MULBERRY"
-        "Loud woman on pay phone"
     , entity "TRASH_DIGGER.character.location=offscreen"
         "Man digging in the trash"
     , entity "SKATER_DUDE.character.location=offscreen"
         "Skater dude"
-    , entity "GRAFFITI.item.location=EAST_MULBERRY"
-        "Graffiti on the wall"
     , entity "BENCH_BUM.character.location=offscreen"
         "Guy sleeping on a bench"
+
+    -- EAST_MULBERRY
+    , entity "COFFEE_CART.character.location=EAST_MULBERRY"
+        "Coffee cart"
+    , entity "COMMUTER_1.character.location=EAST_MULBERRY"
+        "Woman in a maroon jacket"
+    , entity "LOUD_PAYPHONE_LADY.character.location=EAST_MULBERRY"
+        "Loud woman on pay phone"
+    , entity "GRAFFITI.item.location=EAST_MULBERRY"
+        "Graffiti on the wall"
     , entity "SODA_MACHINE.item.broken.location=EAST_MULBERRY"
         "Soda vending machine"
+
+    -- WEST_MULBERRY
+    , entity "SOGGY_JACKET.item.location=WEST_MULBERRY"
+        "Soggy looking jacket"
+    , entity "BULLETIN_BOARD.item.location=WEST_MULBERRY"
+        "Bulletin board"
+    , entity "TRASH_CAN.item.location=WEST_MULBERRY"
+        "Trash can"
+    , entity "MISSIONARIES.character.location=WEST_MULBERRY"
+        "Missionaries"
+    , entity "DRINKING_FOUNTAIN.item.location=WEST_MULBERRY"
+        "Rusty drinking fountain"
+
+    -- CHURCH_STREET
+    , entity "WOMAN_IN_ODD_HAT.character.location=CHURCH_STREET"
+        "A woman with an odd hat"
+    , entity "SCHOOL_CHILDREN.character.location=CHURCH_STREET"
+        "A group of school children"
 
     --  TWIN_BROOKS
     , entity "SAFETY_WARNING_POSTER.item.location=TWIN_BROOKS"
