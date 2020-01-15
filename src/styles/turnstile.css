@@ -1,16 +1,18 @@
-.Turnstile { }
+.Turnstile {
+}
 
 .Scene.Turnstile:before {
-  background: url(../img/subway-turnstile.jpg);
-  background-position: center 60%;
+  background-image: url(../img/subway-turnstile.jpg);
+  background-position: center 72%;
   opacity: 0.8;
-  animation: flicker 0.3s cubic-bezier(0.840, 0.170, 0.540, 1.350) alternate infinite 0s;
+  animation: flicker 0.3s cubic-bezier(0.84, 0.17, 0.54, 1.35) alternate
+    infinite 0s;
 }
 
 .Turnstile__dialog {
   user-select: none;
   padding: 2em 3em;
-  background: #1a1a1a;;
+  background: #1a1a1a;
   position: relative;
   color: white;
   font-size: 1.5em;
@@ -26,8 +28,8 @@
 }
 
 .Turnstile__icon {
-  width: 4em;
-  height: 4em;
+  width: 2.7em;
+  height: 2.7em;
   background-size: contain;
   background-repeat: no-repeat;
   background-position: center center;
@@ -36,10 +38,15 @@
 }
 
 .Turnstile__status_text {
-  font-size: 2em;
+  font-size: 1.5em;
   font-family: "arial";
   text-transform: uppercase;
-  line-height: 1em;
+}
+
+.Turnstile__status_sub_text {
+  font-size: 0.8em;
+  text-transform: uppercase;
+  font-family: "arial";
 }
 
 .Turnstile__buttons {

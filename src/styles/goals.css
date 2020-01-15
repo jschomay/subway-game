@@ -1,8 +1,16 @@
+.Notebook__scrim {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  left: 0;
+}
+
 .Notebook {
   display: flex;
   justify-content: space-around;
   color: black;
-  font-family: 'Nanum Pen Script', cursive;
+  font-family: "Nanum Pen Script", cursive;
   background: center no-repeat url("../img/notebook.jpg");
   background-size: contain;
   box-shadow: 0 0 100px 0px black;

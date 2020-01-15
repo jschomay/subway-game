@@ -53,7 +53,7 @@ general =
         |> content__________________________________ "BRIEFCASE"
             "My portable office, all my work is in it."
         |> content__________________________________ "notebookInstructions" """
-{I have my notebook with me to day to keep track of everything.
+{I have my notebook with me today to keep track of everything.
 
 (Click the notebook icon or press 'n' to toggle the notebook from now on)
 |}
@@ -378,12 +378,14 @@ intro =
 """
         |> content__________________________________ "coffeeCartMonday" """
 {Carl runs the little coffee stand at my local station.  The coffee is decent, and it's nice to see his smiling face each morning.
-
+---
 "Morning, Carl! Can I just get the usual?"
 
 "Sure thing, Steve. That'll be a buck twenty five."
 
 "Here you go, Carl, exact change. Thanks. Have a good one."
+
+(Coffee added to your inventory)
 |"See you tomorrow."|"See you tomorrow."|"Don't miss your train."}
 """
         |> content__________________________________ "coffeeCartTuesday" """
@@ -495,7 +497,7 @@ He's still at it.  Wonder what he thinks he'll find.
 }
 """
         |> content__________________________________ "BENCH_BUM" """
-{Some college kid is sprawled out across the whole bench. I wished he'd move. I'd like to just sit down.
+{Some college kid is sprawled out across the whole bench. I wish he'd move. I'd like to just sit down.
 ---
 "Hi there. Could you sit up please? I'd like to sit while I wait for my train."
 ---

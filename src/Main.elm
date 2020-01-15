@@ -792,4 +792,4 @@ mapView =
 
 notebookView : Manifest.WorldModel -> Html Msg
 notebookView worldModel =
-    div [ onClick ToggleNotebook ] [ Goals.view worldModel ]
+    div [ class "Notebook__scrim", onClick ToggleNotebook ] [ Goals.view worldModel ]

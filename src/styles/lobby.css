@@ -1,8 +1,8 @@
 .Lobby {
 }
 
-.Lobby:before {
-  background: url(../img/subway-lobby.jpg);
+.Scene.Lobby:before {
+  background-image: url(../img/subway-lobby.jpg);
   opacity: 0.8;
   animation: flicker 0.3s cubic-bezier(0.84, 0.17, 0.54, 1.35) alternate
     infinite 0s;
@@ -156,34 +156,32 @@
 /* Line colors */
 
 .RED_LINE {
-  background: #FD0000;
+  background: #fd0000;
 }
 .YELLOW_LINE {
-  background: #FFD107;
+  background: #ffd107;
 }
 .GREEN_LINE {
-  background: #08A84E;
+  background: #08a84e;
 }
 .ORANGE_LINE {
-  background: #FE8200;
+  background: #fe8200;
 }
 .BLUE_LINE {
-  background: #0487F6;
+  background: #0487f6;
 }
 .DARK_BLUE_LINE {
-  background: #4352A2;
+  background: #4352a2;
 }
 .PURPLE_LINE {
-  background: #9547AA;
+  background: #9547aa;
 }
 .BROWN_LINE {
-  background: #9E4F2F;
+  background: #9e4f2f;
 }
 .GRAY_LINE {
-  background: #A5A5A5;
+  background: #a5a5a5;
 }
-
-
 
 .Inventory {
   display: flex;

@@ -2,14 +2,15 @@
 }
 
 .Platform:before {
-  background: url(../img/train.jpg);
+  background-image: url(../img/train.jpg);
   opacity: 0.8;
-  animation: flicker 0.3s cubic-bezier(0.840, 0.170, 0.540, 1.350) alternate infinite 0s;
+  animation: flicker 0.3s cubic-bezier(0.84, 0.17, 0.54, 1.35) alternate
+    infinite 0s;
 }
 
 .Exit {
   user-select: none;
-  background: #1a1a1a;;
+  background: #1a1a1a;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
@@ -34,7 +35,6 @@
   height: 1px;
   background: white;
 }
-
 
 .Exit__text {
   margin-left: 0.5em;
@@ -99,7 +99,6 @@
   bottom: 22px;
   border-radius: 20px;
 }
-
 
 /* Stop */
 

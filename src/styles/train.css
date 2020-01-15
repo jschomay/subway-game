@@ -7,11 +7,12 @@
 
 .Scene.train {
   justify-content: flex-start;
-  animation: bump 0.6s cubic-bezier(0.840, 0.170, 0.540, 1.350) alternate infinite 0s;
+  animation: bump 0.6s cubic-bezier(0.84, 0.17, 0.54, 1.35) alternate infinite
+    0s;
 }
 
 .Scene.train:before {
-  background: url(../img/riding-train.jpg);
+  background-image: url(../img/riding-train.jpg);
   background-position: 50% 40%;
   opacity: 0.6;
   animation: flash 0.9s ease-in-out alternate infinite 0s;
@@ -71,7 +72,7 @@
   color: #ffc000;
   text-transform: uppercase;
   font-family: subway;
-  padding: 1.0em;
+  padding: 1em;
   text-align: center;
   position: relative;
   top: -0.5em;

@@ -31,7 +31,10 @@ view worldModel line =
             if canEnter then
                 [ div [ class "Turnstile__status" ]
                     [ img [ class "Turnstile__icon", src "img/icons/enter.svg" ] []
-                    , div [ class "Turnstile__status_text" ] [ text "Please proceed" ]
+                    , div []
+                        [ div [ class "Turnstile__status_text" ] [ text "Ticket valid" ]
+                        , div [ class "Turnstile__status_sub_text" ] [ text "Please proceed" ]
+                        ]
                     ]
                 , div [ class "Turnstile__buttons" ]
                     [ div
@@ -45,7 +48,10 @@ view worldModel line =
             else
                 [ div [ class "Turnstile__status" ]
                     [ img [ class "Turnstile__icon", src "img/icons/no_entry.svg" ] []
-                    , div [ class "Turnstile__status_text" ] [ text "Invalid ticket" ]
+                    , div []
+                        [ div [ class "Turnstile__status_text" ] [ text "Invalid ticket" ]
+                        , div [ class "Turnstile__status_sub_text" ] [ text "Do not enter" ]
+                        ]
                     ]
                 , div [ class "Turnstile__buttons" ]
                     [ div

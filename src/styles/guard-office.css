@@ -3,12 +3,12 @@
 }
 
 .Scene.CentralGuardOffice:before {
-  background: url(../img/gurad-office.jpg);
+  background-image: url(../img/gurad-office.jpg);
   background-position: 50% 40%;
   opacity: 0.6;
-  animation: flicker 0.3s cubic-bezier(0.840, 0.170, 0.540, 1.350) alternate infinite 0s;
+  animation: flicker 0.3s cubic-bezier(0.84, 0.17, 0.54, 1.35) alternate
+    infinite 0s;
 }
-
 
 .CentralGuardOffice--top {
   display: inline-block;
@@ -24,9 +24,9 @@
 
 .CentralGuardOffice--content {
   color: white;
-  font-family: 'Quicksand', sans-serif;
+  font-family: "Quicksand", sans-serif;
   font-size: 1.2em;
-  color: #ccc;;
+  color: #ccc;
   padding: 5em;
   background: black;
   margin-top: 3em;
