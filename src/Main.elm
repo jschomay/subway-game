@@ -276,8 +276,8 @@ specialEvents ruleId model =
             ( { model | scene = Lobby }, Cmd.none )
 
         -- achievements
-        "get_caffeinated_plot_2" ->
-            ( model, Process.sleep 300 |> Task.perform (\_ -> Achievement "get_caffeinated_plot_achievement") )
+        "get_caffeinated_quest_2" ->
+            ( model, Process.sleep 300 |> Task.perform (\_ -> Achievement "get_caffeinated_quest_achievement") )
 
         other ->
             if List.member other [ "goToLinePlatform" ] then

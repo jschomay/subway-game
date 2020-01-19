@@ -52,8 +52,8 @@ rules =
             """
             ON: COFFEE_CART
             IF: PLAYER.day=5.chapter=0
-                SODA_MACHINE.get_caffeinated_plot<1
-            DO: SODA_MACHINE.get_caffeinated_plot=1
+                SODA_MACHINE.get_caffeinated_quest<1
+            DO: SODA_MACHINE.get_caffeinated_quest=1
             """
         |> rule_______________________ "sodaMachineBroken"
             """
@@ -64,22 +64,22 @@ rules =
             ON: SODA_MACHINE.!broken
             IF: PLAYER.chapter=0
             """
-        |> rule_______________________ "get_caffeinated_plot_1"
+        |> rule_______________________ "get_caffeinated_quest_1"
             """
-            ON: SODA_MACHINE.!broken.get_caffeinated_plot=1
+            ON: SODA_MACHINE.!broken.get_caffeinated_quest=1
             IF: PLAYER.chapter=0
-            DO: $.get_caffeinated_plot+1
+            DO: $.get_caffeinated_quest+1
             """
-        |> rule_______________________ "get_caffeinated_plot_2"
+        |> rule_______________________ "get_caffeinated_quest_2"
             """
-            ON: SODA_MACHINE.!broken.get_caffeinated_plot=2
+            ON: SODA_MACHINE.!broken.get_caffeinated_quest=2
             IF: PLAYER.chapter=0
-            DO: $.get_caffeinated_plot+1
+            DO: $.get_caffeinated_quest+1
                 PLAYER.persistent+1
             """
-        |> rule_______________________ "get_caffeinated_plot_3"
+        |> rule_______________________ "get_caffeinated_quest_3"
             """
-            ON: SODA_MACHINE.!broken.get_caffeinated_plot=3
+            ON: SODA_MACHINE.!broken.get_caffeinated_quest=3
             IF: PLAYER.chapter=0
             """
         |> rule_______________________ "firstMeetSkaterDude"

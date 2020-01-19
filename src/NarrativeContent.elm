@@ -457,7 +457,7 @@ It's out of order.
         |> content__________________________________ "sodaMachineFixed" """
 Wow, the "Out of Order" sign is gone. Did they actually fix it?
 """
-        |> content__________________________________ "get_caffeinated_plot_1" """
+        |> content__________________________________ "get_caffeinated_quest_1" """
 {The "Out of Order" sign is gone. Maybe it will work?
 
 Since I can't get my coffee, I might as well get my caffeine fix from somewhere.
@@ -467,7 +467,7 @@ Great, the button doesn't work and it's not giving my change back. Damn.
 The "Out of Order" sign might be gone, but I know better.
 }
 """
-        |> content__________________________________ "get_caffeinated_plot_2" """
+        |> content__________________________________ "get_caffeinated_quest_2" """
 {This thing stole my quarters.  I want my soda!
 
 I know it's dumb, but I kick the machine so hard my foot hurts.
@@ -481,11 +481,11 @@ A soda dropped out!  Yes!
 Ugh, this tastes disgusting.  How long has it been in there?
 }
 """
-        |> content__________________________________ "get_caffeinated_plot_achievement" """
+        |> content__________________________________ "get_caffeinated_quest_achievement" """
 _Achievement unlocked:_  
 Get caffeinated
 """
-        |> content__________________________________ "get_caffeinated_plot_3" """
+        |> content__________________________________ "get_caffeinated_quest_3" """
 No thank you.
 """
         |> content__________________________________ "TRASH_DIGGER" """
