@@ -56,7 +56,7 @@ entities =
     [ entity "PLAYER.chapter=0.day=1.location=EAST_MULBERRY.destination=BROADWAY_STREET"
         "Steve"
 
-    -- inventory
+    -- inventory options
     , entity "BRIEFCASE.item.location=PLAYER"
         "Briefcase"
     , entity "RED_LINE_PASS.item.location=PLAYER.valid_on=RED_LINE"
@@ -67,6 +67,12 @@ entities =
         "Subway map"
     , entity "NOTEBOOK.item.new"
         "I keep track of my daily plans in this."
+    , entity "DOLLAR_BILL.item.location=offscreen"
+        "Dollar bill"
+    , entity "CHANGE.item.location=offscreen.amount=0"
+        "Loose change"
+    , entity "SODA.item.location=offscreen"
+        "Soda"
 
     -- other locations
     , entity "CENTRAL_GUARD_OFFICE.location"
@@ -113,6 +119,8 @@ entities =
         "A woman with an odd hat"
     , entity "SCHOOL_CHILDREN.character.location=CHURCH_STREET"
         "A group of school children"
+    , entity "MOTHER.character.screaming_child_quest=0.location=CHURCH_STREET"
+        "Mother and child"
 
     --  TWIN_BROOKS
     , entity "SAFETY_WARNING_POSTER.item.location=TWIN_BROOKS"

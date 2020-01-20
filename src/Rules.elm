@@ -10,6 +10,7 @@ import Rules.Chapter1
 import Rules.General
 import Rules.Helpers exposing (RulesSpec)
 import Rules.Intro
+import Rules.Quests
 
 
 rules : Result ParseErrors Rules
@@ -22,7 +23,8 @@ allRuleSpecs : RulesSpec
 allRuleSpecs =
     List.foldl Dict.union
         Rules.General.rules
-        [ Rules.Intro.rules
+        [ Rules.Quests.rules
+        , Rules.Intro.rules
         , Rules.Chapter1.rules
         ]
 

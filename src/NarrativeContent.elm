@@ -27,6 +27,7 @@ all =
         Dict.empty
         [ silent
         , general
+        , quests
         , intro
         , chapter1
         ]
@@ -163,6 +164,52 @@ I'm not going to try to talk to her again.
 An unspoken rule seems to keep them from just climbing on the bench and pushing him off. But after a few attempts, one of the kids manages to grab his arm and tugs hard, bringing the standing boy down on top of him. A scream, a crash, then laughter and the kids are picking themselves up and scurrying towards the bench again, fighting to see who gets to stand on the bench next.
 ---|}
 Children aren't supposed to be down here unsupervised. And that game looks dangerous. Where are their parents?
+"""
+        |> content__________________________________ "SODA" """
+This soda is probably really old and gross.
+"""
+        |> content__________________________________ "CHANGE" """
+I have 0.{CHANGE.amount} cents.
+"""
+        |> content__________________________________ "DOLLAR_BILL" """
+A wrinkled dollar bill.
+"""
+
+
+quests : Dict String String
+quests =
+    Dict.empty
+        |> content__________________________________ "meetingScreamingChild" """
+The child is screaming his head off.  It's actually very annoying.  Even his mother looks like she can barely take any more of it.  She looks at me apologetically.
+---
+"I'm sorry, he won't calm down.  He wants a soda, but I can't leave this spot because I'm waiting for someone."
+---
+This situation seems bad for everyone.
+
+(Talk to the mother again if you want to offer help.)
+"""
+        |> content__________________________________ "offerToHelpScreamingChild" """
+{"Hey, I could go get you a soda if you want..."
+---
+"Oh my God, yes, please!  Here, take a dollar to buy it.  Thank you!"
+|"Did you find any soda?"
+
+"Um... not yet."
+|"So are you going to get me a soda or not?"
+}
+"""
+        |> content__________________________________ "getSodaForScreamingChild" """
+I put my dollar in and a soda and some change comes out.  Hope it's the right flavor.
+"""
+        |> content__________________________________ "giveSodaToScreamingChild" """
+Here's your soda. I didn't know what flavor to get."
+
+Without hesitation the child snatches the can from my hand and starts guzzling it down.
+
+"Thank you so much!  Keep the change.  Nice to know there are still decent people around."
+"""
+        |> content__________________________________ "MOTHER" """
+The kid has stopped screaming and the mother looks very relieved.  So am I.
 """
 
 
