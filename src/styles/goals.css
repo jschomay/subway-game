@@ -26,6 +26,10 @@
   font-size: 2em;
 }
 
+.done > .Notebook__subheading {
+  text-decoration: line-through;
+}
+
 .Notebook__page {
   flex: 0 0 auto;
   width: 40%;

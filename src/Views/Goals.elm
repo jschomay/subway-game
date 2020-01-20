@@ -14,7 +14,7 @@ view : Manifest.WorldModel -> Html Msg
 view worldModel =
     let
         goalListItemView title subGoals level =
-            li [ class "Notebook__item" ]
+            li [ classList [ ( "Notebook__item", True ), ( "done", level >= List.length subGoals ) ] ]
                 [ div [ class "Notebook__subheading" ] [ text title ]
                 , ul [ class "Notebook__sublist" ]
                     (List.take level subGoals
@@ -88,7 +88,7 @@ distractions : List ( String, String, List String )
 distractions =
     [ ( "GIRL_IN_YELLOW.who_was_girl_in_yellow_quest"
       , "Who was that girl in yellow?"
-      , []
+      , [ "", "" ]
       )
     , ( "MOTHER.screaming_child_quest"
       , "Stop the kid from screaming."
