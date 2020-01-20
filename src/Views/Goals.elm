@@ -25,10 +25,18 @@ view worldModel =
                     )
                 ]
 
+        getGoal goalId =
+            case String.split "." goalId of
+                [ id, stat ] ->
+                    getStat id stat worldModel
+
+                _ ->
+                    Nothing
+
         goalListView goals_ =
             List.foldl
-                (\( stat, title, subGoals ) acc ->
-                    case getStat "PLAYER" stat worldModel of
+                (\( goalId, title, subGoals ) acc ->
+                    case getGoal goalId of
                         Just level ->
                             if level > 0 then
                                 goalListItemView title subGoals level :: acc
@@ -58,7 +66,7 @@ view worldModel =
 
 goals : List ( String, String, List String )
 goals =
-    [ ( "present_proposal"
+    [ ( "PLAYER.present_proposal"
       , "Present proposal"
       , [ "Get to work by 6:30am"
         , "Get to work by 6:45am"
@@ -66,7 +74,7 @@ goals =
         , ""
         ]
       )
-    , ( "find_briefcase"
+    , ( "PLAYER.find_briefcase"
       , "Find stolen briefcase!"
       , [ "Report it stolen?"
         , "Talk to Mark @ Spring Hill?"
@@ -78,8 +86,12 @@ goals =
 
 distractions : List ( String, String, List String )
 distractions =
-    [ ( "who_was_girl_in_yellow"
+    [ ( "GIRL_IN_YELLOW.who_was_girl_in_yellow_quest"
       , "Who was that girl in yellow?"
       , []
+      )
+    , ( "MOTHER.screaming_child_quest"
+      , "Stop the kid from screaming."
+      , [ "Find a soda for the kid", "" ]
       )
     ]

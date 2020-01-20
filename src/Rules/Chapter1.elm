@@ -49,7 +49,7 @@ rules =
             """
             ON: GIRL_IN_YELLOW
             IF: PLAYER.chapter=1
-            DO: PLAYER.who_was_girl_in_yellow=1
+            DO: GIRL_IN_YELLOW.who_was_girl_in_yellow_quest=1
                 GIRL_IN_YELLOW.location=offscreen
             """
         |> rule_______________________ "briefcaseStolen"

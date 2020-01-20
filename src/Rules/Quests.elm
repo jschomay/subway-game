@@ -9,13 +9,14 @@ rules =
     Dict.empty
         |> rule_______________________ "meetingScreamingChild"
             """
-            ON: MOTHER.screaming_child_quest=0
-            DO: MOTHER.screaming_child_quest=1
+            ON: MOTHER.!met
+            DO: MOTHER.met
             """
         |> rule_______________________ "offerToHelpScreamingChild"
             """
-            ON: MOTHER.screaming_child_quest=1
+            ON: MOTHER.met.screaming_child_quest=0
             DO: DOLLAR_BILL.location=PLAYER
+                MOTHER.screaming_child_quest=1
             """
         |> rule_______________________ "getSodaForScreamingChild"
             """
