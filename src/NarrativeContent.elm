@@ -28,6 +28,7 @@ all =
         [ silent
         , general
         , quests
+        , achievements
         , intro
         , chapter1
         ]
@@ -174,6 +175,11 @@ I have 0.{CHANGE.amount} cents.
         |> content__________________________________ "DOLLAR_BILL" """
 A wrinkled dollar bill.
 """
+        |> content__________________________________ "MUSICIAN" """
+He's playing an old cracked violin with a hat out in front of him for spare change.
+
+The music sounds nice, but I wouldn't call that a real job.
+"""
 
 
 quests : Dict String String
@@ -210,6 +216,71 @@ Without hesitation the child snatches the can from my hand and starts guzzling i
 """
         |> content__________________________________ "MOTHER" """
 The kid has stopped screaming and the mother looks very relieved.  So am I.
+"""
+        ------------------------
+        |> content__________________________________ "ratty_hat_man_advice_1" """
+He's staring at me from across the room and mumbling to himself.
+
+Wait a minute, did he just say something about a briefcase?
+---
+"Excuse me, I thought I just heard you mention--"
+
+He holds up his finger with the utmost importance.
+
+"Holds your things.  That's what you need.  A place to hold your things.  Where are your things?"
+
+"Um... my briefcase was stolen.  Do you know something?"
+---
+"Ah... briefcase!  Yes.  West Mulberry.  East.  No, West.  Mulberry.  Yes."
+
+"Are you saying you saw it at West Mulberry?"
+
+"West Mulberry.  West Mulberry."
+
+With that he turns and scampers away.
+"""
+        |> content__________________________________ "ratty_hat_man_advice_2" """
+Hey, it's that guy again.  Oh no, he saw me.  Now he's approaching me.
+---
+"I have your case."
+---
+"Wait, what?"
+---
+"Forty third.  That's where it's at.  That's where it's all at."
+
+Again, he dashes away.
+"""
+        |> content__________________________________ "ratty_hat_man_advice_3" """
+There he is again.
+
+"Proposal.  I've got a proposal.  A proposal to make."
+
+"Ok, I'll bite."
+---
+"My friends, they know.  Samual, Walter and Mark.  Go to them.  Say hello."
+"""
+        |> content__________________________________ "ratty_hat_man_advice_4" """
+Oh no, not again.
+---
+"Brief case.  Thief's face.  Safe place.  Iris Lake."
+"""
+        |> content__________________________________ "ratty_hat_man_advice_5" """
+"Hey you!  I've been on a wild goose chase all over this subway system following your nonsense advice.  Have you seen my briefcase or haven't you?"
+---
+"Briefcase?  I haven't heard of any briefcase.  You really shouldn't talk to strangers.  Now if you'll excuse me, I have to go."
+"""
+
+
+achievements : Dict String String
+achievements =
+    Dict.empty
+        |> content__________________________________ "get_caffeinated_quest_achievement" """
+_Achievement unlocked:_  
+Get caffeinated
+"""
+        |> content__________________________________ "fools_errand_achievement" """
+_Achievement unlocked:_  
+Fool's errand
 """
 
 
@@ -528,10 +599,6 @@ A soda dropped out!  Yes!
 Ugh, this tastes disgusting.  How long has it been in there?
 }
 """
-        |> content__________________________________ "get_caffeinated_quest_achievement" """
-_Achievement unlocked:_  
-Get caffeinated
-"""
         |> content__________________________________ "get_caffeinated_quest_3" """
 No thank you.
 """
@@ -649,11 +716,6 @@ What? What do they mean "delays?"
 """
         |> content__________________________________ "EXIT" """
 {ANGRY_CROWD.location=BROADWAY_STREET? There's a big crowd of people blocking my view, but it looks like the exits have their shutters down.  What the hell is going on here?|It's still locked.}
-"""
-        |> content__________________________________ "MUSICIAN" """
-He's playing an old cracked violin with a hat out in front of him for spare change.
-
-The music sounds nice, but I wouldn't call that a real job.
 """
         |> content__________________________________ "ANGRY_CROWD" """
 {BRIEFCASE.location=PLAYER?

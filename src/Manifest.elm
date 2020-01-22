@@ -143,6 +143,8 @@ entities =
     -- CONVENTION_CENTER
     , entity "MUSICIAN.character.location=CONVENTION_CENTER"
         "Man playing violin"
+    , entity "MAN_IN_RATTY_HAT.character.location=CONVENTION_CENTER"
+        "Man in a ratty brown hat"
 
     -- SPRING HILL
     , entity "SECURITY_DEPOT_SPRING_HILL_STATION.item.location=SPRING_HILL"
@@ -150,7 +152,7 @@ entities =
 
     -- Stations
     , entity "ONE_HUNDRED_FOURTH_STREET.station" "104th Street"
-    , entity "FOURTY_SECOND_STREET.station" "42nd Street"
+    , entity "FORTY_SECOND_STREET.station" "42nd Street"
     , entity "SEVENTY_THIRD_STREET.station" "73rd Street"
     , entity "BROADWAY_STREET.station" "Broadway Street"
     , entity "BURLINGTON.station" "Burlington"

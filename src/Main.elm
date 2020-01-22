@@ -292,6 +292,9 @@ specialEvents ruleId model =
         "get_caffeinated_quest_2" ->
             ( model, Process.sleep 300 |> Task.perform (\_ -> Achievement "get_caffeinated_quest_achievement") )
 
+        "ratty_hat_man_advice_5" ->
+            ( model, Process.sleep 300 |> Task.perform (\_ -> Achievement "fools_errand_achievement") )
+
         other ->
             if List.member other [ "goToLinePlatform" ] then
                 -- Remember, if you add another matcher to jump the turnstile, remove

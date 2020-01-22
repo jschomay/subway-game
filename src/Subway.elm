@@ -132,7 +132,7 @@ lineInfo line =
             , stations =
                 [ "ONE_HUNDRED_FOURTH_STREET"
                 , "SEVENTY_THIRD_STREET"
-                , "FOURTY_SECOND_STREET"
+                , "FORTY_SECOND_STREET"
                 , "MUSEUM"
                 , "BROADWAY_STREET"
                 , "ST_MARKS"
