@@ -5,6 +5,11 @@ Train picture https://unsplash.com/photos/ARpPPB5dUC0 by Paul Gaudriault on Unsp
 Guard office picture https://unsplash.com/photos/4pPzKfd6BEg by Patryk Grądys on Unsplash
 Desk picture https://unsplash.com/photos/Eti6ph51H4A by Gery Wibowo on Unsplash (unused)
 
+Fonts
+https://fonts.google.com/specimen/Montserrat+Subrayada
+https://fonts.google.com/specimen/Quicksand
+https://fonts.google.com/specimen/Nanum+Pen+Script
+
 Icons
 https://www.flaticon.com/free-icon/briefcase_149399
 https://www.flaticon.com/free-icon/folded-tube-map_84780

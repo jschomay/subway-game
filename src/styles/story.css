@@ -1,7 +1,7 @@
 .StoryLine {
   user-select: none;
   padding: 5em 3em;
-  background: #1a1a1a;;
+  background: #1a1a1a;
   color: white;
   font-size: 1.8em;
   font-weight: normal;
@@ -49,6 +49,7 @@
 }
 
 .StoryLine__continue {
+  font-family: "Quicksand", "helvetica";
   font-weight: bold;
   cursor: pointer;
   padding-top: 2em;

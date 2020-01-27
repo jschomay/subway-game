@@ -87,9 +87,9 @@ init initialWorldModel flags =
     in
     ( { worldModel = initialWorldModel
       , loaded = False
-      , story = []
+      , story = NarrativeContent.t "title_intro" |> String.split "---"
       , ruleMatchCounts = Dict.empty
-      , scene = Title (dayText initialWorldModel)
+      , scene = MainTitle
       , showMap = False
       , showNotebook = False
       , showTranscript = False
@@ -374,8 +374,26 @@ update rules msg model =
                                 | showSelectScene = False
                                 , showMap = False
                                 , showNotebook = False
-                                , scene = Lobby
-                                , story = []
+                                , scene =
+                                    case m.scene of
+                                        Train _ ->
+                                            Lobby
+
+                                        Turnstile _ ->
+                                            Lobby
+
+                                        Platform _ ->
+                                            Lobby
+
+                                        other ->
+                                            other
+                                , story =
+                                    case m.scene of
+                                        MainTitle ->
+                                            m.story
+
+                                        other ->
+                                            []
                               }
                             , Cmd.none
                             )
@@ -463,6 +481,9 @@ update rules msg model =
                                         ( { m | scene = Train <| changeTrainStatus Arriving train }
                                         , delay arrivingDelay <| Disembark
                                         )
+
+                                    MainTitle ->
+                                        ( { m | scene = Title <| dayText m.worldModel }, Cmd.none )
 
                                     _ ->
                                         ( m, Cmd.none )
@@ -580,7 +601,13 @@ view model =
 
     else
         div []
-            [ mainView model
+            [ if model.scene == MainTitle then
+                -- should always have a head since the scene switches to Title after
+                -- the story runs out
+                mainTitleView <| Maybe.withDefault "ERROR: No story to show" <| List.head model.story
+
+              else
+                mainView model
             , div
                 [ class "Debug"
                 , stopPropagationOn "keydown" <| Json.succeed ( NoOp, True )
@@ -649,6 +676,10 @@ mainView model =
     Html.Keyed.node "div"
         [ class "game" ]
         [ case scene of
+            MainTitle ->
+                -- shouldn't happen because mainTitleView is showing instad of mainView
+                ( "mainTitle", text "" )
+
             Title title ->
                 ( "title", titleView title )
 
@@ -755,10 +786,10 @@ selectSceneView model =
 
         scenes =
             [ ( "Beginning", ( model, [] ) )
-            , ( "Tuesday", skip 6 )
-            , ( "Wednesday", skip 11 )
-            , ( "Thursday", skip 16 )
-            , ( "Friday", skip 21 )
+            , ( "Tuesday", skip 5 )
+            , ( "Wednesday", skip 10 )
+            , ( "Thursday", skip 15 )
+            , ( "Friday", skip 20 )
             , ( "Arrive at Twin Brooks", skip 26 )
             , ( "Briefcase stolen", skip 33 )
             , ( "(Interact with everything)", ( model, fullPlay ) )
@@ -781,6 +812,16 @@ titleView title =
         [ div [ class "TitleContent" ]
             [ h1 [ class "Title" ] [ text title ]
             , span [ class "StoryLine__continue", onClick (Interact "LOBBY") ] [ text "Continue..." ]
+            ]
+        ]
+
+
+mainTitleView : String -> Html Msg
+mainTitleView story =
+    div [ class "Scene MainTitleScene" ]
+        [ div [ class "MainTitleContent" ]
+            [ Markdown.toHtml [] story
+            , span [ class "StoryLine__continue", onClick Continue ] [ text "Continue..." ]
             ]
         ]
 

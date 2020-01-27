@@ -287,6 +287,21 @@ Fool's errand
 intro : Dict String String
 intro =
     Dict.empty
+        |> content__________________________________ "title_intro" """
+Steve,
+---
+Steve,
+
+I've got something big for you.
+---
+Steve,
+
+I've got something big for you.
+
+Come by my office first thing Monday morning.
+---
+![title](img/title.jpg)
+"""
         |> content__________________________________ "firstInteractionWithCommuter1" """
 {Another commuter waiting on the train.  I say hello and she says hello back.
 |I think one hello is enough when talking to complete strangers.}
@@ -302,12 +317,14 @@ intro =
     Sent: Sunday, 4:00 pm
     Subject: I've Got a Job for You
 
+
     Steve,
-    Just got word that some very important clients are coming in in the next few weeks.
-    The boys up stairs want me to put together a new proposal to bring to them. 
-    Steve, you're one of our senior agents and you've been in the department for, what, 6 years?
+
+    I've got something big for you.
+    We landed some new clients.  The boys up stairs want want to wow them with a new proposal.
+    You're one of our senior agents and you've been in the department for, what, 6 years?
     I need you to work on this and really make it shine.
-    Be at my office at 6:30 am Monday and we can talk over the details.
+    Come by my office first thing Monday morning.
 
     Jason Harris
     District Sales Manager
@@ -415,7 +432,7 @@ intro =
     seem like life quality expenses. We need to think about the bottom dollar here, Steve. "Pet Insurance
     Plan", "Kidnap/Ransom Insurance", "Divorce Insurance"? These benefits not only expose us to
     unwarranted risk of loss, but also far out weigh our customers premiums. You've got to do better than
-    this, Steve. We're two two days from the proposal meeting. Do NOT fuck this up.
+    this. We're two two days from the proposal meeting. Do NOT fuck this up.
 
     Put something better together tonight and get it to me in the morning. You're running out of time.
 

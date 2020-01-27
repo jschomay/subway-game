@@ -42,7 +42,7 @@ body {
 body {
   margin: 0px;
   padding: 0px;
-  background-color: black;
+  background-color: #1a1a1a;
   font-family: sans-serif;
   font-family: helvetica;
 }
@@ -54,10 +54,10 @@ body {
   align-items: center;
   justify-content: center;
   color: #555;
-  font-size: 48px;
+  font-size: 1.8em;
   font-weight: normal;
   color: white;
-  background-color: black;
+  background-color: #1a1a1a;
 }
 
 .SelectScene {
@@ -79,6 +79,35 @@ body {
   font-size: 3em;
 }
 
+.Scene.MainTitleScene {
+  color: white;
+  font-size: 1.8em;
+  overflow: auto;
+  position: initial;
+}
+
+.MainTitleContent {
+  color: white;
+  position: absolute;
+  top: 5em;
+  left: 10em;
+  right: 10em;
+}
+
+@media (max-width: 800px) {
+  .MainTitleContent {
+    left: 3em;
+    right: 3em;
+  }
+}
+
+.MainTitleContent img {
+  max-width: 600px;
+  margin: auto;
+  display: block;
+  margin-top: -3em;
+}
+
 .SelectScene li {
   list-style: circle;
   margin-left: 10px;
@@ -88,7 +117,7 @@ body {
 
 .game {
   position: relative;
-  background: black;
+  background: #1a1a1a;
   width: 100%;
   min-height: 100vh;
 }
@@ -119,7 +148,7 @@ body {
 }
 
 .Scene {
-  background: black;
+  background: #1a1a1a;
   opacity: 1;
   animation: fadeIn 0.3s linear forwards;
   position: fixed;
