@@ -102,6 +102,8 @@ body {
 }
 
 .MainTitleContent img {
+  animation: flicker 0.3s cubic-bezier(0.84, 0.17, 0.54, 1.35) alternate
+    infinite 0s;
   max-width: 600px;
   margin: auto;
   display: block;
