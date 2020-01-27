@@ -192,9 +192,26 @@
   margin: 0 1em;
   height: 3em;
   width: 3em;
+  position: relative;
   background-size: contain;
   background-repeat: no-repeat;
   background-position: center center;
+}
+
+.Inventory__item img {
+  width: 100%;
+}
+
+.Inventory__item--new::after {
+  content: "";
+  display: block;
+  background: #ff1c1c;
+  border-radius: 50%;
+  width: 12px;
+  height: 12px;
+  position: absolute;
+  top: -9px;
+  right: 2px;
 }
 
 /* Media queries */

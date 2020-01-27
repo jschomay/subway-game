@@ -45,7 +45,15 @@ view map worldModel currentStation =
 
         inventoryItemView : ( Manifest.ID, Entity ) -> Html Msg
         inventoryItemView ( id, entity ) =
-            img [ src <| "img/icons/" ++ String.toLower id ++ ".svg", class <| "Inventory__item", onClick <| Interact id ] []
+            div
+                [ classList
+                    [ ( "Inventory__item", True )
+                    , ( "Inventory__item--new", Rules.unsafeAssert (id ++ ".new") worldModel )
+                    ]
+                , onClick <| Interact id
+                ]
+                [ img [ src <| "img/icons/" ++ String.toLower id ++ ".svg" ] []
+                ]
 
         nonInteractableItemView name =
             li [ class "Sign__item Sign__item--list" ] [ text name ]

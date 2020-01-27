@@ -16,12 +16,12 @@ rules =
         |> rule_______________________ "checkEmails"
             """
             ON: CELL_PHONE
-            DO: CELL_PHONE.-unread
+            DO: CELL_PHONE.-new
             """
         |> rule_______________________ "forcePlayerToReadEmails"
             """
             ON: *.line
-            IF: CELL_PHONE.unread
+            IF: CELL_PHONE.new
                 PLAYER.chapter=0
             """
         |> rule_______________________ "coffeeCartMonday"
@@ -99,7 +99,7 @@ rules =
             ON: BROADWAY_STREET
             IF: PLAYER.day=1
             DO: PLAYER.location=EAST_MULBERRY.day+1
-                CELL_PHONE.unread
+                CELL_PHONE.new
                 COFFEE.location=offscreen
                 COMMUTER_1.location=offscreen
                 LOUD_PAYPHONE_LADY.location=offscreen
@@ -110,7 +110,7 @@ rules =
             ON: BROADWAY_STREET
             IF: PLAYER.day=2
             DO: PLAYER.location=EAST_MULBERRY.day+1
-                CELL_PHONE.unread
+                CELL_PHONE.new
                 COFFEE.location=offscreen
                 TRASH_DIGGER.location=offscreen
                 SKATER_DUDE.location=EAST_MULBERRY
@@ -120,7 +120,7 @@ rules =
             ON: BROADWAY_STREET
             IF: PLAYER.day=3
             DO: PLAYER.location=EAST_MULBERRY.day+1
-                CELL_PHONE.unread
+                CELL_PHONE.new
                 COFFEE.location=offscreen
                 SKATER_DUDE.location=offscreen
                 TRASH_DIGGER.location=EAST_MULBERRY
@@ -131,7 +131,7 @@ rules =
             ON: BROADWAY_STREET
             IF: PLAYER.day=4
             DO: PLAYER.location=EAST_MULBERRY.day+1.present_proposal=1
-                CELL_PHONE.unread
+                CELL_PHONE.new
                 COFFEE.location=offscreen
                 TRASH_DIGGER.location=offscreen
                 BENCH_BUM.location=offscreen
