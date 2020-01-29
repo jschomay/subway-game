@@ -180,6 +180,26 @@ He's playing an old cracked violin with a hat out in front of him for spare chan
 
 The music sounds nice, but I wouldn't call that a real job.
 """
+        |> content__________________________________ "BROKEN_PAYPHONE" """
+{Now that everyone's got cell phones, there's not much use for those things any more.  That's just as well, it's |Well, it used to be a pay phone. Now it's } just a gutted payphone stand with stray wires poking out.
+"""
+        |> content__________________________________ "BUSTLING_CROWD" """
+{Wow, this station is crowded. Everyone seems to be rushing off to somewhere.|
+{?"Hey, watch it!" |
+"Excuse me. Pardon me."|
+"Make way, I've got a train to catch."
+}}
+"""
+        |> content__________________________________ "MARCYS_PIZZA" """
+I haven't eaten here before, but it looks popular.  It's packed, even this time of day.
+"""
+        |> content__________________________________ "MAINTENANCE_MAN" """
+He's still at it, fixing the... well, whatever it is he's fixing.
+"""
+
+
+
+-- end  general
 
 
 quests : Dict String String
@@ -269,6 +289,10 @@ Oh no, not again.
 ---
 "Briefcase?  I haven't heard of any briefcase.  You really shouldn't talk to strangers.  Now if you'll excuse me, I have to go."
 """
+
+
+
+-- end quests
 
 
 achievements : Dict String String
@@ -700,7 +724,7 @@ Oh my God, I'm in so much trouble!  I have to get back to my stop.
 chapter1 : Dict String String
 chapter1 =
     Dict.empty
-        |> content__________________________________ "MAINTENANCE_MAN" """
+        |> content__________________________________ "askMaintenanceManForDirections" """
 {"Excuse me, sir! How can I get to Broadway Street Station as quickly as possible?"
 ---
 "Damn it, can't you see I'm busy?  Go and check the damn map if you're lost. It's that big map looking thing on the wall over there."

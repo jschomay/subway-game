@@ -7,6 +7,11 @@ import Rules.Helpers exposing (..)
 rules : RulesSpec
 rules =
     Dict.empty
+        |> rule_______________________ "askMaintenanceManForDirections"
+            """
+            ON: MAINTENANCE_MAN
+            IF: PLAYER.destination=BROADWAY_STREET.chapter=1
+            """
         |> rule_______________________ "getMap"
             """
             ON: MAP_POSTER

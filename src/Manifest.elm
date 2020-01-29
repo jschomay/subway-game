@@ -109,8 +109,6 @@ entities =
         "Bulletin board"
     , entity "TRASH_CAN.item.location=WEST_MULBERRY"
         "Trash can"
-    , entity "MISSIONARIES.character.location=WEST_MULBERRY"
-        "Missionaries"
     , entity "DRINKING_FOUNTAIN.item.location=WEST_MULBERRY"
         "Rusty drinking fountain"
 
@@ -121,6 +119,8 @@ entities =
         "A group of school children"
     , entity "MOTHER.character.screaming_child_quest=0.location=CHURCH_STREET"
         "Mother and child"
+    , entity "MISSIONARIES.character.location=CHURCH_STREET"
+        "Missionaries"
 
     --  TWIN_BROOKS
     , entity "SAFETY_WARNING_POSTER.item.location=TWIN_BROOKS"
@@ -145,6 +145,12 @@ entities =
         "Man playing violin"
     , entity "MAN_IN_RATTY_HAT.character.location=CONVENTION_CENTER"
         "Man in a ratty brown hat"
+    , entity "BROKEN_PAYPHONE.item.location=CONVENTION_CENTER"
+        "Broken payphone"
+    , entity "BUSTLING_CROWD.character.location=CONVENTION_CENTER"
+        "Bustling crowds of people"
+    , entity "MARCYS_PIZZA.item.fixed.location=CONVENTION_CENTER"
+        "Marcy's Pizza"
 
     -- SPRING HILL
     , entity "SECURITY_DEPOT_SPRING_HILL_STATION.item.location=SPRING_HILL"
