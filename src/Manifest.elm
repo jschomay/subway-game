@@ -157,7 +157,7 @@ entities =
         "Security Depot"
 
     -- Stations
-    , entity "ONE_HUNDRED_FOURTH_STREET.station" "104th Street"
+    , entity "ONE_HUNDRED_FORTH_STREET.station" "104th Street"
     , entity "FORTY_SECOND_STREET.station" "42nd Street"
     , entity "SEVENTY_THIRD_STREET.station" "73rd Street"
     , entity "BROADWAY_STREET.station" "Broadway Street"

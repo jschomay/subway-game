@@ -108,4 +108,46 @@ rules =
             IF: BROADWAY_STREET.leaving_broadway_street_station_plot<5
                 PLAYER.chapter=1
             DO: BROADWAY_STREET.leaving_broadway_street_station_plot=5
+                SKATER_DUDE.location=SPRING_HILL
+            """
+        |> rule_______________________ "helpFromSkaterDude"
+            """
+            ON: SKATER_DUDE
+            IF: PLAYER.chapter=1.location=SPRING_HILL
+            DO: SKATER_DUDE.help_steve=1
+                PLAYER.destination=CAPITOL_HEIGHTS
+            """
+        |> rule_______________________ "forcePlayerToFollowSkaterDudeOntoOrangeLine"
+            """
+            ON: RED_LINE
+            IF: PLAYER.chapter=1.location=SPRING_HILL
+                SKATER_DUDE.help_steve=1
+            """
+        |> rule_______________________ "forcePlayerToFollowSkaterDudeToCapitolHeights"
+            """
+            ON: *.station
+            IF: PLAYER.chapter=1.location=SPRING_HILL
+                SKATER_DUDE.help_steve=1
+            """
+        |> rule_______________________ "followSkaterDudeToOrangeLine"
+            """
+            ON: ORANGE_LINE
+            IF: PLAYER.chapter=1.location=SPRING_HILL
+                SKATER_DUDE.help_steve=1
+            DO: PLAYER.line=ORANGE_LINE.at_turnstile
+            """
+        |> rule_______________________ "jumpTurnstileWithSkaterDude"
+            """
+            ON: ORANGE_LINE
+            IF: PLAYER.chapter=1.location=SPRING_HILL.at_turnstile
+                SKATER_DUDE.help_steve=1
+            DO: PLAYER.line=ORANGE_LINE.-at_turnstile
+            """
+        |> rule_______________________ "followSkaterDudeToCapitalHeights"
+            """
+            ON: CAPITOL_HEIGHTS
+            IF: PLAYER.chapter=1.location=SPRING_HILL
+                SKATER_DUDE.help_steve=1
+            DO: PLAYER.destination=xxx.location=CAPITOL_HEIGHTS
+                SKATER_DUDE.location=ONE_HUNDRED_FORTH_STREET
             """

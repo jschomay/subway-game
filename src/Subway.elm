@@ -121,7 +121,7 @@ lineInfo line =
                 , "SPRING_HILL"
                 , "CAPITOL_HEIGHTS"
                 , "SEVENTY_THIRD_STREET"
-                , "ONE_HUNDRED_FOURTH_STREET"
+                , "ONE_HUNDRED_FORTH_STREET"
                 ]
             }
 
@@ -130,7 +130,7 @@ lineInfo line =
             , name = "Blue Line"
             , id = "BLUE_LINE"
             , stations =
-                [ "ONE_HUNDRED_FOURTH_STREET"
+                [ "ONE_HUNDRED_FORTH_STREET"
                 , "SEVENTY_THIRD_STREET"
                 , "FORTY_SECOND_STREET"
                 , "MUSEUM"

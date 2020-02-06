@@ -196,6 +196,9 @@ I haven't eaten here before, but it looks popular.  It's packed, even this time 
         |> content__________________________________ "MAINTENANCE_MAN" """
 He's still at it, fixing the... well, whatever it is he's fixing.
 """
+        |> content__________________________________ "SECURITY_DEPOT_SPRING_HILL_STATION" """
+It's closed. It's good to see where my tax dollars are going.
+"""
 
 
 
@@ -910,8 +913,108 @@ I followed the rules. I pay my taxes on time. I make sure to do everything right
 ---
 Mr. Harris is going to kill me. What the hell am I going to do?
 ---
-END OF DEMO!  Thank you for playing.
+...
+---
+"Hey, man. Are you crying?"
+
+Who said that?
 """
-        |> content__________________________________ "SECURITY_DEPOT_SPRING_HILL_STATION" """
-END OF DEMO!  Thank you for playing.
+        |> content__________________________________ "helpFromSkaterDude" """
+{Aw damn!  It's that skater punk that's always goofing around my station.
+
+He lights up a cigarette even though this is clearly a no smoking area, and gazes at me with smug amusement.
+---
+"I'm not crying.  I'm just... under a lot of stress."
+
+"Something of yours get snatched?"
+
+"Why would you say that?"
+---
+He flicks ashes onto the floor.
+
+"Seen a few suits like you dragging around the pig sty. Not sure why, it's been closed all week.  None of 'em cried though."
+---
+"I wasn't-- never mind.  Did the others get any help?"
+
+"Nah, cops are never any help.  Especially today, they're all hung up at Broadway Station for some reason.  Your junk's probably been dumped in a trashcan somewhere.  That's what usually happens."
+
+"That's great!  Maybe we can still find it."
+---
+The punk takes his time finishing off his cigarette before finally responding.
+
+"Doubt it, the bums will beat us to it.  What's so important about it anyway?  Just buy another one."
+
+"Damn!  No, I need to get it back at all costs. It's got a very important presentation in it."
+
+He looks at me with a glimmer in his eye.
+---
+"Well...  I happen to know the bum's ringleader.  I could take you to him."
+
+"Yes!  Please!"
+
+"What's it worth to you?"
+---
+"What do you mean, you want cash?  I guess I could give you a hundred--"
+
+"A thousand."
+
+"No way, I--"
+
+He jumps on his skate board and starts rolling away.
+
+"Wait!  OK, a thousand.  But not until I see some results.  Who do I talk to?"
+
+"Follow me. We got a train to catch."
+---
+He rides off on his skateboard over to the orange line.
+|
+"Let's go, orange line's this way."
+}
+"""
+        |> content__________________________________ "forcePlayerToFollowSkaterDudeOntoOrangeLine" """
+"Hey! Where you going? We gotta ride the orange line."
+
+"But I don't have a ticket."
+
+"So?"
+"""
+        |> content__________________________________ "forcePlayerToFollowSkaterDudeToCapitolHeights" """
+"Yo, that's the wrong train!  We're headed headed to Capitol Heights."
+"""
+        |> content__________________________________ "followSkaterDudeToOrangeLine" """
+"My guy's at Capitol Heights Station."
+
+"But I don't have tickets for the orange line!"
+---
+"You don't need any of that. Just hop the stile. It don't cost a thing."
+
+Without another word he's over the turnstile in one swift movement. No alarms sound, no security guards running.
+
+Nothing.
+
+"Come on, man. It ain't nothin. Hurry up, train's about to leave."
+---
+He makes it sound so easy. But I can't just break the law.  This punk's used to it, but what if I get caught?
+
+Then again what if I don't get my proposal back?
+"""
+        |> content__________________________________ "jumpTurnstileWithSkaterDude" """
+Here goes nothing...
+"""
+        |> content__________________________________ "followSkaterDudeToCapitalHeights" """
+I just broke the law. I'm riding without a ticket or a pass.  This isn't right.
+---
+Is that guy staring at me? He knows I jumped. He knows I did something wrong. Everyone knows. I have to get out of here, I can't breath. I--
+
+"Hey, man. Chill the fuck out.  You don't want to draw attention to us."
+---
+"Speaking of which... I can't be seen around Capitol Heights, so you're gonna have to do this next part alone.  Just look for Mark.  You got that?  Mark."
+
+The train approaches our station.
+---
+"Wait, how will I know what he looks like?"
+
+"I'll be waiting for you down at 104th Street Station.  Come find me there when you find your briefcase.  And don't try running off without paying me. I got eyes and ears everywhere down here, man. If you don't find me, I'll find you."
+---
+He shoves me off the train onto the platform.
 """

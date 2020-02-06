@@ -282,9 +282,6 @@ specialEvents ruleId model =
         "checkMap" ->
             ( { model | showMap = not model.showMap }, Cmd.none )
 
-        "goToLineTurnstile" ->
-            ( { model | scene = Turnstile <| Maybe.withDefault Red <| getCurrentLine model.worldModel }, Cmd.none )
-
         "goToLobby" ->
             ( { model | scene = Lobby }, Cmd.none )
 
@@ -296,7 +293,11 @@ specialEvents ruleId model =
             ( model, Process.sleep 300 |> Task.perform (\_ -> Achievement "fools_errand_achievement") )
 
         other ->
-            if List.member other [ "goToLinePlatform" ] then
+            if List.member other [ "goToLineTurnstile", "followSkaterDudeToOrangeLine" ] then
+                -- Remember to add line=LINE_[X] when adding rules to this match!!!
+                ( { model | scene = Turnstile <| Maybe.withDefault Red <| getCurrentLine model.worldModel }, Cmd.none )
+
+            else if List.member other [ "goToLinePlatform", "jumpTurnstileWithSkaterDude" ] then
                 -- Remember, if you add another matcher to jump the turnstile, remove
                 -- the at_turnstile tag!!!!!!!!
                 ( { model | scene = Platform <| Maybe.withDefault Red <| getCurrentLine model.worldModel }, Cmd.none )
@@ -779,6 +780,13 @@ selectSceneView model =
             , "LOBBY"
             , "SECURITY_OFFICERS"
             , "RED_LINE"
+            , "SECURITY_OFFICERS"
+            , "RED_LINE"
+            , "RED_LINE"
+            , "SPRING_HILL"
+            , "LOBBY"
+            , "SECURITY_DEPOT_SPRING_HILL_STATION"
+            , "SKATER_DUDE"
             ]
 
         skip i =
@@ -792,6 +800,7 @@ selectSceneView model =
             , ( "Friday", skip 20 )
             , ( "Arrive at Twin Brooks", skip 26 )
             , ( "Briefcase stolen", skip 33 )
+            , ( "Run into skater dude again", skip 39 )
             , ( "(Interact with everything)", ( model, fullPlay ) )
             ]
     in

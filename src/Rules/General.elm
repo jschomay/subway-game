@@ -25,8 +25,7 @@ rules =
             """
             ON: *.line
             IF: PLAYER.!at_turnstile
-            DO: PLAYER.line=$
-                PLAYER.at_turnstile
+            DO: PLAYER.line=$.at_turnstile
             """
         |> rule_______________________ "goToLinePlatform"
             """
