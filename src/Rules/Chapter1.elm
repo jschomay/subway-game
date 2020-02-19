@@ -148,6 +148,6 @@ rules =
             ON: CAPITOL_HEIGHTS
             IF: PLAYER.chapter=1.location=SPRING_HILL
                 SKATER_DUDE.help_steve=1
-            DO: PLAYER.destination=xxx.location=CAPITOL_HEIGHTS
+            DO: PLAYER.destination=xxx.location=CAPITOL_HEIGHTS.find_briefcase+1
                 SKATER_DUDE.location=ONE_HUNDRED_FORTH_STREET
             """
