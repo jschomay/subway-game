@@ -148,6 +148,24 @@ rules =
             ON: CAPITOL_HEIGHTS
             IF: PLAYER.chapter=1.location=SPRING_HILL
                 SKATER_DUDE.help_steve=1
-            DO: PLAYER.destination=xxx.location=CAPITOL_HEIGHTS.find_briefcase+1
+            DO: PLAYER.destination=xxx.location=CAPITOL_HEIGHTS.find_briefcase=2
                 SKATER_DUDE.location=ONE_HUNDRED_FORTH_STREET
+            """
+        -- orange line
+        |> rule_______________________ "findKeyInTrashCan"
+            """
+            ON: TRASH_CAN_CAPITOL_HEIGHTS.!empty
+            DO: ODD_KEY.location=PLAYER
+                TRASH_CAN_CAPITOL_HEIGHTS.empty
+            """
+        |> rule_______________________ "markTellsAboutBroomCloset"
+            """
+            ON: MARK
+            IF: PLAYER.find_briefcase=2
+            DO: PLAYER.find_briefcase=3
+            """
+        |> rule_______________________ "pleasantriesWithMark"
+            """
+            ON: MARK
+            IF: PLAYER.find_briefcase>2
             """

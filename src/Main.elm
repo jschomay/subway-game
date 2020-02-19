@@ -790,6 +790,7 @@ selectSceneView model =
 
             -- 40
             , "ORANGE_LINE"
+            , "ORANGE_LINE"
             , "CAPITOL_HEIGHTS"
             ]
 
@@ -805,7 +806,7 @@ selectSceneView model =
             , ( "Arrive at Twin Brooks", skip 26 )
             , ( "Briefcase stolen", skip 33 )
             , ( "Run into skater dude again", skip 39 )
-            , ( "Orange line", skip 42 )
+            , ( "Orange line", skip 43 )
             , ( "(Interact with everything)", ( model, fullPlay ) )
             ]
     in

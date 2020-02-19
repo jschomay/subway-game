@@ -37,7 +37,7 @@ rules =
         |> rule_______________________ "jumpTurnstileFail"
             """
             ON: *.line
-            DO: PLAYER.-at_turnstile
+            DO: PLAYER
             """
         |> rule_______________________ "checkMap"
             """

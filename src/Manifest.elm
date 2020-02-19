@@ -107,7 +107,7 @@ entities =
         "Soggy looking jacket"
     , entity "BULLETIN_BOARD.item.location=WEST_MULBERRY"
         "Bulletin board"
-    , entity "TRASH_CAN.item.location=WEST_MULBERRY"
+    , entity "TRASH_CAN_WEST_MULBERRY.item.location=WEST_MULBERRY"
         "Trash can"
     , entity "DRINKING_FOUNTAIN.item.location=WEST_MULBERRY"
         "Rusty drinking fountain"
@@ -155,6 +155,20 @@ entities =
     -- SPRING HILL
     , entity "SECURITY_DEPOT_SPRING_HILL_STATION.item.location=SPRING_HILL"
         "Security Depot"
+
+    -- CAPITOL_HEIGHTS
+    , entity "TRASH_CAN_CAPITOL_HEIGHTS.item.location=CAPITOL_HEIGHTS"
+        "Trash can"
+    , entity "ODD_KEY.item"
+        "Odd key"
+    , entity "SHIFTY_MAN.character.location=CAPITOL_HEIGHTS"
+        "Shifty looking man"
+    , entity "MARK.character.location=CAPITOL_HEIGHTS"
+        "Guy with cardboard sign"
+    , entity "SPIKY_HAIR_GUY.character.location=CAPITOL_HEIGHTS"
+        "Guy with Spiky Hair"
+    , entity "GREEN_SUIT_MAN.character.location=CAPITOL_HEIGHTS"
+        "Man in a fancy green suit"
 
     -- Stations
     , entity "ONE_HUNDRED_FORTH_STREET.station" "104th Street"

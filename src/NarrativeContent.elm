@@ -78,7 +78,7 @@ That's just great.  I wish people would just follow the rules.
 """
         |> content__________________________________ "ridingTheTrain" ""
         |> content__________________________________ "jumpTurnstileFail"
-            "{I've never jumped a turnstile in my life, and I'm not about to start now.|I don't want to get caught.|Better to stick to the lines I have passes for.}"
+            "{?I'm not the type to jump turnstiles.|I don't want to get caught.|Better to stick to the lines I have passes for.}"
         |> content__________________________________ "outOfServiceStations" """
 PLEASE NOTICE: Normal service disruption is in effect.
 
@@ -95,7 +95,7 @@ Thank you and we apologize for the inconvenience.
 Nope, nothing.  Darn.|
 Still nothing about my briefcase, but if I'm ever in need of a house cleaner or want to join a lame garage band, I know where to look.}
 """
-        |> content__________________________________ "TRASH_CAN" """
+        |> content__________________________________ "TRASH_CAN_WEST_MULBERRY" """
 {?I'm not about to rummage through the trash.
 |
 I've got a weird feeling about this can. Maybe it wouldn't hurt to take a quick look.
@@ -1017,4 +1017,80 @@ The train approaches our station.
 "I'll be waiting for you down at 104th Street Station.  Come find me there when you find your briefcase.  And don't try running off without paying me. I got eyes and ears everywhere down here, man. If you don't find me, I'll find you."
 ---
 He shoves me off the train onto the platform.
+"""
+        |> content__________________________________ "findKeyInTrashCan" """
+It's just a trash can. Nothing important here.
+---
+...
+---
+Wait. There's something inside.
+
+I better not regret this...
+---
+This is a strange key.  I think I'll hold onto it. Just in case.
+"""
+        |> content__________________________________ "TRASH_CAN_CAPITOL_HEIGHTS" """
+There's nothing but junk in here. Just as it should be.
+"""
+        |> content__________________________________ "ODD_KEY" """
+I wonder what this is for. It's probably just junk.
+"""
+        |> content__________________________________ "SHIFTY_MAN" """
+{He stands in the shadows of the platform away from the crowds and he seems to jump at every loud noise. This guys has to be up to something.
+|
+{PLAYER.find_briefcase=2?"Excuse me, sir? Your name wouldn't happen to be Mark would it?"
+---
+"Beat it, shit head. I'm waiting for someone."
+|
+He's still up to no good.
+}
+|
+He's still up to no good.
+}
+"""
+        |> content__________________________________ "SPIKY_HAIR_GUY" """
+{{PLAYER.find_briefcase=2?"Excuse me, Mark?"
+
+"Sorry, bud. Wrong guy."
+|
+That's not Mark.
+}
+|
+That's not Mark.
+}
+"""
+        |> content__________________________________ "GREEN_SUIT_MAN" """
+His suit looks like it costs more than my rent.  I'm not going to bother him.
+"""
+        |> content__________________________________ "markTellsAboutBroomCloset" """
+His clothes are covered in dirt and holes. He sits on the tile floor with a sign.
+
+The sign reads, "Hi, I'm Mark. Anything helps. God Ble$$."
+---
+Well, that was easy.
+---
+I quickly explain the situation, but he doesn't seem to be following any of it.
+
+This was a waste of time!
+---
+"Did you say briefcase?"
+
+"Yeah, it was stolen.  I was told you might have found it."
+
+Now that I say it, it sounds really dumb.  Why did I think this would work?
+---
+His eyes go blank for a few moments, then with a sudden jolt, he's back again.
+
+"Yeah, bout 10 minutes ago. One of the rail kiddies was lugging around this real fancy thing."
+
+"Oh my God, really?! Did you say rail kitty?  Never mind.  Tell me, where did he go?"
+---
+"Hold your horses. He hangs out with a real rough group, bunch of nabbers and grabbers. But ol' Mark's seen where they horde their stash.  An old broom closet at 73rd Street Station, lock doesn't even work--"
+---
+"That's great, thanks!  Gotta go!"
+
+I leave the bum still talking to himself about the broom closet.
+"""
+        |> content__________________________________ "pleasantriesWithMark" """
+He's still describing the broom closet...
 """
