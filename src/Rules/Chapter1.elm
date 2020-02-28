@@ -169,3 +169,21 @@ rules =
             ON: MARK
             IF: PLAYER.find_briefcase>2
             """
+        |> rule_______________________ "jumpTurnstileAfterTaklingToMark"
+            """
+            ON: ORANGE_LINE
+            IF: PLAYER.chapter=1.location=CAPITOL_HEIGHTS.find_briefcase=3.at_turnstile
+            DO: PLAYER.line=ORANGE_LINE.-at_turnstile
+            """
+        |> rule_______________________ "caughtOnOrangeLineHeadingTo73rd"
+            """
+            ON: SEVENTY_THIRD_STREET
+            IF: PLAYER.chapter=1.location=CAPITOL_HEIGHTS.find_briefcase=3
+            DO: PLAYER.location=ST_MARKS
+            """
+        |> rule_______________________ "caughtOnOrangeLineHeadingToOther"
+            """
+            ON: *.station
+            IF: PLAYER.chapter=1.location=CAPITOL_HEIGHTS.find_briefcase=3
+            DO: PLAYER.location=ST_MARKS
+            """

@@ -164,7 +164,7 @@ entities =
     , entity "SHIFTY_MAN.character.location=CAPITOL_HEIGHTS"
         "Shifty looking man"
     , entity "MARK.character.location=CAPITOL_HEIGHTS"
-        "Guy with cardboard sign"
+        "{PLAYER.find_briefcase>2?Mark|Guy with cardboard sign}"
     , entity "SPIKY_HAIR_GUY.character.location=CAPITOL_HEIGHTS"
         "Guy with Spiky Hair"
     , entity "GREEN_SUIT_MAN.character.location=CAPITOL_HEIGHTS"

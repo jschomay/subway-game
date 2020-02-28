@@ -297,10 +297,13 @@ specialEvents ruleId model =
                 -- Remember to add line=LINE_[X] when adding rules to this match!!!
                 ( { model | scene = Turnstile <| Maybe.withDefault Red <| getCurrentLine model.worldModel }, Cmd.none )
 
-            else if List.member other [ "goToLinePlatform", "jumpTurnstileWithSkaterDude" ] then
+            else if List.member other [ "goToLinePlatform", "jumpTurnstileWithSkaterDude", "jumpTurnstileAfterTaklingToMark" ] then
                 -- Remember, if you add another matcher to jump the turnstile, remove
                 -- the at_turnstile tag!!!!!!!!
                 ( { model | scene = Platform <| Maybe.withDefault Red <| getCurrentLine model.worldModel }, Cmd.none )
+
+            else if List.member other [ "caughtOnOrangeLineHeadingTo73rd", "caughtOnOrangeLineHeadingToOther" ] then
+                ( { model | scene = CentralGuardOffice }, Cmd.none )
 
             else if List.member other [ "endMonday", "endTuesday", "endWednesday", "endThursday" ] then
                 ( { model | scene = Title (dayText model.worldModel) }, Cmd.none )
@@ -742,7 +745,7 @@ selectSceneView : Model -> Html Msg
 selectSceneView model =
     let
         fullPlay =
-            [ "LOBBY", "BRIEFCASE", "RED_LINE_PASS", "RED_LINE_PASS", "RED_LINE", "CELL_PHONE", "CELL_PHONE", "CELL_PHONE", "COFFEE_CART", "COFFEE", "COFFEE_CART", "COMMUTER_1", "COMMUTER_1", "LOUD_PAYPHONE_LADY", "COFFEE_CART", "LOUD_PAYPHONE_LADY", "GRAFFITI", "RED_LINE", "RED_LINE", "BROADWAY_STREET", "LOBBY", "RED_LINE_PASS", "COFFEE_CART", "COFFEE_CART", "TRASH_DIGGER", "TRASH_DIGGER", "GRAFFITI", "COFFEE", "CELL_PHONE", "CELL_PHONE", "RED_LINE", "RED_LINE", "CONVENTION_CENTER", "BROADWAY_STREET", "LOBBY", "RED_LINE", "SKATER_DUDE", "COFFEE_CART", "COFFEE_CART", "COFFEE", "CELL_PHONE", "CELL_PHONE", "COFFEE", "RED_LINE", "RED_LINE", "BROADWAY_STREET", "LOBBY", "CELL_PHONE", "COFFEE_CART", "COFFEE_CART", "COFFEE_CART", "COFFEE", "RED_LINE", "RED_LINE", "CHURCH_STREET", "BROADWAY_STREET", "LOBBY", "CELL_PHONE", "COFFEE_CART", "RED_LINE", "RED_LINE", "LOBBY", "RED_LINE", "RED_LINE", "BROADWAY_STREET", "MAP_POSTER", "MAP", "SAFETY_WARNING_POSTER", "CONVENTION_CENTER", "BROADWAY_STREET", "LOBBY", "EXIT", "ANGRY_CROWD", "YELLOW_LINE", "RED_LINE", "COMMUTER_1", "COMMUTER_1", "GIRL_IN_YELLOW", "NOTEBOOK", "SECURITY_OFFICERS", "RED_LINE", "ANGRY_CROWD", "COMMUTER_1", "SECURITY_OFFICERS", "RED_LINE", "RED_LINE", "SPRING_HILL", "LOBBY", "SECURITY_DEPOT_SPRING_HILL_STATION", "RED_LINE", "RED_LINE", "CHURCH_STREET", "MOTHER", "MOTHER", "RED_LINE", "RED_LINE", "EAST_MULBERRY", "SODA_MACHINE", "RED_LINE", "RED_LINE", "CHURCH_STREET", "MOTHER", "RED_LINE", "RED_LINE", "SPRING_HILL", "SECURITY_DEPOT_SPRING_HILL_STATION", "SKATER_DUDE", "SKATER_DUDE", "RED_LINE", "ORANGE_LINE", "ORANGE_LINE", "UNIVERSITY", "ST_MARKS", "CAPITOL_HEIGHTS" ]
+            [ "LOBBY", "BRIEFCASE", "RED_LINE_PASS", "RED_LINE_PASS", "RED_LINE", "CELL_PHONE", "CELL_PHONE", "CELL_PHONE", "COFFEE_CART", "COFFEE", "COFFEE_CART", "COMMUTER_1", "COMMUTER_1", "LOUD_PAYPHONE_LADY", "COFFEE_CART", "LOUD_PAYPHONE_LADY", "GRAFFITI", "RED_LINE", "RED_LINE", "BROADWAY_STREET", "LOBBY", "RED_LINE_PASS", "COFFEE_CART", "COFFEE_CART", "TRASH_DIGGER", "TRASH_DIGGER", "GRAFFITI", "COFFEE", "CELL_PHONE", "CELL_PHONE", "RED_LINE", "RED_LINE", "CONVENTION_CENTER", "BROADWAY_STREET", "LOBBY", "RED_LINE", "SKATER_DUDE", "COFFEE_CART", "COFFEE_CART", "COFFEE", "CELL_PHONE", "CELL_PHONE", "COFFEE", "RED_LINE", "RED_LINE", "BROADWAY_STREET", "LOBBY", "CELL_PHONE", "COFFEE_CART", "COFFEE_CART", "COFFEE_CART", "COFFEE", "RED_LINE", "RED_LINE", "CHURCH_STREET", "BROADWAY_STREET", "LOBBY", "CELL_PHONE", "COFFEE_CART", "RED_LINE", "RED_LINE", "LOBBY", "RED_LINE", "RED_LINE", "BROADWAY_STREET", "MAP_POSTER", "MAP", "SAFETY_WARNING_POSTER", "CONVENTION_CENTER", "BROADWAY_STREET", "LOBBY", "EXIT", "ANGRY_CROWD", "YELLOW_LINE", "RED_LINE", "COMMUTER_1", "COMMUTER_1", "GIRL_IN_YELLOW", "NOTEBOOK", "SECURITY_OFFICERS", "RED_LINE", "ANGRY_CROWD", "COMMUTER_1", "SECURITY_OFFICERS", "RED_LINE", "RED_LINE", "SPRING_HILL", "LOBBY", "SECURITY_DEPOT_SPRING_HILL_STATION", "RED_LINE", "RED_LINE", "CHURCH_STREET", "MOTHER", "MOTHER", "RED_LINE", "RED_LINE", "EAST_MULBERRY", "SODA_MACHINE", "RED_LINE", "RED_LINE", "CHURCH_STREET", "MOTHER", "RED_LINE", "RED_LINE", "SPRING_HILL", "SECURITY_DEPOT_SPRING_HILL_STATION", "SKATER_DUDE", "SKATER_DUDE", "RED_LINE", "ORANGE_LINE", "ORANGE_LINE", "UNIVERSITY", "ST_MARKS", "CAPITOL_HEIGHTS", "GREEN_SUIT_MAN", "SHIFTY_MAN", "TRASH_CAN_CAPITOL_HEIGHTS", "ODD_KEY", "SPIKY_HAIR_GUY", "MARK", "MARK", "YELLOW_LINE", "YELLOW_LINE", "LOBBY", "ORANGE_LINE", "ORANGE_LINE", "SEVENTY_THIRD_STREET" ]
 
         skeleton =
             [ "LOBBY"
@@ -792,22 +795,27 @@ selectSceneView model =
             , "ORANGE_LINE"
             , "ORANGE_LINE"
             , "CAPITOL_HEIGHTS"
+            , "MARK"
+            , "ORANGE_LINE"
+            , "ORANGE_LINE"
+            , "SEVENTY_THIRD_STREET"
             ]
 
         skip i =
             ( model, skeleton |> List.take i )
 
         scenes =
-            [ ( "Beginning", ( model, [] ) )
-            , ( "Tuesday", skip 5 )
-            , ( "Wednesday", skip 10 )
-            , ( "Thursday", skip 15 )
-            , ( "Friday", skip 20 )
-            , ( "Arrive at Twin Brooks", skip 26 )
-            , ( "Briefcase stolen", skip 33 )
-            , ( "Run into skater dude again", skip 39 )
+            [ ( "(Interact with everything)", ( model, fullPlay ) )
+            , ( "Caught", skip 47 )
             , ( "Orange line", skip 43 )
-            , ( "(Interact with everything)", ( model, fullPlay ) )
+            , ( "Run into skater dude again", skip 39 )
+            , ( "Briefcase stolen", skip 33 )
+            , ( "Arrive at Twin Brooks", skip 26 )
+            , ( "Friday", skip 20 )
+            , ( "Thursday", skip 15 )
+            , ( "Wednesday", skip 10 )
+            , ( "Tuesday", skip 5 )
+            , ( "Beginning", ( model, [] ) )
             ]
     in
     div [ class "SelectScene" ]

@@ -7,6 +7,7 @@ import Html.Events exposing (..)
 import LocalTypes exposing (..)
 import Manifest exposing (..)
 import NarrativeEngine.Core.WorldModel exposing (..)
+import NarrativeEngine.Syntax.NarrativeParser as NarrativeParser
 import Rules
 import Subway exposing (..)
 import Views.Goals as Goals
@@ -16,6 +17,15 @@ import Views.Station.Connections as Connections
 view : Subway.Map -> Manifest.WorldModel -> Station -> Html Msg
 view map worldModel currentStation =
     let
+        -- This is a partial config allowing variable text
+        -- Only the worldmodel has actual data
+        config =
+            { cycleIndex = 0
+            , propKeywords = Dict.empty
+            , trigger = ""
+            , worldModel = worldModel
+            }
+
         stationName =
             worldModel
                 |> Dict.get currentStation
@@ -60,7 +70,7 @@ view map worldModel currentStation =
 
         interactableItemView ( id, name ) =
             div [ class "Sign__item Sign__item--interactable", onClick <| Interact id ]
-                [ text name ]
+                [ text <| Maybe.withDefault name <| List.head <| NarrativeParser.parse config name ]
 
         stationInfoView =
             div [ class "Sign Sign--station" ]

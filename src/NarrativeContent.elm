@@ -1094,3 +1094,28 @@ I leave the bum still talking to himself about the broom closet.
         |> content__________________________________ "pleasantriesWithMark" """
 He's still describing the broom closet...
 """
+        |> content__________________________________ "jumpTurnstileAfterTaklingToMark" """
+Ok, I've done this once before, I'll just do it the same way the skater punk showed me.  Nice and easy...
+---
+Made it!  That wasn't so bad.  I'm starting to get the hang of it.
+"""
+        |> content__________________________________ "caughtOnOrangeLineHeadingTo73rd" """
+I'm so close.  This has been one crazy morning, but I'll just grab my briefcase now, hopefully everything is still in there, and I can buy a ticket back to my station and get to work and give the presesntation and get my promotion and everything will be fine.
+---
+"Excuse me sir, can I see your ticket or pass please?"
+---
+...
+---
+Oh.  Shit.
+"""
+        |> content__________________________________ "caughtOnOrangeLineHeadingToOther" """
+Oh no, I got on the wrong train!  Mark said 73rd Street Station, how did I mess this up?
+---
+It's ok, take a few breaths.  I'll just get off at the next stop, then catch the right train.  Then I can grab my briefcase, hopefully everything is still in there, and I can buy a ticket back to my station and get to work and give the presesntation and get my promotion and everything will be fine.
+---
+"Excuse me sir, can I see your ticket or pass please?"
+---
+...
+---
+Oh.  Shit.
+"""
