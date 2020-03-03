@@ -1119,3 +1119,201 @@ It's ok, take a few breaths.  I'll just get off at the next stop, then catch the
 ---
 Oh.  Shit.
 """
+        |> content__________________________________ "TICKET_INSPECTOR" """
+"Where am I!?"
+
+"This is the Central Guard Station at St. Mark's. Follow the instructions on the poster."
+
+"But--"
+---
+The steel door slams shut before I can get another word out and he is gone.
+"""
+        |> content__________________________________ "INFRACTIONS_ROOM_DOOR" """
+{It's locked. I'm trapped. What am I supposed to do? And how do I get out  of here? They can't keep me in here like this.
+---
+Can they?
+|{?
+It's locked. 
+|
+Still locked.
+|
+Maybe if I jiggle the handle a few more times...
+|
+Nope. It's locked.
+|
+Wait a second. I think I got it! Oh, no. Just kidding. Still locked.
+}}
+"""
+        |> content__________________________________ "INFRACTIONS_INSTRUCTIONS_POSTER" """
+{_Violators of the law! Due to high volumes of fare evasion, vandalism, and littering, all minor infractions will be dealt with by our new automated system. Please read carefully the following instructions as Transit Authorities Fine Distribution has recently changed:_
+---
+_Step 1: Approach computer terminal in center of room (WARNING: Do not press the big green button)._
+---
+_Step 2:  Scan a state issued ID, Transit Line Pass, or input social security number and verify the listed personal information. System will power on after input._
+---
+_Step 3: Select minor infraction the violator is accused of (WARNING: you are being monitored, any attempt to supply misinformation will be met with harsh consequences!)._
+---
+_Step 4: Press send. The information provided will now be processed and verified by a member of Transit Authority. Whilst this is happening the violator may fill out a Violation Dispute Document on the computer or a Violation Apology Document (WARNING: All documents are subject to be read at Transit Authorities earliest convenience)._
+---
+_Step 5:  If all the information is correct, a fine ticket will print out next to the computer and the door will be unlocked. Once the ticket has been removed the violator may leave the Detention Room._
+---
+_Thank you and have a nice day!_
+---
+Wow, this seems overly complicated. I'm never going to break the law again.
+|
+_Violators of the law! Due to high volumes of fare evasion..._
+
+Blah, blah blah... let's see, scan your pass... check the computer... print ticket.
+
+Hmmm.
+}
+"""
+        |> content__________________________________ "infractionAutomationStep1" """
+Well, It's a card reader, and the only card I have on me is my Red Line Pass. It's worth a try.
+---
+*BEEP*
+---
+Aha! The computer seems to be booting up... very slowly. Where did they dig up this antique? It makes our computers at the office look new. As long as it's working I guess.
+"""
+        |> content__________________________________ "INFRACTIONS_CARD_READER" """
+{INFRACTIONS_ROOM_DOOR.infraction_step=1?  I can already see my personal information on the computer screen.  No need to scan my Red Line Pass again. }
+
+{INFRACTIONS_ROOM_DOOR.infraction_step=2?  They already  have my info.  I don't want to get fined again! }
+
+{INFRACTIONS_ROOM_DOOR.infraction_step=3?  The computer is still rebooting and the whole system is broken. Damn it! Why isn't anything working!
+}
+"""
+        |> content__________________________________ "infractionAutomationStep2" """
+I can see all of my personal info on the dusty computer monitor. My name, age, address. Everything. It all seems up to date, though that picture certainly isn't.
+
+I'll just going to hit send and get this over with.
+---
+...
+---
+This thing is sure taking a long time.
+---
+There it goes. Now it's asking me to select my violation. "Fare Evasion" sounds so official.  I hope this doesn't go on a permanent record. I don't know if I'll ever live this down.
+---
+There. It's sent. How long will I have to wait now for this to print?
+"""
+        |> content__________________________________ "INFRACTIONS_COMPUTER" """
+{INFRACTIONS_ROOM_DOOR.infraction_step=0?  The computer doesn't seem to be on. But there is a [green lit button](INFRACTIONS_GREEN_BUTTON) on it's front.}
+
+{INFRACTIONS_ROOM_DOOR.infraction_step=2?  Everything is sent and I just have to get my printed ticket. I wonder how much this is going to cost me.}
+
+{INFRACTIONS_ROOM_DOOR.infraction_step=3?  It's stuck on the blue screen of death! }
+"""
+        |> content__________________________________ "infractionAutomationStep3" """
+{Nothing's coming out! Did something break?
+---
+Something must have went wrong because the computer seems to be rebooting!
+
+Damn it! Why isn't anything working!  What do I do now?
+|
+The whole damn system is broken and I'm stuck!
+}
+"""
+        |> content__________________________________ "INFRACTIONS_PRINTER" """
+It's an old printer attached to the computer. It looks like it barely works.
+"""
+        |> content__________________________________ "breakInfractionAutomationSystem" """
+Nothing happens.
+---
+...
+---
+Oh no.  The computer is making a terrible sound.
+---
+Maybe it's starting up.
+---
+Nope.  It's rebooting.  But it looks like it froze.
+
+I'm stuck! What did I do? What did I do?
+"""
+        |> content__________________________________ "INFRACTIONS_GREEN_BUTTON" """
+It's not doing anything.  I'm stuck.
+"""
+        |> content__________________________________ "escapingInfractionRoom" """
+It's open! The reseting computer must have reset the locks. Seems like a flaw in the design, but I'll take it.
+---
+The door opens up to the maze of hallways. I think I can remember the path back to the station platform.
+
+It was left, left, right, straight till the water cooler, then another left, or was it right--
+---
+"Hey, what are you doing back here?"
+---
+Shit, another security guard. But he doesn't look like the one that brought me here.
+
+He's looking right at me.  He looks pissed...
+"""
+        |> content__________________________________ "GRIZZLED_SECURITY_GUARD" """
+"No one is supposed to be back here right now! What are you doing here?"
+
+..............
+
+Now that he's close up, he seems a lot different than the other
+security guards. He's an older man, short and thin too. Really not all
+that imposing. His security uniform even seems a little too big for him.
+---
+"I-I'm Steve. I was caught riding without a ticket and the Guards brought
+me here."
+"Damn, I told them over the radio to take everbody to  Museum Station,
+this place is supposed to be empty for the pest control guys."
+---
+"It's no problem I was just leaving."
+"Not that way you're not. The exit's over here. Follow me. And hurry up,
+they're going to spraying back here any minute."
+---
+He's seems in a hurry and I have to power walk just to keep up with him.
+And he keeps looking back at me making me nervous. Does he know I
+didn't get a ticket?
+---
+"So, uh, what are they spraying for down here?"
+"Rats. Things get everywhere and spread like fire. They get caught on the
+third rails and eat through old wires. We've got enough things breaking down
+here without their help. Guess someone found a big nest in one of the
+empty offices."
+"Oh, that sounds bad."
+---
+"So how'd you get out of the detention office any how? Nothing came up
+on the computers."
+--------------------------------------------------------------------------------------------------------
+If -1 in Obedience
+"I- I don't know. I got my ticket and everything. Your computer's probably
+aren't working properly. They seem a little... outdated."
+"You ain't wrong. This subway has been running on an outdated system
+for a long time. But nobody does anything about it. And when they do
+it's just a matter of time befroe something else goes out."
+
+If 0 or +1 in Obedience
+"The computer broke before I could get my ticket. But I guess it unlocked
+the door when the computer rebooted. Do I still need to get a ticket?"
+"Don't worry about it. We just need to get you out of here. Nothing seems to
+work down here anyways. Just promise you won't do what ever you did
+again, alright?"
+"Y-yes sir."
+---
+"It's been that way a long time down here. Broken things are patched up with
+duct tape and expected to keep on running. I don't think any of those big wigs
+at city hall have a clue how close this place is to falling apart. And without the
+trains people are going to have a real tough time getting around."
+"Oh."
+---
+"Just like that computer it's just going to up and break one day and not a single
+person's gonna know what to do about it."
+"I know the feeling."
+---
+As much as I'd like to get knee deep in this guys career woes, I really need to
+get out of here. There's a big set of double doors coming up in front of us. Maybe
+that's it!
+---
+"Here you are- Steve, was it? Out you go."
+"Thank you, sir."
+"And just so you don't end up back here again, take this."
+Orange Pass (ITEM) now in INVENTORY
+---
+"Wow, this is just what I needed. Thank you- uh, I don't think I caught your
+name."
+"That's cause I didn't give it. Now out with you!"
+
+END OF CHAPTER 1
+"""

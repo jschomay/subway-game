@@ -11,29 +11,41 @@ import Views.Shared as Shared
 
 
 view : Manifest.WorldModel -> Html Msg
-view worldmodel =
+view worldModel =
     let
-        interactiveView : ( Manifest.ID, DisplayComponent a ) -> Html Msg
-        interactiveView ( id, { name } ) =
-            div [ class "Station__interactable", onClick <| Interact id ]
+        interactableItemView ( id, name ) =
+            div [ class "Sign__item Sign__item--interactable", onClick <| Interact id ]
                 [ text name ]
 
         characters =
-            Rules.unsafeQuery "*.character.location=CENTRAL_GUARD_OFFICE" worldmodel
+            Rules.unsafeQuery "*.character.location=CENTRAL_GUARD_OFFICE" worldModel
 
         items =
-            Rules.unsafeQuery "*.item.location=CENTRAL_GUARD_OFFICE" worldmodel
+            Rules.unsafeQuery "*.item.location=CENTRAL_GUARD_OFFICE" worldModel
 
         inventory =
-            Rules.unsafeQuery "*.item.location=PLAYER" worldmodel
+            Rules.unsafeQuery "*.item.location=PLAYER" worldModel
+
+        inventoryItemView : ( Manifest.ID, Entity ) -> Html Msg
+        inventoryItemView ( id, entity ) =
+            div
+                [ classList
+                    [ ( "Inventory__item", True )
+                    , ( "Inventory__item--new", Rules.unsafeAssert (id ++ ".new") worldModel )
+                    ]
+                , onClick <| Interact id
+                ]
+                [ img [ src <| "img/icons/" ++ String.toLower id ++ ".svg" ] []
+                ]
+
+        inventoryView =
+            div [ class "Sign Sign--inventory" ]
+                [ div [ class "Sign__header2" ] [ text "Inventory" ]
+                , div [ class "Inventory" ] <| List.map inventoryItemView inventory
+                ]
     in
-    -- TODO this needs to be figured out
     div [ class "Scene CentralGuardOffice" ]
-        [ h2 [ class "CentralGuardOffice--top" ] [ text "Central Guard Office" ]
-        , p [ class "CentralGuardOffice--content" ]
-            [ p [] [ text "You are caught! " ]
-            , p [] [ text "End of demo, thanks for playing!" ]
-            , p [] [ text "Made on the ", a [ href "http://elmnarrativeengine.com" ] [ text "Elm Narrative Engine" ] ]
-            , p [] [ text "Contact ", a [ href "mailto:jeff@elmnarrativeengine.com" ] [ text "jeff@elmnarrativeengine.com" ] ]
-            ]
+        [ div [ class "CentralGuardOffice--content Sign__right" ] <|
+            List.map (Tuple.mapSecond .name >> interactableItemView) (characters ++ items)
+        , inventoryView
         ]

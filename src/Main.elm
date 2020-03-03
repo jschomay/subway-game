@@ -851,11 +851,22 @@ mainTitleView story =
 
 storyView : String -> Html Msg
 storyView story =
+    let
+        linkParser =
+            -- this works because only A tags have a `pathname` attribute (which
+            -- starts with a `/`)
+            Json.map
+                (\path -> ( Interact <| String.dropLeft 1 path, True ))
+                (Json.at [ "target", "pathname" ] Json.string)
+
+        catchLinkClicks =
+            preventDefaultOn "click" <| Json.map identity linkParser
+    in
     Html.Keyed.node "div"
         [ class "StoryLine" ]
         [ ( story
           , div [ class "StoryLine__content" ]
-                [ Markdown.toHtml [] story
+                [ Markdown.toHtml [ catchLinkClicks ] story
                 , span [ class "StoryLine__continue", onClick Continue ] [ text "Continue..." ]
                 ]
           )

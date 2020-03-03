@@ -187,3 +187,49 @@ rules =
             IF: PLAYER.chapter=1.location=CAPITOL_HEIGHTS.find_briefcase=3
             DO: PLAYER.location=ST_MARKS
             """
+        |> rule_______________________ "TICKET_INSPECTOR"
+            """
+            ON: TICKET_INSPECTOR
+            DO: INFRACTIONS_INSTRUCTIONS_POSTER.location=CENTRAL_GUARD_OFFICE
+                INFRACTIONS_COMPUTER.location=CENTRAL_GUARD_OFFICE
+                INFRACTIONS_PRINTER.location=CENTRAL_GUARD_OFFICE
+                INFRACTIONS_GREEN_BUTTON.location=CENTRAL_GUARD_OFFICE
+                INFRACTIONS_ROOM_DOOR.location=CENTRAL_GUARD_OFFICE
+                INFRACTIONS_CARD_READER.location=CENTRAL_GUARD_OFFICE
+                $.location=offscreen
+            """
+        |> rule_______________________ "infractionAutomationStep1"
+            """
+            ON: INFRACTIONS_CARD_READER
+            IF: INFRACTIONS_ROOM_DOOR.infraction_step=0
+            DO: INFRACTIONS_ROOM_DOOR.infraction_step=1
+            """
+        |> rule_______________________ "infractionAutomationStep2"
+            """
+            ON: INFRACTIONS_COMPUTER
+            IF: INFRACTIONS_ROOM_DOOR.infraction_step=1
+            DO: INFRACTIONS_ROOM_DOOR.infraction_step=2
+            """
+        |> rule_______________________ "infractionAutomationStep3"
+            """
+            ON: INFRACTIONS_PRINTER
+            IF: INFRACTIONS_ROOM_DOOR.infraction_step>1
+            DO: INFRACTIONS_ROOM_DOOR.infraction_step=3
+            """
+        |> rule_______________________ "breakInfractionAutomationSystem"
+            """
+            ON: INFRACTIONS_GREEN_BUTTON
+            IF: INFRACTIONS_ROOM_DOOR.infraction_step<3
+            DO: INFRACTIONS_ROOM_DOOR.infraction_step=3
+            """
+        |> rule_______________________ "escapingInfractionRoom"
+            """
+            ON: INFRACTIONS_ROOM_DOOR.infraction_step=3
+            DO: INFRACTIONS_INSTRUCTIONS_POSTER.location=offscreen
+                INFRACTIONS_COMPUTER.location=offscreen
+                INFRACTIONS_PRINTER.location=offscreen
+                INFRACTIONS_GREEN_BUTTON.location=offscreen
+                INFRACTIONS_ROOM_DOOR.location=offscreen
+                INFRACTIONS_CARD_READER.location=offscreen
+                GRIZZLED_SECURITY_GUARD.location=CENTRAL_GUARD_OFFICE
+            """

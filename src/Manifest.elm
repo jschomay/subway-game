@@ -170,6 +170,24 @@ entities =
     , entity "GREEN_SUIT_MAN.character.location=CAPITOL_HEIGHTS"
         "Man in a fancy green suit"
 
+    -- CENTRAL_GUARD_OFFICE
+    , entity "TICKET_INSPECTOR.character.location=CENTRAL_GUARD_OFFICE"
+        "Ticket inspector"
+    , entity "INFRACTIONS_INSTRUCTIONS_POSTER.item"
+        "\"Infractions Instructions\" poster"
+    , entity "INFRACTIONS_COMPUTER.item"
+        "Computer"
+    , entity "INFRACTIONS_PRINTER.item"
+        "Printer"
+    , entity "INFRACTIONS_GREEN_BUTTON.item"
+        "Green button"
+    , entity "INFRACTIONS_ROOM_DOOR.item"
+        "Solid door"
+    , entity "INFRACTIONS_CARD_READER.item"
+        "Card reader"
+    , entity "GRIZZLED_SECURITY_GUARD.character"
+        "Grizzled security guard"
+
     -- Stations
     , entity "ONE_HUNDRED_FORTH_STREET.station" "104th Street"
     , entity "FORTY_SECOND_STREET.station" "42nd Street"
