@@ -221,6 +221,7 @@ rules =
             ON: INFRACTIONS_GREEN_BUTTON
             IF: INFRACTIONS_ROOM_DOOR.infraction_step<3
             DO: INFRACTIONS_ROOM_DOOR.infraction_step=3
+                INFRACTIONS_GREEN_BUTTON.pressed
             """
         |> rule_______________________ "escapingInfractionRoom"
             """
@@ -232,4 +233,9 @@ rules =
                 INFRACTIONS_ROOM_DOOR.location=offscreen
                 INFRACTIONS_CARD_READER.location=offscreen
                 GRIZZLED_SECURITY_GUARD.location=CENTRAL_GUARD_OFFICE
+            """
+        |> rule_______________________ "meetConductorFirstTime"
+            """
+            ON: GRIZZLED_SECURITY_GUARD
+            DO: ORANGE_LINE_PASS.location=PLAYER
             """

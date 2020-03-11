@@ -61,6 +61,8 @@ entities =
         "Briefcase"
     , entity "RED_LINE_PASS.item.location=PLAYER.valid_on=RED_LINE"
         "Red Line metro pass"
+    , entity "ORANGE_LINE_PASS.item.valid_on=ORANAGE_LINE"
+        "Orange Line metro pass"
     , entity "CELL_PHONE.item.location=PLAYER.new"
         "Cell phone"
     , entity "MAP.item.map.silent"

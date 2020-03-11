@@ -62,6 +62,8 @@ general =
 """
         |> content__________________________________ "RED_LINE_PASS"
             "This gets me anywhere on the Red Line, but I really only use it to get to work and back home."
+        |> content__________________________________ "ORANGE_LINE_PASS"
+            "I got this from the security guard guy.  Now I can ride the Orange Line without getting caught."
         |> content__________________________________ "GRAFFITI"
             "That's just vulgar.  Why do people have to mess things up?"
         |> content__________________________________ "COFFEE" """
@@ -308,6 +310,10 @@ Get caffeinated
         |> content__________________________________ "fools_errand_achievement" """
 _Achievement unlocked:_  
 Fool's errand
+"""
+        |> content__________________________________ "transfer_station" """
+_Achievement unlocked:_
+Transfer station
 """
 
 
@@ -1241,79 +1247,42 @@ It was left, left, right, straight till the water cooler, then another left, or 
 ---
 "Hey, what are you doing back here?"
 ---
-Shit, another security guard. But he doesn't look like the one that brought me here.
+Shit, another security guard.
 
-He's looking right at me.  He looks pissed...
+He's looking right at me.
+
+He looks pissed...
 """
-        |> content__________________________________ "GRIZZLED_SECURITY_GUARD" """
+        |> content__________________________________ "meetConductorFirstTime" """
 "No one is supposed to be back here right now! What are you doing here?"
 
-..............
+Now that he's close up, he seems a lot different than the other security guards. His uniform even seems a little too big for him.  He does look flustered, though.
+---
+"I-I'm sorry, sir. {INFRACTIONS_GREEN_BUTTON.pressed? The computer was turned off.  I just pressed the button to turn it on|I followed all of the steps like the poster said}, but the whole thing broke down."
 
-Now that he's close up, he seems a lot different than the other
-security guards. He's an older man, short and thin too. Really not all
-that imposing. His security uniform even seems a little too big for him.
+He seems real upset.
 ---
-"I-I'm Steve. I was caught riding without a ticket and the Guards brought
-me here."
-"Damn, I told them over the radio to take everbody to  Museum Station,
-this place is supposed to be empty for the pest control guys."
----
-"It's no problem I was just leaving."
-"Not that way you're not. The exit's over here. Follow me. And hurry up,
-they're going to spraying back here any minute."
----
-He's seems in a hurry and I have to power walk just to keep up with him.
-And he keeps looking back at me making me nervous. Does he know I
-didn't get a ticket?
----
-"So, uh, what are they spraying for down here?"
-"Rats. Things get everywhere and spread like fire. They get caught on the
-third rails and eat through old wires. We've got enough things breaking down
-here without their help. Guess someone found a big nest in one of the
-empty offices."
-"Oh, that sounds bad."
----
-"So how'd you get out of the detention office any how? Nothing came up
-on the computers."
---------------------------------------------------------------------------------------------------------
-If -1 in Obedience
-"I- I don't know. I got my ticket and everything. Your computer's probably
-aren't working properly. They seem a little... outdated."
-"You ain't wrong. This subway has been running on an outdated system
-for a long time. But nobody does anything about it. And when they do
-it's just a matter of time befroe something else goes out."
+"That's typical.  Everything around here is breaking down under too much load."
 
-If 0 or +1 in Obedience
-"The computer broke before I could get my ticket. But I guess it unlocked
-the door when the computer rebooted. Do I still need to get a ticket?"
-"Don't worry about it. We just need to get you out of here. Nothing seems to
-work down here anyways. Just promise you won't do what ever you did
-again, alright?"
-"Y-yes sir."
+He looks in the room as if expecting to find someone else.
 ---
-"It's been that way a long time down here. Broken things are patched up with
-duct tape and expected to keep on running. I don't think any of those big wigs
-at city hall have a clue how close this place is to falling apart. And without the
-trains people are going to have a real tough time getting around."
-"Oh."
----
-"Just like that computer it's just going to up and break one day and not a single
-person's gonna know what to do about it."
-"I know the feeling."
----
-As much as I'd like to get knee deep in this guys career woes, I really need to
-get out of here. There's a big set of double doors coming up in front of us. Maybe
-that's it!
----
-"Here you are- Steve, was it? Out you go."
-"Thank you, sir."
-"And just so you don't end up back here again, take this."
-Orange Pass (ITEM) now in INVENTORY
----
-"Wow, this is just what I needed. Thank you- uh, I don't think I caught your
-name."
-"That's cause I didn't give it. Now out with you!"
+"I'm sorry pal, I didn't mean to yell at you.  They aren't supposed to be taking people here today.  It's closed.  For pest control spraying."
 
-END OF CHAPTER 1
+"Spraying?"
+
+"Look, just go.  The exit is down the hallway behind me.  Three lefts and a right and you're out.  I've got to take care of something."
+---
+I guess I got off easy.  I didn't see any rats or bugs or anything in there though.
+---
+"Hey, buddy!  Hang on a minute."
+
+Uh oh.
+---
+He holds something out to me.
+
+"Here, take this.  Don't want you to end up back here again."
+---
+It's an Orange Line pass!  That's great.
+
+What a strange guy.
 """
