@@ -61,7 +61,7 @@ entities =
         "Briefcase"
     , entity "RED_LINE_PASS.item.location=PLAYER.valid_on=RED_LINE"
         "Red Line metro pass"
-    , entity "ORANGE_LINE_PASS.item.valid_on=ORANAGE_LINE"
+    , entity "ORANGE_LINE_PASS.item.valid_on=ORANGE_LINE"
         "Orange Line metro pass"
     , entity "CELL_PHONE.item.location=PLAYER.new"
         "Cell phone"
@@ -98,7 +98,7 @@ entities =
     , entity "COMMUTER_1.character.location=EAST_MULBERRY"
         "Woman in a maroon jacket"
     , entity "LOUD_PAYPHONE_LADY.character.location=EAST_MULBERRY"
-        "Loud woman on pay phone"
+        "Loud woman on payphone"
     , entity "GRAFFITI.item.location=EAST_MULBERRY"
         "Graffiti on the wall"
     , entity "SODA_MACHINE.item.broken.location=EAST_MULBERRY"
@@ -171,6 +171,18 @@ entities =
         "Guy with Spiky Hair"
     , entity "GREEN_SUIT_MAN.character.location=CAPITOL_HEIGHTS"
         "Man in a fancy green suit"
+
+    -- SEVENTY_THIRD_STREET
+    , entity "BROOM_CLOSET.item.location=SEVENTY_THIRD_STREET"
+        "Broom closet"
+    , entity "DISTRESSED_WOMAN.character.location=SEVENTY_THIRD_STREET"
+        "Woman in a Pink Poncho"
+    , entity "PAYPHONE_SEVENTY_THIRD_STREET.item.location=SEVENTY_THIRD_STREET"
+        "Payphone"
+    , entity "TRASH_CAN_THIRD_STREET.item.location=SEVENTY_THIRD_STREET"
+        "Trash can"
+    , entity "BUSINESS_MAN.character.location=SEVENTY_THIRD_STREET"
+        "Slick Looking Business Man"
 
     -- CENTRAL_GUARD_OFFICE
     , entity "TICKET_INSPECTOR.character.location=CENTRAL_GUARD_OFFICE"

@@ -7,6 +7,7 @@ import NarrativeEngine.Core.WorldModel exposing (ChangeWorld(..), EntityMatcher(
 import NarrativeEngine.Syntax.Helpers exposing (..)
 import NarrativeEngine.Syntax.RuleParser exposing (..)
 import Rules.Chapter1
+import Rules.Chapter2
 import Rules.General
 import Rules.Helpers exposing (RulesSpec)
 import Rules.Intro
@@ -26,6 +27,7 @@ allRuleSpecs =
         [ Rules.Quests.rules
         , Rules.Intro.rules
         , Rules.Chapter1.rules
+        , Rules.Chapter2.rules
         ]
 
 

@@ -79,7 +79,12 @@ goals =
       , [ "Report it stolen?"
         , "Talk to Mark @ Spring Hill?"
         , "Broom closet @ 73rd"
+        , ""
         ]
+      )
+    , ( "PLAYER.call_boss"
+      , "Call Mr. Harris"
+      , [ "", "" ]
       )
     ]
 

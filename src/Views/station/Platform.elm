@@ -23,7 +23,7 @@ view map currentStation line worldModel =
 
         lineInfoView =
             div [ class "Line_map__info" ]
-                [ Connections.byLine line
+                [ Connections.byLine False line
                 , text <| lineInfo.name
                 ]
 
@@ -69,7 +69,7 @@ view map currentStation line worldModel =
                 ]
             <|
                 [ div [ class "Stop__connections" ] <|
-                    List.map Connections.byLine (List.filter ((/=) transferLine) <| connections station)
+                    List.map (Connections.byLine False) (List.filter ((/=) transferLine) <| connections station)
                 , div
                     [ classList
                         [ ( "Stop__dot", True )

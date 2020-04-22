@@ -149,7 +149,7 @@ rules =
             IF: PLAYER.chapter=1.location=SPRING_HILL
                 SKATER_DUDE.help_steve=1
             DO: PLAYER.destination=xxx.location=CAPITOL_HEIGHTS.find_briefcase=2
-                SKATER_DUDE.location=ONE_HUNDRED_FORTH_STREET
+                SKATER_DUDE.location=offscreen.help_steve=2
             """
         -- orange line
         |> rule_______________________ "findKeyInTrashCan"
@@ -193,7 +193,6 @@ rules =
             DO: INFRACTIONS_INSTRUCTIONS_POSTER.location=CENTRAL_GUARD_OFFICE
                 INFRACTIONS_COMPUTER.location=CENTRAL_GUARD_OFFICE
                 INFRACTIONS_PRINTER.location=CENTRAL_GUARD_OFFICE
-                INFRACTIONS_GREEN_BUTTON.location=CENTRAL_GUARD_OFFICE
                 INFRACTIONS_ROOM_DOOR.location=CENTRAL_GUARD_OFFICE
                 INFRACTIONS_CARD_READER.location=CENTRAL_GUARD_OFFICE
                 $.location=offscreen
@@ -219,7 +218,6 @@ rules =
         |> rule_______________________ "breakInfractionAutomationSystem"
             """
             ON: INFRACTIONS_GREEN_BUTTON
-            IF: INFRACTIONS_ROOM_DOOR.infraction_step<3
             DO: INFRACTIONS_ROOM_DOOR.infraction_step=3
                 INFRACTIONS_GREEN_BUTTON.pressed
             """
@@ -229,7 +227,6 @@ rules =
             DO: INFRACTIONS_INSTRUCTIONS_POSTER.location=offscreen
                 INFRACTIONS_COMPUTER.location=offscreen
                 INFRACTIONS_PRINTER.location=offscreen
-                INFRACTIONS_GREEN_BUTTON.location=offscreen
                 INFRACTIONS_ROOM_DOOR.location=offscreen
                 INFRACTIONS_CARD_READER.location=offscreen
                 GRIZZLED_SECURITY_GUARD.location=CENTRAL_GUARD_OFFICE
@@ -238,4 +235,5 @@ rules =
             """
             ON: GRIZZLED_SECURITY_GUARD
             DO: ORANGE_LINE_PASS.location=PLAYER
+                PLAYER.chapter=2
             """
