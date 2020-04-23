@@ -9,6 +9,7 @@ import Manifest exposing (..)
 import NarrativeEngine.Core.WorldModel exposing (..)
 import NarrativeEngine.Syntax.NarrativeParser as NarrativeParser
 import Rules
+import Set
 import Subway exposing (..)
 import Views.Goals as Goals
 import Views.Station.Connections as Connections
@@ -53,6 +54,37 @@ view map worldModel currentStation =
                     , ul [ class "Sign__list" ] list
                     ]
 
+        groupedEntityTags =
+            [ "pass", "missing_dog_posters" ]
+
+        groupInventory : List ( Manifest.ID, Entity ) -> List ( Manifest.ID, Entity )
+        groupInventory =
+            List.foldr
+                (\(( id, entity ) as e) ( entities, existingGroups ) ->
+                    List.foldl
+                        (\groupTag ( keep, groups ) ->
+                            if not <| Rules.unsafeAssert (id ++ "." ++ groupTag) worldModel then
+                                ( keep && True, groups )
+
+                            else if Set.member groupTag groups then
+                                ( keep && False, groups )
+
+                            else
+                                ( keep && True, Set.insert groupTag groups )
+                        )
+                        ( True, existingGroups )
+                        groupedEntityTags
+                        |> (\( keep, updatedGroups ) ->
+                                if keep then
+                                    ( e :: entities, updatedGroups )
+
+                                else
+                                    ( entities, updatedGroups )
+                           )
+                )
+                ( [], Set.empty )
+                >> Tuple.first
+
         inventoryItemView : ( Manifest.ID, Entity ) -> Html Msg
         inventoryItemView ( id, entity ) =
             div
@@ -84,7 +116,7 @@ view map worldModel currentStation =
         inventoryView =
             div [ class "Sign Sign--inventory" ]
                 [ div [ class "Sign__header2" ] [ text "Inventory" ]
-                , div [ class "Inventory" ] <| List.map inventoryItemView inventory
+                , div [ class "Inventory" ] <| List.map inventoryItemView <| groupInventory inventory
                 ]
     in
     div [ class "Scene Lobby" ]

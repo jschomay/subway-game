@@ -1,4 +1,4 @@
-module NarrativeContent.Static exposing (content)
+module NarrativeContent.General exposing (content)
 
 import Dict exposing (Dict)
 import NarrativeEngine.Syntax.Helpers exposing (ParseErrors)
@@ -38,7 +38,6 @@ content =
 That's just great.  I wish people would just follow the rules.
 |}
 """
-        |> content__________________________________ "ridingTheTrain" ""
         |> content__________________________________ "jumpTurnstileFail"
             "{?I'm not the type to jump turnstiles.|I don't want to get caught.|Better to stick to the lines I have passes for.}"
         |> content__________________________________ "outOfServiceStations" """
@@ -166,4 +165,13 @@ It's just a broom closet. Plenty of toilet paper and cleaning products, but no b
 """
         |> content__________________________________ "PAYPHONE_SEVENTY_THIRD_STREET" """
 It's a payphone. Not much use for those things anymore with everyone having cellphones these days.
+"""
+        |> content__________________________________ "inspectPasses" """
+I have a Red Line Pass{ORANGE_LINE_PASS.location=PLAYER? and an Orange Line Pass}.
+
+{It gets me anywhere on the Red Line, but I really only use it to get to work and back home.|}
+
+{ORANGE_LINE_PASS.new?
+I got the Orange Line Pass from the security guard guy.  Now I can ride the Orange Line without getting caught.
+}
 """

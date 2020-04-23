@@ -235,5 +235,6 @@ rules =
             """
             ON: GRIZZLED_SECURITY_GUARD
             DO: ORANGE_LINE_PASS.location=PLAYER
+                (*.pass).new
                 PLAYER.chapter=2
             """

@@ -48,3 +48,8 @@ rules =
             ON: NOTEBOOK.new
             DO: NOTEBOOK.-new.silent
             """
+        |> rule_______________________ "inspectPasses"
+            """
+            ON: *.pass
+            DO: (*.pass.new).-new
+            """

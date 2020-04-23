@@ -59,9 +59,9 @@ entities =
     -- inventory options
     , entity "BRIEFCASE.item.location=PLAYER"
         "Briefcase"
-    , entity "RED_LINE_PASS.item.location=PLAYER.valid_on=RED_LINE"
+    , entity "RED_LINE_PASS.pass.item.location=PLAYER.valid_on=RED_LINE"
         "Red Line metro pass"
-    , entity "ORANGE_LINE_PASS.item.valid_on=ORANGE_LINE"
+    , entity "ORANGE_LINE_PASS.pass.item.valid_on=ORANGE_LINE"
         "Orange Line metro pass"
     , entity "CELL_PHONE.item.location=PLAYER.new"
         "Cell phone"

@@ -3,7 +3,7 @@ module NarrativeContent exposing (parseAll, t)
 import Dict exposing (Dict)
 import NarrativeContent.Chapter1 as Chapter1
 import NarrativeContent.Chapter2 as Chapter2
-import NarrativeContent.Static as Static
+import NarrativeContent.General as General
 import NarrativeEngine.Syntax.Helpers exposing (ParseErrors)
 import NarrativeEngine.Syntax.NarrativeParser as NarrativeParser
 
@@ -34,7 +34,7 @@ all =
         , intro
         , Chapter1.content
         , Chapter2.content
-        , Static.content
+        , General.content
         ]
 
 
@@ -51,6 +51,7 @@ silent =
         |> content__________________________________ "goToLineTurnstile" ""
         |> content__________________________________ "goToLinePlatform" ""
         |> content__________________________________ "checkMap" ""
+        |> content__________________________________ "ridingTheTrain" ""
 
 
 quests : Dict String String
