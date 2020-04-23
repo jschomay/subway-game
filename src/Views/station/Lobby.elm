@@ -12,6 +12,7 @@ import Rules
 import Set
 import Subway exposing (..)
 import Views.Goals as Goals
+import Views.Shared as Shared
 import Views.Station.Connections as Connections
 
 
@@ -39,11 +40,6 @@ view map worldModel currentStation =
         items =
             Rules.unsafeQuery ("*.item.location=" ++ currentStation) worldModel
 
-        inventory =
-            Rules.unsafeQuery
-                "*.item.location=PLAYER"
-                worldModel
-
         sectionView name list =
             if List.isEmpty list then
                 text ""
@@ -53,49 +49,6 @@ view map worldModel currentStation =
                     [ div [ class "Sign__header3" ] [ text name ]
                     , ul [ class "Sign__list" ] list
                     ]
-
-        groupedEntityTags =
-            [ "pass", "missing_dog_posters" ]
-
-        groupInventory : List ( Manifest.ID, Entity ) -> List ( Manifest.ID, Entity )
-        groupInventory =
-            List.foldr
-                (\(( id, entity ) as e) ( entities, existingGroups ) ->
-                    List.foldl
-                        (\groupTag ( keep, groups ) ->
-                            if not <| Rules.unsafeAssert (id ++ "." ++ groupTag) worldModel then
-                                ( keep && True, groups )
-
-                            else if Set.member groupTag groups then
-                                ( keep && False, groups )
-
-                            else
-                                ( keep && True, Set.insert groupTag groups )
-                        )
-                        ( True, existingGroups )
-                        groupedEntityTags
-                        |> (\( keep, updatedGroups ) ->
-                                if keep then
-                                    ( e :: entities, updatedGroups )
-
-                                else
-                                    ( entities, updatedGroups )
-                           )
-                )
-                ( [], Set.empty )
-                >> Tuple.first
-
-        inventoryItemView : ( Manifest.ID, Entity ) -> Html Msg
-        inventoryItemView ( id, entity ) =
-            div
-                [ classList
-                    [ ( "Inventory__item", True )
-                    , ( "Inventory__item--new", Rules.unsafeAssert (id ++ ".new") worldModel )
-                    ]
-                , onClick <| Interact id
-                ]
-                [ img [ src <| "img/icons/" ++ String.toLower id ++ ".svg" ] []
-                ]
 
         nonInteractableItemView name =
             li [ class "Sign__item Sign__item--list" ] [ text name ]
@@ -112,16 +65,10 @@ view map worldModel currentStation =
                     , div [ class "Sign__right" ] <| List.map (Tuple.mapSecond .name >> interactableItemView) (characters ++ items)
                     ]
                 ]
-
-        inventoryView =
-            div [ class "Sign Sign--inventory" ]
-                [ div [ class "Sign__header2" ] [ text "Inventory" ]
-                , div [ class "Inventory" ] <| List.map inventoryItemView <| groupInventory inventory
-                ]
     in
     div [ class "Scene Lobby" ]
         [ div [ class "Lobby__scene" ]
             [ stationInfoView
-            , inventoryView
+            , Shared.inventoryView worldModel
             ]
         ]

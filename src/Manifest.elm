@@ -183,6 +183,18 @@ entities =
         "Trash can"
     , entity "BUSINESS_MAN.character.location=SEVENTY_THIRD_STREET"
         "Slick Looking Business Man"
+    , entity "MISSING_DOG_POSTER_1.item.missing_dog_poster"
+        "Missing dog poster"
+    , entity "MISSING_DOG_POSTER_2.item.missing_dog_poster"
+        "Missing dog poster"
+    , entity "MISSING_DOG_POSTER_3.item.missing_dog_poster"
+        "Missing dog poster"
+    , entity "MISSING_DOG_POSTER_4.item.missing_dog_poster"
+        "Missing dog poster"
+    , entity "MISSING_DOG_POSTER_5.item.missing_dog_poster"
+        "Missing dog poster"
+    , entity "MISSING_DOG_POSTER_0.item.missing_dog_poster.location=SPRING_HILL"
+        "Missing dog poster"
 
     -- CENTRAL_GUARD_OFFICE
     , entity "TICKET_INSPECTOR.character.location=CENTRAL_GUARD_OFFICE"

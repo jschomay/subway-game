@@ -22,30 +22,9 @@ view worldModel =
 
         items =
             Rules.unsafeQuery "*.item.location=CENTRAL_GUARD_OFFICE" worldModel
-
-        inventory =
-            Rules.unsafeQuery "*.item.location=PLAYER" worldModel
-
-        inventoryItemView : ( Manifest.ID, Entity ) -> Html Msg
-        inventoryItemView ( id, entity ) =
-            div
-                [ classList
-                    [ ( "Inventory__item", True )
-                    , ( "Inventory__item--new", Rules.unsafeAssert (id ++ ".new") worldModel )
-                    ]
-                , onClick <| Interact id
-                ]
-                [ img [ src <| "img/icons/" ++ String.toLower id ++ ".svg" ] []
-                ]
-
-        inventoryView =
-            div [ class "Sign Sign--inventory" ]
-                [ div [ class "Sign__header2" ] [ text "Inventory" ]
-                , div [ class "Inventory" ] <| List.map inventoryItemView inventory
-                ]
     in
     div [ class "Scene CentralGuardOffice" ]
         [ div [ class "CentralGuardOffice--content Sign__right" ] <|
             List.map (Tuple.mapSecond .name >> interactableItemView) (characters ++ items)
-        , inventoryView
+        , Shared.inventoryView worldModel
         ]
