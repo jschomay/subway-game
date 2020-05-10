@@ -293,7 +293,12 @@ specialEvents ruleId model =
             ( model, Process.sleep 300 |> Task.perform (\_ -> Achievement "fools_errand_achievement") )
 
         "meetConductorFirstTime" ->
-            ( { model | scene = Lobby }, Process.sleep 300 |> Task.perform (\_ -> Achievement "transfer_station") )
+            -- to avoid the popup when loading a scene
+            if not model.showSelectScene then
+                ( { model | scene = Lobby }, Process.sleep 300 |> Task.perform (\_ -> Achievement "transfer_station") )
+
+            else
+                ( model, Cmd.none )
 
         other ->
             if List.member other [ "goToLineTurnstile", "followSkaterDudeToOrangeLine" ] then
@@ -812,6 +817,11 @@ selectSceneView model =
             , "INFRACTIONS_GREEN_BUTTON"
             , "INFRACTIONS_ROOM_DOOR"
             , "GRIZZLED_SECURITY_GUARD"
+            , "ORANGE_LINE"
+            , "ORANGE_LINE"
+            , "SEVENTY_THIRD_STREET"
+            , "BROOM_CLOSET"
+            , "PAYPHONE_SEVENTY_THIRD_STREET"
             ]
 
         skip i =
@@ -819,6 +829,7 @@ selectSceneView model =
 
         scenes =
             [ ( "(Interact with everything)", ( model, fullPlay ) )
+            , ( "Pay phone", skip 56 )
             , ( "Recieved orange line pass", skip 51 )
             , ( "Caught", skip 47 )
             , ( "Orange line", skip 43 )

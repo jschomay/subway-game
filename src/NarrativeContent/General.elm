@@ -175,3 +175,6 @@ I have a Red Line Pass{ORANGE_LINE_PASS.location=PLAYER? and an Orange Line Pass
 I got the Orange Line Pass from the security guard guy.  Now I can ride the Orange Line without getting caught.
 }
 """
+        |> content__________________________________ "BUSINESS_MAN" """
+He looks busy.
+"""

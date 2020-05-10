@@ -32,7 +32,7 @@ rules =
                 MISSING_DOG_POSTER_3.location=PLAYER
                 MISSING_DOG_POSTER_4.location=PLAYER
                 MISSING_DOG_POSTER_5.location=PLAYER
-                DISTRESSED_WOMAN.location=offscreen
+                DISTRESSED_WOMAN.location=offscreen.missing_dog_posters_quest=1
             """
         |> rule_______________________ "tryingToCallBossWithCellphone"
             """
@@ -47,7 +47,7 @@ rules =
             """
             ON: *.missing_dog_poster.location=PLAYER
             DO: $.location=(link PLAYER.location)
-                DISTRESSED_WOMAN.help_hang+1
+                DISTRESSED_WOMAN.missing_dog_posters_quest+1
             """
         |> rule_______________________ "tryToHangDogPosterOnWrongLine"
             """
@@ -55,8 +55,36 @@ rules =
             IF: PLAYER.!line=RED_LINE
             """
         |> rule_______________________ "tryToHangRedundantDogPosters"
+            -- this needs an extra condition to override tryToHangDogPosterOnWrongLine
             """
             ON: *.missing_dog_poster.location=PLAYER
             IF: *.missing_dog_poster.location=(link PLAYER.location)
-                DISTRESSED_WOMAN.help_hang<99
+                DISTRESSED_WOMAN.missing_dog_posters_quest>0
             """
+        |> rule_______________________ "askBusinessmanForChange"
+            """
+            ON: BUSINESS_MAN
+            IF: PLAYER.call_boss>0
+            DO: BUSINESS_MAN.location=offscreen
+            """
+        |> rule_______________________ "trashcanWhileHoldingPosters"
+            """
+            ON: *.trashcan
+            IF: *.missing_dog_poster.location=PLAYER
+            """
+        |> rule_______________________ "throwAwayPosters"
+            """
+            ON: "through_away_posters"
+            DO: (*.missing_dog_poster).location=offscreen
+                PLAYER.good_will-3
+            """
+
+
+
+-- TODO
+-- remove busines man and distressed woman after using the payphone
+-- go back and rework mother scene to user her 50 cents to buy a soda
+-- (instead of the dollar bill)
+-- put all change finding entities in place when call_boss gets set to 1
+-- on payphone when calling boss, if you alrady have 50 cents but screaming child
+-- quest is only at 1, show different text

@@ -99,4 +99,8 @@ distractions =
       , "Stop the kid from screaming."
       , [ "Find a soda for the kid", "" ]
       )
+    , ( "DISTRESSED_WOMAN.missing_dog_posters_quest"
+      , "Hang up the missing dog posters."
+      , [ "", "", "", "", "", "" ]
+      )
     ]

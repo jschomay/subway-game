@@ -17,7 +17,7 @@
             "elm-community/intdict": "3.0.0",
             "elm-community/list-extra": "8.0.0",
             "elm-explorations/markdown": "1.0.0",
-            "jschomay/elm-narrative-engine": "5.0.1",
+            "jschomay/elm-narrative-engine": "6.0.0",
             "the-sett/elm-color": "1.0.0"
         },
         "indirect": {

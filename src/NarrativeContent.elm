@@ -86,7 +86,7 @@ Without hesitation the child snatches the can from my hand and starts guzzling i
 
 "Thank you so much!  Keep the change.  Nice to know there are still decent people around."
 """
-        |> content__________________________________ "MOTHER" """
+        |> content__________________________________ "noMoreScreamingChild" """
 The kid has stopped screaming and the mother looks very relieved.  So am I.
 """
         ------------------------

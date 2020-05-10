@@ -14,7 +14,7 @@ rules =
             """
         |> rule_______________________ "offerToHelpScreamingChild"
             """
-            ON: MOTHER.met.screaming_child_quest=0
+            ON: MOTHER.met.screaming_child_quest<2
             DO: DOLLAR_BILL.location=PLAYER
                 MOTHER.screaming_child_quest=1
             """
@@ -33,6 +33,10 @@ rules =
             IF: SODA.location=PLAYER
             DO: SODA.location=offscreen
                 MOTHER.screaming_child_quest=2
+            """
+        |> rule_______________________ "noMoreScreamingChild"
+            """
+            ON: MOTHER.screaming_child_quest=2
             """
         -----------------------------
         |> rule_______________________ "ratty_hat_man_advice_1"
