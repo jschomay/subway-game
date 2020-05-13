@@ -37,6 +37,7 @@ rules =
             IF: SODA.location=PLAYER
             DO: SODA.location=offscreen
                 MOTHER.screaming_child_quest=2
+                PLAYER.good_will+2
             """
         |> rule_______________________ "noMoreScreamingChild"
             """
