@@ -205,11 +205,23 @@ parseNarrative model matchedRuleID trigger rawNarrative =
                            )
                   )
                 , ( "description", replaceTrigger >> NarrativeContent.t >> Ok )
-                , ( "amount"
+                , ( "format_amount"
                   , replaceTrigger
                         >> (\id ->
                                 getStat id "amount" model.worldModel
-                                    |> Maybe.map String.fromInt
+                                    |> Maybe.map
+                                        (\n ->
+                                            "$"
+                                                ++ (String.fromInt <| n // 100)
+                                                ++ "."
+                                                ++ (case modBy 100 n of
+                                                        0 ->
+                                                            "00"
+
+                                                        rem ->
+                                                            String.fromInt rem
+                                                   )
+                                        )
                                     |> Result.fromMaybe ("Error looking up 'amount' stat on " ++ id)
                            )
                   )

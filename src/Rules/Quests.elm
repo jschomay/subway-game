@@ -14,18 +14,22 @@ rules =
             """
         |> rule_______________________ "offerToHelpScreamingChild"
             """
-            ON: MOTHER.met.screaming_child_quest<2
-            DO: DOLLAR_BILL.location=PLAYER
+            ON: MOTHER.met.screaming_child_quest=0
+            DO: CHANGE.location=PLAYER.amount+50
                 MOTHER.screaming_child_quest=1
+            """
+        |> rule_______________________ "keepBotheringMother"
+            """
+            ON: MOTHER.met.screaming_child_quest=1
             """
         |> rule_______________________ "getSodaForScreamingChild"
             """
             ON: SODA_MACHINE
             IF: MOTHER.screaming_child_quest=1
-                DOLLAR_BILL.location=PLAYER
-            DO: DOLLAR_BILL.location=offscreen
+                CHANGE.location=PLAYER.amount>49
+                SODA.!location=PLAYER
+            DO: CHANGE.amount-50
                 SODA.location=PLAYER
-                CHANGE.location=PLAYER.amount+25
             """
         |> rule_______________________ "giveSodaToScreamingChild"
             """

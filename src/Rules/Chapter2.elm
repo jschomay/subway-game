@@ -74,7 +74,7 @@ rules =
             """
         |> rule_______________________ "throwAwayPosters"
             """
-            ON: "through_away_posters"
+            ON: "throw_away_posters"
             DO: (*.missing_dog_poster).location=offscreen
                 PLAYER.good_will-3
             """
@@ -83,8 +83,6 @@ rules =
 
 -- TODO
 -- remove busines man and distressed woman after using the payphone
--- go back and rework mother scene to user her 50 cents to buy a soda
--- (instead of the dollar bill)
 -- put all change finding entities in place when call_boss gets set to 1
 -- on payphone when calling boss, if you alrady have 50 cents but screaming child
 -- quest is only at 1, show different text

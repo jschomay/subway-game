@@ -67,24 +67,26 @@ This situation seems bad for everyone.
 (Talk to the mother again if you want to offer help.)
 """
         |> content__________________________________ "offerToHelpScreamingChild" """
-{"Hey, I could go get you a soda if you want..."
+"Hey, I could go get you a soda if you want..."
 ---
-"Oh my God, yes, please!  Here, take a dollar to buy it.  Thank you!"
-|"Did you find any soda?"
+"Oh my God, yes, please!  Here, take some change to buy it.  Thank you!"
+"""
+        |> content__________________________________ "keepBotheringMother" """
+{"Did you find any soda?"
 
 "Um... not yet."
 |"So are you going to get me a soda or not?"
 }
 """
         |> content__________________________________ "getSodaForScreamingChild" """
-I put my dollar in and a soda and some change comes out.  Hope it's the right flavor.
+I put 50 cents in and a soda comes out.  Hope it's the right flavor.
 """
         |> content__________________________________ "giveSodaToScreamingChild" """
 Here's your soda. I didn't know what flavor to get."
 
 Without hesitation the child snatches the can from my hand and starts guzzling it down.
 
-"Thank you so much!  Keep the change.  Nice to know there are still decent people around."
+"Thank you so much!  Nice to know there are still decent people around."
 """
         |> content__________________________________ "noMoreScreamingChild" """
 The kid has stopped screaming and the mother looks very relieved.  So am I.

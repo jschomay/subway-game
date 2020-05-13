@@ -117,7 +117,7 @@ Nothing but trash in here.
         |> content__________________________________ "trashcanWhileHoldingPosters" """
 Nothing but trash in here.
 ---
-I'm lugging around these missing dog posters.  I don't want to go hang them all up, maybe I should just [throw them away](through_away_posters) instead.
+I'm lugging around these missing dog posters.  I don't want to go hang them all up, maybe I should just [throw them away](throw_away_posters) instead.
 """
         |> content__________________________________ "throwAwayPosters" """
 I'll just toss these posters in here. I mean, I've got more important things to do than looking around for "Jonathan."

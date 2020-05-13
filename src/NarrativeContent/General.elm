@@ -131,7 +131,7 @@ Children aren't supposed to be down here unsupervised. And that game looks dange
 This soda is probably really old and gross.
 """
         |> content__________________________________ "CHANGE" """
-I have 0.{CHANGE.amount} cents.
+I have {CHANGE.format_amount} in change.
 """
         |> content__________________________________ "DOLLAR_BILL" """
 A wrinkled dollar bill.
