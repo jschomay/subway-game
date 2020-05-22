@@ -178,3 +178,9 @@ I got the Orange Line Pass from the security guard guy.  Now I can ride the Oran
         |> content__________________________________ "BUSINESS_MAN" """
 He looks busy.
 """
+        |> content__________________________________ "FORT_FRANK" """
+{MAN_IN_HOT_DOG_SUIT.job_hunt_quest_1>1?
+I may have helped one get a job, but I still don't like hot dogs.
+|
+I'm not really a hot dog guy.}
+"""

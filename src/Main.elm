@@ -834,6 +834,27 @@ selectSceneView model =
             , "SEVENTY_THIRD_STREET"
             , "BROOM_CLOSET"
             , "PAYPHONE_SEVENTY_THIRD_STREET"
+            , "ORANGE_LINE"
+            , "ORANGE_LINE"
+            , "SPRING_HILL"
+            , "RED_LINE"
+
+            -- 60
+            , "RED_LINE"
+            , "TWIN_BROOKS"
+            , "MAN_IN_HOT_DOG_SUIT"
+            , "RED_LINE"
+            , "RED_LINE"
+            , "SPRING_HILL"
+            , "ORANGE_LINE"
+            , "ORANGE_LINE"
+            , "UNIVERSITY"
+            , "FORT_FRANK"
+            , "MAN_IN_HOT_DOG_SUIT"
+            , "ORANGE_LINE"
+            , "ORANGE_LINE"
+            , "SEVENTY_THIRD_STREET"
+            , "PAYPHONE_SEVENTY_THIRD_STREET"
             ]
 
         skip i =
@@ -841,7 +862,8 @@ selectSceneView model =
 
         scenes =
             [ ( "(Interact with everything)", ( model, fullPlay ) )
-            , ( "Pay phone", skip 56 )
+            , ( "Call boss", skip 76 )
+            , ( "Empty broom closet", skip 55 )
             , ( "Recieved orange line pass", skip 51 )
             , ( "Caught", skip 47 )
             , ( "Orange line", skip 43 )

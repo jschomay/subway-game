@@ -4,6 +4,7 @@ import Dict exposing (Dict)
 import NarrativeContent.Chapter1 as Chapter1
 import NarrativeContent.Chapter2 as Chapter2
 import NarrativeContent.General as General
+import NarrativeContent.Quests as Quests
 import NarrativeEngine.Syntax.Helpers exposing (ParseErrors)
 import NarrativeEngine.Syntax.NarrativeParser as NarrativeParser
 
@@ -29,7 +30,7 @@ all =
     List.foldl Dict.union
         Dict.empty
         [ silent
-        , quests
+        , Quests.content
         , achievements
         , intro
         , Chapter1.content
@@ -52,101 +53,6 @@ silent =
         |> content__________________________________ "goToLinePlatform" ""
         |> content__________________________________ "checkMap" ""
         |> content__________________________________ "ridingTheTrain" ""
-
-
-quests : Dict String String
-quests =
-    Dict.empty
-        |> content__________________________________ "meetingScreamingChild" """
-The child is screaming his head off.  It's actually very annoying.  Even his mother looks like she can barely take any more of it.  She looks at me apologetically.
----
-"I'm sorry, he won't calm down.  He wants a soda, but I can't leave this spot because I'm waiting for someone."
----
-This situation seems bad for everyone.
-
-(Talk to the mother again if you want to offer help.)
-"""
-        |> content__________________________________ "offerToHelpScreamingChild" """
-"Hey, I could go get you a soda if you want..."
----
-"Oh my God, yes, please!  Here, take some change to buy it.  Thank you!"
-"""
-        |> content__________________________________ "keepBotheringMother" """
-{"Did you find any soda?"
-
-"Um... not yet."
-|"So are you going to get me a soda or not?"
-}
-"""
-        |> content__________________________________ "getSodaForScreamingChild" """
-I put 50 cents in and a soda comes out.  Hope it's the right flavor.
-"""
-        |> content__________________________________ "giveSodaToScreamingChild" """
-Here's your soda. I didn't know what flavor to get."
-
-Without hesitation the child snatches the can from my hand and starts guzzling it down.
-
-"Thank you so much!  Nice to know there are still decent people around."
-"""
-        |> content__________________________________ "noMoreScreamingChild" """
-The kid has stopped screaming and the mother looks very relieved.  So am I.
-"""
-        ------------------------
-        |> content__________________________________ "ratty_hat_man_advice_1" """
-He's staring at me from across the room and mumbling to himself.
-
-Wait a minute, did he just say something about a briefcase?
----
-"Excuse me, I thought I just heard you mention--"
-
-He holds up his finger with the utmost importance.
-
-"Holds your things.  That's what you need.  A place to hold your things.  Where are your things?"
-
-"Um... my briefcase was stolen.  Do you know something?"
----
-"Ah... briefcase!  Yes.  West Mulberry.  East.  No, West.  Mulberry.  Yes."
-
-"Are you saying you saw it at West Mulberry?"
-
-"West Mulberry.  West Mulberry."
-
-With that he turns and scampers away.
-"""
-        |> content__________________________________ "ratty_hat_man_advice_2" """
-Hey, it's that guy again.  Oh no, he saw me.  Now he's approaching me.
----
-"I have your case."
----
-"Wait, what?"
----
-"Forty third.  That's where it's at.  That's where it's all at."
-
-Again, he dashes away.
-"""
-        |> content__________________________________ "ratty_hat_man_advice_3" """
-There he is again.
-
-"Proposal.  I've got a proposal.  A proposal to make."
-
-"Ok, I'll bite."
----
-"My friends, they know.  Samual, Walter and Mark.  Go to them.  Say hello."
-"""
-        |> content__________________________________ "ratty_hat_man_advice_4" """
-Oh no, not again.
----
-"Brief case.  Thief's face.  Safe place.  Iris Lake."
-"""
-        |> content__________________________________ "ratty_hat_man_advice_5" """
-"Hey you!  I've been on a wild goose chase all over this subway system following your nonsense advice.  Have you seen my briefcase or haven't you?"
----
-"Briefcase?  I haven't heard of any briefcase.  You really shouldn't talk to strangers.  Now if you'll excuse me, I have to go."
-"""
-
-
-
--- end quests
 
 
 achievements : Dict String String

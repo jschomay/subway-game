@@ -141,6 +141,10 @@ entities =
         "Map on the wall"
     , entity "MAINTENANCE_MAN.character.location=TWIN_BROOKS"
         "Maintenance man"
+    , entity "MAN_IN_HOT_DOG_SUIT.character"
+        "Man in a hot dog suit"
+    , entity "MASCOT_PAPERS.item"
+        "Mascot papers"
 
     --  BROADWAY_STREET
     , entity "EXIT.item.location=BROADWAY_STREET"
@@ -188,13 +192,19 @@ entities =
     , entity "BROOM_CLOSET.item.location=SEVENTY_THIRD_STREET"
         "Broom closet"
     , entity "DISTRESSED_WOMAN.character.location=SEVENTY_THIRD_STREET"
-        "Woman in a Pink Poncho"
+        "Woman in a pink poncho"
     , entity "PAYPHONE_SEVENTY_THIRD_STREET.item.location=SEVENTY_THIRD_STREET"
         "Payphone"
     , entity "TRASH_CAN_SEVENTY_THIRD_STREET.item.trashcan.location=SEVENTY_THIRD_STREET"
         "Trash can"
     , entity "BUSINESS_MAN.character.location=SEVENTY_THIRD_STREET"
-        "Slick Looking Business Man"
+        "Slick looking business man"
+    , entity "ABANDONED_JACKET.item.location=SEVENTY_THIRD_STREET"
+        "Abandoned jacket"
+
+    -- UNIVERSITY
+    , entity "FORT_FRANK.item.fixed.location=UNIVERSITY"
+        "Fort Frank hot dog stand"
 
     -- CENTRAL_GUARD_OFFICE
     , entity "TICKET_INSPECTOR.character.location=CENTRAL_GUARD_OFFICE"

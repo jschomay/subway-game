@@ -122,3 +122,25 @@ I'm lugging around these missing dog posters.  I don't want to go hang them all 
         |> content__________________________________ "throwAwayPosters" """
 I'll just toss these posters in here. I mean, I've got more important things to do than looking around for "Jonathan."
 """
+        |> content__________________________________ "ABANDONED_JACKET" """
+{PLAYER.call_boss=1?
+{Maybe I'll just check the pockets for change. I mean, it'll probably just get thrown out anyway.
+---
+...
+---
+Nope, nothing. Ah, well. It was worth a look anyways.
+|
+The pockets are empty.  No change in here.
+}
+|
+{It's lying on the bench like someone just forgot it. It's pretty worn out so I sort of doubt they'll be coming back for it.
+|It's just a discarded jacket. Nobody's coming back for it.}
+}
+"""
+        --
+        |> content__________________________________ "useChangeFromMotherToCallBoss" """
+        TODO needs content!!!!!!!!!!!!!!!!!!!!!!!!!!!
+"""
+        |> content__________________________________ "collectedEnoughChangeToCallBoss" """
+        TODO needs content!!!!!!!!!!!!!!!!!!!!!!!!!!!
+"""

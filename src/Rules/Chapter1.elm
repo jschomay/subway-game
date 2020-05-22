@@ -237,4 +237,5 @@ rules =
             DO: ORANGE_LINE_PASS.location=PLAYER
                 (*.pass).new
                 PLAYER.chapter=2
+                MAN_IN_HOT_DOG_SUIT.location=TWIN_BROOKS
             """

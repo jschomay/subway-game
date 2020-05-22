@@ -69,3 +69,24 @@ rules =
             ON: MAN_IN_RATTY_HAT.ratty_hat_man_advice=4
             DO: $.location=offscreen.ratty_hat_man_advice+1
             """
+        ------------------------
+        |> rule_______________________ "meet_the_man_in_the_hot_dog_suit"
+            """
+            ON: MAN_IN_HOT_DOG_SUIT.location=TWIN_BROOKS
+            DO: MASCOT_PAPERS.location=PLAYER
+                MAN_IN_HOT_DOG_SUIT.job_hunt_quest_1=1
+            """
+        |> rule_______________________ "give_mascot_papers_to_frank"
+            """
+            ON: FORT_FRANK
+            IF: MAN_IN_HOT_DOG_SUIT.job_hunt_quest_1=1
+            DO: MASCOT_PAPERS.location=offscreen
+                MAN_IN_HOT_DOG_SUIT.job_hunt_quest_1=2.location=UNIVERSITY
+            """
+        |> rule_______________________ "check_up_on_hot_dog_guy_at_fort_frank"
+            """
+            ON: MAN_IN_HOT_DOG_SUIT.job_hunt_quest_1=2
+            DO: MAN_IN_HOT_DOG_SUIT.job_hunt_quest_1=3
+                CHANGE.location=PLAYER.amount+50
+                PLAYER.good_will+3
+            """

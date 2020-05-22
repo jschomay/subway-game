@@ -103,4 +103,8 @@ distractions =
       , "Hang up the missing dog posters."
       , [ "", "", "", "", "", "" ]
       )
+    , ( "MAN_IN_HOT_DOG_SUIT.job_hunt_quest_1"
+      , "Help the hot dog mascot work at Fort Frank"
+      , [ "", "", "" ]
+      )
     ]
