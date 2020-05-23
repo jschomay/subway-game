@@ -7,8 +7,6 @@
 }
 
 .Notebook {
-  display: flex;
-  justify-content: space-around;
   color: black;
   font-family: "Nanum Pen Script", cursive;
   background: center no-repeat url("../img/notebook.jpg");
@@ -22,7 +20,7 @@
   left: 0px;
   margin: auto;
   position: absolute;
-  padding-top: 2em;
+  padding-top: 1em;
   font-size: 2em;
 }
 
@@ -31,9 +29,56 @@
 }
 
 .Notebook__page {
-  flex: 0 0 auto;
-  width: 40%;
+  user-select: none;
+  padding: 0 1em;
+  width: 100%;
+  height: 100%;
   padding-left: 1em;
+}
+
+.Notebook__header {
+  font-size: 0.8em;
+  text-decoration: underline;
+  margin-bottom: 1em;
+}
+
+.Notebook__tab {
+  padding: 0.15em 0.2em;
+  position: absolute;
+  background: #888;
+  top: 40%;
+  font-size: 1em;
+  user-select: none;
+  cursor: pointer;
+}
+
+.Notebook__page--distractions .Notebook__tab {
+  transform: rotate(-90deg);
+  left: -1.1em;
+}
+
+.Notebook__page--goals .Notebook__tab {
+  transform: rotate(90deg);
+  right: -2.5em;
+}
+
+.Notebook__content {
+  height: 90%;
+  display: flex;
+  flex-wrap: wrap;
+  overflow: auto;
+  width: 100%;
+  justify-content: space-between;
+  align-content: flex-start;
+}
+
+.Notebook__item {
+  flex: 0 1 46%;
+  margin-bottom: 1em;
+}
+
+.Notebook__page--distractions .Notebook__item {
+  font-size: 0.8em;
 }
 
 .Notebook__subitem {

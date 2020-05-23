@@ -1,4 +1,4 @@
-module LocalTypes exposing (Model, Msg(..), Rule, Rules, Scene(..), TrainProps, TrainStatus(..))
+module LocalTypes exposing (Model, Msg(..), NoteBookPage(..), Rule, Rules, Scene(..), TrainProps, TrainStatus(..))
 
 import Dict exposing (Dict)
 import Manifest
@@ -17,6 +17,7 @@ type alias Model =
     , ruleMatchCounts : Dict RuleID Int
     , showMap : Bool
     , showNotebook : Bool
+    , noteBookPage : NoteBookPage
     , showTranscript : Bool
     , gameOver : Bool
     , debugState : Maybe Debug.State
@@ -41,6 +42,7 @@ type Msg
     | Continue
     | Achievement String
     | ToggleTranscript
+    | ToggleNotebookPage
     | DebugSeachWorldModel String
 
 
@@ -55,6 +57,11 @@ type alias Rules =
 type TrainStatus
     = InTransit
     | Arriving
+
+
+type NoteBookPage
+    = Goals
+    | Distractions
 
 
 type alias TrainProps =

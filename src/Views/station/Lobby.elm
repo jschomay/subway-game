@@ -11,7 +11,6 @@ import NarrativeEngine.Syntax.NarrativeParser as NarrativeParser
 import Rules
 import Set
 import Subway exposing (..)
-import Views.Goals as Goals
 import Views.Shared as Shared
 import Views.Station.Connections as Connections
 

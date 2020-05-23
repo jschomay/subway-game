@@ -23,7 +23,7 @@ import Set
 import Subway exposing (..)
 import Task
 import Tuple
-import Views.Goals as Goals
+import Views.NoteBook as NoteBook
 import Views.Station.CentralGuardOffice as CentralGuardOffice
 import Views.Station.Lobby as Lobby
 import Views.Station.Platform as Platform
@@ -92,6 +92,7 @@ init initialWorldModel flags =
       , scene = MainTitle
       , showMap = False
       , showNotebook = False
+      , noteBookPage = Goals
       , showTranscript = False
       , gameOver = False
       , debugState = debugState
@@ -464,6 +465,19 @@ update rules msg model =
                 else
                     ( model, Cmd.none )
 
+            ToggleNotebookPage ->
+                ( { model
+                    | noteBookPage =
+                        case model.noteBookPage of
+                            Goals ->
+                                Distractions
+
+                            Distractions ->
+                                Goals
+                  }
+                , Cmd.none
+                )
+
             ToggleMap ->
                 if Rules.unsafeAssert "MAP.location=PLAYER" model.worldModel then
                     ( { model | showMap = not model.showMap }
@@ -746,7 +760,7 @@ mainView model =
           )
         , ( "notebook"
           , if model.showNotebook then
-                notebookView model.worldModel
+                notebookView model.noteBookPage model.worldModel
 
             else
                 text ""
@@ -939,6 +953,6 @@ mapView =
         ]
 
 
-notebookView : Manifest.WorldModel -> Html Msg
-notebookView worldModel =
-    div [ class "Notebook__scrim", onClick ToggleNotebook ] [ Goals.view worldModel ]
+notebookView : NoteBookPage -> Manifest.WorldModel -> Html Msg
+notebookView page worldModel =
+    div [ class "Notebook__scrim", onClick ToggleNotebook ] [ NoteBook.view page worldModel ]
