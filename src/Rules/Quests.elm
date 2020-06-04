@@ -78,15 +78,30 @@ rules =
             """
         |> rule_______________________ "give_mascot_papers_to_frank"
             """
-            ON: FORT_FRANK
+            ON: FRANKS_FRANKS
             IF: MAN_IN_HOT_DOG_SUIT.job_hunt_quest_1=1
             DO: MASCOT_PAPERS.location=offscreen
                 MAN_IN_HOT_DOG_SUIT.job_hunt_quest_1=2.location=UNIVERSITY
             """
-        |> rule_______________________ "check_up_on_hot_dog_guy_at_fort_frank"
+        |> rule_______________________ "check_up_on_hot_dog_guy_at_franks_franks"
             """
             ON: MAN_IN_HOT_DOG_SUIT.job_hunt_quest_1=2
             DO: MAN_IN_HOT_DOG_SUIT.job_hunt_quest_1=3
                 CHANGE.location=PLAYER.amount+50
                 PLAYER.good_will+3
+            """
+        |> rule_______________________ "throw_away_mascot_papers"
+            """
+            ON: "throw_away_mascot_papers"
+            DO: MASCOT_PAPERS.location=offscreen
+                PLAYER.good_will-1
+                MAN_IN_HOT_DOG_SUIT.job_hunt_quest_1=100
+            """
+        |> rule_______________________ "hot_dog_man_rebuffed"
+            """
+            ON: MAN_IN_HOT_DOG_SUIT.location=TWIN_BROOKS.job_hunt_quest_1=100
+            """
+        |> rule_______________________ "man_in_hot_dog_suit_wants_more"
+            """
+            ON: MAN_IN_HOT_DOG_SUIT.job_hunt_quest_1=3
             """

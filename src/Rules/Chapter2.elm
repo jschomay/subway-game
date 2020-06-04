@@ -53,11 +53,6 @@ rules =
             IF: *.missing_dog_poster.location=(link PLAYER.location)
                 DISTRESSED_WOMAN.missing_dog_posters_quest>0
             """
-        |> rule_______________________ "trashcanWhileHoldingPosters"
-            """
-            ON: *.trashcan
-            IF: *.missing_dog_poster.location=PLAYER
-            """
         |> rule_______________________ "throwAwayPosters"
             """
             ON: "throw_away_posters"

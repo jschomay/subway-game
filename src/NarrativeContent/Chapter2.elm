@@ -82,6 +82,11 @@ I wonder if he's been found yet.
         |> content__________________________________ "putUpMissingDogPoster" """
 This station doesn't have a poster yet.  Here, I'll hang one up now.
 """
+        |> content__________________________________ "putUpLastMissingDogPoster" """
+This station doesn't have a poster yet.  Here, I'll hang one up now.
+
+There, that's the last one.  Hope someone finds "Jonathan."
+"""
         |> content__________________________________ "tryToHangDogPosterOnWrongLine" """
 That lady in the pink poncho wanted me to hang these on the Red line.
 """
@@ -110,14 +115,6 @@ What the hell?
 Before I can say another word, the man steps through the turnstile and doesn't look back.
 
 What an asshole.
-"""
-        |> content__________________________________ "TRASH_CAN_SEVENTY_THIRD_STREET" """
-Nothing but trash in here.
-"""
-        |> content__________________________________ "trashcanWhileHoldingPosters" """
-Nothing but trash in here.
----
-I'm lugging around these missing dog posters.  I don't want to go hang them all up, maybe I should just [throw them away](throw_away_posters) instead.
 """
         |> content__________________________________ "throwAwayPosters" """
 I'll just toss these posters in here. I mean, I've got more important things to do than looking around for "Jonathan."

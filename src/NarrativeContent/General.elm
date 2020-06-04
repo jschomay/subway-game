@@ -56,7 +56,7 @@ Thank you and we apologize for the inconvenience.
 Nope, nothing.  Darn.|
 Still nothing about my briefcase, but if I'm ever in need of a house cleaner or want to join a lame garage band, I know where to look.}
 """
-        |> content__________________________________ "TRASH_CAN_WEST_MULBERRY" """
+        |> content__________________________________ "trashcan" """
 {?I'm not about to rummage through the trash.
 |
 I've got a weird feeling about this can. Maybe it wouldn't hurt to take a quick look.
@@ -70,6 +70,20 @@ Waste of time.
 Wonder who takes out the garbage down here.
 |
 Just garbage.
+|
+There's nothing but junk in here. Just as it should be.
+|
+Nothing but trash in here.
+}
+
+---
+
+{*.missing_dog_poster.location=PLAYER?
+I'm lugging around these missing dog posters.  I don't want to go hang them all up, maybe I should just [throw them away](throw_away_posters) instead.
+}
+---
+{MASCOT_PAPERS.location=PLAYER?
+This resume is a joke.  Even if I deliver it nobody's going to hire this guy.  Maybe I should do him a favor and just [toss it](throw_away_mascot_papers).
 }
 """
         |> content__________________________________ "MISSIONARIES" """
@@ -178,7 +192,7 @@ I got the Orange Line Pass from the security guard guy.  Now I can ride the Oran
         |> content__________________________________ "BUSINESS_MAN" """
 He looks busy.
 """
-        |> content__________________________________ "FORT_FRANK" """
+        |> content__________________________________ "FRANKS_FRANKS" """
 {MAN_IN_HOT_DOG_SUIT.job_hunt_quest_1>1?
 I may have helped one get a job, but I still don't like hot dogs.
 |

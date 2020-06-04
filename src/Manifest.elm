@@ -203,8 +203,8 @@ entities =
         "Abandoned jacket"
 
     -- UNIVERSITY
-    , entity "FORT_FRANK.item.fixed.location=UNIVERSITY"
-        "Fort Frank hot dog stand"
+    , entity "FRANKS_FRANKS.item.fixed.location=UNIVERSITY"
+        "Frank's Franks hot dog stand"
 
     -- CENTRAL_GUARD_OFFICE
     , entity "TICKET_INSPECTOR.character.location=CENTRAL_GUARD_OFFICE"

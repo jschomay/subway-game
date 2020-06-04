@@ -126,13 +126,13 @@ That's my cue to slowly walk away...
 
 But the guy jumps up and tosses his resume in my hands.
 
-"Listen, stop by Fort Frank on University Station.  Ask for Frank, drop off my papers, tell him I'm a swell guy.  Do this for me and I'll make it worth your while."
+"Listen, stop by Frank's Franks on University Station.  Ask for Frank, drop off my papers, tell him I'm a swell guy.  Do this for me and I'll make it worth your while."
 ---
 Why does this keep happening to me? Am I a freak magnet or something?
 
 "Thanks, bud. You won't regret this!"
 |
-"Hey, did you talk to Frank at Fort Frank for me yet? I can't just sit around on my buns all day!"
+"Hey, did you talk to Frank at Frank's Franks for me yet? I can't just sit around on my buns all day!"
 }
 """
         |> content__________________________________ "MASCOT_PAPERS" """
@@ -157,7 +157,7 @@ Frank looks it over and whistles.
 ---
 Well, Steve, today you're going to make a weirdo very happy. Good on you.
 """
-        |> content__________________________________ "check_up_on_hot_dog_guy_at_fort_frank" """
+        |> content__________________________________ "check_up_on_hot_dog_guy_at_franks_franks" """
 Wow, he got here fast.
 
 He's already at it.  Looks like he's having the time of his life.  But everyone mostly ignores him.  At least he's happy.
@@ -173,4 +173,17 @@ He hugs me tight.
 "Oh, and here's a little tip someone gave me, it's all yours for the help you're doing me."
 
 He drops 2 quarters in my hand and waves as he rushes back to his stand.  Is this what he meant by "worth while?"
+"""
+        |> content__________________________________ "throw_away_mascot_papers" """
+There.  Who makes a resume to be a hot dog anyway?
+"""
+        |> content__________________________________ "hot_dog_man_rebuffed" """
+{"What did Frank say?  Did he say anything?  Did he turn me down?  Oh no, he turned me down, didn't he.  I'm a failure.  I'll never be a hot dog man.  Ohhhhhh....."
+|
+The guy is still crying.  What a weenie.
+}
+{||Heh heh.  Weenie.}
+"""
+        |> content__________________________________ "man_in_hot_dog_suit_wants_more" """
+"Thanks, bud. You won't regret this!"
 """

@@ -53,3 +53,7 @@ rules =
             ON: *.pass
             DO: (*.pass.new).-new
             """
+        |> rule_______________________ "trashcan"
+            """
+            ON: *.trashcan
+            """

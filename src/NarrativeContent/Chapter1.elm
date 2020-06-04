@@ -314,9 +314,6 @@ I better not regret this...
 ---
 This is a strange key.  I think I'll hold onto it. Just in case.
 """
-        |> content__________________________________ "TRASH_CAN_CAPITOL_HEIGHTS" """
-There's nothing but junk in here. Just as it should be.
-"""
         |> content__________________________________ "ODD_KEY" """
 I wonder what this is for. It's probably just junk.
 """
