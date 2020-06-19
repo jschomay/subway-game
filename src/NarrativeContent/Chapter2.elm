@@ -23,7 +23,7 @@ Well, it's unlocked.
 ---
 It's dark, but I don't need to flip the switch to see that there's nothing in here but cleaning supplies.
 
-Of course there's nothing in here. What was I expecting? 
+Of course there's nothing in here. What was I expecting?
 ---
 Damn I wanted it to be true.
 ---
@@ -133,6 +133,37 @@ The pockets are empty.  No change in here.
 {It's lying on the bench like someone just forgot it. It's pretty worn out so I sort of doubt they'll be coming back for it.
 |It's just a discarded jacket. Nobody's coming back for it.}
 }
+"""
+        |> content__________________________________ "stealMusiciansChange" """
+I snatch two dirty quarters from the top of the pile and pocket them quickly so no one sees.
+
+The violinist keeps on playing.
+---
+This isn't right, but it is just 50 cents. He's probably not even going to notice that it's missing. I mean, how could he?
+"""
+        |> content__________________________________ "stealMusiciansChangeSecondTime" """
+I guess another quarter might be useful...
+---
+The musician suddenly speaks in a surprisingly low voice, "Stealing from a blind man.  I guess you need that more than I do."
+---
+Shit!
+"""
+        |> content__________________________________ "girlInYellowSecondEncounter" """
+It's that girl again!  She really sticks out down here.  Oh, she sees me.
+---
+"Excuse me sir, would you like to buy some flowers? Only 50 cents for a bundle."
+
+She hold up a cardboard box with bunches of various weeds and flowers held together by rubber bands. They look like they were plucked from every public garden and sidewalk crack in the city.  Not worth 50 cents.
+---
+Suddenly she spots someone behind me.  A moment of worry crosses her face, then she giggles and dashes away.
+
+I turn around to see who startled her.  It's just a maintenance person.
+---
+When I turn back, she has completely disappeared!
+---
+Where did she go?
+
+Am I imagining things?
 """
         --
         |> content__________________________________ "useChangeFromMotherToCallBoss" """

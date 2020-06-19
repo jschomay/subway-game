@@ -57,3 +57,9 @@ rules =
             """
             ON: *.trashcan
             """
+        |> rule_______________________ "check_coin_return"
+            """
+            ON: *.coin_in_coin_return
+            DO: $.-coin_in_coin_return
+                CHANGE.amount+25.location=PLAYER
+            """

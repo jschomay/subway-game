@@ -54,8 +54,8 @@ rules =
             """
             ON: GIRL_IN_YELLOW
             IF: PLAYER.chapter=1
-            DO: GIRL_IN_YELLOW.who_was_girl_in_yellow_quest=1
-                GIRL_IN_YELLOW.location=offscreen
+            DO: GIRL_IN_YELLOW.who_was_girl_in_yellow_quest+1
+                GIRL_IN_YELLOW.location=IRIS_LAKE
             """
         |> rule_______________________ "briefcaseStolen"
             """
@@ -64,7 +64,7 @@ rules =
                 BROADWAY_STREET.leaving_broadway_street_station_plot=1
             DO: BRIEFCASE.location=THIEF
                 BROADWAY_STREET.leaving_broadway_street_station_plot=2
-                GIRL_IN_YELLOW.location=offscreen
+                GIRL_IN_YELLOW.location=IRIS_LAKE
                 PLAYER.find_briefcase=1.present_proposal+1
             """
         |> rule_______________________ "tellOfficersAboutStolenBriefcase"

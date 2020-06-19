@@ -12,6 +12,8 @@ rules =
             ON: BROOM_CLOSET
             IF: PLAYER.find_briefcase=3
             DO: PLAYER.find_briefcase=4.call_boss=1
+                VENDING_MACHINE.coin_in_coin_return
+                BROKEN_PAYPHONE.coin_in_coin_return
             """
         |> rule_______________________ "getDogPostersFromDistressedWoman"
             """
@@ -101,9 +103,30 @@ rules =
             IF: PLAYER.call_boss=1
             DO: BUSINESS_MAN.location=offscreen
             """
+        |> rule_______________________ "stealMusiciansChange"
+            """
+            ON: "musicians_change"
+            DO: MUSICIAN.robbed
+                CHANGE.amount+50.location=PLAYER
+                PLAYER.good_will-3
+            """
+        |> rule_______________________ "stealMusiciansChangeSecondTime"
+            """
+            ON: "musicians_change"
+            IF: MUSICIAN.robbed
+            DO: PLAYER.good_will-5
+            """
+        |> rule_______________________ "girlInYellowSecondEncounter"
+            """
+            ON: GIRL_IN_YELLOW
+            DO: GIRL_IN_YELLOW.who_was_girl_in_yellow_quest+1.location=WESTGATE
+            """
 
 
 
 -- TODO
--- put all change finding entities in place when call_boss gets set to 1
--- follow up quests (mother and missing posters) at some point on train rides (like she yells at you if you didn't hang the posters, or she says she foud the dog and thanks)
+-- Move GIRL_IN_YELLOW if you don't talk to her at end of chapter
+-- Fix GIRL_IN_YELLOW notebook done status (crossing it out for some reason)
+-- follow up quests (mother and missing posters) at some point on train rides (like
+-- she yells at you if you didn't hang the posters, or she says she foud the dog and
+-- thanks)

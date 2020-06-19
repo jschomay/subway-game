@@ -153,7 +153,14 @@ A wrinkled dollar bill.
         |> content__________________________________ "MUSICIAN" """
 He's playing an old cracked violin with a hat out in front of him for spare change.
 
+He has a sign: "Blind, Homeless Veteran. Anything helps. God Bless."
+
 The music sounds nice, but I wouldn't call that a real job.
+
+{PLAYER.call_boss=1?
+---
+Then again, he's got quite a lot of [change](musicians_change) in his hat.
+}
 """
         |> content__________________________________ "BROKEN_PAYPHONE" """
 {Now that everyone's got cell phones, there's not much use for those things any more.  That's just as well, it's |Well, it used to be a payphone. Now it's } just a gutted payphone stand with stray wires poking out.
@@ -197,4 +204,14 @@ He looks busy.
 I may have helped one get a job, but I still don't like hot dogs.
 |
 I'm not really a hot dog guy.}
+"""
+        |> content__________________________________ "VENDING_MACHINE" """
+It's an old snack machine. I don't recognize any of these brands. How long has it been since they changed these out? Ugh.
+"""
+        |> content__________________________________ "check_coin_return" """
+Maybe there's some change left in the coin return, let me check.
+---
+...
+---
+Hey, a quarter!  Nice.
 """

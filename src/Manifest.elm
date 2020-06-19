@@ -154,15 +154,13 @@ entities =
     , entity "ANGRY_CROWD.character.location=BROADWAY_STREET"
         "A large crowd of people"
     , entity "GIRL_IN_YELLOW.character.location=BROADWAY_STREET"
-        "Girl in yellow"
+        "Girl in yellow dress"
 
     -- CONVENTION_CENTER
     , entity "MUSICIAN.character.location=CONVENTION_CENTER"
         "Man playing violin"
     , entity "MAN_IN_RATTY_HAT.character.location=CONVENTION_CENTER"
         "Man in a ratty brown hat"
-    , entity "BROKEN_PAYPHONE.item.location=CONVENTION_CENTER"
-        "Broken payphone"
     , entity "BUSTLING_CROWD.character.location=CONVENTION_CENTER"
         "Bustling crowds of people"
     , entity "MARCYS_PIZZA.item.fixed.location=CONVENTION_CENTER"
@@ -205,6 +203,14 @@ entities =
     -- UNIVERSITY
     , entity "FRANKS_FRANKS.item.fixed.location=UNIVERSITY"
         "Frank's Franks hot dog stand"
+
+    -- ST_MARKS
+    , entity "BROKEN_PAYPHONE.item.location=ST_MARKS"
+        "Broken payphone"
+
+    -- ONE_HUNDRED_FORTH_STREET
+    , entity "VENDING_MACHINE.item.location=ONE_HUNDRED_FORTH_STREET"
+        "Snack machine"
 
     -- CENTRAL_GUARD_OFFICE
     , entity "TICKET_INSPECTOR.character.location=CENTRAL_GUARD_OFFICE"
