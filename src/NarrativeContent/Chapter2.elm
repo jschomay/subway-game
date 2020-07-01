@@ -167,8 +167,132 @@ Am I imagining things?
 """
         --
         |> content__________________________________ "useChangeFromMotherToCallBoss" """
-        TODO needs content!!!!!!!!!!!!!!!!!!!!!!!!!!!
+I've got this change from that woman with the annoying kid. It's just 50 cents, she probably won't miss it. Plus that kid is probably better off without all that sugar.
+---
+*Ring* *Ring*
+---
+"Hello, this is In your Hands Insurance Agency, how may I direct your call?"
+
+"Hey Paula, this is Steve. Can I-"
+---
+"Steve? Steve who? You're going to have to be a little more specific, sir."
+
+"Steve. Steve Perry. Insurance agent, office 213. We talked about your cat for like, twenty minutes in the break room last week."
+---
+"Okay Mr. Kerry. How may I direct your call?"
+
+"Can I speak to Mr. Harris please? It's very urgent."
+
+"Mr. Harris is very busy, sir. What is the nature of the call?"
+---
+"Dammit Paula, just put Jason on the phone, will you?"
+
+She murmurs something unpleasant, but makes the transfer.
+---
+Okay, so what do I say? My briefcase and proposal were stolen, please don't fire me?
+
+I can feel his hands around my throat already. God damn it.
+---
+"Where the HELL are you with my proposal, Steve?"
+
+"Ah! Good morning Mr. Harris!"
+---
+"Cut the bullshit. You were supposed to be HERE an hour and a half ago --".
+
+"About that sir... I've had a little trouble..."
+---
+Mr. Harris goes into a rant before I can explain any more.  He is yelling so loud that I have to hold the phone away from my ear.
+
+A train pulls onto the platform.  The only passenger that exits is an odd looking man in a pulled up blue hoody.
+
+We're the only two on the platform and he gives me a once-over.  Mr. Harris keeps yelling.
+---
+This guy looks familiar.
+
+It's the thief!
+---
+"That's the guy-- hey stop!"
+
+The thief recognizes me too and turns and runs.  Mr. Harris stops his tirade in surprise.
+
+"What did you say to me Steve?  You want me to stop?  Why don't you--"
+
+"Sorry Mr. Harris, I have to run.  I'll see you with the proposal very soon.  Bye!"
+
+*CLICK*
+---
+The man disappears around a concrete pillar.
+
+I chase after him, just in time to see him dash through an obscure maintenance door.
+
+I want my briefcase back.
+
+I'm going after him.
 """
         |> content__________________________________ "collectedEnoughChangeToCallBoss" """
-        TODO needs content!!!!!!!!!!!!!!!!!!!!!!!!!!!
+I have the change. Guess there's no more avoiding it.
+Here we go.
+---
+*Ring* *Ring*
+---
+"Hello, this is In your Hands Insurance Agency, how may I direct your call?"
+
+"Hey Paula, this is Steve. Can I-"
+---
+"Steve? Steve who? You're going to have to be a little more specific, sir."
+
+"Steve. Steve Perry. Insurance agent, office 213. We talked about your cat for like, twenty minutes in the break room last week."
+---
+"Okay Mr. Kerry. How may I direct your call?"
+
+"Can I speak to Mr. Harris please? It's very urgent."
+
+"Mr. Harris is very busy, sir. What is the nature of the call?"
+---
+"Dammit Paula, just put Jason on the phone, will you?"
+
+She murmurs something unpleasant, but makes the transfer.
+---
+Okay, so what do I say? My briefcase and proposal were stolen, please don't fire me?
+
+I can feel his hands around my throat already. God damn it.
+---
+"Where the HELL are you with my proposal, Steve?"
+
+"Ah! Good morning Mr. Harris!"
+---
+"Cut the bullshit. You were supposed to be HERE an hour and a half ago --".
+
+"About that sir... I've had a little trouble..."
+---
+Mr. Harris goes into a rant before I can explain any more.  He is yelling so loud that I have to hold the phone away from my ear.
+
+A train pulls onto the platform.  The only passenger that exits is an odd looking man in a pulled up blue hoody.
+
+We're the only two on the platform and he gives me a once-over.  Mr. Harris keeps yelling.
+---
+This guy looks familiar.
+
+It's the thief!
+---
+"That's the guy-- hey stop!"
+
+The thief recognizes me too and turns and runs.  Mr. Harris stops his tirade in surprise.
+
+"What did you say to me Steve?  You want me to stop?  Why don't you--"
+
+"Sorry Mr. Harris, I have to run.  I'll see you with the proposal very soon.  Bye!"
+
+*CLICK*
+---
+The man disappears around a concrete pillar.
+
+I chase after him, just in time to see him dash through an obscure maintenance door.
+
+I want my briefcase back.
+
+I'm going after him.
+"""
+        |> content__________________________________ "chaseThiefAgain" """
+        TODO needs content!!!!!!!!!!
 """

@@ -199,6 +199,12 @@ entities =
         "Slick looking business man"
     , entity "ABANDONED_JACKET.item.location=SEVENTY_THIRD_STREET"
         "Abandoned jacket"
+    , entity "MAINTENANCE_DOOR_SEVENTY_THIRD_STREET_TO_FORTY_SECOND_STREET.item.passage_to=FORTY_SECOND_STREET.location=SEVENTY_THIRD_STREET.hidden"
+        "Maintenance door"
+
+    -- FORTY_SECOND_STREET
+    , entity "MAINTENANCE_DOOR_FORTY_SECOND_STREET_SEVENTY_THIRD_STREET_TO.item.passage_to=SEVENTY_THIRD_STREET.location=FORTY_SECOND_STREET"
+        "Maintenance door"
 
     -- UNIVERSITY
     , entity "FRANKS_FRANKS.item.fixed.location=UNIVERSITY"

@@ -34,10 +34,10 @@ view map worldModel currentStation =
                 |> Maybe.withDefault ("ERRORR getting station: " ++ currentStation)
 
         characters =
-            Rules.unsafeQuery ("*.character.location=" ++ currentStation) worldModel
+            Rules.unsafeQuery ("*.character.!hidden.location=" ++ currentStation) worldModel
 
         items =
-            Rules.unsafeQuery ("*.item.location=" ++ currentStation) worldModel
+            Rules.unsafeQuery ("*.item.!hidden.location=" ++ currentStation) worldModel
 
         sectionView name list =
             if List.isEmpty list then

@@ -63,3 +63,8 @@ rules =
             DO: $.-coin_in_coin_return
                 CHANGE.amount+25.location=PLAYER
             """
+        |> rule_______________________ "use_secret_passage_way"
+            """
+            ON: *.passage_to=(*)
+            DO: PLAYER.location=(link $.passage_to)
+            """

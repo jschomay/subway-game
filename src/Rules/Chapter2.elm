@@ -77,6 +77,7 @@ rules =
                 PLAYER.good_will-1
                 PLAYER.call_boss=2
                 MOTHER.location=offscreen.screaming_child_quest=100
+                MAINTENANCE_DOOR_SEVENTY_THIRD_STREET_TO_FORTY_SECOND_STREET.-hidden
             """
         |> rule_______________________ "collectedEnoughChangeToCallBoss"
             """
@@ -85,6 +86,13 @@ rules =
                 PLAYER.call_boss=1
             DO: CHANGE.amount-50
                 PLAYER.call_boss=2
+                MAINTENANCE_DOOR_SEVENTY_THIRD_STREET_TO_FORTY_SECOND_STREET.-hidden
+            """
+        |> rule_______________________ "chaseThiefAgain"
+            """
+            ON: MAINTENANCE_DOOR_SEVENTY_THIRD_STREET_TO_FORTY_SECOND_STREET
+            IF: PLAYER.call_boss=2
+            DO: PLAYER.call_boss=3.location=FORTY_SECOND_STREET
             """
         |> rule_______________________ "ponderingCallingBossOnTrain"
             """
@@ -127,6 +135,7 @@ rules =
 -- TODO
 -- Move GIRL_IN_YELLOW if you don't talk to her at end of chapter
 -- Fix GIRL_IN_YELLOW notebook done status (crossing it out for some reason)
+-- Add fade through black when using secret passage
 -- follow up quests (mother and missing posters) at some point on train rides (like
 -- she yells at you if you didn't hang the posters, or she says she foud the dog and
 -- thanks)
