@@ -294,5 +294,16 @@ I want my briefcase back.
 I'm going after him.
 """
         |> content__________________________________ "chaseThiefAgain" """
-        TODO needs content!!!!!!!!!!
+There's a big "DO NOT ENTER" sign.  But the door is unlocked...
+---
+*Creak*
+---
+This leads to a dark, dank, twisty passage.
+---
+What the hell, I'm going for it.
+"""
+        |> content__________________________________ "exitPassagewayAtFortySecondStreet" """
+This passageway lets out in a different station.
+
+I don't see the thief anywhere though.  Maybe he outran me?  Or took a different turn?
 """

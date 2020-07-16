@@ -26,6 +26,7 @@ import Tuple
 import Views.NoteBook as NoteBook
 import Views.Station.CentralGuardOffice as CentralGuardOffice
 import Views.Station.Lobby as Lobby
+import Views.Station.Passageway as Passageway
 import Views.Station.Platform as Platform
 import Views.Station.Turnstile as Turnstile
 import Views.Train as Train
@@ -123,6 +124,11 @@ arrivingDelay =
 travelDelay : Float
 travelDelay =
     1.5 * 1000
+
+
+passagewayDelay : Float
+passagewayDelay =
+    1.6 * 1000
 
 
 {-| "Ticks" the narrative engine, and displays the story content. Also preps changes
@@ -314,7 +320,10 @@ specialEvents ruleId model =
                 ( model, Cmd.none )
 
         other ->
-            if List.member other [ "goToLineTurnstile", "followSkaterDudeToOrangeLine" ] then
+            if List.member other [ "use_secret_passage_way", "chaseThiefAgain" ] then
+                ( { model | scene = Passageway }, delay passagewayDelay <| Disembark )
+
+            else if List.member other [ "goToLineTurnstile", "followSkaterDudeToOrangeLine" ] then
                 -- Remember to add line=LINE_[X] when adding rules to this match!!!
                 ( { model | scene = Turnstile <| Maybe.withDefault Red <| getCurrentLine model.worldModel }, Cmd.none )
 
@@ -444,7 +453,7 @@ update rules msg model =
                             ( m
                             , case ( m.scene, m.story ) of
                                 ( Train _, [] ) ->
-                                    delay travelDelay Continue
+                                    delay arrivingDelay Continue
 
                                 _ ->
                                     Cmd.none
@@ -535,8 +544,11 @@ update rules msg model =
 
             Disembark ->
                 ( { model | scene = Lobby }
-                , Cmd.none
+                , delay 500 DisembarkStory
                 )
+
+            DisembarkStory ->
+                updateStory rules "disembark" model
 
             DebugSeachWorldModel text ->
                 let
@@ -729,6 +741,9 @@ mainView model =
 
             Platform line ->
                 ( "platform", Platform.view map currentStation line model.worldModel )
+
+            Passageway ->
+                ( "passageway", Passageway.view )
 
             Turnstile line ->
                 ( "turnstile", Turnstile.view model.worldModel line )

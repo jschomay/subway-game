@@ -94,6 +94,12 @@ rules =
             IF: PLAYER.call_boss=2
             DO: PLAYER.call_boss=3.location=FORTY_SECOND_STREET
             """
+        |> rule_______________________ "exitPassagewayAtFortySecondStreet"
+            """
+            ON: "disembark"
+            IF: PLAYER.location=FORTY_SECOND_STREET.call_boss=3
+            DO: PLAYER.call_boss=4
+            """
         |> rule_______________________ "ponderingCallingBossOnTrain"
             """
             ON: *.station.!out_of_service
@@ -135,7 +141,6 @@ rules =
 -- TODO
 -- Move GIRL_IN_YELLOW if you don't talk to her at end of chapter
 -- Fix GIRL_IN_YELLOW notebook done status (crossing it out for some reason)
--- Add fade through black when using secret passage
 -- follow up quests (mother and missing posters) at some point on train rides (like
 -- she yells at you if you didn't hang the posters, or she says she foud the dog and
 -- thanks)

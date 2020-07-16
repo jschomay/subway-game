@@ -1,6 +1,6 @@
-if(btoa(localStorage.getItem("password")) !== "c3Vid2F5") {
+if (btoa(localStorage.getItem("password")) !== "c3Vid2F5") {
   var pass = prompt("Please enter the password to play the demo.");
-  if(btoa(pass) !== "c3Vid2F5") {
+  if (btoa(pass) !== "c3Vid2F5") {
     alert("Sorry, incorrect password");
     throw "Wrong password";
   } else {
@@ -14,17 +14,18 @@ require("./styles/story.css");
 require("./styles/train.css");
 require("./styles/platform.css");
 require("./styles/lobby.css");
+require("./styles/passageway.css");
 require("./styles/turnstile.css");
 require("./styles/guard-office.css");
 require("./styles/goals.css");
 require("./styles/game.css");
 
 // inject bundled Elm app
-const {Elm} = require("./Main.elm");
+const { Elm } = require("./Main.elm");
 const debug = location.hash === "#debug";
 const app = Elm.Main.init({
   node: document.getElementById("main"),
-  flags: {debug: debug}
+  flags: { debug: debug }
 });
 
 var imagesToLoad = require.context("./img/", true, /\.*$/).keys();
@@ -58,7 +59,7 @@ function loaded() {
   console.log("loaded");
 }
 
-document.addEventListener("keydown", function (e) {
+document.addEventListener("keydown", function(e) {
   app.ports.keyPress.send(e.key);
   if (e.key == " " || e.key === "Backspace") {
     if (e.target.tagName != "INPUT") e.preventDefault();

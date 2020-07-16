@@ -39,6 +39,7 @@ type Msg
     | Go Scene
     | BoardTrain Line Station
     | Disembark
+    | DisembarkStory
     | Continue
     | Achievement String
     | ToggleTranscript
@@ -77,4 +78,5 @@ type Scene
     | Turnstile Line
     | Platform Line
     | Train TrainProps
+    | Passageway
     | CentralGuardOffice

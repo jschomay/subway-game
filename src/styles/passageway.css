@@ -1,0 +1,31 @@
+.Passageway {
+}
+
+.Scene.Passageway:before {
+  background-image: url(../img/subway-passageway.jpg);
+  animation: passageway 1.8s ease-in normal forwards;
+}
+
+@keyframes passageway {
+  0% {
+    opacity: 0.6;
+    transform: scale(1);
+  }
+
+  25% {
+    opacity: 0.80;
+  }
+
+  35% {
+    opacity: 0.70;
+  }
+
+  60% {
+    opacity: 0.80;
+  }
+
+  100% {
+    opacity: 0;
+    transform: scale(1.05);
+  }
+}

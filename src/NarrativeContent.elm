@@ -53,17 +53,18 @@ silent =
         |> content__________________________________ "goToLinePlatform" ""
         |> content__________________________________ "checkMap" ""
         |> content__________________________________ "ridingTheTrain" ""
+        |> content__________________________________ "disembark" ""
 
 
 achievements : Dict String String
 achievements =
     Dict.empty
         |> content__________________________________ "get_caffeinated_quest_achievement" """
-_Achievement unlocked:_  
+_Achievement unlocked:_
 Get caffeinated
 """
         |> content__________________________________ "fools_errand_achievement" """
-_Achievement unlocked:_  
+_Achievement unlocked:_
 Fool's errand
 """
         |> content__________________________________ "transfer_station" """
@@ -124,12 +125,12 @@ Come by my office first thing Monday morning.
     To: Jason Harris
     Sent: Sunday, 4:01 pm
     Subject: RE: I've Got a Job for You
-    
+
     Dear Mr. Harris,
-    I've actually been with the company for eight years, but no need to worry, sir. I'm happy for the 
+    I've actually been with the company for eight years, but no need to worry, sir. I'm happy for the
     opportunity. I've got a few big ideas that I've been wanting to try out.
     I'll be there bright and early, sir.
-    
+
     Steve Perkins
     Insurance Agent
     In Your Hands Insurance
@@ -138,7 +139,7 @@ Come by my office first thing Monday morning.
     To: Steve Perkins
     Sent: Monday, 6:05am
     Subject: Job Opportunity
-    
+
     Hi Mr. Steve Perkins
 
     My name is Janis and I'm reaching out on behalf of Embrace Insurance. I came across your resume
@@ -147,7 +148,7 @@ Come by my office first thing Monday morning.
     love to set up a meeting with you and see what your future could hold.
 
     We look forward to your response!
-    
+
     Janis Franz
     Assistant Director
     Embrace Insurance
@@ -261,9 +262,9 @@ Come by my office first thing Monday morning.
     Subject: Today?
 
     Hey Steve,
-    I'm in the city today and I haven't heard back from you. I'm sure you're busy, but it would 
-    really be nice to see you while I'm down. My plane leaves tomorrow, so today is probably it. You 
-    can call me at my old number if you get this in time and we can plan something out. It hasn't 
+    I'm in the city today and I haven't heard back from you. I'm sure you're busy, but it would
+    really be nice to see you while I'm down. My plane leaves tomorrow, so today is probably it. You
+    can call me at my old number if you get this in time and we can plan something out. It hasn't
     changed.
 
     Hope to talk to you soon.
@@ -293,7 +294,7 @@ Come by my office first thing Monday morning.
     way.  I'm excited to talk to you!
 
     Have a wonderful weekend.
-    
+
     Janis Franz
     Assistant Director
     Embrace Insurance
@@ -448,7 +449,7 @@ I'm curious what my boss has in mind for this proposal.  It's nice he thought of
         |> content__________________________________ "endTuesday" """
 It's going to be tough getting this proposal put together by Friday, but I've got to do it.  I just wish I had more time to make it good.
 ---
-Also, It would be great to see Henry again. I've got to remember to get back to him.  
+Also, It would be great to see Henry again. I've got to remember to get back to him.
 """
         |> content__________________________________ "endWednesday" """
 This train is two minutes late again.  This is becoming more and more of a problem lately.  They've got to do something about it.
