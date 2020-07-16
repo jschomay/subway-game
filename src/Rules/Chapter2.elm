@@ -135,12 +135,20 @@ rules =
             ON: GIRL_IN_YELLOW
             DO: GIRL_IN_YELLOW.who_was_girl_in_yellow_quest+1.location=WESTGATE
             """
+        |> rule_______________________ "catchConductorMessingWithPanel"
+            """
+            ON: GRIZZLED_REPAIRMAN.location=FORTY_SECOND_STREET
+            DO: GRIZZLED_REPAIRMAN.location=offscreen
+                ELECTRIC_PANEL.-hidden
+            """
 
 
 
 -- TODO
+-- Update goals (find security footage)
 -- Move GIRL_IN_YELLOW if you don't talk to her at end of chapter
 -- Fix GIRL_IN_YELLOW notebook done status (crossing it out for some reason)
+-- add more security cameras in every station and show them all after noticing the first one
 -- follow up quests (mother and missing posters) at some point on train rides (like
 -- she yells at you if you didn't hang the posters, or she says she foud the dog and
 -- thanks)

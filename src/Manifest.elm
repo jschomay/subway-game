@@ -205,6 +205,12 @@ entities =
     -- FORTY_SECOND_STREET
     , entity "MAINTENANCE_DOOR_FORTY_SECOND_STREET_SEVENTY_THIRD_STREET_TO.item.passage_to=SEVENTY_THIRD_STREET.location=FORTY_SECOND_STREET"
         "Maintenance door"
+    , entity "GRIZZLED_REPAIRMAN.character.location=FORTY_SECOND_STREET"
+        "Grizzled repairman"
+    , entity "ELECTRIC_PANEL.item.hidden.location=FORTY_SECOND_STREET"
+        "Electric panel"
+    , entity "SECURITY_CAMERA_FORTY_SECOND_STREET.item.security_camera.location=FORTY_SECOND_STREET"
+        "Security camera"
 
     -- UNIVERSITY
     , entity "FRANKS_FRANKS.item.fixed.location=UNIVERSITY"

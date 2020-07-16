@@ -307,3 +307,20 @@ This passageway lets out in a different station.
 
 I don't see the thief anywhere though.  Maybe he outran me?  Or took a different turn?
 """
+        |> content__________________________________ "catchConductorMessingWithPanel" """
+That's strange... he looks just like the security guard who gave me my orange line pass.  But... he's dressed like a repairman now.  And he is messing with some kind of panel.
+---
+He sees me.  He slams the panel shut and bolts.
+---
+How weird.
+"""
+        |> content__________________________________ "ELECTRIC_PANEL" """
+Hmm... the lock is busted.  Lots of wires and blinking lights inside.  This is the panel that odd repairman-slash-security guard was messing with...
+"""
+        |> content__________________________________ "SECURITY_CAMERA_FORTY_SECOND_STREET" """
+{You know, I'm surprised I never noticed these before.
+|}
+They must have this whole place under surveillance.
+{---
+Maybe I can locate the thief and see where he goes if I can find the security footage.  They must have a surveillance room down here somewhere.|}
+"""
