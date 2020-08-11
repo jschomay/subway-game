@@ -65,6 +65,6 @@ rules =
             """
         |> rule_______________________ "use_secret_passage_way"
             """
-            ON: *.passage_to=(*)
+            ON: *.passage_to=(*).!locked
             DO: PLAYER.location=(link $.passage_to)
             """

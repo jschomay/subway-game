@@ -109,7 +109,7 @@ entities =
         "Woman in a maroon jacket"
     , entity "LOUD_PAYPHONE_LADY.character.location=EAST_MULBERRY"
         "Loud woman on payphone"
-    , entity "GRAFFITI.item.location=EAST_MULBERRY"
+    , entity "GRAFFITI_EAST_MULBERRY.item.location=EAST_MULBERRY"
         "Graffiti on the wall"
     , entity "SODA_MACHINE.item.broken.location=EAST_MULBERRY"
         "Soda vending machine"
@@ -241,6 +241,24 @@ entities =
         "Card reader"
     , entity "GRIZZLED_SECURITY_GUARD.character"
         "Grizzled security guard"
+
+    -- IRIS_LAKE
+    , entity "CONCERT_POSTER.item.location=IRIS_LAKE"
+        "Poster"
+    , entity "GRAFFITI_IRIS_LAKE.item.location=IRIS_LAKE"
+        "Graffiti"
+    , entity "MAINTENANCE_DOOR_IRIS_LAKE_TO_WEST_MULBERRY.item.passage_to=WEST_MULBERRY.location=IRIS_LAKE.locked"
+        "Maintenance door"
+    , entity "TRASHED_NEWSPAPERS.item.location=IRIS_LAKE"
+        "Pile of crumpled newspapers "
+
+    -- NORWOOD
+    , entity "OLD_LADIES.character.location=NORWOOD"
+        "Old women in floral dresses"
+    , entity "TRASH_CAN_NORWOOD.item.trashcan.location=NORWOOD"
+        "Trash can"
+    , entity "LIVING_STATUE.character.location=NORWOOD"
+        "Living statue"
 
     -- Stations
     , entity "ONE_HUNDRED_FORTH_STREET.station" "104th Street"

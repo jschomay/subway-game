@@ -54,6 +54,7 @@ silent =
         |> content__________________________________ "checkMap" ""
         |> content__________________________________ "ridingTheTrain" ""
         |> content__________________________________ "disembark" ""
+        |> content__________________________________ "use_secret_passage_way" ""
 
 
 achievements : Dict String String

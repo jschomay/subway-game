@@ -24,7 +24,7 @@ content =
             "This gets me anywhere on the Red Line, but I really only use it to get to work and back home."
         |> content__________________________________ "ORANGE_LINE_PASS"
             "I got this from the security guard guy.  Now I can ride the Orange Line without getting caught."
-        |> content__________________________________ "GRAFFITI"
+        |> content__________________________________ "GRAFFITI_EAST_MULBERRY"
             "That's just vulgar.  Why do people have to mess things up?"
         |> content__________________________________ "COFFEE" """
 {PLAYER.day=1?  Carl's Coffee has been fueling me for years. Can't imagine surviving a Monday without it.}
@@ -215,5 +215,60 @@ Maybe there's some change left in the coin return, let me check.
 ---
 Hey, a quarter!  Nice.
 """
-        |> content__________________________________ "use_secret_passage_way" """
+        |> content__________________________________ "CONCERT_POSTER" """
+{It's a poster for some kind of concert. Not sure what type of music it is, but telling from all the skulls, tigers, and half naked women colorfully scribbled in the margins I don't think I'd like it very much.
+|
+It's a poster for a rock concert, or something. I'm not much for music.
+}
+"""
+        |> content__________________________________ "GRAFFITI_IRIS_LAKE" """
+{It covers one of the walls from floor to ceiling. This station looks severely unused, but how can the authorities just leave this here?
+|
+These things are always so hard to read. Most of it illegible but I can make out the words "Wild West". I can't be sure though. If you're going to break the law, why not at least make what you're saying legible?
+}
+"""
+        |> content__________________________________ "MAINTENANCE_DOOR_IRIS_LAKE_TO_WEST_MULBERRY" """
+It's locked.
+"""
+        |> content__________________________________ "TRASHED_NEWSPAPERS" """
+{It's a pile of trashed newspapers by a bench. They look pretty gross.  Hey, what's that? There's something in there.
+---
+...
+---
+AHH!
+IT"S A FUCKING RAT!
+|
+NO!
+------------------------------------------
+NEVER!
+|
+GAH!
+}
+"""
+        |> content__________________________________ "OLD_LADIES" """
+{"...the state of this city has really gone down hill since-"
+
+"I agree, all the radio talks about anymore is the homeless crisis-"
+
+"And the crime rate."
+
+"Did you hear about that man that jumped off that bank building yesterday? Laid on the side walk for nearly an hour before-"
+|
+"-nothing new, Maggy was nearly run down on MacArthur Street last week on her way to the bridge game."
+
+"-probably a drunk driver.  I heard there's more of them these days than-"
+|
+"Go, go, go. That's all these people know how to do."
+
+"-can't live that way."
+
+"- won't last long."
+
+"When's our train getting here? It's always late."
+|
+They're still chattering without a single pause. I bet a single second of silence would drive them mad.
+}
+"""
+        |> content__________________________________ "LIVING_STATUE" """
+Kind of cool... I bet they are really bored.
 """
