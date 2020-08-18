@@ -141,6 +141,12 @@ rules =
             DO: GRIZZLED_REPAIRMAN.location=offscreen
                 ELECTRIC_PANEL.-hidden
             """
+        |> rule_______________________ "coffee_ruined"
+            """
+            ON: "help_a_guy_out"
+            DO: SLEEPING_MAN.coffee_ruined
+                CHANGE.amount-25
+            """
 
 
 

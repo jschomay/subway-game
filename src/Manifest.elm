@@ -219,6 +219,14 @@ entities =
     -- ST_MARKS
     , entity "BROKEN_PAYPHONE.item.location=ST_MARKS"
         "Broken payphone"
+    , entity "CENTRAL_GUARD_OFFICE_ENTRANCE.item.location=ST_MARKS"
+        "Guard Station Entrance"
+    , entity "MURAL.item.location=ST_MARKS"
+        "Mural"
+    , entity "BIRD.item.location=ST_MARKS"
+        "A bird!"
+    , entity "COMMUTERS_ST_MARKS.character.location=ST_MARKS"
+        "Commuters"
 
     -- ONE_HUNDRED_FORTH_STREET
     , entity "VENDING_MACHINE.item.location=ONE_HUNDRED_FORTH_STREET"
@@ -259,6 +267,8 @@ entities =
         "Trash can"
     , entity "LIVING_STATUE.character.location=NORWOOD"
         "Living statue"
+    , entity "SLEEPING_MAN.character.location=NORWOOD"
+        "Man sleeping on ground"
 
     -- Stations
     , entity "ONE_HUNDRED_FORTH_STREET.station" "104th Street"

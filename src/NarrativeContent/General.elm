@@ -157,10 +157,8 @@ He has a sign: "Blind, Homeless Veteran. Anything helps. God Bless."
 
 The music sounds nice, but I wouldn't call that a real job.
 
-{PLAYER.call_boss=1?
 ---
 Then again, he's got quite a lot of [change](musicians_change) in his hat.
-}
 """
         |> content__________________________________ "BROKEN_PAYPHONE" """
 {Now that everyone's got cell phones, there's not much use for those things any more.  That's just as well, it's |Well, it used to be a payphone. Now it's } just a gutted payphone stand with stray wires poking out.
@@ -271,4 +269,33 @@ They're still chattering without a single pause. I bet a single second of silenc
 """
         |> content__________________________________ "LIVING_STATUE" """
 Kind of cool... I bet they are really bored.
+"""
+        |> content__________________________________ "SLEEPING_MAN" """
+{SLEEPING_MAN.coffee_ruined?  At least he didn't ask me to get him another coffee.
+|
+He's sitting on the ground with a shabby hat drawn over his face he's got a Styrofoam cup in front of him. Looks like he could use some {CHANGE.location=PLAYER.amount>0? [CHANGE](help_a_guy_out) | change}.
+}
+"""
+        |> content__________________________________ "coffee_ruined" """
+I toss a quarter in the cup.
+---
+*SPLASH*
+
+"Hey, what the fuck, asshole? That was my coffee!"
+
+"Oh, I'm sorry! I thought-"
+---
+"Just fuck off, will ya?"
+"""
+        |> content__________________________________ "CENTRAL_GUARD_OFFICE_ENTRANCE" """
+I really dodged a bullet there, I have no desire to go back.
+"""
+        |> content__________________________________ "MURAL" """
+It's a mosaic mural made out of many different colors of glass. I think it's supposed to be some type of abstract piece, because I can't make out what it's supposed to be. It looks pretty though. I think.
+"""
+        |> content__________________________________ "BIRD" """
+It's flying all over the place, barely missing the passing commuters. I'm not sure how it got in here, but it seems scared. Hopefully it finds it's way out.
+"""
+        |> content__________________________________ "COMMUTERS_ST_MARKS" """
+Various come and go through the busy station.
 """
