@@ -171,6 +171,12 @@ entities =
         "Security Depot"
     , entity "MISSING_DOG_POSTER_0.item.missing_dog_poster.location=SPRING_HILL"
         "Missing dog poster"
+    , entity "OVERTURNED_TRASHCAN.item.location=SPRING_HILL"
+        "Overturned trashcan"
+    , entity "NEWSPAPER_VENDING_MACHINE.item.location=SPRING_HILL"
+        "Newspaper vending machine"
+    , entity "CUSTODIAN.character.location=SPRING_HILL"
+        "Custodian"
 
     -- CAPITOL_HEIGHTS
     , entity "TRASH_CAN_CAPITOL_HEIGHTS.item.trashcan.location=CAPITOL_HEIGHTS"
@@ -185,6 +191,8 @@ entities =
         "Guy with Spiky Hair"
     , entity "GREEN_SUIT_MAN.character.location=CAPITOL_HEIGHTS"
         "Man in a fancy green suit"
+    , entity "TROPICAL_T_SHIRT_MAN.character.location=CAPITOL_HEIGHTS"
+        "Man in a bright tropical T-shirt"
 
     -- SEVENTY_THIRD_STREET
     , entity "BROOM_CLOSET.item.location=SEVENTY_THIRD_STREET"
@@ -215,6 +223,14 @@ entities =
     -- UNIVERSITY
     , entity "FRANKS_FRANKS.item.fixed.location=UNIVERSITY"
         "Frank's Franks hot dog stand"
+    , entity "SECRET_SERVICE_TYPE_GUY.character.location=UNIVERSITY"
+        "Man in sunglasses and suit"
+    , entity "MAGAZINE_STAND.item.location=UNIVERSITY"
+        "Magazine stand"
+    , entity "FAKE_COP.character.location=UNIVERSITY"
+        "Police officer"
+    , entity "ADVERTISEMENT.item.location=UNIVERSITY"
+        "Advertisement poster"
 
     -- ST_MARKS
     , entity "BROKEN_PAYPHONE.item.location=ST_MARKS"
@@ -231,6 +247,12 @@ entities =
     -- ONE_HUNDRED_FORTH_STREET
     , entity "VENDING_MACHINE.item.location=ONE_HUNDRED_FORTH_STREET"
         "Snack machine"
+    , entity "CONSTRUCTION_AREA.item.location=ONE_HUNDRED_FORTH_STREET"
+        "Roped off area"
+    , entity "FLUORESCENT_LIGHTS.item.location=ONE_HUNDRED_FORTH_STREET"
+        "Flickering fluorescent lights"
+    , entity "TRASH_CAN_ONE_HUNDRED_FOURTH_STREET.item.trashcan.location=ONE_HUNDRED_FORTH_STREET"
+        "Trash can"
 
     -- CENTRAL_GUARD_OFFICE
     , entity "TICKET_INSPECTOR.character.location=CENTRAL_GUARD_OFFICE"

@@ -147,6 +147,10 @@ rules =
             DO: SLEEPING_MAN.coffee_ruined
                 CHANGE.amount-25
             """
+        |> rule_______________________ "maintenanceManAtOneHundredFourthStreet"
+            """
+            ON: MAINTENANCE_MAN.location=ONE_HUNDRED_FORTH_STREET
+            """
 
 
 

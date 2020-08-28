@@ -299,3 +299,107 @@ It's flying all over the place, barely missing the passing commuters. I'm not su
         |> content__________________________________ "COMMUTERS_ST_MARKS" """
 Various come and go through the busy station.
 """
+        |> content__________________________________ "SECRET_SERVICE_TYPE_GUY" """
+{He's just standing against the wall, not doing anything. He doesn't even react to the passing crowds or trains. If he's trying not to look suspicious, he's not doing a very good job.
+|
+Oh shit, I think he's watching me. Eeek!
+}
+"""
+        |> content__________________________________ "MAGAZINE_STAND" """
+{~Biking, cars, computers, tabloid gossip. There's a zine for everything.
+|
+Maybe I should get a hobby. Golf? No. Guns? Nah ah. Cars?
+
+I think I'll just stick to doing nothing.
+|
+"End of the World? Top 10 Reasons Why You Should Be Very, Very Afraid."  Wow, they'll really try anything to get you to buy these tabloids. Resorting to top ten lists. Yeesh.
+|
+The old man smiles toothily at me he sits behind the rack of magazines. I think he wants me to buy something.
+}
+"""
+        |> content__________________________________ "FAKE_COP" """
+{Oh my god, it's a police officer! I'm saved! He has to help me!
+
+"Officer! Officer! I need your help!"
+
+I tell him the whole story. My proposal, the missed stop, the thief. I even spill about jumping the turn stile. I don't care, I just need help.
+---
+He doesn't say a word while I talk. It's tough to read him with his aviators on, but I think he's really listening.
+
+I finally finish and he stays quiet for a minute, then he takes off his sunglasses.
+---
+"Wow, man. That's a crazy fucking story. What are you going to do?"
+
+"Uh, I thought you could help. You're a cop. You help people!"
+---
+"Oh... Oh! You're talking about my costume! Sorry, man, I ain't no cop. I'm on my way to my girlfriends costume brunch party. I told her this was fucking weird, but women, am I right bud?"
+
+"God damn it. I've got to go."
+
+"Well, hey man, good luck finding your ring or whatever!"
+|
+It's not a police officer. It's just an idiot in a costume.
+}
+"""
+        |> content__________________________________ "ADVERTISEMENT" """
+It's a giant poster advertising a hot new off-road vehicle. Four wheel drive, the highest safety test awards, great gas mileage, and... out of the price range of anyone one who steps foot in the subway.  Who do they think their selling to?
+"""
+        |> content__________________________________ "OVERTURNED_TRASHCAN" """
+{~Looks like someone kicked it over. Half eaten food, stained newspapers, and other junk are splayed over the platform. Why do people have to be so senselessly destructive?
+|
+I'm not going to clean it up. Who knows what that stuff is covered in.
+}
+"""
+        |> content__________________________________ "NEWSPAPER_VENDING_MACHINE" """
+The door's been forced open and all the papers cleaned out. Didn't think anyone read the paper anymore, let alone stole them.
+"""
+        |> content__________________________________ "CUSTODIAN" """
+{He's asleep on a bench.  This place is a wreck! How does he still have a job?
+|
+He's asleep. He should really do his job.
+
+I'm going to wake him up.
+---
+No, I can't do that.  Maybe he's just on his break.
+|
+Wow, still on break.
+}
+"""
+        |> content__________________________________ "TROPICAL_T_SHIRT_MAN" """
+        He easily stands out from the crowd and he looks to be utterly lost. Maybe he's from out
+of town?
+---
+{He's got a map, but it doesn't seem to be doing him much good. He just keeps looking from his map to the signs overhead.
+---
+I like his shirt though
+|
+He still looks lost.  I'm just getting the subway layout figured out myself.
+}
+"""
+        |> content__________________________________ "CONSTRUCTION_AREA" """
+Half of the platform is draped in yellow tape and littered with orange cones. I remember hearing about this hefty construction project going on around here, but at this rate they're never going to finish.
+"""
+        |> content__________________________________ "FLUORESCENT_LIGHTS" """
+{~Ugh, it's giving me a headache.
+|
+How hard is it to get someone out here to fix this thing?
+|
+It. Won't. Stop. But I can't look away.
+}
+"""
+        |> content__________________________________ "maintenanceManAtOneHundredFourthStreet" """
+{He looks to be working indiscriminately on a wall of pipes. Taping here, hammering there, lots of wrenching. It doesn't look like much is being fixed though, in fact this whole station seems like a Case 27B - 6 waiting to happen.  Maybe I should leave my card.
+---
+He doesn't seem to notice me, but he's muttering to himself, something about "this whole damn place is falling apart."
+
+Better give him his space.
+|
+Now he's either hammering a very rusty pipe or wrenching a bent nail.
+|
+Maybe I should offer him a hand.
+---
+Ha ha, good one Steve!
+---
+Why am I so fascinated with his maintenance guy?
+}
+"""

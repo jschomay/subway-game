@@ -238,4 +238,5 @@ rules =
                 (*.pass).new
                 PLAYER.chapter=2
                 MAN_IN_HOT_DOG_SUIT.location=TWIN_BROOKS
+                MAINTENANCE_MAN.location=ONE_HUNDRED_FORTH_STREET
             """
