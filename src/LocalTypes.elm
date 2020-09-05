@@ -73,6 +73,7 @@ type alias TrainProps =
 type Scene
     = Title String
     | MainTitle
+    | End
     | Lobby
     | Turnstile Line
     | Platform Line

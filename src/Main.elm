@@ -159,7 +159,7 @@ updateStory rules trigger model =
                             |> parseNarrative model trigger trigger
 
                 newDebugState =
-                    Maybe.map (Debug.setLastMatchedRuleId trigger >> Debug.setLastInteractionId trigger) model.debugState
+                    Maybe.map (Debug.setLastMatchedRuleId "no matching rule" >> Debug.setLastInteractionId trigger) model.debugState
             in
             -- no need to apply special events or pending changes (no changes,
             -- and no rule id to match).
@@ -325,6 +325,10 @@ specialEvents rules ruleId model =
             ( { model | scene = Lobby }, Cmd.none )
                 |> updateAndThen (delay rules achievementDelay (Achievement "transfer_station"))
 
+        "jumpTurnstileFortySecondStreet" ->
+            ( { model | scene = End }, Cmd.none )
+                |> updateAndThen (delay rules achievementDelay (Achievement "freedom"))
+
         other ->
             if List.member other [ "use_secret_passage_way", "chaseThiefAgain" ] then
                 ( { model | scene = Passageway }, Cmd.none )
@@ -451,7 +455,7 @@ update rules msg model =
                         (\m ->
                             case ( m.scene, m.story ) of
                                 ( Train _, [] ) ->
-                                    delay rules arrivingDelay Continue model
+                                    delay rules arrivingDelay Continue m
 
                                 _ ->
                                     ( m, Cmd.none )
@@ -727,6 +731,9 @@ mainView model =
             Title title ->
                 ( "title", titleView title )
 
+            End ->
+                ( "end", endView )
+
             CentralGuardOffice ->
                 ( "centralGuardOffice", CentralGuardOffice.view model.worldModel )
 
@@ -921,6 +928,15 @@ titleView title =
         [ div [ class "TitleContent" ]
             [ h1 [ class "Title" ] [ text title ]
             , span [ class "StoryLine__continue", onClick (Interact "LOBBY") ] [ text "Continue..." ]
+            ]
+        ]
+
+
+endView : Html Msg
+endView =
+    div [ class "Scene MainTitleScene" ]
+        [ div [ class "MainTitleContent" ]
+            [ Markdown.toHtml [] "![title](img/title.jpg)\n\nThe end of Part 1 - Thank you for playing!"
             ]
         ]
 

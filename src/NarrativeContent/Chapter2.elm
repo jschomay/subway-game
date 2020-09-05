@@ -307,13 +307,6 @@ This passageway lets out in a different station.
 
 I don't see the thief anywhere though.  Maybe he outran me?  Or took a different turn?
 """
-        |> content__________________________________ "catchConductorMessingWithPanel" """
-That's strange... he looks just like the security guard who gave me my orange line pass.  But... he's dressed like a repairman now.  And he is messing with some kind of panel.
----
-He sees me.  He slams the panel shut and bolts.
----
-How weird.
-"""
         |> content__________________________________ "ELECTRIC_PANEL" """
 Hmm... the lock is busted.  Lots of wires and blinking lights inside.  This is the panel that odd repairman-slash-security guard was messing with...
 """
@@ -323,4 +316,72 @@ Hmm... the lock is busted.  Lots of wires and blinking lights inside.  This is t
 They must have this whole place under surveillance.
 {---
 Maybe I can locate the thief and see where he goes if I can find the security footage.  They must have a surveillance room down here somewhere.|}
+"""
+        |> content__________________________________ "catchConductorMessingWithPanel" """
+He tinkers away on an electric panel on the wall.
+---
+...
+---
+There's [something](confront_repairman) about that guy...
+"""
+        |> content__________________________________ "confrontConductor" """
+I know what it is, he looks like the security guard who yelled at me before.  But now he's a repair man?
+
+I shout out to him.  "Hey, excuse me!"
+---
+He doesn't turn around.  I call out again.
+---
+He stops what he is doing and looks around.
+
+I do know this guy.
+
+"Aren't you that guy from Central Security?"
+
+"Nope."
+---
+"You bailed me out, remember? Gave me an Orange pass and everything?"
+
+"Nope."
+---
+What's going on here?  There's no mistaking it. This is him.  It's hard not to remember that grizzle.
+
+"What are you doing here? And what's up with the uniform?"
+---
+He finally looks me in the eye and his expression changes.
+
+"You ever think about what runs these trains?"
+
+"Uh, no. Not really."
+---
+"Well maybe you should."
+
+With that he takes off, heading deeper into the tunnel for the oncoming train.
+---
+What the hell just happened?
+"""
+        |> content__________________________________ "passageLocked" """
+I guess it locked behind me. No going back now.
+"""
+        |> content__________________________________ "tryToJumpTurnstileWithRepairManWatching" """
+I can't jump it with that repair guy here, he'll report me.
+"""
+        |> content__________________________________ "questionJumpingTurnstiles" """
+I'm not the type to jump turnstiles.
+---
+Well...
+---
+Maybe I should [jump anyway](just_do_it).
+"""
+        |> content__________________________________ "jumpTurnstileFortySecondStreet" """
+Okay, the first time didn't go so hot, but maybe I can do it this time.
+
+This is it, Steve. No turning back. It's either get this proposal back, or get fired.
+---
+No one's looking. No guards in sight. Don't think about the consequences. Just jump and run.
+---
+Here.
+---
+We.
+---
+Go!
 """

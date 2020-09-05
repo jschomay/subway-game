@@ -72,6 +72,10 @@ Fool's errand
 _Achievement unlocked:_
 Transfer station
 """
+        |> content__________________________________ "freedom" """
+_Achievement unlocked:_
+Free to roam
+"""
 
 
 intro : Dict String String

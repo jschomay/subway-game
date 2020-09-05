@@ -211,7 +211,7 @@ entities =
         "Maintenance door"
 
     -- FORTY_SECOND_STREET
-    , entity "MAINTENANCE_DOOR_FORTY_SECOND_STREET_SEVENTY_THIRD_STREET_TO.item.passage_to=SEVENTY_THIRD_STREET.location=FORTY_SECOND_STREET"
+    , entity "MAINTENANCE_DOOR_FORTY_SECOND_STREET_TO_SEVENTY_THIRD_STREET.item.passage_to=SEVENTY_THIRD_STREET.location=FORTY_SECOND_STREET"
         "Maintenance door"
     , entity "GRIZZLED_REPAIRMAN.character.location=FORTY_SECOND_STREET"
         "Grizzled repairman"

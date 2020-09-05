@@ -94,6 +94,10 @@ rules =
             IF: PLAYER.call_boss=2
             DO: PLAYER.call_boss=3.location=FORTY_SECOND_STREET
             """
+        |> rule_______________________ "passageLocked"
+            """
+            ON: MAINTENANCE_DOOR_FORTY_SECOND_STREET_TO_SEVENTY_THIRD_STREET
+            """
         |> rule_______________________ "exitPassagewayAtFortySecondStreet"
             """
             ON: "disembark"
@@ -138,6 +142,10 @@ rules =
         |> rule_______________________ "catchConductorMessingWithPanel"
             """
             ON: GRIZZLED_REPAIRMAN.location=FORTY_SECOND_STREET
+            """
+        |> rule_______________________ "confrontConductor"
+            """
+            ON: "confront_repairman"
             DO: GRIZZLED_REPAIRMAN.location=offscreen
                 ELECTRIC_PANEL.-hidden
             """
@@ -150,6 +158,21 @@ rules =
         |> rule_______________________ "maintenanceManAtOneHundredFourthStreet"
             """
             ON: MAINTENANCE_MAN.location=ONE_HUNDRED_FORTH_STREET
+            """
+        |> rule_______________________ "tryToJumpTurnstileWithRepairManWatching"
+            """
+            ON: BLUE_LINE
+            IF: PLAYER.at_turnstile.location=FORTY_SECOND_STREET
+                GRIZZLED_REPAIRMAN.location=FORTY_SECOND_STREET
+            """
+        |> rule_______________________ "questionJumpingTurnstiles"
+            """
+            ON: BLUE_LINE
+            IF: PLAYER.at_turnstile.location=FORTY_SECOND_STREET
+            """
+        |> rule_______________________ "jumpTurnstileFortySecondStreet"
+            """
+            ON: "just_do_it"
             """
 
 
