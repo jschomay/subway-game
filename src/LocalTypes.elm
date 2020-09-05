@@ -33,7 +33,6 @@ type Msg
     | LoadScene ( Model, List String )
     | Interact String
     | Loaded
-    | Delay Float Msg
     | ToggleMap
     | ToggleNotebook
     | Go Scene

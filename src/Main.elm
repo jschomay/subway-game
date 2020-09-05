@@ -121,9 +121,19 @@ arrivingDelay =
     0.9 * 1000
 
 
+achievementDelay : Float
+achievementDelay =
+    0.3 * 1000
+
+
 travelDelay : Float
 travelDelay =
     1.5 * 1000
+
+
+disembarkStoryDelay : Float
+disembarkStoryDelay =
+    0.5 * 1000
 
 
 passagewayDelay : Float
@@ -160,7 +170,7 @@ updateStory rules trigger model =
               }
             , Cmd.none
             )
-                |> updateAndThen (specialEvents trigger)
+                |> updateAndThen (specialEvents rules trigger)
 
         Just ( matchedRuleID, matchedRule ) ->
             let
@@ -180,7 +190,7 @@ updateStory rules trigger model =
             )
                 |> updateAndThen
                     (if List.isEmpty newStory then
-                        applyPendingChanges
+                        applyPendingChanges rules
 
                      else
                         noop
@@ -289,8 +299,8 @@ Note that this only runs when a rule has matched. In other words, you won't get 
 id of an entity as a ruleId to match against.
 
 -}
-specialEvents : String -> Model -> ( Model, Cmd Msg )
-specialEvents ruleId model =
+specialEvents : LocalTypes.Rules -> String -> Model -> ( Model, Cmd Msg )
+specialEvents rules ruleId model =
     case ruleId of
         "notebookInstructions" ->
             ( { model | showNotebook = True }, Cmd.none )
@@ -306,22 +316,19 @@ specialEvents ruleId model =
 
         -- achievements
         "get_caffeinated_quest_2" ->
-            ( model, Process.sleep 300 |> Task.perform (\_ -> Achievement "get_caffeinated_quest_achievement") )
+            delay rules achievementDelay (Achievement "get_caffeinated_quest_achievement") model
 
         "ratty_hat_man_advice_5" ->
-            ( model, Process.sleep 300 |> Task.perform (\_ -> Achievement "fools_errand_achievement") )
+            delay rules achievementDelay (Achievement "fools_errand_achievement") model
 
         "meetConductorFirstTime" ->
-            -- to avoid the popup when loading a scene
-            if not model.showSelectScene then
-                ( { model | scene = Lobby }, Process.sleep 300 |> Task.perform (\_ -> Achievement "transfer_station") )
-
-            else
-                ( model, Cmd.none )
+            ( { model | scene = Lobby }, Cmd.none )
+                |> updateAndThen (delay rules achievementDelay (Achievement "transfer_station"))
 
         other ->
             if List.member other [ "use_secret_passage_way", "chaseThiefAgain" ] then
-                ( { model | scene = Passageway }, delay passagewayDelay <| Disembark )
+                ( { model | scene = Passageway }, Cmd.none )
+                    |> updateAndThen (delay rules passagewayDelay Disembark)
 
             else if List.member other [ "goToLineTurnstile", "followSkaterDudeToOrangeLine" ] then
                 -- Remember to add line=LINE_[X] when adding rules to this match!!!
@@ -381,15 +388,7 @@ update rules msg model =
                 noop model
 
             Loaded ->
-                ( { model | loaded = True }
-                , if model.showSelectScene then
-                    Cmd.none
-
-                  else
-                    -- doesn't need anything special to start events now (starts at
-                    -- title screen)
-                    Cmd.none
-                )
+                ( { model | loaded = True }, Cmd.none )
 
             LoadScene ( model_, history ) ->
                 -- TODO maybe this can use a recursive `Process.sleep 0 (Replay id)` to create debuggable history
@@ -397,7 +396,7 @@ update rules msg model =
                     (\id modelTuple ->
                         modelTuple
                             |> updateAndThen (update rules <| Interact id)
-                            |> updateAndThen applyPendingChanges
+                            |> updateAndThen (applyPendingChanges rules)
                     )
                     ( model_, Cmd.none )
                     history
@@ -450,20 +449,13 @@ update rules msg model =
                         -- Need to continue automaticaly when riding on the train if
                         -- there is no story, otherwise the train never arrives
                         (\m ->
-                            ( m
-                            , case ( m.scene, m.story ) of
+                            case ( m.scene, m.story ) of
                                 ( Train _, [] ) ->
-                                    delay arrivingDelay Continue
+                                    delay rules arrivingDelay Continue model
 
                                 _ ->
-                                    Cmd.none
-                            )
+                                    ( m, Cmd.none )
                         )
-
-            Delay duration delayedMsg ->
-                ( model
-                , Task.perform (always delayedMsg) <| Process.sleep duration
-                )
 
             ToggleNotebook ->
                 if Rules.unsafeAssert "NOTEBOOK.!new" model.worldModel then
@@ -506,9 +498,8 @@ update rules msg model =
                 ( { model | scene = area }, Cmd.none )
 
             BoardTrain line station ->
-                ( { model | scene = Train { line = line, status = InTransit } }
-                , delay departingDelay (Interact station)
-                )
+                ( { model | scene = Train { line = line, status = InTransit } }, Cmd.none )
+                    |> updateAndThen (delay rules departingDelay (Interact station))
 
             Continue ->
                 -- reduces the story and applies the pending changes when the story
@@ -519,15 +510,14 @@ update rules msg model =
 
                 else
                     ( { model | story = [] }, Cmd.none )
-                        |> updateAndThen applyPendingChanges
+                        |> updateAndThen (applyPendingChanges rules)
                         |> updateAndThen
                             (\m ->
                                 -- special case when riding the train
                                 case m.scene of
                                     Train train ->
-                                        ( { m | scene = Train <| changeTrainStatus Arriving train }
-                                        , delay arrivingDelay <| Disembark
-                                        )
+                                        ( { m | scene = Train <| changeTrainStatus Arriving train }, Cmd.none )
+                                            |> updateAndThen (delay rules arrivingDelay Disembark)
 
                                     MainTitle ->
                                         ( { m | scene = Title <| dayText m.worldModel }, Cmd.none )
@@ -543,9 +533,8 @@ update rules msg model =
                 )
 
             Disembark ->
-                ( { model | scene = Lobby }
-                , delay 500 DisembarkStory
-                )
+                ( { model | scene = Lobby }, Cmd.none )
+                    |> updateAndThen (delay rules disembarkStoryDelay DisembarkStory)
 
             DisembarkStory ->
                 updateStory rules "disembark" model
@@ -563,8 +552,8 @@ update rules msg model =
 {-| Applies pending changes and special events. This is used to make sure the view
 doesn't change in the background until the story modal has closed.
 -}
-applyPendingChanges : Model -> ( Model, Cmd Msg )
-applyPendingChanges model =
+applyPendingChanges : LocalTypes.Rules -> Model -> ( Model, Cmd Msg )
+applyPendingChanges rules model =
     case model.pendingChanges of
         Just ( trigger, changes, matchedRuleID ) ->
             ( { model
@@ -573,15 +562,20 @@ applyPendingChanges model =
               }
             , Cmd.none
             )
-                |> updateAndThen (specialEvents matchedRuleID)
+                |> updateAndThen (specialEvents rules matchedRuleID)
 
         _ ->
             ( model, Cmd.none )
 
 
-delay : Float -> Msg -> Cmd Msg
-delay duration msg =
-    Task.perform (always msg) <| Process.sleep duration
+delay : LocalTypes.Rules -> Float -> Msg -> Model -> ( Model, Cmd Msg )
+delay rules duration msg model =
+    -- no delay if loading a checkpoint
+    if model.showSelectScene then
+        update rules msg model
+
+    else
+        ( model, Task.perform (always msg) <| Process.sleep duration )
 
 
 port loaded : (Bool -> msg) -> Sub msg
@@ -797,7 +791,7 @@ selectSceneView model =
             [ "LOBBY", "BRIEFCASE", "RED_LINE_PASS", "RED_LINE_PASS", "RED_LINE", "CELL_PHONE", "CELL_PHONE", "CELL_PHONE", "COFFEE_CART", "COFFEE", "COFFEE_CART", "COMMUTER_1", "COMMUTER_1", "LOUD_PAYPHONE_LADY", "COFFEE_CART", "LOUD_PAYPHONE_LADY", "GRAFFITI_EAST_MULBERRY", "RED_LINE", "RED_LINE", "BROADWAY_STREET", "LOBBY", "RED_LINE_PASS", "COFFEE_CART", "COFFEE_CART", "TRASH_DIGGER", "TRASH_DIGGER", "GRAFFITI_EAST_MULBERRY", "COFFEE", "CELL_PHONE", "CELL_PHONE", "RED_LINE", "RED_LINE", "CONVENTION_CENTER", "BROADWAY_STREET", "LOBBY", "RED_LINE", "SKATER_DUDE", "COFFEE_CART", "COFFEE_CART", "COFFEE", "CELL_PHONE", "CELL_PHONE", "COFFEE", "RED_LINE", "RED_LINE", "BROADWAY_STREET", "LOBBY", "CELL_PHONE", "COFFEE_CART", "COFFEE_CART", "COFFEE_CART", "COFFEE", "RED_LINE", "RED_LINE", "CHURCH_STREET", "BROADWAY_STREET", "LOBBY", "CELL_PHONE", "COFFEE_CART", "RED_LINE", "RED_LINE", "LOBBY", "RED_LINE", "RED_LINE", "BROADWAY_STREET", "MAP_POSTER", "MAP", "SAFETY_WARNING_POSTER", "CONVENTION_CENTER", "BROADWAY_STREET", "LOBBY", "EXIT", "ANGRY_CROWD", "YELLOW_LINE", "RED_LINE", "COMMUTER_1", "COMMUTER_1", "GIRL_IN_YELLOW", "NOTEBOOK", "SECURITY_OFFICERS", "RED_LINE", "ANGRY_CROWD", "COMMUTER_1", "SECURITY_OFFICERS", "RED_LINE", "RED_LINE", "SPRING_HILL", "LOBBY", "SECURITY_DEPOT_SPRING_HILL_STATION", "RED_LINE", "RED_LINE", "CHURCH_STREET", "MOTHER", "MOTHER", "RED_LINE", "RED_LINE", "EAST_MULBERRY", "SODA_MACHINE", "RED_LINE", "RED_LINE", "CHURCH_STREET", "MOTHER", "RED_LINE", "RED_LINE", "SPRING_HILL", "SECURITY_DEPOT_SPRING_HILL_STATION", "SKATER_DUDE", "SKATER_DUDE", "RED_LINE", "ORANGE_LINE", "ORANGE_LINE", "UNIVERSITY", "ST_MARKS", "CAPITOL_HEIGHTS", "GREEN_SUIT_MAN", "SHIFTY_MAN", "TRASH_CAN_CAPITOL_HEIGHTS", "ODD_KEY", "SPIKY_HAIR_GUY", "MARK", "MARK", "YELLOW_LINE", "YELLOW_LINE", "LOBBY", "ORANGE_LINE", "ORANGE_LINE", "SEVENTY_THIRD_STREET", "TICKET_INSPECTOR", "INFRACTIONS_INSTRUCTIONS_POSTER", "INFRACTIONS_ROOM_DOOR", "INFRACTIONS_PRINTER", "INFRACTIONS_COMPUTER", "INFRACTIONS_CARD_READER", "INFRACTIONS_CARD_READER", "INFRACTIONS_PRINTER", "INFRACTIONS_COMPUTER", "INFRACTIONS_CARD_READER", "INFRACTIONS_COMPUTER", "INFRACTIONS_PRINTER", "INFRACTIONS_CARD_READER", "INFRACTIONS_COMPUTER", "INFRACTIONS_PRINTER", "INFRACTIONS_ROOM_DOOR", "GRIZZLED_SECURITY_GUARD", "RED_LINE_PASS" ]
 
         chatper2 =
-            [ "ORANGE_LINE", "ORANGE_LINE", "SEVENTY_THIRD_STREET", "BROOM_CLOSET", "PAYPHONE_SEVENTY_THIRD_STREET", "DISTRESSED_WOMAN", "MISSING_DOG_POSTER_5", "BUSINESS_MAN", "ORANGE_LINE", "ORANGE_LINE", "SPRING_HILL", "MISSING_DOG_POSTER_0", "MISSING_DOG_POSTER_5", "RED_LINE", "RED_LINE", "CONVENTION_CENTER", "MISSING_DOG_POSTER_5", "MISSING_DOG_POSTER_4", "MISSING_DOG_POSTER_5", "RED_LINE", "RED_LINE", "BROADWAY_STREET", "CHURCH_STREET", "MISSING_DOG_POSTER_4", "MISSING_DOG_POSTER_4", "RED_LINE", "RED_LINE", "EAST_MULBERRY", "MISSING_DOG_POSTER_3", "RED_LINE", "RED_LINE", "WEST_MULBERRY", "MISSING_DOG_POSTER_2", "RED_LINE", "RED_LINE", "TWIN_BROOKS", "MISSING_DOG_POSTER_1", "MISSING_DOG_POSTER_1", "MAN_IN_HOT_DOG_SUIT", "MASCOT_PAPERS", "MAN_IN_HOT_DOG_SUIT", "RED_LINE", "RED_LINE", "SPRING_HILL", "ORANGE_LINE", "ORANGE_LINE", "UNIVERSITY", "FRANKS_FRANKS", "FRANKS_FRANKS", "MAN_IN_HOT_DOG_SUIT", "CHANGE", "MAN_IN_HOT_DOG_SUIT", "ORANGE_LINE", "ORANGE_LINE", "ST_MARKS", "BROKEN_PAYPHONE", "ORANGE_LINE", "ORANGE_LINE", "SEVENTY_THIRD_STREET", "PAYPHONE_SEVENTY_THIRD_STREET", "MAINTENANCE_DOOR_SEVENTY_THIRD_STREET_TO_FORTY_SECOND_STREET", "SECURITY_CAMERA_FORTY_SECOND_STREET", "GRIZZLED_REPAIRMAN", "ELECTRIC_PANEL" ]
+            [ "ORANGE_LINE", "ORANGE_LINE", "SEVENTY_THIRD_STREET", "BROOM_CLOSET", "PAYPHONE_SEVENTY_THIRD_STREET", "DISTRESSED_WOMAN", "MISSING_DOG_POSTER_5", "BUSINESS_MAN", "ORANGE_LINE", "ORANGE_LINE", "SPRING_HILL", "MISSING_DOG_POSTER_0", "MISSING_DOG_POSTER_5", "RED_LINE", "RED_LINE", "CONVENTION_CENTER", "MISSING_DOG_POSTER_5", "MISSING_DOG_POSTER_4", "MISSING_DOG_POSTER_5", "RED_LINE", "RED_LINE", "BROADWAY_STREET", "CHURCH_STREET", "MISSING_DOG_POSTER_4", "MISSING_DOG_POSTER_4", "RED_LINE", "RED_LINE", "EAST_MULBERRY", "MISSING_DOG_POSTER_3", "RED_LINE", "RED_LINE", "WEST_MULBERRY", "MISSING_DOG_POSTER_2", "RED_LINE", "RED_LINE", "TWIN_BROOKS", "MISSING_DOG_POSTER_1", "MISSING_DOG_POSTER_1", "MAN_IN_HOT_DOG_SUIT", "MASCOT_PAPERS", "MAN_IN_HOT_DOG_SUIT", "RED_LINE", "RED_LINE", "SPRING_HILL", "ORANGE_LINE", "ORANGE_LINE", "UNIVERSITY", "FRANKS_FRANKS", "FRANKS_FRANKS", "MAN_IN_HOT_DOG_SUIT", "CHANGE", "MAN_IN_HOT_DOG_SUIT", "ORANGE_LINE", "ORANGE_LINE", "ST_MARKS", "BROKEN_PAYPHONE", "ORANGE_LINE", "ORANGE_LINE", "SEVENTY_THIRD_STREET", "PAYPHONE_SEVENTY_THIRD_STREET", "MAINTENANCE_DOOR_SEVENTY_THIRD_STREET_TO_FORTY_SECOND_STREET", "MAINTENANCE_DOOR_FORTY_SECOND_STREET_TO_SEVENTY_THIRD_STREET", "BLUE_LINE", "BLUE_LINE", "LOBBY", "SECURITY_CAMERA_FORTY_SECOND_STREET", "GRIZZLED_REPAIRMAN", "confront_repairman", "ELECTRIC_PANEL", "BLUE_LINE" ]
 
         fullPlay =
             chapter1 ++ chatper2
@@ -884,6 +878,9 @@ selectSceneView model =
             , "ORANGE_LINE"
             , "SEVENTY_THIRD_STREET"
             , "PAYPHONE_SEVENTY_THIRD_STREET"
+            , "MAINTENANCE_DOOR_SEVENTY_THIRD_STREET_TO_FORTY_SECOND_STREET"
+            , "confront_repairman"
+            , "BLUE_LINE"
             ]
 
         skip i =
@@ -891,7 +888,8 @@ selectSceneView model =
 
         scenes =
             [ ( "(Interact with everything)", ( model, fullPlay ) )
-            , ( "Call boss", skip 76 )
+            , ( "End", skip 79 )
+            , ( "Call boss", skip 75 )
             , ( "Empty broom closet", skip 55 )
             , ( "Recieved orange line pass", skip 51 )
             , ( "Caught", skip 47 )
