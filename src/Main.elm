@@ -783,7 +783,7 @@ mainView model =
           )
         , ( "map"
           , if model.showMap then
-                mapView
+                mapView model.worldModel
 
             else
                 text ""
@@ -979,11 +979,16 @@ storyView story =
         ]
 
 
-mapView : Html Msg
-mapView =
-    div [ onClick ToggleMap, class "map" ]
+mapView : Manifest.WorldModel -> Html Msg
+mapView worldModel =
+    div [ onClick ToggleMap, class "map" ] <|
         [ img [ class "map__image", src <| "img/" ++ Subway.mapImage ] []
         ]
+            ++ List.map
+                (\i ->
+                    img [ class "map__image", src <| "img/map-passage-" ++ String.fromInt i ++ ".png" ] []
+                )
+                (getStat "PLAYER" "mapLevel" worldModel |> Maybe.withDefault 0 |> List.range 1)
 
 
 notebookView : NoteBookPage -> Manifest.WorldModel -> Html Msg

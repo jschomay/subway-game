@@ -92,7 +92,7 @@ rules =
             """
             ON: MAINTENANCE_DOOR_SEVENTY_THIRD_STREET_TO_FORTY_SECOND_STREET
             IF: PLAYER.call_boss=2
-            DO: PLAYER.call_boss=3.location=FORTY_SECOND_STREET
+            DO: PLAYER.call_boss=3.location=FORTY_SECOND_STREET.mapLevel=1
             """
         |> rule_______________________ "passageLocked"
             """

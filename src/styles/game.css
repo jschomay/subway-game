@@ -143,10 +143,13 @@ body {
   padding: 1em;
   margin: auto;
   max-height: 90%;
-  background: #fff;
   border: 1px solid black;
   box-shadow: 0 0 100px 0px black;
   border-radius: 2px;
+}
+
+.map__image:first-child {
+  background: #fff;
 }
 
 .Scene {
