@@ -12,6 +12,21 @@ rules =
             ON: MOTHER.!met
             DO: MOTHER.met
             """
+        |> rule_______________________ "offerYourSodaToScreamingChildFromSoda"
+            """
+            ON: SODA
+            IF: MOTHER.met.screaming_child_quest=0
+                SODA.location=PLAYER
+            DO: MOTHER.screaming_child_quest=99
+                MOTHER.location=offscreen
+            """
+        |> rule_______________________ "offerYourSodaToScreamingChild"
+            """
+            ON: MOTHER.met.screaming_child_quest=0
+            IF: SODA.location=PLAYER
+            DO: MOTHER.screaming_child_quest=99
+                MOTHER.location=offscreen
+            """
         |> rule_______________________ "offerToHelpScreamingChild"
             """
             ON: MOTHER.met.screaming_child_quest=0

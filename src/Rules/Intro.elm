@@ -76,6 +76,13 @@ rules =
             IF: PLAYER.chapter=0
             DO: $.get_caffeinated_quest+1
                 PLAYER.persistent+1
+                SODA.location=PLAYER
+            """
+        |> rule_______________________ "drink_old_soda"
+            """
+            ON: SODA
+            IF: MOTHER.screaming_child_quest<1
+            DO: SODA.location=offscreen
             """
         |> rule_______________________ "get_caffeinated_quest_3"
             """

@@ -18,8 +18,16 @@ The child is screaming his head off.  It's actually very annoying.  Even his mot
 "I'm sorry, he won't calm down.  He wants a soda, but I can't leave this spot because I'm waiting for someone."
 ---
 This situation seems bad for everyone.
-
-(Talk to the mother again if you want to offer help.)
+"""
+        |> content__________________________________ "offerYourSodaToScreamingChildFromSoda" """
+"Say, I actually have a soda.  I didn't drink it yet.  Do you want it?"
+---
+"Gross!  I don't want your weird soda!  Get away from me!"
+"""
+        |> content__________________________________ "offerYourSodaToScreamingChild" """
+"Say, I actually have a soda.  I didn't drink it yet.  Do you want it?"
+---
+"Gross!  I don't want your weird soda!  Get away from me!"
 """
         |> content__________________________________ "offerToHelpScreamingChild" """
 "Hey, I could go get you a soda if you want..."
@@ -110,7 +118,7 @@ But... it looks like he is... crying?
 
 "I'm sorry.  Are you... are you alright?"
 
-He looks up at me and his face brightens up.  He pats the bench for me to join him, but the size of his suit makes it hard to sit. I think I'll just stand. 
+He looks up at me and his face brightens up.  He pats the bench for me to join him, but the size of his suit makes it hard to sit. I think I'll just stand.
 ---
 "Listen, buddy. You ever feel like no matter how hard you try, the world manages to find new ways of bringing you right back down?"
 ---
@@ -151,7 +159,7 @@ The stand is greasy looking and the man behind it even greasier.
 
 "Oh!  No, not for me. It's for my... client. A real stand-up guy.  Here's his resume."
 ---
-Frank looks it over and whistles.  
+Frank looks it over and whistles.
 
 "Hey, this looks good.  You cant imagine the weirdos that try to get this sort of gig. I'll give him a ring."
 ---
@@ -163,7 +171,7 @@ Wow, he got here fast.
 He's already at it.  Looks like he's having the time of his life.  But everyone mostly ignores him.  At least he's happy.
 
 He's coming over to talk to me.
---- 
+---
 "Oh, man. I didn't think I'd get the chance to thank you! But... Thank you! You don't know how much you've just changed my life!"
 
 He hugs me tight.

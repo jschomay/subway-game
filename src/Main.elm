@@ -524,6 +524,9 @@ update rules msg model =
                                             |> updateAndThen (delay rules arrivingDelay Disembark)
 
                                     MainTitle ->
+                                        ( { m | scene = Splash }, Cmd.none )
+
+                                    Splash ->
                                         ( { m | scene = Title <| dayText m.worldModel }, Cmd.none )
 
                                     _ ->
@@ -622,6 +625,9 @@ handleKey model key =
 
                 else if model.showNotebook then
                     ToggleNotebook
+
+                else if model.scene == Splash then
+                    Continue
 
                 else if not <| List.isEmpty model.story then
                     Continue
@@ -727,6 +733,9 @@ mainView model =
             MainTitle ->
                 -- shouldn't happen because mainTitleView is showing instad of mainView
                 ( "mainTitle", text "" )
+
+            Splash ->
+                ( "splash", splashView )
 
             Title title ->
                 ( "title", titleView title )
@@ -941,6 +950,16 @@ endView =
     div [ class "Scene MainTitleScene" ]
         [ div [ class "MainTitleContent" ]
             [ Markdown.toHtml [] "![title](img/title.jpg)\n\nThe end of Part 1 - Thank you for playing!"
+            ]
+        ]
+
+
+splashView : Html Msg
+splashView =
+    div [ class "Scene Splash" ]
+        [ div [ class "MainTitleContent" ]
+            [ Markdown.toHtml [] "![title](img/title.jpg)"
+            , span [ class "StoryLine__continue", onClick Continue ] [ text "Continue..." ]
             ]
         ]
 

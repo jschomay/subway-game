@@ -93,8 +93,6 @@ Steve,
 I've got something big for you.
 
 Come by my office first thing Monday morning.
----
-![title](img/title.jpg)
 """
         |> content__________________________________ "firstInteractionWithCommuter1" """
 {Another commuter waiting on the train.  I say hello and she says hello back.
@@ -406,9 +404,10 @@ OK, calm down Steve.  The hard part is done, just focus on the getting to work.
 Wait, I think I hear something...
 ---
 A soda dropped out!  Yes!
-
-Ugh, this tastes disgusting.  How long has it been in there?
 }
+"""
+        |> content__________________________________ "drink_old_soda" """
+Ugh, this tastes disgusting.  How long has it been in there?
 """
         |> content__________________________________ "get_caffeinated_quest_3" """
 No thank you.
@@ -471,7 +470,7 @@ Today's the day.  I busted my ass, but I think it will work.  I better get my da
 
 I just wish I wasn't so tired.
 ---
-Three more stops. Maybe I can steal a wink or two before I get to the station. I'll just close my eyes for a minute.
+Two more stops. Maybe I can steal a wink or two before I get to the station. I'll just close my eyes for a minute.
 ---
 ...
 ---
