@@ -13,9 +13,34 @@ rules =
             IF: PLAYER.destination=BROADWAY_STREET.chapter=0
             """
         -- (NOTE this rule is general)
-        |> rule_______________________ "checkEmails"
+        |> rule_______________________ "checkEmailsDay1"
             """
             ON: CELL_PHONE
+            IF: PLAYER.day=1
+            DO: CELL_PHONE.-new
+            """
+        |> rule_______________________ "checkEmailsDay2"
+            """
+            ON: CELL_PHONE
+            IF: PLAYER.day=2
+            DO: CELL_PHONE.-new
+            """
+        |> rule_______________________ "checkEmailsDay3"
+            """
+            ON: CELL_PHONE
+            IF: PLAYER.day=3
+            DO: CELL_PHONE.-new
+            """
+        |> rule_______________________ "checkEmailsDay4"
+            """
+            ON: CELL_PHONE
+            IF: PLAYER.day=4
+            DO: CELL_PHONE.-new
+            """
+        |> rule_______________________ "checkEmailsDay5"
+            """
+            ON: CELL_PHONE
+            IF: PLAYER.day=5
             DO: CELL_PHONE.-new
             """
         |> rule_______________________ "forcePlayerToReadEmails"

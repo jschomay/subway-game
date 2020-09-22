@@ -98,209 +98,187 @@ Come by my office first thing Monday morning.
 {Another commuter waiting on the train.  I say hello and she says hello back.
 |I think one hello is enough when talking to complete strangers.}
 """
-        -- (NOTE this rule is general)
-        |> content__________________________________ "checkEmails" """
+        |> content__________________________________ "checkEmailsDay1" """
 {There's no service, but I can view my emails.
 ---
-|}
-{PLAYER.day=1?
+Email 1
+
     From: Jason Harris
-    To: Steve Perkins
-    Sent: Sunday, 4:00 pm
+    To: Steve Perry
+    Sent: Monday, 5:15am
     Subject: I've Got a Job for You
 
-
+    ---
     Steve,
 
     I've got something big for you.
-    We landed some new clients.  The boys up stairs want want to wow them with a new proposal.
-    You're one of our senior agents and you've been in the department for, what, 6 years?
-    I need you to work on this and really make it shine.
-    Come by my office first thing Monday morning.
+    We've landed some important clients. The boys upstairs want you to wow them with a new
+    proposal. You're one of our senior agents and you've been in the department for, what, 6 years?
 
-    Jason Harris
-    District Sales Manager
-    In Your Hands Insurance, Inc.  All rights reserved.
+    I'm giving this opportunity to you.  Be at my office at 6:30 am this Monday and we can talk over the details.
 ---
-    -Reply -
 
-    From: Steve Perkins
-    To: Jason Harris
-    Sent: Sunday, 4:01 pm
-    Subject: RE: I've Got a Job for You
+Reply
 
     Dear Mr. Harris,
-    I've actually been with the company for eight years, but no need to worry, sir. I'm happy for the
-    opportunity. I've got a few big ideas that I've been wanting to try out.
-    I'll be there bright and early, sir.
 
-    Steve Perkins
-    Insurance Agent
-    In Your Hands Insurance
+    I've actually been with the company for eight years, but no need to worry, sir. I'm happy to finally
+    be given the opportunity to do some real good for the company. I've got a few big ideas that I feel
+    could really help our customers in a really big way.
+
+    I'll be there bright and early, sir. I can't wait to start on this project together.
+
 ---
-    From: Janice Franz
-    To: Steve Perkins
-    Sent: Monday, 6:05am
-    Subject: Job Opportunity
+Email 2
 
-    Hi Mr. Steve Perkins
+    From: Janice Franz
+    To: Steve Perry
+    Sent: Monday, 6:05am
+    Subject: RE: RE: Job Opportunity
+---
+    Hi Mr. Steve Perry
 
     My name is Janis and I'm reaching out on behalf of Embrace Insurance. I came across your resume
-    in our system and I believe you would make a perfect fit for our team here at Embrace Insurance.
-    If you're looking for a job change or would just simply like to see what your options are we would
-    love to set up a meeting with you and see what your future could hold.
+    in our system and I believe you would make a perfect fit for our team!
+    If you're looking for a change or would simply like to see what options are available, we would
+    love to set up a meeting soon!
 
     We look forward to your response!
-
-    Janis Franz
-    Assistant Director
-    Embrace Insurance
+|
+Still no service, but Mr. Harris is waiting for me at the office.
 }
-{PLAYER.day=2?
-    From: Jason Harris
-    To: Steve Perkins
-    Sent: Monday, 6:26pm
-    Subject: Good Things!
+"""
+        |> content__________________________________ "checkEmailsDay2" """
+{
+Email 1
 
+    From: Jason Harris
+    To: Steve Perry
+    Sent: Tuesday, 6:10am
+    Subject: Good Things!
+---
     Steve,
 
-    I like a few of the ideas that you brought to me this morning.  But I just got word that our clients are
-    pushing up the meeting and will be here on Friday! You're going to have to put this thing in high gear, Steve.
-    I can't hand them half assed work.
+    I liked the ideas that you brought up yesterday. But I got word that the new clients are pushing up
+    the meeting to Friday! You're going to have to put this thing in HIGH gear, Steve. I can't hand them
+    half assed work.
 
     Don't let me down.
-
-    Jason Harris
-    District Sales Manager
-    In Your Hands Insurance, Inc.  All rights reserved.
 ---
-    -Reply-
-
-    From: Steve Perkins
-    To: Jason Harris
-    Sent: Monday, 6:32pm
-    Subject: RE: Good Things!
+Reply
 
     Dear Mr. Harris,
 
-    Thank you for the update.  I'll do my best, but Friday is a little soon isn't it? I just want to be able to
-    put together something that will really help our customers.  I'll have to cut a lot of the ideas we spoke about.
-    But I'll do my best, sir.
+    Thanks for the update. But Friday is a little soon isn't it? I just want to put something
+    together that will really help our customers. I may have to cut a lot of the ideas we spoke
+    about.
 
-    See you tomorrow, Mr. Harris
+    But I'll do my best, sir!
 
-    Steve Perkins
-    Insurance Agent
-    In Your Hands Insurance
 ---
-    From: Henry Thorne
-    To: Steve Perkins
-    Sent: Monday, 8:25pm
-    Subject: Stevey!
+Email 2
 
+    From: Henry Thorne
+    To: Steve Perry
+    Sent: Tuesday, 6:29am
+    Subject: Stevey!
+---
     Hey Steve!
 
-    How's it going? Long time no talk! Just checking in with you and letting you know I'm going to be
-    in the city in a few days. It's supposed to be a business trip and it's just for a day, but I
-    thought it's be nice to drop by and see how things were and maybe grab a few drinks somewhere.
-    I know things have been difficult since we last talked. Just let me know when you're free and I'll
-    make something work.
+    Long time no talk! Just checking in with you and letting you know I'm going to be in the city in a
+    few days. It's supposed to be a business trip and it's only for a day, but I thought it's be nice to drop
+    by and catch up. I know things have been difficult since we last talked.
+
+    Just let me know when you're free and I'll make something work.
 
     See you soon!
-
-    Henry
-
+|
+That's all the emails.  How am I supposed to get this done by Friday?
 }
-{PLAYER.day=3?
+"""
+        |> content__________________________________ "checkEmailsDay3" """
+{
+Email 1
 
     From: Jason Harris
-    To: Steve Perkins
-    Sent: Tuesday, 4:48pm
-    Subject: No good
-
+    To: Steve Perry
+    Sent: Wednesday, 5:45am
+    Subject: Pure Risk
+---
     Steve,
 
-    What you handed me today WON'T work. The Premiums we offer will NOT cover these plans. Half of these
-    seem like life quality expenses. We need to think about the bottom dollar here, Steve. "Pet Insurance
-    Plan", "Kidnap/Ransom Insurance", "Divorce Insurance"? These benefits not only expose us to
-    unwarranted risk of loss, but also far out weigh our customers premiums. You've got to do better than
-    this. We're two two days from the proposal meeting. Do NOT fuck this up.
+    What you handed me today WON'T work. The Premiums we offer do NOT cover these plans.
+    Half of these are life quality expenses. We NEED to think about the bottom dollar here. We're
+    two days from the proposal meeting. You've got to do better than this.
 
-    Put something better together tonight and get it to me in the morning. You're running out of time.
+    Put something better together today and get it to me by tonight. You're running out of time.
 
-    Jason Harris
-    District Sales Manager
-    In Your Hands Insurance, Inc.  All rights reserved.
 ---
-    -Reply- (unsent)
-
-    From: Steve Perkins
-    To: Jason Harris
-    Sent: Tuesday, 5:00pm
-    Subject: RE: No good
+Reply (Unsent)
 
     Dear Mr. Harris,
 
-    Sir, I have to disagree. I feel that these plans are essential for our customers. If you'd just
-    look over the papers I sent you about the
-}
-{PLAYER.day=4?
-    From: Jason Harris
-    To: Steve Perkins
-    Sent: Wednesday, 4:27pm
-    Subject: (Subject)
+    Sir, I have to disagree. I feel that these plans are essential for our customers. If you'd just look
+    over the papers I sent you about the
 
-    Steve, our clients are going to be here tomorrow whether you're ready or not. You're going to need
-    to push harder. I don't care what you have to do to put this thing together, just get it done.
-
-    Bring me what you have in the morning.
-
-    Jason Harris
-    District Sales Manager
-    In Your Hands Insurance, Inc.  All rights reserved.
 ---
+Reply
+
+    Dear, Mr. Harris
+
+    Yes, sir. I'll make some changes.
+
+|
+Have to cut more. Have to work harder. Have to keep moving. This will be worth it. Right?
+}
+"""
+        |> content__________________________________ "checkEmailsDay4" """
+{
+Email 1
+
+    From: Jason Harris
+    To: Steve Perry
+    Sent: Thursday, 4:27am
+    Subject: (Subject)
+---
+    Steve, our clients are going to be here tomorrow whether you're ready or not. You're going to
+    need to PUSH HARDER. I don't care what you have to do to put this thing together, just GET IT DONE.
+
+    BRING ME WHAT YOU HAVE ASAP.
+
+---
+Email 2
+
     From: Henry Thorne
-    To: Steve Perkins
+    To: Steve Perry
     Sent: Thursday, 5:45am
     Subject: Today?
+---
+    Hey, Steve
 
-    Hey Steve,
-    I'm in the city today and I haven't heard back from you. I'm sure you're busy, but it would
-    really be nice to see you while I'm down. My plane leaves tomorrow, so today is probably it. You
-    can call me at my old number if you get this in time and we can plan something out. It hasn't
+    I'm in the city today and I haven't heard back from you. I'm sure you're busy, but it would really
+    be nice to see you while I'm down. My plane leaves tomorrow, so today is probably it. You can
+    call me at my old number if you get this in time and we can plan something out. It hasn't
     changed.
 
     Hope to talk to you soon.
+|
+How can Mr Harris ask me to push harder? I'm working my ass off!
 }
-{PLAYER.day=5?
+"""
+        |> content__________________________________ "checkEmailsDay5" """
+{
+Email 1
+
     From: Jason Harris
-    To: Steve Perkins
-    Sent: Friday, 6:00am
-    Subject: where the hell are you?
-
-    I want to run through the presentation once before the clients are here.
-    Get your ass down here right away.
-
-    Jason Harris
-    District Sales Manager
-    In Your Hands Insurance, Inc.  All rights reserved.
+    To: Steve Perry
+    Sent: Friday, 5:00am
+    Subject: WHERE THE HELL ARE YOU?
 ---
-    From: Janice Franz
-    To: Steve Perkins
-    Sent: Friday, 6:09am
-    Subject: RE: Job Opportunity
-
-    Hi Steve!
-
-    Hope you're having a great day!  I didn't hear back from you.  I just wanted to reach out to you
-    one more time to set up a quick chat.  How's Tuesday morning next week?  Let me know either
-    way.  I'm excited to talk to you!
-
-    Have a wonderful weekend.
-
-    Janis Franz
-    Assistant Director
-    Embrace Insurance
+    I WANT TO RUN THROUGH THE PRESENTATION BEFORE THE CLIENTS GET HERE.
+    GET YOUR ASS DOWN HERE RIGHT AWAY!
+|
+Maybe I should call in sick.
 }
 """
         |> content__________________________________ "coffeeCartMonday" """
@@ -463,7 +441,7 @@ I'm not looking forward to talking to Mr. Harris this morning.  This proposal is
 But I've got to make it work.
 """
         |> content__________________________________ "endThursday" """
-I'm so tired.  I've been up all night working on this damn proposal, and there's still a lot more work to be done. I hope Mr. Harris appreciates it.
+I'm so tired.  I've been up all night working on this damn proposal, and there's still a lot more work to be done. Mr. Harris better appreciate it.
 """
         |> content__________________________________ "fallAsleep" """
 Today's the day.  I busted my ass, but I think it will work.  I better get my damn promotion.

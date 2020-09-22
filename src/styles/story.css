@@ -46,6 +46,8 @@
 .StoryLine__content code {
   overflow: hidden;
   white-space: pre-wrap;
+  margin-left: 2em;
+  display: block;
 }
 
 .StoryLine__continue {
@@ -80,7 +82,7 @@
 
 .StoryLine a::before {
   content: "\2022";
-  font-size:0.5em;
+  font-size: 0.5em;
   display: inline-block;
   margin-right: 0.1em;
   vertical-align: middle;
@@ -88,7 +90,7 @@
 
 .StoryLine a::after {
   content: "\2022";
-  font-size:0.5em;
+  font-size: 0.5em;
   display: inline-block;
   margin-left: 0.1em;
   vertical-align: middle;
