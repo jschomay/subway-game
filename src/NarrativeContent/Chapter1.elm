@@ -67,21 +67,23 @@ This is my stop, where else would I need to go?
 {
 Oh good, some officers are here.  I can find out what the hold up is.
 
-"Excuse me, officers? I--"
+"Excuse me, ma'am? I--"
 
-They cut me off mid sentence.
+She cuts me off mid sentence.
 ---
 "This exit is closed sir. There's an incident going on above ground and we're not letting anyone through 'till we get the all clear. You will have to wait like all the others."
 ---
 "But I work up there! I'm going to be late if I don't--"
 
-Again they cut me off.
+Again she cuts me off.
 |}
 "If you are unable to wait, take the train to the next stop and walk from there."
 
 "But I--"
 
 "Have a nice day sir."
+---
+Why aren't these officers doing their jobs?
 """
         |> content__________________________________ "askCommuter1AboutDelay" """
 {COMMUTER_1.friendliness>0?
@@ -415,7 +417,7 @@ The steel door slams shut before I can get another word out and he is gone.
 ---
 Can they?
 |{?
-It's locked. 
+It's locked.
 |
 Still locked.
 |

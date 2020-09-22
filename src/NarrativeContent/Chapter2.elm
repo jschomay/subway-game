@@ -191,7 +191,7 @@ She murmurs something unpleasant, but makes the transfer.
 ---
 Okay, so what do I say? My briefcase and proposal were stolen, please don't fire me?
 
-I can feel his hands around my throat already. God damn it.
+I can feel his hands around my throat already. Damn it.
 ---
 "Where the HELL are you with my proposal, Steve?"
 
@@ -255,7 +255,7 @@ She murmurs something unpleasant, but makes the transfer.
 ---
 Okay, so what do I say? My briefcase and proposal were stolen, please don't fire me?
 
-I can feel his hands around my throat already. God damn it.
+I can feel his hands around my throat already. Damn it.
 ---
 "Where the HELL are you with my proposal, Steve?"
 

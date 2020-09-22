@@ -156,9 +156,10 @@ He's playing an old cracked violin with a hat out in front of him for spare chan
 He has a sign: "Blind, Homeless Veteran. Anything helps. God Bless."
 
 The music sounds nice, but I wouldn't call that a real job.
-
+{PLAYER.call_boss>0?
 ---
 Then again, he's got quite a lot of [change](musicians_change) in his hat.
+|}
 """
         |> content__________________________________ "BROKEN_PAYPHONE" """
 {Now that everyone's got cell phones, there's not much use for those things any more.  That's just as well, it's |Well, it used to be a payphone. Now it's } just a gutted payphone stand with stray wires poking out.
