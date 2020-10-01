@@ -197,6 +197,20 @@ rules =
                 INFRACTIONS_CARD_READER.location=CENTRAL_GUARD_OFFICE
                 $.location=offscreen
             """
+        |> rule_______________________ "readingInfrationsPoster"
+            """
+            ON: INFRACTIONS_INSTRUCTIONS_POSTER
+            DO: INFRACTIONS_INSTRUCTIONS_POSTER.read
+            """
+        |> rule_______________________ "pourSodaOnInfractionsMachine"
+            """
+            ON: SODA
+            IF: INFRACTIONS_INSTRUCTIONS_POSTER.read
+                PLAYER.chapter=1
+            DO: SODA.location=offscreen
+                INFRACTIONS_ROOM_DOOR.infraction_step=3
+                PLAYER.good_will-10
+            """
         |> rule_______________________ "infractionAutomationStep1"
             """
             ON: INFRACTIONS_CARD_READER

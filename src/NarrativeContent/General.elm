@@ -287,6 +287,12 @@ I toss a quarter in the cup.
 "Oh, I'm sorry! I thought-"
 ---
 "Just fuck off, will ya?"
+---
+...
+---
+"Um... could I have my quarter back?"
+---
+He just scowls.  Guess not.
 """
         |> content__________________________________ "CENTRAL_GUARD_OFFICE_ENTRANCE" """
 I really dodged a bullet there, I have no desire to go back.
@@ -367,12 +373,11 @@ Wow, still on break.
 }
 """
         |> content__________________________________ "TROPICAL_T_SHIRT_MAN" """
-        He easily stands out from the crowd and he looks to be utterly lost. Maybe he's from out
-of town?
+He easily stands out from the crowd and he looks to be utterly lost. Maybe he's from out of town?
 ---
 {He's got a map, but it doesn't seem to be doing him much good. He just keeps looking from his map to the signs overhead.
 ---
-I like his shirt though
+I like his shirt though.
 |
 He still looks lost.  I'm just getting the subway layout figured out myself.
 }

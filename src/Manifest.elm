@@ -119,10 +119,12 @@ entities =
         "Soggy looking jacket"
     , entity "BULLETIN_BOARD.item.location=WEST_MULBERRY"
         "Bulletin board"
-    , entity "TRASH_CAN_WEST_MULBERRY.item.trashcan.location=WEST_MULBERRY"
-        "Trash can"
     , entity "DRINKING_FOUNTAIN.item.location=WEST_MULBERRY"
         "Rusty drinking fountain"
+    , entity "OVERTURNED_TRASHCAN.item.location=WEST_MULBERRY"
+        "Overturned trashcan"
+    , entity "CUSTODIAN.character.location=WEST_MULBERRY"
+        "Custodian"
 
     -- CHURCH_STREET
     , entity "WOMAN_IN_ODD_HAT.character.location=CHURCH_STREET"
@@ -145,6 +147,8 @@ entities =
         "Man in a hot dog suit"
     , entity "MASCOT_PAPERS.item"
         "Mascot papers"
+    , entity "NEWSPAPER_VENDING_MACHINE.item.location=TWIN_BROOKS"
+        "Newspaper vending machine"
 
     --  BROADWAY_STREET
     , entity "EXIT.item.location=BROADWAY_STREET"
@@ -171,12 +175,6 @@ entities =
         "Security Depot"
     , entity "MISSING_DOG_POSTER_0.item.missing_dog_poster.location=SPRING_HILL"
         "Missing dog poster"
-    , entity "OVERTURNED_TRASHCAN.item.location=SPRING_HILL"
-        "Overturned trashcan"
-    , entity "NEWSPAPER_VENDING_MACHINE.item.location=SPRING_HILL"
-        "Newspaper vending machine"
-    , entity "CUSTODIAN.character.location=SPRING_HILL"
-        "Custodian"
 
     -- CAPITOL_HEIGHTS
     , entity "TRASH_CAN_CAPITOL_HEIGHTS.item.trashcan.location=CAPITOL_HEIGHTS"
@@ -191,8 +189,6 @@ entities =
         "Guy with Spiky Hair"
     , entity "GREEN_SUIT_MAN.character.location=CAPITOL_HEIGHTS"
         "Man in a fancy green suit"
-    , entity "TROPICAL_T_SHIRT_MAN.character.location=CAPITOL_HEIGHTS"
-        "Man in a bright tropical T-shirt"
 
     -- SEVENTY_THIRD_STREET
     , entity "BROOM_CLOSET.item.location=SEVENTY_THIRD_STREET"
@@ -243,6 +239,8 @@ entities =
         "A bird!"
     , entity "COMMUTERS_ST_MARKS.character.location=ST_MARKS"
         "Commuters"
+    , entity "TROPICAL_T_SHIRT_MAN.character.location=ST_MARKS"
+        "Man in a bright tropical T-shirt"
 
     -- ONE_HUNDRED_FORTH_STREET
     , entity "VENDING_MACHINE.item.location=ONE_HUNDRED_FORTH_STREET"

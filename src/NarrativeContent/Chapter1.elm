@@ -428,7 +428,7 @@ Nope. It's locked.
 Wait a second. I think I got it! Oh, no. Just kidding. Still locked.
 }}
 """
-        |> content__________________________________ "INFRACTIONS_INSTRUCTIONS_POSTER" """
+        |> content__________________________________ "readingInfrationsPoster" """
 {_Violators of the law! Due to high volumes of fare evasion, vandalism, and littering, all minor infractions will be dealt with by our new automated system. Please read carefully the following instructions as Transit Authorities Fine Distribution has recently changed:_
 ---
 _Step 1: Approach computer terminal in center of room (WARNING: Do not press the big green button)._
@@ -514,6 +514,13 @@ Maybe it's starting up.
 Nope.  It's rebooting.  But it looks like it froze.
 
 I'm stuck! What did I do? What did I do?
+"""
+        |> content__________________________________ "pourSodaOnInfractionsMachine" """
+This damn system!
+
+In an uncharacteristic moment of weakness, I pop open this can of soda I still have for some reason and pour it all over the damn machine.
+
+It sizzles and sparks, and the whole thing goes off-line, then resets.
 """
         |> content__________________________________ "escapingInfractionRoom" """
 It's open! The reseting computer must have reset the locks. Seems like a flaw in the design, but I'll take it.

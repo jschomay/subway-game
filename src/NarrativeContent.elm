@@ -76,6 +76,10 @@ Transfer station
 _Achievement unlocked:_
 Free to roam
 """
+        |> content__________________________________ "f_the_system" """
+_Achievement unlocked:_
+F&ast;&ast;&ast; the system
+"""
 
 
 intro : Dict String String

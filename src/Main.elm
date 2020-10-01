@@ -329,6 +329,9 @@ specialEvents rules ruleId model =
             ( { model | scene = End }, Cmd.none )
                 |> updateAndThen (delay rules achievementDelay (Achievement "freedom"))
 
+        "pourSodaOnInfractionsMachine" ->
+            delay rules achievementDelay (Achievement "f_the_system") model
+
         other ->
             if List.member other [ "use_secret_passage_way", "chaseThiefAgain" ] then
                 ( { model | scene = Passageway }, Cmd.none )
