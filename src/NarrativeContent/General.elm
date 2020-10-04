@@ -329,7 +329,7 @@ The old man smiles toothily at me he sits behind the rack of magazines. I think 
 
 "Officer! Officer! I need your help!"
 
-I tell him the whole story. My proposal, the missed stop, the thief. I even spill about jumping the turn stile. I don't care, I just need help.
+I tell him the whole story. My proposal, the missed stop, the thief. I even spill about jumping the turnstile. I don't care, I just need help.
 ---
 He doesn't say a word while I talk. It's tough to read him with his aviators on, but I think he's really listening.
 
