@@ -31,19 +31,28 @@ const app = Elm.Main.init({
 const persistPrefix = "persist-";
 
 app.ports.persistListReq.subscribe(() => {
-  let saves = (Object.keys(localStorage) || {})
-    .filter((k) => k.startsWith(persistPrefix))
-    .map((k) => k.slice(persistPrefix.length));
+  let saves = Object.entries(localStorage)
+    .filter(([k, v]) => k.startsWith(persistPrefix))
+    .sort(
+      ([k1, v1], [k2, v2]) =>
+        JSON.parse(v2).timestamp - JSON.parse(v1).timestamp
+    )
+    .map(([k, v]) => k.slice(persistPrefix.length));
   app.ports.persistListRes.send([new Date().toUTCString(), saves]);
 });
 
 app.ports.persistLoadReq.subscribe((key) => {
-  let history = JSON.parse(localStorage.getItem(persistPrefix + key) || "[]");
-  setTimeout(() => app.ports.persistLoadRes.send(history), 100);
+  let { history } = JSON.parse(localStorage.getItem(persistPrefix + key)) || {
+    history: []
+  };
+  if (history) setTimeout(() => app.ports.persistLoadRes.send(history), 100);
 });
 
 app.ports.persistSaveReq.subscribe(([key, value]) => {
-  localStorage.setItem(persistPrefix + key, JSON.stringify(value));
+  localStorage.setItem(
+    persistPrefix + key,
+    JSON.stringify({ timestamp: Date.now(), history: value })
+  );
   app.ports.persistListChanged.send(null);
 });
 
