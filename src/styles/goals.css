@@ -20,7 +20,7 @@
   left: 0px;
   margin: auto;
   position: absolute;
-  padding-top: 1em;
+  padding: 1em;
   font-size: 2em;
 }
 
@@ -42,24 +42,22 @@
   margin-bottom: 1em;
 }
 
+.Notebook__tabs {
+  display: flex;
+  position: absolute;
+  justify-content: space-around;
+  transform: rotate(90deg);
+  left: 69%;
+  width: 500px;
+  top: 50%;
+}
+
 .Notebook__tab {
   padding: 0.15em 0.2em;
-  position: absolute;
   background: #888;
-  top: 40%;
   font-size: 1em;
   user-select: none;
   cursor: pointer;
-}
-
-.Notebook__page--distractions .Notebook__tab {
-  transform: rotate(-90deg);
-  left: -1.1em;
-}
-
-.Notebook__page--goals .Notebook__tab {
-  transform: rotate(90deg);
-  right: -2.5em;
 }
 
 .Notebook__content {
@@ -77,10 +75,6 @@
   margin-bottom: 1em;
 }
 
-.Notebook__page--distractions .Notebook__item {
-  font-size: 0.8em;
-}
-
 .Notebook__subitem {
   font-size: 0.8em;
   padding-left: 1em;
@@ -92,4 +86,31 @@
 
 .Notebook__subitem:last-child {
   text-decoration: none;
+}
+
+.Notebook__save-new {
+  cursor: pointer;
+  position: absolute;
+  top: 1em;
+  right: 2em;
+  padding: 0;
+  margin: 0;
+  line-height: 0.5em;
+}
+
+.Notebook__item--savedGame {
+  cursor: pointer;
+}
+
+.Notebook__persistKeyInput {
+  position: absolute;
+  top: 2.8em;
+  right: 2em;
+  width: 15em;
+  text-align: right;
+  outline: none;
+  background: none;
+  font-family: "Nanum Pen Script", cursive;
+  font-size: 0.7em;
+  border: none;
 }

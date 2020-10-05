@@ -1,5 +1,6 @@
 module Views.NoteBook exposing (view)
 
+import Browser.Events exposing (onClick)
 import Dict
 import Html exposing (..)
 import Html.Attributes exposing (..)
@@ -11,8 +12,15 @@ import NarrativeEngine.Core.WorldModel exposing (..)
 import Rules
 
 
-view : NoteBookPage -> Manifest.WorldModel -> Html Msg
-view page worldModel =
+view :
+    { m
+        | worldModel : Manifest.WorldModel
+        , noteBookPage : NoteBookPage
+        , persistKey : String
+        , history : List String
+    }
+    -> Html Msg
+view { worldModel, noteBookPage, persistKey, history } =
     let
         goalListItemView title subGoals level =
             li [ classList [ ( "Notebook__item", True ), ( "done", level >= List.length subGoals ) ] ]
@@ -53,28 +61,45 @@ view page worldModel =
                 |> List.reverse
                 |> ul [ class "Notebook__content" ]
 
-        togglePage =
-            stopPropagationOn "click" <| Json.succeed ( ToggleNotebookPage, True )
+        savesView saves =
+            saves
+                |> List.map (\s -> li [ class "Notebook__item Notebook__item--savedGame", click (Persist <| Load s) ] [ text s ])
+                |> ul [ class "Notebook__content" ]
+
+        click msg =
+            custom "click" <| Json.succeed { message = msg, stopPropagation = True, preventDefault = True }
     in
     div [ class "Notebook" ] <|
-        case page of
-            Goals ->
-                [ div
-                    [ class "Notebook__page Notebook__page--goals" ]
-                    [ div [ class "Notebook__tab", togglePage ] [ text "Distractions" ]
-                    , h3 [ class "Notebook__header", togglePage ] [ text "Goals" ]
-                    , goalListView goals
-                    ]
-                ]
+        [ div [ class "Notebook__tabs" ]
+            [ div [ class "Notebook__tab Notebook__tab--goals", click <| ToggleNotebookPage Goals ] [ text "Goals" ]
+            , div [ class "Notebook__tab Notebook__tab--distractions", click <| ToggleNotebookPage Distractions ] [ text "Distractions" ]
+            , div [ class "Notebook__tab Notebook__tab--savedGames", click (Persist ListSaves) ] [ text "Saved games" ]
+            ]
+        ]
+            ++ (case noteBookPage of
+                    Goals ->
+                        [ h3 [ class "Notebook__header" ] [ text "Goals" ]
+                        , goalListView goals
+                        ]
 
-            Distractions ->
-                [ div
-                    [ class "Notebook__page Notebook__page--distractions" ]
-                    [ div [ class "Notebook__tab", togglePage ] [ text "Goals" ]
-                    , h3 [ class "Notebook__header", togglePage ] [ text "Distractions" ]
-                    , goalListView distractions
-                    ]
-                ]
+                    Distractions ->
+                        [ h3 [ class "Notebook__header" ] [ text "Distractions" ]
+                        , goalListView distractions
+                        ]
+
+                    SavedGames saves ->
+                        [ h3 [ class "Notebook__header" ] [ text "Saved games" ]
+                        , input
+                            [ class "Notebook__persistKeyInput"
+                            , click NoOp
+                            , onInput (Persist << PersistKeyUpdate)
+                            , Html.Attributes.value persistKey
+                            ]
+                            []
+                        , p [ class "Notebook__save-new", click <| Persist <| Save persistKey history ] [ text "Save new" ]
+                        , savesView saves
+                        ]
+               )
 
 
 goals : List ( String, String, List String )

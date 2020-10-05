@@ -42,6 +42,11 @@ type alias Flags =
     { debug : Bool }
 
 
+defaultFlags : Flags
+defaultFlags =
+    { debug = False }
+
+
 main : Program Flags Model Msg
 main =
     -- This does all parsing up front.  If there are errors, a different view is displayed.
@@ -88,6 +93,7 @@ init initialWorldModel flags =
     in
     ( { worldModel = initialWorldModel
       , loaded = False
+      , persistKey = ""
       , story = NarrativeContent.t "title_intro" |> String.split "---"
       , ruleMatchCounts = Dict.empty
       , scene = MainTitle
@@ -394,10 +400,25 @@ update rules msg model =
             NoOp ->
                 noop model
 
+            Persist ListSaves ->
+                ( model, persistListReq () )
+
+            Persist (Load k) ->
+                ( { model | loaded = False }, persistLoadReq k )
+
+            Persist (Save k v) ->
+                ( model, persistSaveReq ( k, v ) )
+
+            Persist (ExistingSaves ( currTime, saves )) ->
+                ( { model | noteBookPage = SavedGames saves, persistKey = currTime }, Cmd.none )
+
+            Persist (PersistKeyUpdate key) ->
+                ( { model | persistKey = key }, Cmd.none )
+
             Loaded ->
                 ( { model | loaded = True }, Cmd.none )
 
-            LoadScene ( model_, history ) ->
+            LoadScene history ->
                 -- TODO maybe this can use a recursive `Process.sleep 0 (Replay id)` to create debuggable history
                 List.foldl
                     (\id modelTuple ->
@@ -405,7 +426,7 @@ update rules msg model =
                             |> updateAndThen (update rules <| Interact id)
                             |> updateAndThen (applyPendingChanges rules)
                     )
-                    ( model_, Cmd.none )
+                    ( init (Manifest.initialWorldModel |> Result.withDefault Dict.empty) { debug = model.debugState /= Nothing } |> Tuple.first, Cmd.none )
                     history
                     |> updateAndThen
                         (\m ->
@@ -413,6 +434,7 @@ update rules msg model =
                             ( { m
                                 | showSelectScene = False
                                 , showMap = False
+                                , loaded = True
                                 , showNotebook = False
                                 , scene =
                                     case m.scene of
@@ -440,7 +462,7 @@ update rules msg model =
                         )
 
             Interact interactableId ->
-                ( { model | history = model.history ++ [ interactableId ] |> Debug.log "history\n" }
+                ( { model | history = model.history ++ [ interactableId ] }
                 , Cmd.none
                 )
                     |> updateAndThen (updateStory rules interactableId)
@@ -473,18 +495,8 @@ update rules msg model =
                 else
                     ( model, Cmd.none )
 
-            ToggleNotebookPage ->
-                ( { model
-                    | noteBookPage =
-                        case model.noteBookPage of
-                            Goals ->
-                                Distractions
-
-                            Distractions ->
-                                Goals
-                  }
-                , Cmd.none
-                )
+            ToggleNotebookPage page ->
+                ( { model | noteBookPage = page }, Cmd.none )
 
             ToggleMap ->
                 if Rules.unsafeAssert "MAP.location=PLAYER" model.worldModel then
@@ -581,11 +593,16 @@ applyPendingChanges rules model =
 delay : LocalTypes.Rules -> Float -> Msg -> Model -> ( Model, Cmd Msg )
 delay rules duration msg model =
     -- no delay if loading a checkpoint
-    if model.showSelectScene then
+    if model.showSelectScene || not model.loaded then
         update rules msg model
 
     else
         ( model, Task.perform (always msg) <| Process.sleep duration )
+
+
+
+-- PORTS
+-- IN
 
 
 port loaded : (Bool -> msg) -> Sub msg
@@ -594,11 +611,36 @@ port loaded : (Bool -> msg) -> Sub msg
 port keyPress : (String -> msg) -> Sub msg
 
 
+port persistLoadRes : (List String -> msg) -> Sub msg
+
+
+port persistListRes : (( String, List String ) -> msg) -> Sub msg
+
+
+port persistSaveRes : (() -> msg) -> Sub msg
+
+
+
+-- OUT
+
+
+port persistListReq : () -> Cmd msg
+
+
+port persistLoadReq : String -> Cmd msg
+
+
+port persistSaveReq : ( String, List String ) -> Cmd msg
+
+
 subscriptions : Model -> Sub Msg
 subscriptions model =
     Sub.batch
         [ loaded <| always Loaded
         , keyPress <| handleKey model
+        , persistListRes <| (Persist << ExistingSaves)
+        , persistLoadRes LoadScene
+        , persistSaveRes <| always (Persist ListSaves)
         ]
 
 
@@ -654,7 +696,7 @@ view model =
         div [ class "Loading" ] [ text "Loading..." ]
 
     else if model.showSelectScene then
-        selectSceneView model
+        selectSceneView
 
     else
         div []
@@ -788,7 +830,7 @@ mainView model =
           )
         , ( "notebook"
           , if model.showNotebook then
-                notebookView model.noteBookPage model.worldModel
+                notebookView model
 
             else
                 text ""
@@ -803,8 +845,8 @@ mainView model =
         ]
 
 
-selectSceneView : Model -> Html Msg
-selectSceneView model =
+selectSceneView : Html Msg
+selectSceneView =
     let
         chapter1 =
             [ "LOBBY", "BRIEFCASE", "RED_LINE_PASS", "RED_LINE_PASS", "RED_LINE", "CELL_PHONE", "CELL_PHONE", "CELL_PHONE", "COFFEE_CART", "COFFEE", "COFFEE_CART", "COMMUTER_1", "COMMUTER_1", "LOUD_PAYPHONE_LADY", "COFFEE_CART", "LOUD_PAYPHONE_LADY", "GRAFFITI_EAST_MULBERRY", "RED_LINE", "RED_LINE", "BROADWAY_STREET", "LOBBY", "RED_LINE_PASS", "COFFEE_CART", "COFFEE_CART", "TRASH_DIGGER", "TRASH_DIGGER", "GRAFFITI_EAST_MULBERRY", "COFFEE", "CELL_PHONE", "CELL_PHONE", "RED_LINE", "RED_LINE", "CONVENTION_CENTER", "BROADWAY_STREET", "LOBBY", "RED_LINE", "SKATER_DUDE", "COFFEE_CART", "COFFEE_CART", "COFFEE", "CELL_PHONE", "CELL_PHONE", "COFFEE", "RED_LINE", "RED_LINE", "BROADWAY_STREET", "LOBBY", "CELL_PHONE", "COFFEE_CART", "COFFEE_CART", "COFFEE_CART", "COFFEE", "RED_LINE", "RED_LINE", "CHURCH_STREET", "BROADWAY_STREET", "LOBBY", "CELL_PHONE", "COFFEE_CART", "RED_LINE", "RED_LINE", "LOBBY", "RED_LINE", "RED_LINE", "BROADWAY_STREET", "MAP_POSTER", "MAP", "SAFETY_WARNING_POSTER", "CONVENTION_CENTER", "BROADWAY_STREET", "LOBBY", "EXIT", "ANGRY_CROWD", "YELLOW_LINE", "RED_LINE", "COMMUTER_1", "COMMUTER_1", "GIRL_IN_YELLOW", "NOTEBOOK", "SECURITY_OFFICERS", "RED_LINE", "ANGRY_CROWD", "COMMUTER_1", "SECURITY_OFFICERS", "RED_LINE", "RED_LINE", "SPRING_HILL", "LOBBY", "SECURITY_DEPOT_SPRING_HILL_STATION", "RED_LINE", "RED_LINE", "CHURCH_STREET", "MOTHER", "MOTHER", "RED_LINE", "RED_LINE", "EAST_MULBERRY", "SODA_MACHINE", "RED_LINE", "RED_LINE", "CHURCH_STREET", "MOTHER", "RED_LINE", "RED_LINE", "SPRING_HILL", "SECURITY_DEPOT_SPRING_HILL_STATION", "SKATER_DUDE", "SKATER_DUDE", "RED_LINE", "ORANGE_LINE", "ORANGE_LINE", "UNIVERSITY", "ST_MARKS", "CAPITOL_HEIGHTS", "GREEN_SUIT_MAN", "SHIFTY_MAN", "TRASH_CAN_CAPITOL_HEIGHTS", "ODD_KEY", "SPIKY_HAIR_GUY", "MARK", "MARK", "YELLOW_LINE", "YELLOW_LINE", "LOBBY", "ORANGE_LINE", "ORANGE_LINE", "SEVENTY_THIRD_STREET", "TICKET_INSPECTOR", "INFRACTIONS_INSTRUCTIONS_POSTER", "INFRACTIONS_ROOM_DOOR", "INFRACTIONS_PRINTER", "INFRACTIONS_COMPUTER", "INFRACTIONS_CARD_READER", "INFRACTIONS_CARD_READER", "INFRACTIONS_PRINTER", "INFRACTIONS_COMPUTER", "INFRACTIONS_CARD_READER", "INFRACTIONS_COMPUTER", "INFRACTIONS_PRINTER", "INFRACTIONS_CARD_READER", "INFRACTIONS_COMPUTER", "INFRACTIONS_PRINTER", "INFRACTIONS_ROOM_DOOR", "GRIZZLED_SECURITY_GUARD", "RED_LINE_PASS" ]
@@ -906,11 +948,11 @@ selectSceneView model =
             ]
 
         skip i =
-            ( model, skeleton |> List.take i )
+            List.take i skeleton
 
         scenes =
-            [ ( "(Full playthrough)", ( model, finalPlayThrough ) )
-            , ( "(Interact with everything)", ( model, fullPlay ) )
+            [ ( "(Full playthrough)", finalPlayThrough )
+            , ( "(Interact with everything)", fullPlay )
             , ( "End", skip 79 )
             , ( "Call boss", skip 75 )
             , ( "Empty broom closet", skip 55 )
@@ -924,7 +966,7 @@ selectSceneView model =
             , ( "Thursday", skip 15 )
             , ( "Wednesday", skip 10 )
             , ( "Tuesday", skip 5 )
-            , ( "Beginning", ( model, [] ) )
+            , ( "Beginning", [] )
             ]
     in
     div [ class "SelectScene" ]
@@ -1013,6 +1055,6 @@ mapView worldModel =
                 (getStat "PLAYER" "mapLevel" worldModel |> Maybe.withDefault 0 |> List.range 1)
 
 
-notebookView : NoteBookPage -> Manifest.WorldModel -> Html Msg
-notebookView page worldModel =
-    div [ class "Notebook__scrim", onClick ToggleNotebook ] [ NoteBook.view page worldModel ]
+notebookView : Model -> Html Msg
+notebookView model =
+    div [ class "Notebook__scrim", onClick ToggleNotebook ] [ NoteBook.view model ]

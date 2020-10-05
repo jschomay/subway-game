@@ -1,4 +1,4 @@
-module LocalTypes exposing (Model, Msg(..), NoteBookPage(..), Rule, Rules, Scene(..), TrainProps, TrainStatus(..))
+module LocalTypes exposing (Model, Msg(..), NoteBookPage(..), PersistAction(..), Rule, Rules, Scene(..), TrainProps, TrainStatus(..))
 
 import Dict exposing (Dict)
 import Manifest
@@ -12,6 +12,7 @@ import Subway exposing (..)
 type alias Model =
     { worldModel : Manifest.WorldModel
     , loaded : Bool
+    , persistKey : String
     , story : List String
     , scene : Scene
     , ruleMatchCounts : Dict RuleID Int
@@ -30,7 +31,7 @@ type alias Model =
 
 type Msg
     = NoOp
-    | LoadScene ( Model, List String )
+    | LoadScene (List String)
     | Interact String
     | Loaded
     | ToggleMap
@@ -42,8 +43,17 @@ type Msg
     | Continue
     | Achievement String
     | ToggleTranscript
-    | ToggleNotebookPage
+    | ToggleNotebookPage NoteBookPage
     | DebugSeachWorldModel String
+    | Persist PersistAction
+
+
+type PersistAction
+    = ListSaves
+    | Save String (List String)
+    | Load String
+    | ExistingSaves ( String, List String )
+    | PersistKeyUpdate String
 
 
 type alias Rule =
@@ -62,6 +72,7 @@ type TrainStatus
 type NoteBookPage
     = Goals
     | Distractions
+    | SavedGames (List String)
 
 
 type alias TrainProps =

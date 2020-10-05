@@ -28,6 +28,25 @@ const app = Elm.Main.init({
   flags: { debug: debug }
 });
 
+const persistPrefix = "persist-";
+
+app.ports.persistListReq.subscribe(() => {
+  let saves = (Object.keys(localStorage) || {})
+    .filter((k) => k.startsWith(persistPrefix))
+    .map((k) => k.slice(persistPrefix.length));
+  app.ports.persistListRes.send([new Date().toUTCString(), saves]);
+});
+
+app.ports.persistLoadReq.subscribe((key) => {
+  let history = JSON.parse(localStorage.getItem(persistPrefix + key) || "[]");
+  setTimeout(() => app.ports.persistLoadRes.send(history), 100);
+});
+
+app.ports.persistSaveReq.subscribe(([key, value]) => {
+  localStorage.setItem(persistPrefix + key, JSON.stringify(value));
+  app.ports.persistSaveRes.send(null);
+});
+
 var imagesToLoad = require.context("./img/", true, /\.*$/).keys();
 
 // start app right away if we don't need to load anything
@@ -59,9 +78,13 @@ function loaded() {
   console.log("loaded");
 }
 
-document.addEventListener("keydown", function(e) {
-  app.ports.keyPress.send(e.key);
+document.addEventListener("keydown", function (e) {
+  if (e.target.tagName != "INPUT") {
+    app.ports.keyPress.send(e.key);
+  }
   if (e.key == " " || e.key === "Backspace") {
-    if (e.target.tagName != "INPUT") e.preventDefault();
+    if (e.target.tagName != "INPUT") {
+      e.preventDefault();
+    }
   }
 });
