@@ -44,7 +44,12 @@ app.ports.persistLoadReq.subscribe((key) => {
 
 app.ports.persistSaveReq.subscribe(([key, value]) => {
   localStorage.setItem(persistPrefix + key, JSON.stringify(value));
-  app.ports.persistSaveRes.send(null);
+  app.ports.persistListChanged.send(null);
+});
+
+app.ports.persistDeleteReq.subscribe((key) => {
+  localStorage.removeItem(persistPrefix + key);
+  app.ports.persistListChanged.send(null);
 });
 
 var imagesToLoad = require.context("./img/", true, /\.*$/).keys();

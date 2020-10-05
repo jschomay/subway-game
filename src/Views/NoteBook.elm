@@ -61,9 +61,15 @@ view { worldModel, noteBookPage, persistKey, history } =
                 |> List.reverse
                 |> ul [ class "Notebook__content" ]
 
+        saveItemView s =
+            li [ class "Notebook__item" ]
+                [ span [ click (Persist <| Load s), class "Notebook__item--savedGame" ] [ text s ]
+                , span [ click (Persist <| Delete s), class "Notebook__item-delete" ] [ text "(delete)" ]
+                ]
+
         savesView saves =
             saves
-                |> List.map (\s -> li [ class "Notebook__item Notebook__item--savedGame", click (Persist <| Load s) ] [ text s ])
+                |> List.map saveItemView
                 |> ul [ class "Notebook__content" ]
 
         click msg =

@@ -114,3 +114,15 @@
   font-size: 0.7em;
   border: none;
 }
+
+.Notebook__item-delete {
+  font-size: 0.6em;
+  margin-left: 0.5em;
+  cursor: pointer;
+}
+
+.Notebook__item-delete:hover,
+.Notebook__item--savedGame:hover,
+.Notebook__save-new:hover {
+  text-decoration: underline;
+}

@@ -409,6 +409,9 @@ update rules msg model =
             Persist (Save k v) ->
                 ( model, persistSaveReq ( k, v ) )
 
+            Persist (Delete k) ->
+                ( model, persistDeleteReq k )
+
             Persist (ExistingSaves ( currTime, saves )) ->
                 ( { model | noteBookPage = SavedGames saves, persistKey = currTime }, Cmd.none )
 
@@ -617,7 +620,7 @@ port persistLoadRes : (List String -> msg) -> Sub msg
 port persistListRes : (( String, List String ) -> msg) -> Sub msg
 
 
-port persistSaveRes : (() -> msg) -> Sub msg
+port persistListChanged : (() -> msg) -> Sub msg
 
 
 
@@ -633,6 +636,9 @@ port persistLoadReq : String -> Cmd msg
 port persistSaveReq : ( String, List String ) -> Cmd msg
 
 
+port persistDeleteReq : String -> Cmd msg
+
+
 subscriptions : Model -> Sub Msg
 subscriptions model =
     Sub.batch
@@ -640,7 +646,7 @@ subscriptions model =
         , keyPress <| handleKey model
         , persistListRes <| (Persist << ExistingSaves)
         , persistLoadRes LoadScene
-        , persistSaveRes <| always (Persist ListSaves)
+        , persistListChanged <| always (Persist ListSaves)
         ]
 
 

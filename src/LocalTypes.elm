@@ -52,6 +52,7 @@ type PersistAction
     = ListSaves
     | Save String (List String)
     | Load String
+    | Delete String
     | ExistingSaves ( String, List String )
     | PersistKeyUpdate String
 
