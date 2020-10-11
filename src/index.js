@@ -28,6 +28,8 @@ const app = Elm.Main.init({
   flags: { debug: debug }
 });
 
+//////////////////// PERSIST STATE
+
 const persistPrefix = "persist-";
 
 app.ports.persistListReq.subscribe(() => {
@@ -61,36 +63,67 @@ app.ports.persistDeleteReq.subscribe((key) => {
   app.ports.persistListChanged.send(null);
 });
 
-var imagesToLoad = require.context("./img/", true, /\.*$/).keys();
+/////////////////// LOADING ASSETS
 
-// start app right away if we don't need to load anything
-if (!imagesToLoad.length) {
-  loaded();
-}
-
-// need to keep a reference so browsers don't dereference and lose the cache
-var loadedImages = imagesToLoad.map(loadImage);
-
+// TODO consider specifying only the images needed immediatly to load
+var totalAssetsToLoad = 0;
 var numAssetsLoaded = 0;
+
 function assetLoaded() {
   numAssetsLoaded++;
-  if (numAssetsLoaded === imagesToLoad.length) {
+  if (numAssetsLoaded === totalAssetsToLoad) {
     loaded();
   }
 }
 
+function loaded() {
+  app.ports.loaded.send(true);
+  console.log("all assets loaded");
+}
+
+//////// images
+
+var imagesToLoad = require.context("./img/", true, /\.*$/).keys();
+
+// need to keep a reference so browsers don't dereference and lose the cache
+var loadedImages = imagesToLoad.map(loadImage);
+
 function loadImage(path) {
+  totalAssetsToLoad++;
   var img = new Image();
   img.src = "img/" + path;
   img.onload = assetLoaded;
-  console.log("loading", img.src);
+  console.log("loading image", img.src);
   return img;
 }
 
-function loaded() {
-  app.ports.loaded.send(true);
-  console.log("loaded");
+////// audio
+
+const audoPrefix = "audio/";
+const sounds = {
+  piano2: { exts: ["mp3"], waitForLoad: true },
+  song: { exts: ["mp3", "ogg"] },
+  "subway_ambient loop": { exts: ["wav"], waitForLoad: true, loop: true },
+  subway_arrival: { exts: ["wav"], waitForLoad: true },
+  subway_departure: { exts: ["wav"] },
+  subway_whistle: { exts: ["wav"] }
+};
+
+const loadedSounds = {};
+Object.entries(sounds).forEach(loadSound);
+
+function loadSound([key, { waitForLoad, exts, loop }]) {
+  if (waitForLoad) totalAssetsToLoad++;
+  let sound = new Howl({
+    src: exts.map((ext) => audoPrefix + key + "." + ext),
+    loop: loop || false
+  });
+  if (waitForLoad) sound.once("load", assetLoaded);
+  console.log("loading sound", key);
+  loadedSounds[key] = sound;
 }
+
+///////////////////// LISTENERS
 
 document.addEventListener("keydown", function (e) {
   if (e.target.tagName != "INPUT") {
