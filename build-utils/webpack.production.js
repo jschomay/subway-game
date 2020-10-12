@@ -45,6 +45,9 @@ module.exports = () => ({
     new CopyWebpackPlugin([
       {from: 'src/img', to: 'img/'}
     ]),
+    new CopyWebpackPlugin([
+      {from: 'src/audio', to: 'audio/'}
+    ]),
 
     // including svg here requires svgo 0.3.0 which has a bug, so removed for now
     new ImageminPlugin({test: /\.(jpe?g|png|gif)$/i}),

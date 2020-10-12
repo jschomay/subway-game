@@ -74,7 +74,9 @@ app.ports.playSound.subscribe((key) => {
 
 app.ports.stopSound.subscribe((key) => {
   // console.debug("stopping", key, loadedSounds[key]);
-  loadedSounds[key].fade(1, 0, 1000).once("fade", () => loadedSounds[key].stop().volume(1));
+  loadedSounds[key]
+    .fade(1, 0, 1000)
+    .once("fade", () => loadedSounds[key].stop().volume(1));
 });
 
 //////////////////
