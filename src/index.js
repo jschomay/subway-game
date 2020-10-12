@@ -28,7 +28,8 @@ const app = Elm.Main.init({
   flags: { debug: debug }
 });
 
-//////////////////// PERSIST STATE
+////////////////////
+//PERSIST STATE
 
 const persistPrefix = "persist-";
 
@@ -63,16 +64,34 @@ app.ports.persistDeleteReq.subscribe((key) => {
   app.ports.persistListChanged.send(null);
 });
 
-/////////////////// LOADING ASSETS
+//////////////////
+//PLAYING SOUNDS
+
+app.ports.playSound.subscribe((key) => {
+  // console.debug("playing", key, loadedSounds[key]);
+  loadedSounds[key].play();
+});
+
+app.ports.stopSound.subscribe((key) => {
+  // console.debug("stopping", key, loadedSounds[key]);
+  loadedSounds[key].fade(1, 0, 1000).once("fade", () => loadedSounds[key].stop().volume(1));
+});
+
+//////////////////
+//LOADING ASSETS
 
 // TODO consider specifying only the images needed immediatly to load
 var totalAssetsToLoad = 0;
 var numAssetsLoaded = 0;
-
+const progressBarEl = document.getElementById("loading-progress");
 function assetLoaded() {
   numAssetsLoaded++;
+  progressBarEl.value = numAssetsLoaded / totalAssetsToLoad;
+  progressBarEl.innerText = numAssetsLoaded / totalAssetsToLoad;
   if (numAssetsLoaded === totalAssetsToLoad) {
     loaded();
+  } else {
+    // console.log(`loaded ${numAssetsLoaded} of ${totalAssetsToLoad} assets`);
   }
 }
 
@@ -81,7 +100,8 @@ function loaded() {
   console.log("all assets loaded");
 }
 
-//////// images
+///////
+//images
 
 var imagesToLoad = require.context("./img/", true, /\.*$/).keys();
 
@@ -97,19 +117,26 @@ function loadImage(path) {
   return img;
 }
 
-////// audio
-
-const audoPrefix = "audio/";
-const sounds = {
-  piano2: { exts: ["mp3"], waitForLoad: true },
-  song: { exts: ["mp3", "ogg"] },
-  "subway_ambient loop": { exts: ["wav"], waitForLoad: true, loop: true },
-  subway_arrival: { exts: ["wav"], waitForLoad: true },
-  subway_departure: { exts: ["wav"] },
-  subway_whistle: { exts: ["wav"] }
-};
+/////
+//audio
 
 const loadedSounds = {};
+const audoPrefix = "audio/";
+const sounds = {
+  piano2: { exts: ["mp3"], waitForLoad: true, loop: true },
+  song: { exts: ["mp3", "ogg"], loop: true },
+  song_long: { exts: ["mp3"], loop: true },
+  subway_ambient_loop: {
+    exts: ["wav"],
+    waitForLoad: true,
+    loop: true,
+    volumn: 0.6
+  },
+  subway_arrival: { exts: ["wav"] },
+  subway_departure: { exts: ["wav"], waitForLoad: true },
+  subway_whistle: { exts: ["wav"], waitForLoad: true }
+};
+
 Object.entries(sounds).forEach(loadSound);
 
 function loadSound([key, { waitForLoad, exts, loop }]) {
@@ -123,7 +150,8 @@ function loadSound([key, { waitForLoad, exts, loop }]) {
   loadedSounds[key] = sound;
 }
 
-///////////////////// LISTENERS
+////////////////////
+//LISTENERS
 
 document.addEventListener("keydown", function (e) {
   if (e.target.tagName != "INPUT") {

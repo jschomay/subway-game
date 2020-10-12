@@ -51,6 +51,7 @@ body {
   width: 100%;
   height: 100%;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   color: #555;
@@ -58,6 +59,11 @@ body {
   font-weight: normal;
   color: white;
   background-color: black;
+}
+
+progress {
+  background: #ccc;
+  height: 10px;
 }
 
 .SelectScene {

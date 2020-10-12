@@ -124,17 +124,12 @@ departingDelay =
 
 arrivingDelay : Float
 arrivingDelay =
-    0.9 * 1000
+    3 * 1000
 
 
 achievementDelay : Float
 achievementDelay =
     0.3 * 1000
-
-
-travelDelay : Float
-travelDelay =
-    1.5 * 1000
 
 
 disembarkStoryDelay : Float
@@ -307,6 +302,15 @@ id of an entity as a ruleId to match against.
 -}
 specialEvents : LocalTypes.Rules -> String -> Model -> ( Model, Cmd Msg )
 specialEvents rules ruleId model =
+    let
+        -- don't play sounds when loading (needed since special events get run)
+        playSound_ key =
+            if model.showSelectScene || not model.loaded then
+                Cmd.none
+
+            else
+                playSound key
+    in
     case ruleId of
         "notebookInstructions" ->
             ( { model | showNotebook = True }, Cmd.none )
@@ -337,6 +341,25 @@ specialEvents rules ruleId model =
 
         "pourSodaOnInfractionsMachine" ->
             delay rules achievementDelay (Achievement "f_the_system") model
+
+        "fallAsleep" ->
+            ( model, stopSound "piano2" )
+
+        "briefcaseStolen" ->
+            ( model, playSound_ "song_long" )
+
+        "nextDay" ->
+            ( { model | scene = Lobby }
+            , if model.scene == Title "Monday morning" then
+                Cmd.batch
+                    [ playSound "subway_ambient_loop"
+                    , Process.sleep 2000 |> Task.perform (always <| PlaySound "piano2")
+                    , Process.sleep 8000 |> Task.perform (always <| SubwaySounds)
+                    ]
+
+              else
+                Cmd.none
+            )
 
         other ->
             if List.member other [ "use_secret_passage_way", "chaseThiefAgain" ] then
@@ -515,12 +538,13 @@ update rules msg model =
                 , Cmd.none
                 )
 
-            Go area ->
-                -- TODO would be best to move all of `model.scene` into the world model, but for now, just duplicate the line color there
-                ( { model | scene = area }, Cmd.none )
-
             BoardTrain line station ->
-                ( { model | scene = Train { line = line, status = InTransit } }, Cmd.none )
+                ( { model | scene = Train { line = line, status = InTransit } }
+                , Cmd.batch
+                    [ playSound "subway_departure"
+                    , playSound "subway_whistle"
+                    ]
+                )
                     |> updateAndThen (delay rules departingDelay (Interact station))
 
             Continue ->
@@ -535,21 +559,45 @@ update rules msg model =
                         |> updateAndThen (applyPendingChanges rules)
                         |> updateAndThen
                             (\m ->
-                                -- special case when riding the train
+                                -- handle continue by scene
                                 case m.scene of
                                     Train train ->
                                         ( { m | scene = Train <| changeTrainStatus Arriving train }, Cmd.none )
                                             |> updateAndThen (delay rules arrivingDelay Disembark)
 
                                     MainTitle ->
-                                        ( { m | scene = Splash }, Cmd.none )
+                                        ( { m | scene = Splash }
+                                        , Cmd.batch
+                                            [ playSound "subway_departure"
+                                            , Process.sleep 2000 |> Task.perform (always <| PlaySound "subway_whistle")
+                                            ]
+                                        )
 
                                     Splash ->
-                                        ( { m | scene = Title <| dayText m.worldModel }, Cmd.none )
+                                        ( { m | scene = Title <| dayText m.worldModel }
+                                        , stopSound "subway_departure"
+                                        )
+
+                                    Title _ ->
+                                        ( m, stopSound "subway_departure" )
 
                                     _ ->
                                         ( m, Cmd.none )
                             )
+
+            PlaySound key ->
+                ( model, playSound key )
+
+            StopSound key ->
+                ( model, stopSound key )
+
+            SubwaySounds ->
+                ( model
+                , Cmd.batch
+                    [ playSound "subway_arrival"
+                    , Process.sleep 37000 |> Task.perform (always <| SubwaySounds)
+                    ]
+                )
 
             Achievement key ->
                 -- TODO probably make a better UI for this
@@ -558,7 +606,7 @@ update rules msg model =
                 )
 
             Disembark ->
-                ( { model | scene = Lobby }, Cmd.none )
+                ( { model | scene = Lobby }, stopSound "subway_departure" )
                     |> updateAndThen (delay rules disembarkStoryDelay DisembarkStory)
 
             DisembarkStory ->
@@ -639,6 +687,12 @@ port persistSaveReq : ( String, List String ) -> Cmd msg
 port persistDeleteReq : String -> Cmd msg
 
 
+port playSound : String -> Cmd msg
+
+
+port stopSound : String -> Cmd msg
+
+
 subscriptions : Model -> Sub Msg
 subscriptions model =
     Sub.batch
@@ -668,8 +722,7 @@ handleKey model key =
         case key of
             " " ->
                 if showingTitle then
-                    -- TODO might need to parameterize the Title with a msg
-                    Interact "LOBBY"
+                    Interact "next_day"
 
                 else if model.showMap then
                     ToggleMap
@@ -699,7 +752,10 @@ handleKey model key =
 view : Model -> Html Msg
 view model =
     if not model.loaded then
-        div [ class "Loading" ] [ text "Loading..." ]
+        div [ class "Loading" ]
+            [ p [] [ text "Loading..." ]
+            , progress [ id "loading-progress", value "0" ] [ text "0" ]
+            ]
 
     else if model.showSelectScene then
         selectSceneView
@@ -991,7 +1047,7 @@ titleView title =
     div [ class "Scene TitleScene" ]
         [ div [ class "TitleContent" ]
             [ h1 [ class "Title" ] [ text title ]
-            , span [ class "StoryLine__continue", onClick (Interact "LOBBY") ] [ text "Continue..." ]
+            , span [ class "StoryLine__continue", onClick (Interact "next_day") ] [ text "Continue..." ]
             ]
         ]
 

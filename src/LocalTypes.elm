@@ -36,7 +36,6 @@ type Msg
     | Loaded
     | ToggleMap
     | ToggleNotebook
-    | Go Scene
     | BoardTrain Line Station
     | Disembark
     | DisembarkStory
@@ -46,6 +45,9 @@ type Msg
     | ToggleNotebookPage NoteBookPage
     | DebugSeachWorldModel String
     | Persist PersistAction
+    | SubwaySounds
+    | PlaySound String
+    | StopSound String
 
 
 type PersistAction

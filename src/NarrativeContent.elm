@@ -48,6 +48,7 @@ content__________________________________ =
 silent : Dict String String
 silent =
     Dict.empty
+        |> content__________________________________ "nextDay" ""
         |> content__________________________________ "goToLobby" ""
         |> content__________________________________ "goToLineTurnstile" ""
         |> content__________________________________ "goToLinePlatform" ""

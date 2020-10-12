@@ -16,6 +16,10 @@ rules =
             """
             ON: *.station.out_of_service
             """
+        |> rule_______________________ "nextDay"
+            """
+            ON: "next_day"
+            """
         |> rule_______________________ "goToLobby"
             """
             ON: LOBBY
