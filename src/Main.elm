@@ -302,15 +302,6 @@ id of an entity as a ruleId to match against.
 -}
 specialEvents : LocalTypes.Rules -> String -> Model -> ( Model, Cmd Msg )
 specialEvents rules ruleId model =
-    let
-        -- don't play sounds when loading (needed since special events get run)
-        playSound_ key =
-            if model.showSelectScene || not model.loaded then
-                Cmd.none
-
-            else
-                playSound key
-    in
     case ruleId of
         "notebookInstructions" ->
             ( { model | showNotebook = True }, Cmd.none )
@@ -346,7 +337,7 @@ specialEvents rules ruleId model =
             ( model, stopSound "piano2" )
 
         "briefcaseStolen" ->
-            ( model, playSound_ "song_long" )
+            ( model, playSound "song_long" )
 
         "nextDay" ->
             ( { model | scene = Lobby }
@@ -483,7 +474,11 @@ update rules msg model =
                                         other ->
                                             []
                               }
-                            , Cmd.none
+                              -- start ambiant sounds
+                            , Cmd.batch
+                                [ playSound "subway_ambient_loop"
+                                , Process.sleep 8000 |> Task.perform (always <| SubwaySounds)
+                                ]
                             )
                         )
 
