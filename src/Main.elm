@@ -1079,11 +1079,14 @@ mainTitleView story =
 storyView : String -> Html Msg
 storyView story =
     let
+        lastSeg p =
+            String.split "/" p |> List.reverse |> List.head |> Maybe.withDefault p
+
         linkParser =
             -- this works because only A tags have a `pathname` attribute (which
             -- starts with a `/`)
             Json.map
-                (\path -> ( Interact <| String.dropLeft 1 path, True ))
+                (\path -> ( Interact <| lastSeg path, True ))
                 (Json.at [ "target", "pathname" ] Json.string)
 
         catchLinkClicks =
