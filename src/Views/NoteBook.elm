@@ -97,6 +97,7 @@ view { worldModel, noteBookPage, persistKey, history } =
                         [ h3 [ class "Notebook__header" ] [ text "Saved games" ]
                         , input
                             [ class "Notebook__persistKeyInput"
+                            , id "persistKeyInput"
                             , click NoOp
                             , onInput (Persist << PersistKeyUpdate)
                             , Html.Attributes.value persistKey

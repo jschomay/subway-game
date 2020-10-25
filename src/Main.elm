@@ -1,6 +1,7 @@
 port module Main exposing (main)
 
 import Browser
+import Browser.Dom as Dom
 import Dict exposing (Dict)
 import Html exposing (..)
 import Html.Attributes exposing (..)
@@ -427,7 +428,7 @@ update rules msg model =
                 ( model, persistDeleteReq k )
 
             Persist (ExistingSaves ( currTime, saves )) ->
-                ( { model | noteBookPage = SavedGames saves, persistKey = currTime }, Cmd.none )
+                ( { model | noteBookPage = SavedGames saves, persistKey = currTime }, Task.attempt (\_ -> NoOp) (Dom.focus "persistKeyInput") )
 
             Persist (PersistKeyUpdate key) ->
                 ( { model | persistKey = key }, Cmd.none )
