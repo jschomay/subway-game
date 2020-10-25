@@ -114,6 +114,10 @@
   cursor: pointer;
 }
 
+.Sign__item--interactable:hover {
+  color: orange;
+}
+
 .Sign__item--interactable:last-child {
   padding-bottom: initial;
 }
@@ -151,10 +155,15 @@
   padding-top: 3px;
   justify-content: center;
   flex: 0 0 auto;
+  border: 2px solid transparent;
 }
 
 .Connections .Connection {
   cursor: pointer;
+}
+
+.Connections .Connection:hover {
+  border-color: white;
 }
 
 /* Line colors */
@@ -194,12 +203,16 @@
 .Inventory__item {
   cursor: pointer;
   margin: 0 1em;
-  height: 3em;
+  height: 3.5em;
   width: 3em;
   position: relative;
   background-size: contain;
   background-repeat: no-repeat;
   background-position: center center;
+}
+
+.Inventory__item:hover {
+  border-bottom: 2px solid orange;
 }
 
 .Inventory__item img {

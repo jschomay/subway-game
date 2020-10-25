@@ -40,6 +40,10 @@
   margin-left: 0.5em;
 }
 
+.Exit__text:hover {
+  color: orange;
+}
+
 .Arrow {
   cursor: pointer;
   border: solid white;
@@ -69,7 +73,7 @@
   margin: auto;
   user-select: none;
   padding: 1em;
-  width: 330px;
+  width: 380px;
   border: 0.2em solid #333;
   background: white;
   border-radius: 1.1em;
@@ -122,11 +126,32 @@
 }
 
 .Stop__name {
-  flex: 0 1 auto;
+  flex: 0 0 auto;
+}
+
+.Stop:hover .Stop__dot::after {
+  content: "";
+  position: absolute;
+  display: block;
+  border-radius: 50%;
+  left: 3px;
+  right: 3px;
+  top: 3px;
+  bottom: 3px;
+  margin: 2px;
+  background: inherit;
 }
 
 .Stop__name--current {
   font-weight: bold;
+}
+
+.Stop__name--current:hover {
+  cursor: initial;
+}
+
+.Stop__dot--current::after {
+  display: none !important;
 }
 
 .Stop__dot {

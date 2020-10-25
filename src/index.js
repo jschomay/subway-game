@@ -17,7 +17,7 @@ require("./styles/lobby.css");
 require("./styles/passageway.css");
 require("./styles/turnstile.css");
 require("./styles/guard-office.css");
-require("./styles/goals.css");
+require("./styles/notebook.css");
 require("./styles/game.css");
 
 // inject bundled Elm app

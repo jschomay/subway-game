@@ -59,6 +59,10 @@
   display: block;
 }
 
+.StoryLine__continue:hover {
+  color: orange;
+}
+
 .StoryLine pre {
   font-size: 0.7em;
   font-family: "serif";
@@ -74,30 +78,14 @@
 }
 
 .StoryLine a {
-  color: #aaa;
-  font-size: 1.2em;
+  color: inherit;
+  /* font-size: 1.1em; */
   font-weight: bold;
   text-decoration: none;
 }
 
-.StoryLine a::before {
-  content: "\2022";
-  font-size: 0.5em;
-  display: inline-block;
-  margin-right: 0.1em;
-  vertical-align: middle;
-}
-
-.StoryLine a::after {
-  content: "\2022";
-  font-size: 0.5em;
-  display: inline-block;
-  margin-left: 0.1em;
-  vertical-align: middle;
-}
-
 .StoryLine a:hover {
-  color: inherit;
+  color: orange;
 }
 
 @keyframes fadeIn {

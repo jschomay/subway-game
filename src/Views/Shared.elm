@@ -96,6 +96,5 @@ inventoryView worldModel =
                 ]
     in
     div [ class "Sign Sign--inventory" ]
-        [ div [ class "Sign__header2" ] [ text "Inventory" ]
-        , div [ class "Inventory" ] <| List.map inventoryItemView <| groupInventory inventory
+        [ div [ class "Inventory" ] <| List.map inventoryItemView <| groupInventory inventory
         ]

@@ -47,7 +47,7 @@
   position: absolute;
   justify-content: space-around;
   transform: rotate(90deg);
-  left: 69%;
+  left: 70%;
   width: 500px;
   top: 50%;
 }
@@ -58,6 +58,10 @@
   font-size: 1em;
   user-select: none;
   cursor: pointer;
+}
+
+.Notebook__tab:hover {
+  text-decoration: underline;
 }
 
 .Notebook__content {
