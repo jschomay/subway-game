@@ -109,7 +109,11 @@ init initialWorldModel flags =
       , transcript = []
       , pendingChanges = Nothing
       }
-    , Cmd.none
+    , if flags.debug then
+        Cmd.none
+
+      else
+        persistLoadReq "autosave"
     )
 
 
@@ -542,6 +546,7 @@ update rules msg model =
                     ]
                 )
                     |> updateAndThen (delay rules departingDelay (Interact station))
+                    |> updateAndThen (\m -> ( m, persistSaveReq ( "autosave", m.history ) ))
 
             Continue ->
                 -- reduces the story and applies the pending changes when the story
