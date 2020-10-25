@@ -342,14 +342,14 @@ specialEvents rules ruleId model =
             ( model, stopSound "music/song1/piano2" )
 
         "briefcaseStolen" ->
-            ( model, playSound "music/song2/song" )
+            ( model, playLoop "music/song2" )
 
         "nextDay" ->
             ( { model | scene = Lobby }
             , if model.scene == Title "Monday morning" then
                 Cmd.batch
                     [ playSound "sfx/subway_ambient_loop"
-                    , Process.sleep 2000 |> Task.perform (always <| PlaySound "music/song1/piano2")
+                    , Process.sleep 2000 |> Task.perform (always <| PlayLoop "music/song1/piano2")
                     , Process.sleep 8000 |> Task.perform (always <| SubwaySounds)
                     ]
 
@@ -589,8 +589,15 @@ update rules msg model =
             PlaySound key ->
                 ( model, playSound key )
 
+            PlayLoop key ->
+                ( model, playLoop key )
+
             StopSound key ->
                 ( model, stopSound key )
+
+            QueueNextLoop key ->
+                -- TODO
+                ( model, Cmd.none )
 
             SubwaySounds ->
                 ( model
@@ -689,6 +696,9 @@ port persistDeleteReq : String -> Cmd msg
 
 
 port playSound : String -> Cmd msg
+
+
+port playLoop : String -> Cmd msg
 
 
 port stopSound : String -> Cmd msg

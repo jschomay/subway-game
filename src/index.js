@@ -30,6 +30,7 @@ const app = Elm.Main.init({
 
 ////////////////////
 //PERSIST STATE
+////////////////////
 
 const persistPrefix = "persist-";
 
@@ -66,21 +67,53 @@ app.ports.persistDeleteReq.subscribe((key) => {
 
 //////////////////
 //PLAYING SOUNDS
+//////////////////
 
 app.ports.playSound.subscribe((key) => {
   // console.debug("playing", key, loadedSounds[key]);
   loadedSounds[key].play();
 });
 
+let loopTime;
+let currentLoopKey;
+let currentLoopIndex = 0;
+
+const loops = {
+  "music/song2": 6
+};
+
+function checkLoop() {
+  if (Date.now() > loopTime) {
+    playLoop(currentLoopKey);
+  } else {
+    requestAnimationFrame(checkLoop);
+  }
+}
+
+app.ports.playLoop.subscribe(playLoop);
+
+function playLoop(key) {
+  let loop = `${key}/loop${currentLoopIndex + 1}`;
+  // console.debug("playing loop", loop, loadedSounds[loop]);
+  loadedSounds[loop].play();
+  // each loop transitions to it's "tail" 1/3 of the way through
+  loopTime = loadedSounds[loop].duration() * 1000 * 0.66 + Date.now();
+  currentLoopKey = key;
+  currentLoopIndex = (currentLoopIndex + 1) % loops[key];
+  requestAnimationFrame(checkLoop);
+}
+
 app.ports.stopSound.subscribe((key) => {
   // console.debug("stopping", key, loadedSounds[key]);
+  let v = loadedSounds[key].volume();
   loadedSounds[key]
-    .fade(1, 0, 1000)
-    .once("fade", () => loadedSounds[key].stop().volume(1));
+    .fade(v, 0, 1000)
+    .once("fade", () => loadedSounds[key].stop().volume(v));
 });
 
 //////////////////
 //LOADING ASSETS
+//////////////////
 
 // TODO consider specifying only the images needed immediatly to load
 var totalAssetsToLoad = 0;
@@ -104,6 +137,7 @@ function loaded() {
 
 ///////
 //images
+///////
 
 var imagesToLoad = require.context("./img/", true, /\.*$/).keys();
 
@@ -121,19 +155,25 @@ function loadImage(path) {
 
 /////
 //audio
+/////
 
 const loadedSounds = {};
 const audoPrefix = "audio/";
 const sounds = {
-  "music/song1/piano2": { exts: ["mp3"], waitForLoad: true, loop: true },
-  "music/song2/song": { exts: ["mp3", "ogg"], loop: true },
+  "music/song1/piano2": { exts: ["mp3"], waitForLoad: true },
+  "music/song2/loop1": { exts: ["wav"] },
+  "music/song2/loop2": { exts: ["wav"] },
+  "music/song2/loop3": { exts: ["wav"] },
+  "music/song2/loop4": { exts: ["wav"] },
+  "music/song2/loop5": { exts: ["wav"] },
+  "music/song2/loop6": { exts: ["wav"] },
   "sfx/subway_ambient_loop": {
     exts: ["wav"],
     waitForLoad: true,
     loop: true,
-    volumn: 0.4
+    volume: 0.4
   },
-  "sfx/subway_arrival": { exts: ["wav"], volumn: 0.7 },
+  "sfx/subway_arrival": { exts: ["wav"], volume: 0.7 },
   "sfx/subway_departure": { exts: ["wav"], waitForLoad: true },
   "sfx/subway_whistle": { exts: ["wav"], waitForLoad: true }
 };
@@ -153,6 +193,7 @@ function loadSound([key, { waitForLoad, exts, loop }]) {
 
 ////////////////////
 //LISTENERS
+////////////////////
 
 document.addEventListener("keydown", function (e) {
   if (e.target.tagName != "INPUT") {
