@@ -125,18 +125,17 @@ function loadImage(path) {
 const loadedSounds = {};
 const audoPrefix = "audio/";
 const sounds = {
-  piano2: { exts: ["mp3"], waitForLoad: true, loop: true },
-  song: { exts: ["mp3", "ogg"], loop: true },
-  song_long: { exts: ["mp3"], loop: true },
-  subway_ambient_loop: {
+  "music/song1/piano2": { exts: ["mp3"], waitForLoad: true, loop: true },
+  "music/song2/song": { exts: ["mp3", "ogg"], loop: true },
+  "sfx/subway_ambient_loop": {
     exts: ["wav"],
     waitForLoad: true,
     loop: true,
-    volumn: 0.6
+    volumn: 0.4
   },
-  subway_arrival: { exts: ["wav"] },
-  subway_departure: { exts: ["wav"], waitForLoad: true },
-  subway_whistle: { exts: ["wav"], waitForLoad: true }
+  "sfx/subway_arrival": { exts: ["wav"], volumn: 0.7 },
+  "sfx/subway_departure": { exts: ["wav"], waitForLoad: true },
+  "sfx/subway_whistle": { exts: ["wav"], waitForLoad: true }
 };
 
 Object.entries(sounds).forEach(loadSound);

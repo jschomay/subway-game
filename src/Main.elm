@@ -339,17 +339,17 @@ specialEvents rules ruleId model =
             delay rules achievementDelay (Achievement "f_the_system") model
 
         "fallAsleep" ->
-            ( model, stopSound "piano2" )
+            ( model, stopSound "music/song1/piano2" )
 
         "briefcaseStolen" ->
-            ( model, playSound "song_long" )
+            ( model, playSound "music/song2/song" )
 
         "nextDay" ->
             ( { model | scene = Lobby }
             , if model.scene == Title "Monday morning" then
                 Cmd.batch
-                    [ playSound "subway_ambient_loop"
-                    , Process.sleep 2000 |> Task.perform (always <| PlaySound "piano2")
+                    [ playSound "sfx/subway_ambient_loop"
+                    , Process.sleep 2000 |> Task.perform (always <| PlaySound "music/song1/piano2")
                     , Process.sleep 8000 |> Task.perform (always <| SubwaySounds)
                     ]
 
@@ -481,7 +481,7 @@ update rules msg model =
                               }
                               -- start ambiant sounds
                             , Cmd.batch
-                                [ playSound "subway_ambient_loop"
+                                [ playSound "sfx/subway_ambient_loop"
                                 , Process.sleep 8000 |> Task.perform (always <| SubwaySounds)
                                 ]
                             )
@@ -541,8 +541,8 @@ update rules msg model =
             BoardTrain line station ->
                 ( { model | scene = Train { line = line, status = InTransit } }
                 , Cmd.batch
-                    [ playSound "subway_departure"
-                    , playSound "subway_whistle"
+                    [ playSound "sfx/subway_departure"
+                    , playSound "sfx/subway_whistle"
                     ]
                 )
                     |> updateAndThen (delay rules departingDelay (Interact station))
@@ -569,18 +569,18 @@ update rules msg model =
                                     MainTitle ->
                                         ( { m | scene = Splash }
                                         , Cmd.batch
-                                            [ playSound "subway_departure"
-                                            , Process.sleep 2000 |> Task.perform (always <| PlaySound "subway_whistle")
+                                            [ playSound "sfx/subway_departure"
+                                            , Process.sleep 2000 |> Task.perform (always <| PlaySound "sfx/subway_whistle")
                                             ]
                                         )
 
                                     Splash ->
                                         ( { m | scene = Title <| dayText m.worldModel }
-                                        , stopSound "subway_departure"
+                                        , stopSound "sfx/subway_departure"
                                         )
 
                                     Title _ ->
-                                        ( m, stopSound "subway_departure" )
+                                        ( m, stopSound "sfx/subway_departure" )
 
                                     _ ->
                                         ( m, Cmd.none )
@@ -595,7 +595,7 @@ update rules msg model =
             SubwaySounds ->
                 ( model
                 , Cmd.batch
-                    [ playSound "subway_arrival"
+                    [ playSound "sfx/subway_arrival"
                     , Process.sleep 37000 |> Task.perform (always <| SubwaySounds)
                     ]
                 )
@@ -607,7 +607,7 @@ update rules msg model =
                 )
 
             Disembark ->
-                ( { model | scene = Lobby }, stopSound "subway_departure" )
+                ( { model | scene = Lobby }, stopSound "sfx/subway_departure" )
                     |> updateAndThen (delay rules disembarkStoryDelay DisembarkStory)
 
             DisembarkStory ->
