@@ -124,7 +124,7 @@ introDelay =
 
 departingDelay : Float
 departingDelay =
-    0.8 * 1000
+    2 * 1000
 
 
 arrivingDelay : Float
@@ -342,14 +342,13 @@ specialEvents rules ruleId model =
             ( model, stopSound "music/song1/piano2" )
 
         "briefcaseStolen" ->
-            ( model, playLoop "music/song2" )
+            ( model, playMusic "music/song2" )
 
         "nextDay" ->
             ( { model | scene = Lobby }
             , if model.scene == Title "Monday morning" then
                 Cmd.batch
                     [ playSound "sfx/subway_ambient_loop"
-                    , Process.sleep 2000 |> Task.perform (always <| PlayLoop "music/song1/piano2")
                     , Process.sleep 8000 |> Task.perform (always <| SubwaySounds)
                     ]
 
@@ -423,7 +422,7 @@ update rules msg model =
                 ( model, persistListReq () )
 
             Persist (Load k) ->
-                ( { model | loaded = False }, persistLoadReq k )
+                ( { model | loaded = False }, Cmd.batch [ stopMusic (), persistLoadReq k ] )
 
             Persist (Save k v) ->
                 ( model, persistSaveReq ( k, v ) )
@@ -438,7 +437,11 @@ update rules msg model =
                 ( { model | persistKey = key }, Cmd.none )
 
             Loaded ->
-                ( { model | loaded = True }, Cmd.none )
+                -- TODO change to PlayMusic when I get loops for piano
+                ( { model | loaded = True }, playSound "music/song1/piano2" )
+
+            LoadScene [] ->
+                ( model, Cmd.none )
 
             LoadScene history ->
                 -- TODO maybe this can use a recursive `Process.sleep 0 (Replay id)` to create debuggable history
@@ -543,10 +546,12 @@ update rules msg model =
                 , Cmd.batch
                     [ playSound "sfx/subway_departure"
                     , playSound "sfx/subway_whistle"
+                    , stopSound "sfx/ambience_crowd_loop"
+                    , lowerMusicVolume ()
+                    , persistSaveReq ( "autosave", model.history )
                     ]
                 )
                     |> updateAndThen (delay rules departingDelay (Interact station))
-                    |> updateAndThen (\m -> ( m, persistSaveReq ( "autosave", m.history ) ))
 
             Continue ->
                 -- reduces the story and applies the pending changes when the story
@@ -563,8 +568,11 @@ update rules msg model =
                                 -- handle continue by scene
                                 case m.scene of
                                     Train train ->
-                                        ( { m | scene = Train <| changeTrainStatus Arriving train }, Cmd.none )
+                                        ( { m | scene = Train <| changeTrainStatus Arriving train }
+                                        , playSound "sfx/subway_arrival2"
+                                        )
                                             |> updateAndThen (delay rules arrivingDelay Disembark)
+                                            |> updateAndThen (delay rules 500 <| StopSound "sfx/subway_departure")
 
                                     MainTitle ->
                                         ( { m | scene = Splash }
@@ -589,15 +597,11 @@ update rules msg model =
             PlaySound key ->
                 ( model, playSound key )
 
-            PlayLoop key ->
-                ( model, playLoop key )
+            PlayMusic key ->
+                ( model, playMusic key )
 
             StopSound key ->
                 ( model, stopSound key )
-
-            QueueNextLoop key ->
-                -- TODO
-                ( model, Cmd.none )
 
             SubwaySounds ->
                 ( model
@@ -614,7 +618,29 @@ update rules msg model =
                 )
 
             Disembark ->
-                ( { model | scene = Lobby }, stopSound "sfx/subway_departure" )
+                let
+                    currentStation =
+                        getCurrentStation model.worldModel
+                in
+                ( { model | scene = Lobby }
+                , Cmd.batch
+                    [ restoreMusicVolume ()
+                    , queueNextLoop ()
+                    , if
+                        List.member currentStation
+                            [ "BROADWAY_STREET"
+                            , "CONVENTION_CENTER"
+                            , "CAPITOL_HEIGHTS"
+                            , "UNIVERSITY"
+                            , "ST_MARKS"
+                            ]
+                      then
+                        playSound "sfx/ambience_crowd_loop"
+
+                      else
+                        Cmd.none
+                    ]
+                )
                     |> updateAndThen (delay rules disembarkStoryDelay DisembarkStory)
 
             DisembarkStory ->
@@ -698,7 +724,19 @@ port persistDeleteReq : String -> Cmd msg
 port playSound : String -> Cmd msg
 
 
-port playLoop : String -> Cmd msg
+port playMusic : String -> Cmd msg
+
+
+port stopMusic : () -> Cmd msg
+
+
+port queueNextLoop : () -> Cmd msg
+
+
+port lowerMusicVolume : () -> Cmd msg
+
+
+port restoreMusicVolume : () -> Cmd msg
 
 
 port stopSound : String -> Cmd msg

@@ -295,7 +295,6 @@ Maybe I should call in sick.
 
 "Here you go, Carl, exact change. Thanks. Have a good one."
 
-(Coffee added to your inventory)
 |"See you tomorrow."|"See you tomorrow."|"Don't miss your train."}
 """
         |> content__________________________________ "coffeeCartTuesday" """

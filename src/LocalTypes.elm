@@ -48,8 +48,7 @@ type Msg
     | SubwaySounds
     | PlaySound String
     | StopSound String
-    | PlayLoop String
-    | QueueNextLoop String
+    | PlayMusic String
 
 
 type PersistAction
