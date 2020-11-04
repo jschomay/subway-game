@@ -174,6 +174,33 @@ rules =
             """
             ON: "just_do_it"
             """
+        |> rule_______________________ "savedSeatOnTrain"
+            """
+            ON: *.station.!out_of_service
+            IF: PLAYER.good_will<0.location=CONVENTION_CENTER.!seen_saved_seat
+            DO: PLAYER.location=$.seen_saved_seat
+            """
+        |> rule_______________________ "attempt_to_sit_in_saved_seat"
+            """
+            ON: "attempt_to_sit_in_saved_seat"
+            """
+        |> rule_______________________ "persist_sitting_in_saved_seat"
+            """
+            ON: "persist_sitting_in_saved_seat"
+            DO: PLAYER.good_will-3
+            """
+        |> rule_______________________ "wetPantsOnTrain"
+            """
+            ON: *.station.!out_of_service
+            IF: PLAYER.call_boss=1.line=RED_LINE
+                CHANGE.amount=25
+            DO: PLAYER.location=$
+            """
+        |> rule_______________________ "check_wet_jeans"
+            """
+            ON: "check_wet_jeans"
+            DO: CHANGE.amount+25
+            """
 
 
 

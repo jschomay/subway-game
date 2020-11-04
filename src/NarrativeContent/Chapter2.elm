@@ -385,3 +385,87 @@ We.
 ---
 Go!
 """
+        |> content__________________________________ "savedSeatOnTrain" """
+Wow, this car is packed. There isn't a single place to sit. Just my luck.
+
+Oh, there's an empty seat back there!
+---
+A strange looking woman is covering it with her hands for some reason.
+
+But you're not supposed to save seats, so I'll just [sit down](attempt_to_sit_in_saved_seat).
+---
+Oh, well. I'll just stand. I'd rather not make a scene. My stop's coming up anyways.
+"""
+        |> content__________________________________ "attempt_to_sit_in_saved_seat" """
+"Pardon me, Ma'am. You're not aloud to save seats. So if you'll excuse me, I'd like to sit down."
+
+"This seat's taken!  He's here!"
+
+Who's here?  I don't see anyone in the seat.
+
+"Get out of here!  Leave us alone."
+---
+Her eye's look everywhere but at me, and she now lays sprawled out over both seats. I don't think this is going anywhere.
+
+This isn't fair though. I've a [right](persist_sitting_in_saved_seat) to that seat as much as she does.
+---
+But in this case, it's best to slowly walk away...
+
+My stop's coming up anyways.
+"""
+        |> content__________________________________ "persist_sitting_in_saved_seat" """
+I'm tired of being pushed around! I'm sitting down!
+
+"Out of the way, Ma'am!"
+---
+Once she sees that I'm going to sit whether she's there or not, she slinks back into her seat and presses her back hard against the window. Her eye's are wide.
+
+It pays to be a little assertive sometimes.
+---
+"You're sitting on him."
+---
+"YOU'RE SITTING ON HIM!"
+
+Her screech fills the car and everyone is staring at us. Actually I think they're staring at me...
+---
+"HE CAN"T BREATHE, GET OFF OF HIM NOW!"
+---
+The other passengers chime in.
+
+"C'mon man, just move."
+"Yeah, leave her alone."
+"Just fuck off so she'll shut up.
+She wasn't hurting anyone."
+"What an asshole."
+---
+Jeesh, I just wanted to sit down, and now I'm the bad guy?
+
+The train stops at my stop and I run out as fast as I can.
+
+I just wanted to sit down...
+"""
+        |> content__________________________________ "wetPantsOnTrain" """
+{The car is empty. Just me, empty seats... and what looks to be a wet pair of discarded [jeans](check_wet_jeans) lying in the seat in across from me. Ick.
+|
+The car is empty. Just me, empty seats... and what looks to be a wet pair of discarded [jeans](check_wet_jeans)....
+
+Wait a minute!  Is that the same pair?  Or are there multiple wet people without pants down here...
+|
+Oh no... more wet [jeans](check_wet_jeans)!
+|
+}
+"""
+        |> content__________________________________ "check_wet_jeans" """
+{But maybe someone left something in there. Desperate times call for desperate measures.
+---
+Ugh... They're warm...
+---
+Hey, there's a quarter in the front pocket.  Jackpot!
+
+Not sure that was worth it, though. I should probably burn my hands.
+|
+Well, it worked the first time, maybe these have some money too...
+---
+Yup.  The subway delivers again.
+}
+"""

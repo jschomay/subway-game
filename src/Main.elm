@@ -494,6 +494,16 @@ update rules msg model =
                 ( { model | history = model.history ++ [ interactableId ] }
                 , Cmd.none
                 )
+                    |> updateAndThen
+                        --  need to apply pending changes if there are any queued up otherwise they will be lost
+                        (\m ->
+                            case m.pendingChanges of
+                                Nothing ->
+                                    ( m, Cmd.none )
+
+                                Just changes ->
+                                    applyPendingChanges rules m
+                        )
                     |> updateAndThen (updateStory rules interactableId)
                     |> updateAndThen
                         (\m ->
