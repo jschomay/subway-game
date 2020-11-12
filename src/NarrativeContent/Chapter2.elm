@@ -48,7 +48,20 @@ It costs 50 cents to use. Better start begging for change.  I'm going to need th
 }
 """
         |> content__________________________________ "ponderingCallingBossOnTrain" """
-{Mr. Harris is going to hate me.  I'm really not looking forward to calling him.|}
+{Mr. Harris is going to hate me.  I'm really not looking forward to calling him.
+|||
+Mr. Harris is still waiting.  I should probably call.
+---
+Well, I guess I can put it of a little longer.
+||||
+I've spent a lot of time down here.  I better get back to Mr. Harris.
+||||
+Mr. Harris has probably given up on me.  I guess I could stay down here all day.
+---
+All week...
+---
+All year?
+}
 """
         |> content__________________________________ "tryingToCallBossWithCellphone" """
 I still don't have any service down here.  I'd have to go above ground to make a call.  I guess I could do that, but I'm in no hurry.  And it's probably raining.  And this is my big opportunity to use a payphone for once.
@@ -468,4 +481,32 @@ Well, it worked the first time, maybe these have some money too...
 ---
 Yup.  The subway delivers again.
 }
+"""
+        |> content__________________________________ "womenTalkingAboutHotdogManOnTrain" """
+"Oh, God, what do you mean?"
+
+Two women are speaking rather loudly in the seat behind me. Don't they know they're bugging people?
+---
+"Just like I said! I was at Twin Brooks Station and as I was boarding the train I saw a giant hot dog sitting on one of the benches, crying his eye's out. Such an odd thing."
+
+"What do you suppose he was crying about?"
+---
+"I don't know. I guess you could say I hadn't mustard up the courage to ask! HA!"
+
+"Oh, Hannah, you're terrible."
+---
+Jesus Christ.
+"""
+        |> content__________________________________ "workersComplainingAboutClosuresOnTrain" """
+Three men in construction worker uniforms huddle over their coffee thermoses looking really frustrated.
+
+"How could they shut down a whole damn station? No warnin' or nothin'!"
+---
+"Not sure. And it's a big station too. Musta been pretty serious to be worth pissing off half the city. We won't be the only ones walking to work."
+---
+"I heard someone walked in front of a train!"
+
+"Shut up, Donny. That ain't true."
+
+They all curse in unison.
 """

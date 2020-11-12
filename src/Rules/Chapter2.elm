@@ -201,6 +201,20 @@ rules =
             ON: "check_wet_jeans"
             DO: CHANGE.amount+25
             """
+        |> rule_______________________ "womenTalkingAboutHotdogManOnTrain"
+            """
+            ON: *.station.!out_of_service
+            IF: PLAYER.!heardOfHotdogMan
+                ORANGE_LINE_PASS.location=PLAYER
+            DO: PLAYER.location=$.heardOfHotdogMan
+            """
+        |> rule_______________________ "workersComplainingAboutClosuresOnTrain"
+            """
+            ON: *.station.!out_of_service
+            IF: PLAYER.!heardAboutClosures.line=RED_LINE
+                ORANGE_LINE_PASS.location=PLAYER
+            DO: PLAYER.location=$.heardAboutClosures
+            """
 
 
 
