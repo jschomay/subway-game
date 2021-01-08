@@ -68,7 +68,7 @@ main =
             \model ->
                 case parsedData of
                     Ok _ ->
-                        { title = "Subway!", body = [ view model ] }
+                        { title = "Deadline", body = [ view model ] }
 
                     Err errors ->
                         -- Just show the errors, model is ignored

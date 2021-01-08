@@ -304,7 +304,7 @@ It's a mosaic mural made out of many different colors of glass. I think it's sup
 It's flying all over the place, barely missing the passing commuters. I'm not sure how it got in here, but it seems scared. Hopefully it finds it's way out.
 """
         |> content__________________________________ "COMMUTERS_ST_MARKS" """
-Various come and go through the busy station.
+Various people come and go through the busy station.
 """
         |> content__________________________________ "SECRET_SERVICE_TYPE_GUY" """
 {He's just standing against the wall, not doing anything. He doesn't even react to the passing crowds or trains. If he's trying not to look suspicious, he's not doing a very good job.
