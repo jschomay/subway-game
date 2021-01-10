@@ -4,7 +4,7 @@ const HtmlWebpackPlugin = require("html-webpack-plugin");
 const CopyWebpackPlugin = require("copy-webpack-plugin");
 const StyleLintPlugin = require("stylelint-webpack-plugin");
 
-const modeConfig = env => require(`./build-utils/webpack.${env}`)(env);
+const modeConfig = (env) => require(`./build-utils/webpack.${env}`)(env);
 const presetConfig = require("./build-utils/loadPresets");
 
 module.exports = ({ mode, presets } = { mode: "production", presets: [] }) => {
@@ -42,6 +42,11 @@ module.exports = ({ mode, presets } = { mode: "production", presets: [] }) => {
           inject: "body",
           chunks: ["index"],
           filename: "index.html"
+        }),
+        new HtmlWebpackPlugin({
+          template: "src/about.html",
+          filename: "about.html",
+          chunks: []
         }),
 
         new StyleLintPlugin()
