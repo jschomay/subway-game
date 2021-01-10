@@ -49,11 +49,11 @@ module.exports = ({ mode, presets } = { mode: "production", presets: [] }) => {
           chunks: []
         }),
 
-        new StyleLintPlugin()
+        new StyleLintPlugin(),
 
-        // new CopyWebpackPlugin([
-        //   { from: 'src/assets/favicon.ico' }
-        // ]),
+        new CopyWebpackPlugin([
+          { from: "src/screenshots/", to: "screenshots/" }
+        ])
       ]
     },
     modeConfig(mode),
