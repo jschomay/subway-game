@@ -161,15 +161,11 @@ function assetLoaded() {
   progressBarEl.value = numAssetsLoaded / totalAssetsToLoad;
   progressBarEl.innerText = numAssetsLoaded / totalAssetsToLoad;
   if (numAssetsLoaded === totalAssetsToLoad) {
-    loaded();
+    console.log("all assets loaded");
+    app.ports.loaded.send(true);
   } else {
     // console.log(`loaded ${numAssetsLoaded} of ${totalAssetsToLoad} assets`);
   }
-}
-
-function loaded() {
-  app.ports.loaded.send(true);
-  console.log("all assets loaded");
 }
 
 ///////
@@ -216,7 +212,8 @@ const sounds = {
   "sfx/subway_whistle": { exts: ["wav"], waitForLoad: true },
   "sfx/ambience_crowd_loop": {
     exts: ["ogg"],
-    waitForLoad: true,
+    // won't load in Safari, so game never starts, fix by adding other format
+    // waitForLoad: true,
     loop: true,
     volume: 0.7
   }
