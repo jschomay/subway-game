@@ -93,7 +93,8 @@ init initialWorldModel flags =
                 Nothing
     in
     ( { worldModel = initialWorldModel
-      , loaded = False
+      , assetsLoaded = False
+      , loadingScene = debugState == Nothing
       , persistKey = ""
       , story = NarrativeContent.t "title_intro" |> String.split "---"
       , ruleMatchCounts = Dict.empty
@@ -108,12 +109,10 @@ init initialWorldModel flags =
       , history = []
       , transcript = []
       , pendingChanges = Nothing
+      , currentTrack = "1"
+      , playDramaTrack = False
       }
-    , if flags.debug then
-        Cmd.none
-
-      else
-        persistLoadReq "autosave"
+    , Cmd.none
     )
 
 
@@ -330,6 +329,7 @@ specialEvents rules ruleId model =
         "meetConductorFirstTime" ->
             ( { model | scene = Lobby }, Cmd.none )
                 |> updateAndThen (delay rules achievementDelay (Achievement "transfer_station"))
+                |> updateAndThen (queueLoop "3")
 
         "jumpTurnstileFortySecondStreet" ->
             ( { model | scene = End }, Cmd.none )
@@ -339,10 +339,25 @@ specialEvents rules ruleId model =
             delay rules achievementDelay (Achievement "f_the_system") model
 
         "fallAsleep" ->
-            ( model, stopSound "music/song1/piano2" )
+            addDrama model
 
         "briefcaseStolen" ->
-            ( model, playMusic "music/song2" )
+            addDrama model
+
+        "findingSecurityDepotClosed" ->
+            queueLoop "4" model
+
+        "followSkaterDudeToCapitalHeights" ->
+            delay rules arrivingDelay RemoveDrama model
+
+        "readyToCallBoss" ->
+            delay rules arrivingDelay (QueueLoop "2") model
+
+        "needCoinsForPayphone" ->
+            addDrama model
+
+        "confrontConductor" ->
+            addDrama model
 
         "nextDay" ->
             ( { model | scene = Lobby }
@@ -369,9 +384,21 @@ specialEvents rules ruleId model =
                 -- Remember, if you add another matcher to jump the turnstile, remove
                 -- the at_turnstile tag!!!!!!!!
                 ( { model | scene = Platform <| Maybe.withDefault Red <| getCurrentLine model.worldModel }, Cmd.none )
+                    |> updateAndThen
+                        (case other of
+                            "jumpTurnstileWithSkaterDude" ->
+                                addDrama
+
+                            "jumpTurnstileAfterTaklingToMark" ->
+                                addDrama
+
+                            _ ->
+                                noop
+                        )
 
             else if List.member other [ "caughtOnOrangeLineHeadingTo73rd", "caughtOnOrangeLineHeadingToOther" ] then
-                ( { model | scene = CentralGuardOffice }, Cmd.none )
+                ( { model | scene = CentralGuardOffice }, stopMusic () )
+                    |> updateAndThen removeDrama
 
             else if List.member other [ "endMonday", "endTuesday", "endWednesday", "endThursday" ] then
                 ( { model | scene = Title (dayText model.worldModel) }, Cmd.none )
@@ -422,7 +449,7 @@ update rules msg model =
                 ( model, persistListReq () )
 
             Persist (Load k) ->
-                ( { model | loaded = False }, Cmd.batch [ stopMusic (), persistLoadReq k ] )
+                ( { model | loadingScene = True }, Cmd.batch [ persistLoadReq k ] )
 
             Persist (Save k v) ->
                 ( model, persistSaveReq ( k, v ) )
@@ -436,12 +463,14 @@ update rules msg model =
             Persist (PersistKeyUpdate key) ->
                 ( { model | persistKey = key }, Cmd.none )
 
-            Loaded ->
-                -- TODO change to PlayMusic when I get loops for piano
-                ( { model | loaded = True }, playSound "music/song1/piano2" )
+            AssetsLoaded ->
+                ( { model | assetsLoaded = True }
+                , if model.debugState /= Nothing then
+                    Cmd.none
 
-            LoadScene [] ->
-                ( model, Cmd.none )
+                  else
+                    persistLoadReq "autosave"
+                )
 
             LoadScene history ->
                 -- TODO maybe this can use a recursive `Process.sleep 0 (Replay id)` to create debuggable history
@@ -459,7 +488,8 @@ update rules msg model =
                             ( { m
                                 | showSelectScene = False
                                 , showMap = False
-                                , loaded = True
+                                , loadingScene = False
+                                , assetsLoaded = True
                                 , showNotebook = False
                                 , scene =
                                     case m.scene of
@@ -482,10 +512,17 @@ update rules msg model =
                                         other ->
                                             []
                               }
-                              -- start ambiant sounds
+                              -- start the right sounds and music
                             , Cmd.batch
-                                [ playSound "sfx/subway_ambient_loop"
+                                [ stopMusic ()
+                                , Process.sleep 100 |> Task.perform (always <| QueueLoop m.currentTrack)
+                                , if m.playDramaTrack then
+                                    Process.sleep 200 |> Task.perform (always <| AddDrama)
+
+                                  else
+                                    Cmd.none
                                 , Process.sleep 8000 |> Task.perform (always <| SubwaySounds)
+                                , playSound "sfx/subway_ambient_loop"
                                 ]
                             )
                         )
@@ -527,9 +564,7 @@ update rules msg model =
 
             ToggleNotebook ->
                 if Rules.unsafeAssert "NOTEBOOK.!new" model.worldModel then
-                    ( { model | showNotebook = not model.showNotebook }
-                    , Cmd.none
-                    )
+                    ( { model | showNotebook = not model.showNotebook }, Cmd.none )
 
                 else
                     ( model, Cmd.none )
@@ -557,11 +592,17 @@ update rules msg model =
                     [ playSound "sfx/subway_departure"
                     , playSound "sfx/subway_whistle"
                     , stopSound "sfx/ambience_crowd_loop"
-                    , lowerMusicVolume ()
                     , persistSaveReq ( "autosave", model.history )
                     ]
                 )
                     |> updateAndThen (delay rules departingDelay (Interact station))
+                    |> updateAndThen
+                        (if Rules.unsafeAssert "PLAYER.chapter=1" model.worldModel && station == "BROADWAY_STREET" then
+                            removeDrama
+
+                         else
+                            noop
+                        )
 
             Continue ->
                 -- reduces the story and applies the pending changes when the story
@@ -607,8 +648,14 @@ update rules msg model =
             PlaySound key ->
                 ( model, playSound key )
 
-            PlayMusic key ->
-                ( model, playMusic key )
+            QueueLoop key ->
+                queueLoop key model
+
+            AddDrama ->
+                addDrama model
+
+            RemoveDrama ->
+                removeDrama model
 
             StopSound key ->
                 ( model, stopSound key )
@@ -634,9 +681,7 @@ update rules msg model =
                 in
                 ( { model | scene = Lobby }
                 , Cmd.batch
-                    [ restoreMusicVolume ()
-                    , queueNextLoop ()
-                    , if
+                    [ if
                         List.member currentStation
                             [ "BROADWAY_STREET"
                             , "CONVENTION_CENTER"
@@ -688,11 +733,49 @@ applyPendingChanges rules model =
 delay : LocalTypes.Rules -> Float -> Msg -> Model -> ( Model, Cmd Msg )
 delay rules duration msg model =
     -- no delay if loading a checkpoint
-    if model.showSelectScene || not model.loaded then
+    if model.showSelectScene || model.loadingScene then
         update rules msg model
 
     else
         ( model, Task.perform (always msg) <| Process.sleep duration )
+
+
+queueLoop : String -> Model -> ( Model, Cmd Msg )
+queueLoop key model =
+    ( { model | currentTrack = key }
+    , if not <| isLoading model then
+        queueLoopReq key
+
+      else
+        Cmd.none
+    )
+
+
+addDrama : Model -> ( Model, Cmd Msg )
+addDrama model =
+    ( { model | playDramaTrack = True }
+    , if not <| isLoading model then
+        addDramaReq ()
+
+      else
+        Cmd.none
+    )
+
+
+removeDrama : Model -> ( Model, Cmd Msg )
+removeDrama model =
+    ( { model | playDramaTrack = False }
+    , if not <| isLoading model then
+        removeDramaReq ()
+
+      else
+        Cmd.none
+    )
+
+
+isLoading : Model -> Bool
+isLoading model =
+    not model.assetsLoaded || model.showSelectScene || model.loadingScene
 
 
 
@@ -700,7 +783,7 @@ delay rules duration msg model =
 -- IN
 
 
-port loaded : (Bool -> msg) -> Sub msg
+port assetsLoaded : (Bool -> msg) -> Sub msg
 
 
 port keyPress : (String -> msg) -> Sub msg
@@ -734,19 +817,16 @@ port persistDeleteReq : String -> Cmd msg
 port playSound : String -> Cmd msg
 
 
-port playMusic : String -> Cmd msg
+port queueLoopReq : String -> Cmd msg
 
 
 port stopMusic : () -> Cmd msg
 
 
-port queueNextLoop : () -> Cmd msg
+port removeDramaReq : () -> Cmd msg
 
 
-port lowerMusicVolume : () -> Cmd msg
-
-
-port restoreMusicVolume : () -> Cmd msg
+port addDramaReq : () -> Cmd msg
 
 
 port stopSound : String -> Cmd msg
@@ -755,7 +835,7 @@ port stopSound : String -> Cmd msg
 subscriptions : Model -> Sub Msg
 subscriptions model =
     Sub.batch
-        [ loaded <| always Loaded
+        [ assetsLoaded <| always AssetsLoaded
         , keyPress <| handleKey model
         , persistListRes <| (Persist << ExistingSaves)
         , persistLoadRes LoadScene
@@ -774,7 +854,7 @@ handleKey model key =
                 _ ->
                     False
     in
-    if not model.loaded || model.showSelectScene then
+    if not model.assetsLoaded || model.loadingScene || model.showSelectScene then
         NoOp
 
     else
@@ -810,7 +890,7 @@ handleKey model key =
 
 view : Model -> Html Msg
 view model =
-    if not model.loaded then
+    if not model.assetsLoaded || model.loadingScene then
         div [ class "Loading" ]
             [ p [] [ text "Loading..." ]
             , progress [ id "loading-progress", value "0" ] [ text "0" ]

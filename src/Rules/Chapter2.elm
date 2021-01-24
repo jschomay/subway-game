@@ -110,6 +110,13 @@ rules =
             IF: PLAYER.call_boss=1
             DO: PLAYER.location=$
             """
+        |> rule_______________________ "readyToCallBoss"
+            """
+            ON: SEVENTY_THIRD_STREET
+            IF: PLAYER.call_boss=1
+                CHANGE.amount>49
+            DO: PLAYER.location=$
+            """
         |> rule_______________________ "tryingToCallBossWithCellphone"
             """
             ON: CELL_PHONE

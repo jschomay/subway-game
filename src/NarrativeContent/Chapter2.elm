@@ -55,13 +55,14 @@ Mr. Harris is still waiting.  I should probably call.
 Well, I guess I can put it of a little longer.
 ||||
 I've spent a lot of time down here.  I better get back to Mr. Harris.
-||||
+}
+"""
+        |> content__________________________________ "readyToCallBoss" """
 Mr. Harris has probably given up on me.  I guess I could stay down here all day.
 ---
 All week...
 ---
 All year?
-}
 """
         |> content__________________________________ "tryingToCallBossWithCellphone" """
 I still don't have any service down here.  I'd have to go above ground to make a call.  I guess I could do that, but I'm in no hurry.  And it's probably raining.  And this is my big opportunity to use a payphone for once.

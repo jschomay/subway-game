@@ -11,7 +11,8 @@ import Subway exposing (..)
 
 type alias Model =
     { worldModel : Manifest.WorldModel
-    , loaded : Bool
+    , assetsLoaded : Bool
+    , loadingScene : Bool
     , persistKey : String
     , story : List String
     , scene : Scene
@@ -26,6 +27,8 @@ type alias Model =
     , history : List String
     , transcript : List String
     , pendingChanges : Maybe ( ID, List ChangeWorld, RuleID )
+    , currentTrack : String
+    , playDramaTrack : Bool
     }
 
 
@@ -33,7 +36,7 @@ type Msg
     = NoOp
     | LoadScene (List String)
     | Interact String
-    | Loaded
+    | AssetsLoaded
     | ToggleMap
     | ToggleNotebook
     | BoardTrain Line Station
@@ -48,7 +51,9 @@ type Msg
     | SubwaySounds
     | PlaySound String
     | StopSound String
-    | PlayMusic String
+    | AddDrama
+    | RemoveDrama
+    | QueueLoop String
 
 
 type PersistAction

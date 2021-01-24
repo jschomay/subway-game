@@ -64,88 +64,70 @@ app.ports.playSound.subscribe((key) => {
   loadedSounds[key].play();
 });
 
-let loopTime, nextLoopKey, nextLoopIndex, currentLoopKey, currentLoopIndex;
-
-const loopsPerSong = {
-  "music/song2": 6
-};
-
-function getLoopKey() {
-  return `${currentLoopKey}/loop${currentLoopIndex + 1}`;
-}
+let loopStart,
+  currentLoop,
+  nextLoop,
+  dramaVolume = 0;
+const loopLengths = { "1": 80000, "2": 80000, "3": 80000, "4": 50000 };
 
 function checkLoop() {
-  if (Date.now() > loopTime) {
-    playLoop();
+  if (Date.now() > loopStart + loopLengths[currentLoop]) {
+    loop();
   } else {
     requestAnimationFrame(checkLoop);
   }
 }
 
-app.ports.playMusic.subscribe(newSong);
+app.ports.queueLoopReq.subscribe((key) => {
+  console.log("queue", key);
+  nextLoop = key;
+  if (!currentLoop) loop();
+});
 
-function newSong(key) {
-  nextLoopKey = key;
-  nextLoopIndex = 0;
-  if (
-    currentLoopKey &&
-    currentLoopIndex &&
-    loadedSounds[getLoopKey()].playing()
-  ) {
-    // wait for next loop
-    return;
-  } else {
-    playLoop();
-  }
-}
+function loop() {
+  if (currentLoop !== nextLoop) dramaVolume = 0;
+  currentLoop = nextLoop;
+  console.debug("playing loop", currentLoop);
 
-function playLoop() {
-  currentLoopKey = nextLoopKey;
-  currentLoopIndex = nextLoopIndex;
-  let loop = getLoopKey();
-  console.debug("playing loop", loop);
-  // each loop transitions to it's "tail" 1/3 of the way through
-  loopTime = loadedSounds[loop].duration() * 1000 * 0.66 + Date.now();
-  loadedSounds[loop].play();
+  loadedSounds[`music/${currentLoop}l`].play();
+  loadedSounds[`music/${currentLoop}d`].volume(dramaVolume);
+  loadedSounds[`music/${currentLoop}d`].play();
+  loopStart = Date.now();
   requestAnimationFrame(checkLoop);
 }
 
-// changes the loop of the current song
-app.ports.queueNextLoop.subscribe(
-  () => (nextLoopIndex = (nextLoopIndex + 1) % loopsPerSong[currentLoopKey])
-);
-
-app.ports.stopSound.subscribe(stopSound);
-
-function stopSound(key) {
+app.ports.stopSound.subscribe((key) => {
   // console.debug("stopping", key, loadedSounds[key]);
   let v = loadedSounds[key].volume();
   loadedSounds[key]
     .fade(v, 0, 1000)
     .once("fade", () => loadedSounds[key].stop().volume(v));
-}
+});
 
 app.ports.stopMusic.subscribe(() => {
-  if (!currentLoopKey) return;
-  let loop = getLoopKey();
-  stopSound(loop);
+  if (!currentLoop) return;
+  console.debug("stopping music", currentLoop);
+  loadedSounds[`music/${currentLoop}l`].stop();
+  loadedSounds[`music/${currentLoop}d`].stop();
+  loadedSounds[`music/${currentLoop}d`].volume(0);
+  dramaVolume = 0;
+  currentLoop = null;
+  nextLoop = null;
+  loopStart = null;
 });
 
-let originalVolume;
-app.ports.lowerMusicVolume.subscribe(() => {
-  if (!currentLoopKey) return;
-  let loop = getLoopKey();
-  originalVolume = loadedSounds[loop].volume();
-  // console.debug("lowering mustic volume", loop, originalVolume / 2);
-  loadedSounds[loop].fade(originalVolume, originalVolume / 2, 1000);
+app.ports.addDramaReq.subscribe(() => {
+  if (!currentLoop) return;
+  console.debug("adding drama", currentLoop);
+  dramaVolume = 1;
+  loadedSounds[`music/${currentLoop}d`].fade(0, 1, 1000);
 });
 
-app.ports.restoreMusicVolume.subscribe(() => {
-  if (!currentLoopKey) return;
-  let loop = getLoopKey();
-  // console.debug("restore mustic volume", loop, originalVolume);
-  let currentVolume = loadedSounds[loop].volume();
-  loadedSounds[loop].fade(currentVolume, originalVolume, 1000);
+app.ports.removeDramaReq.subscribe(() => {
+  if (!currentLoop) return;
+  console.debug("removing drama", currentLoop);
+  dramaVolume = 0;
+  loadedSounds[`music/${currentLoop}d`].fade(1, 0, 1000);
 });
 
 //////////////////
@@ -162,7 +144,7 @@ function assetLoaded() {
   progressBarEl.innerText = numAssetsLoaded / totalAssetsToLoad;
   if (numAssetsLoaded === totalAssetsToLoad) {
     console.log("all assets loaded");
-    app.ports.loaded.send(true);
+    app.ports.assetsLoaded.send(true);
   } else {
     // console.log(`loaded ${numAssetsLoaded} of ${totalAssetsToLoad} assets`);
   }
@@ -193,13 +175,14 @@ function loadImage(path) {
 const loadedSounds = {};
 const audoPrefix = "audio/";
 const sounds = {
-  "music/song1/piano2": { exts: ["mp3"], waitForLoad: true, loop: true },
-  "music/song2/loop1": { exts: ["wav"] },
-  "music/song2/loop2": { exts: ["wav"] },
-  "music/song2/loop3": { exts: ["wav"] },
-  "music/song2/loop4": { exts: ["wav"] },
-  "music/song2/loop5": { exts: ["wav"] },
-  "music/song2/loop6": { exts: ["wav"] },
+  "music/1d": { exts: ["mp3", "ogg"], waitForLoad: true },
+  "music/1l": { exts: ["mp3", "ogg"], waitForLoad: true },
+  "music/2d": { exts: ["mp3", "ogg"] },
+  "music/2l": { exts: ["mp3", "ogg"] },
+  "music/3d": { exts: ["mp3", "ogg"] },
+  "music/3l": { exts: ["mp3", "ogg"] },
+  "music/4d": { exts: ["mp3"] },
+  "music/4l": { exts: ["mp3"] },
   "sfx/subway_ambient_loop": {
     exts: ["wav"],
     waitForLoad: true,
@@ -209,7 +192,7 @@ const sounds = {
   "sfx/subway_arrival": { exts: ["wav"], volume: 0.7 },
   "sfx/subway_arrival2": { exts: ["wav"], waitForLoad: true },
   "sfx/subway_departure": { exts: ["wav"], waitForLoad: true },
-  "sfx/subway_whistle": { exts: ["wav"], waitForLoad: true },
+  "sfx/subway_whistle": { exts: ["wav"], waitForLoad: true, volume: 0.5 },
   "sfx/ambience_crowd_loop": {
     exts: ["ogg"],
     // won't load in Safari, so game never starts, fix by adding other format
