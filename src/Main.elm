@@ -311,7 +311,7 @@ specialEvents rules ruleId model =
             ( { model | showNotebook = True }, Cmd.none )
 
         "NOTEBOOK" ->
-            ( { model | showNotebook = not model.showNotebook }, Cmd.none )
+            ( { model | showNotebook = not model.showNotebook, noteBookPage = Goals }, Cmd.none )
 
         "checkMap" ->
             ( { model | showMap = not model.showMap }, Cmd.none )
@@ -564,7 +564,7 @@ update rules msg model =
 
             ToggleNotebook ->
                 if Rules.unsafeAssert "NOTEBOOK.!new" model.worldModel then
-                    ( { model | showNotebook = not model.showNotebook }, Cmd.none )
+                    ( { model | showNotebook = not model.showNotebook, noteBookPage = Goals }, Cmd.none )
 
                 else
                     ( model, Cmd.none )
