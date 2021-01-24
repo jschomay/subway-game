@@ -191,7 +191,7 @@ I've got this change from that woman with the annoying kid. It's just 50 cents, 
 ---
 "Steve? Steve who? You're going to have to be a little more specific, sir."
 
-"Steve. Steve Perry. Insurance agent, office 213. We talked about your cat for like, twenty minutes in the break room last week."
+"Steve. Steve Kerry. Insurance agent, office 213. We talked about your cat for like, twenty minutes in the break room last week."
 ---
 "Okay Mr. Kerry. How may I direct your call?"
 
@@ -255,9 +255,9 @@ Here we go.
 ---
 "Steve? Steve who? You're going to have to be a little more specific, sir."
 
-"Steve. Steve Perry. Insurance agent, office 213. We talked about your cat for like, twenty minutes in the break room last week."
+"Steve. Steve Kerry. Insurance agent, office 213. We talked about your cat for like, twenty minutes in the break room last week."
 ---
-"Okay Mr. Kerry. How may I direct your call?"
+"Okay Mr. Perry. How may I direct your call?"
 
 "Can I speak to Mr. Harris please? It's very urgent."
 

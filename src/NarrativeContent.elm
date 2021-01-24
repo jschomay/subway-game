@@ -109,7 +109,7 @@ Come by my office first thing Monday morning.
 Email 1
 
     From: Jason Harris
-    To: Steve Perry
+    To: Steve Kerry
     Sent: Monday, 5:15am
     Subject: I've Got a Job for You
 
@@ -137,11 +137,11 @@ Reply
 Email 2
 
     From: Janice Franz
-    To: Steve Perry
+    To: Steve Kerry
     Sent: Monday, 6:05am
     Subject: RE: RE: Job Opportunity
 ---
-    Hi Mr. Steve Perry
+    Hi Mr. Steve Kerry
 
     My name is Janis and I'm reaching out on behalf of Embrace Insurance. I came across your resume
     in our system and I believe you would make a perfect fit for our team!
@@ -158,7 +158,7 @@ Still no service, but Mr. Harris is waiting for me at the office.
 Email 1
 
     From: Jason Harris
-    To: Steve Perry
+    To: Steve Kerry
     Sent: Tuesday, 6:10am
     Subject: Good Things!
 ---
@@ -184,7 +184,7 @@ Reply
 Email 2
 
     From: Henry Thorne
-    To: Steve Perry
+    To: Steve Kerry
     Sent: Tuesday, 6:29am
     Subject: Stevey!
 ---
@@ -206,7 +206,7 @@ That's all the emails.  How am I supposed to get this done by Friday?
 Email 1
 
     From: Jason Harris
-    To: Steve Perry
+    To: Steve Kerry
     Sent: Wednesday, 5:45am
     Subject: Pure Risk
 ---
@@ -242,7 +242,7 @@ Have to cut more. Have to work harder. Have to keep moving. This will be worth i
 Email 1
 
     From: Jason Harris
-    To: Steve Perry
+    To: Steve Kerry
     Sent: Thursday, 4:27am
     Subject: (Subject)
 ---
@@ -255,7 +255,7 @@ Email 1
 Email 2
 
     From: Henry Thorne
-    To: Steve Perry
+    To: Steve Kerry
     Sent: Thursday, 5:45am
     Subject: Today?
 ---
@@ -276,7 +276,7 @@ How can Mr Harris ask me to push harder? I'm working my ass off!
 Email 1
 
     From: Jason Harris
-    To: Steve Perry
+    To: Steve Kerry
     Sent: Friday, 5:00am
     Subject: WHERE THE HELL ARE YOU?
 ---
