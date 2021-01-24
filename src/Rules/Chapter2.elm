@@ -58,7 +58,7 @@ rules =
         |> rule_______________________ "throwAwayPosters"
             """
             ON: "throw_away_posters"
-            DO: (*.missing_dog_poster).location=offscreen
+            DO: (*.missing_dog_poster.!location=SPRING_HILL).location=offscreen
                 PLAYER.good_will-3
                 DISTRESSED_WOMAN.missing_dog_posters_quest=100
             """
