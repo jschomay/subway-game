@@ -550,7 +550,7 @@ He seems real upset.
 
 He looks in the room as if expecting to find someone else.
 ---
-"I'm sorry pal, I didn't mean to yell at you.  They aren't supposed to be taking people here today.  It's closed.  For pest control spraying."
+"I'm sorry pal, I didn't mean to yell at you.  They aren't supposed to be taking people here today.  It's closed.  For, um... pest control spraying."
 
 "Spraying?"
 

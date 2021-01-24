@@ -492,7 +492,7 @@ Two women are speaking rather loudly in the seat behind me. Don't they know they
 
 "What do you suppose he was crying about?"
 ---
-"I don't know. I guess you could say I hadn't mustard up the courage to ask! HA!"
+"I don't know. I guess you could say I hadn't 'mustard' up the courage to ask! HA!"
 
 "Oh, Hannah, you're terrible."
 ---

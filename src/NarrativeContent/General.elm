@@ -274,7 +274,7 @@ Kind of cool... I bet they are really bored.
         |> content__________________________________ "SLEEPING_MAN" """
 {SLEEPING_MAN.coffee_ruined?  At least he didn't ask me to get him another coffee.
 |
-He's sitting on the ground with a shabby hat drawn over his face he's got a Styrofoam cup in front of him. Looks like he could use some {CHANGE.location=PLAYER.amount>0? [CHANGE](help_a_guy_out) | change}.
+He's sitting on the ground with a shabby hat drawn over his face he's got a Styrofoam cup in front of him. Looks like he could use some {CHANGE.location=PLAYER.amount>0? [change](help_a_guy_out) | change}.
 }
 """
         |> content__________________________________ "coffee_ruined" """
