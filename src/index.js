@@ -138,12 +138,13 @@ app.ports.removeDramaReq.subscribe(() => {
 var totalAssetsToLoad = 0;
 var numAssetsLoaded = 0;
 const progressBarEl = document.getElementById("loading-progress");
-function assetLoaded() {
+function assetLoaded(e) {
+  // console.log("loaded", e.target.src);
   numAssetsLoaded++;
   progressBarEl.value = numAssetsLoaded / totalAssetsToLoad;
   progressBarEl.innerText = numAssetsLoaded / totalAssetsToLoad;
   if (numAssetsLoaded === totalAssetsToLoad) {
-    console.log("all assets loaded");
+    // console.log("all assets loaded");
     app.ports.assetsLoaded.send(true);
   } else {
     // console.log(`loaded ${numAssetsLoaded} of ${totalAssetsToLoad} assets`);
@@ -164,7 +165,7 @@ function loadImage(path) {
   var img = new Image();
   img.src = "img/" + path;
   img.onload = assetLoaded;
-  console.log("loading image", img.src);
+  // console.log("loading image", img.src);
   return img;
 }
 
@@ -190,16 +191,10 @@ const sounds = {
     volume: 0.4
   },
   "sfx/subway_arrival": { exts: ["wav"], volume: 0.7 },
-  "sfx/subway_arrival2": { exts: ["wav"], waitForLoad: true },
+  "sfx/subway_arrival2": { exts: ["wav"] },
   "sfx/subway_departure": { exts: ["wav"], waitForLoad: true },
   "sfx/subway_whistle": { exts: ["wav"], waitForLoad: true, volume: 0.5 },
-  "sfx/ambience_crowd_loop": {
-    exts: ["ogg"],
-    // won't load in Safari, so game never starts, fix by adding other format
-    // waitForLoad: true,
-    loop: true,
-    volume: 0.7
-  }
+  "sfx/ambience_crowd_loop": { exts: ["ogg"], loop: true, volume: 0.7 }
 };
 
 Object.entries(sounds).forEach(loadSound);
@@ -211,8 +206,9 @@ function loadSound([key, { waitForLoad, exts, loop, volume }]) {
     loop: loop || false,
     volume: volume || 1
   });
-  if (waitForLoad) sound.once("load", assetLoaded);
-  console.log("loading sound", key);
+  if (waitForLoad)
+    sound.once("load", assetLoaded.bind(null, { target: { src: key } }));
+  // console.log("loading sound", key);
   loadedSounds[key] = sound;
 }
 
