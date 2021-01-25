@@ -79,7 +79,7 @@ function checkLoop() {
 }
 
 app.ports.queueLoopReq.subscribe((key) => {
-  console.log("queue", key);
+  // console.log("queue", key);
   nextLoop = key;
   if (!currentLoop) loop();
 });
@@ -87,7 +87,7 @@ app.ports.queueLoopReq.subscribe((key) => {
 function loop() {
   if (currentLoop !== nextLoop) dramaVolume = 0;
   currentLoop = nextLoop;
-  console.debug("playing loop", currentLoop);
+  // console.debug("playing loop", currentLoop);
 
   loadedSounds[`music/${currentLoop}l`].play();
   loadedSounds[`music/${currentLoop}d`].volume(dramaVolume);
@@ -106,7 +106,7 @@ app.ports.stopSound.subscribe((key) => {
 
 app.ports.stopMusic.subscribe(() => {
   if (!currentLoop) return;
-  console.debug("stopping music", currentLoop);
+  // console.debug("stopping music", currentLoop);
   loadedSounds[`music/${currentLoop}l`].stop();
   loadedSounds[`music/${currentLoop}d`].stop();
   loadedSounds[`music/${currentLoop}d`].volume(0);
@@ -118,14 +118,14 @@ app.ports.stopMusic.subscribe(() => {
 
 app.ports.addDramaReq.subscribe(() => {
   if (!currentLoop) return;
-  console.debug("adding drama", currentLoop);
+  // console.debug("adding drama", currentLoop);
   dramaVolume = 1;
   loadedSounds[`music/${currentLoop}d`].fade(0, 1, 1000);
 });
 
 app.ports.removeDramaReq.subscribe(() => {
   if (!currentLoop) return;
-  console.debug("removing drama", currentLoop);
+  // console.debug("removing drama", currentLoop);
   dramaVolume = 0;
   loadedSounds[`music/${currentLoop}d`].fade(1, 0, 1000);
 });
