@@ -122,7 +122,7 @@ goals =
     , ( "PLAYER.find_briefcase"
       , "Find stolen briefcase!"
       , [ "Report it stolen?"
-        , "Talk to Mark @ Spring Hill?"
+        , "Talk to Mark @ Capitol Heights?"
         , "Broom closet @ 73rd"
         , ""
         ]
