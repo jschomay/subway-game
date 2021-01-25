@@ -174,6 +174,6 @@ rules =
             """
             ON: BROADWAY_STREET
             IF: PLAYER.day=5.chapter=0
-            DO: PLAYER.location=TWIN_BROOKS.chapter+1.present_proposal+1
+            DO: PLAYER.location=TWIN_BROOKS.chapter+1.present_proposal=2
                 COFFEE.location=offscreen
             """

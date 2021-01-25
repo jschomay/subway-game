@@ -42,7 +42,7 @@ rules =
             ON: SECURITY_OFFICERS
             IF: BROADWAY_STREET.leaving_broadway_street_station_plot<2
             DO: BROADWAY_STREET.leaving_broadway_street_station_plot=1
-                PLAYER.present_proposal+1
+                PLAYER.present_proposal=3
             """
         |> rule_______________________ "askCommuter1AboutDelay"
             """
@@ -65,7 +65,7 @@ rules =
             DO: BRIEFCASE.location=THIEF
                 BROADWAY_STREET.leaving_broadway_street_station_plot=2
                 GIRL_IN_YELLOW.location=IRIS_LAKE
-                PLAYER.find_briefcase=1.present_proposal+1
+                PLAYER.find_briefcase=1.present_proposal=4
             """
         |> rule_______________________ "tellOfficersAboutStolenBriefcase"
             """

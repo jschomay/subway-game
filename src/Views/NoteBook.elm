@@ -138,7 +138,7 @@ distractions : List ( String, String, List String )
 distractions =
     [ ( "GIRL_IN_YELLOW.who_was_girl_in_yellow_quest"
       , "Who was that girl in yellow?"
-      , [ "", "" ]
+      , [ "", "", "" ]
       )
     , ( "MOTHER.screaming_child_quest"
       , "Stop the kid from screaming."
