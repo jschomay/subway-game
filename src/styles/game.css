@@ -47,23 +47,31 @@ body {
   font-family: helvetica;
 }
 
-.Loading {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  color: #555;
+.loading-info {
   font-size: 1.8em;
   font-weight: normal;
   color: white;
   background-color: black;
+  margin: auto;
+  text-align: center;
+  opacity: 0.6;
+  padding: 60px;
+  border-radius: 20px;
 }
 
 progress {
   background: #ccc;
   height: 10px;
+}
+
+progress::-moz-progress-bar {
+  background: orange;
+}
+progress::-webkit-progress-value {
+  background: orange;
+}
+progress {
+  color: orange;
 }
 
 .SelectScene {

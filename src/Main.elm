@@ -891,9 +891,11 @@ handleKey model key =
 view : Model -> Html Msg
 view model =
     if not model.assetsLoaded || model.loadingScene then
-        div [ class "Loading" ]
-            [ p [] [ text "Loading..." ]
-            , progress [ id "loading-progress", value "0" ] [ text "0" ]
+        div [ class "Scene train" ]
+            [ div [ class "loading-info" ]
+                [ p [] [ text "Loading..." ]
+                , progress [ id "loading-progress", value "0" ] [ text "0" ]
+                ]
             ]
 
     else if model.showSelectScene then

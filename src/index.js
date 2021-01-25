@@ -18,6 +18,10 @@ const app = Elm.Main.init({
   flags: { debug: debug }
 });
 
+// get trains image (used for loading loaded) ready as soon as possible
+var loadingScreenImage = new Image();
+loadingScreenImage.src = "img/riding-train.jpg";
+
 ////////////////////
 //PERSIST STATE
 ////////////////////
