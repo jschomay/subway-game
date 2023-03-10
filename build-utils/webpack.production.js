@@ -31,6 +31,14 @@ module.exports = () => ({
           'css-loader',
           'postcss-loader'
         ],
+      },
+      {
+        test: /\.(eot|ttf|woff|woff2|svg)$/,
+        use: "file-loader?publicPath=../../&name=fonts/[name].[ext]"
+      },
+      {
+        test: /\.(jpg|png)$/,
+        use: "file-loader?publicPath=../../&name=img/[name].[ext]"
       }
     ]
   },
@@ -63,13 +71,15 @@ module.exports = () => ({
       filename: 'assets/css/[name].[contenthash].css',
     }),
 
-    new PurgecssPlugin({
-      paths: glob.sync(path.join(__dirname, '../src/**/*.elm'), { nodir: true }),
-    }),
+    // Removes dynamically added markup from markdown causing lost styles so don't use
+    // new PurgecssPlugin({
+    //   paths: glob.sync(path.join(__dirname, '../src/**/*.elm'), { nodir: true })
+    // }),
 
     new CopyWebpackPlugin({
       patterns: [
-        {from: 'src/assets/images', to: 'assets/images'},
+        {from: 'src/img', to: 'img/'},
+        {from: 'src/audio', to: 'audio/'},
       ]
     }),
 

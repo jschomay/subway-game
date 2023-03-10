@@ -16,14 +16,13 @@
   "scripts": {
     "webpack": "webpack",
     "webpack-dev-server": "webpack-dev-server",
-    "prod": "npm run webpack -- --env.mode production",
+    "prod": "NODE_OPTIONS=--openssl-legacy-provider npm run webpack -- --env.mode production",
     "deploy": "npm run prod && gh-pages -d dist",
     "prod:analyze": "npm run prod -- --env.presets analyze",
     "prod:compress": "npm run prod -- --env.presets compress",
-    "dev": "webpack-dashboard --title 'Elm Dev Server' --minimal -- npm run webpack-dev-server -- --env.mode development",
+    "dev": "NODE_OPTIONS=--openssl-legacy-provider webpack-dashboard --title 'Elm Dev Server' --minimal -- npm run webpack-dev-server -- --env.mode development",
     "elm-analyse": "elm-analyse -s -o",
-    "preprod": "rimraf dist",
-    "lint": "stylelint src/assets/styles"
+    "preprod": "rimraf dist"
   },
   "license": "MIT",
   "browserslist": [
@@ -54,9 +53,6 @@
     "purgecss-webpack-plugin": "^4.0.3",
     "rimraf": "^3.0.2",
     "style-loader": "^2.0.0",
-    "stylelint": "^13.13.1",
-    "stylelint-config-standard": "^22.0.0",
-    "stylelint-webpack-plugin": "^2.3.1",
     "terser-webpack-plugin": "^4.2.3",
     "webpack": "^4.46.0",
     "webpack-bundle-analyzer": "^4.5.0",

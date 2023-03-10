@@ -22,6 +22,14 @@ module.exports = () => ({
       {
         test: /\.s?css$/,
         use: ['style-loader', 'css-loader', 'postcss-loader']
+      },
+      {
+        test: /\.(eot|ttf|woff|woff2|svg)$/,
+        use: "file-loader?publicPath=../../&name=fonts/[name].[ext]"
+      },
+      {
+        test: /\.(jpg|png)$/,
+        use: "file-loader?publicPath=../../&name=img/[name].[ext]"
       }
     ]
   },
