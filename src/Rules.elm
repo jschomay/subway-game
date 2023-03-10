@@ -43,7 +43,7 @@ unsafeParseMatcher s =
             matcher
 
         Err e ->
-            Debug.log ("ERROR parsing matcher:" ++ s ++ "\n" ++ e)
+            -- Debug.log ("ERROR parsing matcher:" ++ s ++ "\n" ++ e)
                 (Match "PARSING_ERROR" [])
 
 
@@ -59,7 +59,7 @@ unsafeParseChanges s =
             changes
 
         Err e ->
-            Debug.log ("ERROR parsing changes:" ++ s ++ "\n" ++ e)
+            -- Debug.log ("ERROR parsing changes:" ++ s ++ "\n" ++ e)
                 (Update "PARSING_ERROR" [])
 
 
