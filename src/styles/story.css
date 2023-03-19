@@ -50,16 +50,55 @@
   display: block;
 }
 
-.StoryLine__continue {
+.StoryLine__content blockquote {
+  font-size: 0.6em;
+  font-style: italic;
+}
+.StoryLine__content blockquote :first-child::after {
+  content: "";
+  margin-left: 1em;
+  width: 12px;
+  height: 12px;
+  border: 1px solid #FFF;
+  border-bottom-color: transparent;
+  border-radius: 50%;
+  display: inline-block;
+  box-sizing: border-box;
+  animation: rotation 1s linear infinite;
+}
+
+.StoryLine__prompt {
+  background: transparent;
+  outline: none;
+  border: 1px solid gray;
+  padding: 1em;
+  background: #1a1a1a;
+  color: white;
+  width: 100%;
+  font-size: 1em;
+  font-weight: normal;
+  line-height: 125%;
+  font-family: "Quicksand", "helvetica";
+}
+
+.StoryLine__actions {
+  padding-top: 2em;
+  display: flex;
+  justify-content: center;
+}
+
+.StoryLine__action {
   font-family: "Quicksand", "helvetica";
   font-weight: bold;
   cursor: pointer;
-  padding-top: 2em;
-  text-align: center;
-  display: block;
+  margin-right: 2em;
 }
 
-.StoryLine__continue:hover {
+.StoryLine__action:last-child {
+  margin-right: initial;
+}
+
+.StoryLine__action:hover {
   color: orange;
 }
 
@@ -88,6 +127,14 @@
   color: orange;
 }
 
+@keyframes rotation {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
 @keyframes fadeIn {
   from {
     opacity: 0;

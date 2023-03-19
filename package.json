@@ -37,20 +37,20 @@
     "css-loader": "^5.2.7",
     "elm": "^0.19.1-5",
     "elm-analyse": "^0.16.5",
-    "file-loader": "^2.0.0",
-    "loader-utils": "^1.1.0",
-    "lodash.assign": "^4.2.0",
     "elm-hot-webpack-loader": "^1.1.8",
     "elm-webpack-loader": "^7.0.1",
+    "file-loader": "^2.0.0",
     "html-webpack-plugin": "^4.5.2",
     "imagemin-webpack-plugin": "^2.4.2",
     "jquery": "^3.6.0",
+    "loader-utils": "^1.1.0",
+    "lodash.assign": "^4.2.0",
     "mini-css-extract-plugin": "^1.6.2",
     "optimize-css-assets-webpack-plugin": "^6.0.1",
     "popper.js": "^1.16.1",
     "postcss-loader": "^3.0.0",
-    "recursive-readdir": "^2.2.2",
     "purgecss-webpack-plugin": "^4.0.3",
+    "recursive-readdir": "^2.2.2",
     "rimraf": "^3.0.2",
     "style-loader": "^2.0.0",
     "terser-webpack-plugin": "^4.2.3",
@@ -60,5 +60,8 @@
     "webpack-dashboard": "^3.3.3",
     "webpack-dev-server": "^3.11.2",
     "webpack-merge": "^4.2.2"
+  },
+  "dependencies": {
+    "@inworld/web-sdk": "^0.9.4"
   }
 }

@@ -97,6 +97,8 @@ init initialWorldModel flags =
       , loadingScene = debugState == Nothing
       , persistKey = ""
       , story = NarrativeContent.t "title_intro" |> String.split "---"
+      , playerPrompt = Nothing
+      , freeChatID = Nothing
       , ruleMatchCounts = Dict.empty
       , scene = MainTitle
       , showMap = False
@@ -434,6 +436,11 @@ updateAndThen f ( model, cmds ) =
     f model |> Tuple.mapSecond (\cmd -> Cmd.batch [ cmd, cmds ])
 
 
+loadingText : String
+loadingText =
+    "> Generating response..."
+
+
 update : LocalTypes.Rules -> Msg -> Model -> ( Model, Cmd Msg )
 update rules msg model =
     if model.gameOver then
@@ -528,9 +535,7 @@ update rules msg model =
                         )
 
             Interact interactableId ->
-                ( { model | history = model.history ++ [ interactableId ] }
-                , Cmd.none
-                )
+                ( { model | history = model.history ++ [ interactableId ] }, Cmd.none )
                     |> updateAndThen
                         --  need to apply pending changes if there are any queued up otherwise they will be lost
                         (\m ->
@@ -560,6 +565,14 @@ update rules msg model =
 
                                 _ ->
                                     ( m, Cmd.none )
+                        )
+                    |> updateAndThen
+                        (\m ->
+                            let
+                                newAllowFreeChat =
+                                    getLink interactableId "inworld_id" m.worldModel
+                            in
+                            ( { m | freeChatID = newAllowFreeChat }, Cmd.none )
                         )
 
             ToggleNotebook ->
@@ -612,7 +625,7 @@ update rules msg model =
                     ( { model | story = List.drop 1 model.story }, Cmd.none )
 
                 else
-                    ( { model | story = [] }, Cmd.none )
+                    ( { model | story = [], freeChatID = Nothing }, Cmd.none )
                         |> updateAndThen (applyPendingChanges rules)
                         |> updateAndThen
                             (\m ->
@@ -644,6 +657,32 @@ update rules msg model =
                                     _ ->
                                         ( m, Cmd.none )
                             )
+
+            StartPrompt ->
+                ( { model | playerPrompt = Just "", story = [] }, Task.attempt (\_ -> NoOp) (Dom.focus "player-prompt") )
+
+            UpdatePrompt newPrompt ->
+                ( { model | playerPrompt = Just newPrompt }, Cmd.none )
+
+            SendPrompt ->
+                if (model.playerPrompt |> Maybe.map String.trim) == Just "" then
+                    ( { model | story = [], freeChatID = Nothing, playerPrompt = Nothing }, Cmd.none )
+
+                else
+                    Maybe.map2
+                        (\freeChatID playerPrompt ->
+                            ( { model | playerPrompt = Nothing, story = [ loadingText ] }, sendPrompt <| Tuple.pair freeChatID playerPrompt )
+                        )
+                        model.freeChatID
+                        model.playerPrompt
+                        |> Maybe.withDefault ( model, Cmd.none )
+
+            PromptResponse { id, response } ->
+                if (model.freeChatID == Just id) && (List.length model.story == 1) then
+                    ( { model | story = List.map (\s -> String.join "\n\n" [ String.replace loadingText "" s, response ]) model.story }, Cmd.none )
+
+                else
+                    ( model, Cmd.none )
 
             PlaySound key ->
                 ( model, playSound key )
@@ -798,6 +837,9 @@ port persistListRes : (( String, List String ) -> msg) -> Sub msg
 port persistListChanged : (() -> msg) -> Sub msg
 
 
+port promptResponse : ({ id : String, response : String } -> msg) -> Sub msg
+
+
 
 -- OUT
 
@@ -832,6 +874,9 @@ port addDramaReq : () -> Cmd msg
 port stopSound : String -> Cmd msg
 
 
+port sendPrompt : ( String, String ) -> Cmd msg
+
+
 subscriptions : Model -> Sub Msg
 subscriptions model =
     Sub.batch
@@ -840,6 +885,7 @@ subscriptions model =
         , persistListRes <| (Persist << ExistingSaves)
         , persistLoadRes LoadScene
         , persistListChanged <| always (Persist ListSaves)
+        , promptResponse PromptResponse
         ]
 
 
@@ -883,6 +929,16 @@ handleKey model key =
 
             "n" ->
                 ToggleNotebook
+
+            "Enter" ->
+                if model.playerPrompt /= Nothing then
+                    SendPrompt
+
+                else if model.freeChatID /= Nothing && List.length model.story == 1 then
+                    StartPrompt
+
+                else
+                    NoOp
 
             _ ->
                 NoOp
@@ -1020,16 +1076,15 @@ mainView model =
                     }
                 )
         , ( "story"
-          , model.story
-                |> List.head
-                |> Maybe.withDefault ""
-                |> (\t ->
-                        if String.isEmpty t then
-                            text ""
+          , case ( List.head model.story, model.playerPrompt ) of
+                ( Just story, _ ) ->
+                    storyWrapperView <| storyView story (List.length model.story == 1) (model.freeChatID /= Nothing)
 
-                        else
-                            storyView t
-                   )
+                ( _, Just prompt ) ->
+                    storyWrapperView <| promptView prompt
+
+                _ ->
+                    text ""
           )
         , ( "notebook"
           , if model.showNotebook then
@@ -1188,7 +1243,7 @@ titleView title =
     div [ class "Scene TitleScene" ]
         [ div [ class "TitleContent" ]
             [ h1 [ class "Title" ] [ text title ]
-            , span [ class "StoryLine__continue", onClick (Interact "next_day") ] [ text "Continue..." ]
+            , div [ class "StoryLine__actions" ] [ span [ class "StoryLine__action", onClick (Interact "next_day") ] [ text "Continue..." ] ]
             ]
         ]
 
@@ -1207,7 +1262,7 @@ splashView =
     div [ class "Scene Splash" ]
         [ div [ class "MainTitleContent" ]
             [ Markdown.toHtml [] "![title](img/title.jpg)"
-            , span [ class "StoryLine__continue", onClick Continue ] [ text "Continue..." ]
+            , div [ class "StoryLine__actions" ] [ span [ class "StoryLine__action", onClick Continue ] [ text "Continue..." ] ]
             ]
         ]
 
@@ -1217,13 +1272,18 @@ mainTitleView story =
     div [ class "Scene MainTitleScene" ]
         [ div [ class "MainTitleContent" ]
             [ Markdown.toHtml [] story
-            , span [ class "StoryLine__continue", onClick Continue ] [ text "Continue..." ]
+            , div [ class "StoryLine__actions" ] [ span [ class "StoryLine__action", onClick Continue ] [ text "Continue..." ] ]
             ]
         ]
 
 
-storyView : String -> Html Msg
-storyView story =
+storyWrapperView : ( String, Html Msg ) -> Html Msg
+storyWrapperView viewFn =
+    Html.Keyed.node "div" [ class "StoryLine" ] [ viewFn ]
+
+
+storyView : String -> Bool -> Bool -> ( String, Html Msg )
+storyView story isFinal allowFreeChat =
     let
         lastSeg p =
             String.split "/" p |> List.reverse |> List.head |> Maybe.withDefault p
@@ -1237,16 +1297,50 @@ storyView story =
 
         catchLinkClicks =
             preventDefaultOn "click" <| Json.map identity linkParser
+
+        nextText =
+            if isFinal then
+                "Done"
+
+            else
+                "Continue..."
     in
-    Html.Keyed.node "div"
-        [ class "StoryLine" ]
-        [ ( story
-          , div [ class "StoryLine__content" ]
-                [ Markdown.toHtml [ catchLinkClicks ] story
-                , span [ class "StoryLine__continue", onClick Continue ] [ text "Continue..." ]
-                ]
-          )
+    ( story
+    , div [ class "StoryLine__content" ]
+        [ Markdown.toHtml [ catchLinkClicks ] story
+        , div [ class "StoryLine__actions" ] <|
+            span [ class "StoryLine__action", onClick Continue ] [ text nextText ]
+                :: (if isFinal && allowFreeChat then
+                        [ span [ class "StoryLine__action", onClick StartPrompt ] [ text "Talk more..." ]
+                        ]
+
+                    else
+                        []
+                   )
         ]
+    )
+
+
+promptView : String -> ( String, Html Msg )
+promptView prompt =
+    ( "prompt"
+    , div [ class "StoryLine__content" ]
+        [ textarea
+            [ id "player-prompt"
+            , class "StoryLine__prompt"
+            , rows 4
+            , placeholder "What do you want to say?"
+            , value prompt
+            , onInput UpdatePrompt
+
+            -- don't update prompt on enter press
+            , preventDefaultOn "keydown" <| Json.map (\k -> ( NoOp, k == 13 )) Html.Events.keyCode
+            ]
+            []
+        , div [ class "StoryLine__actions" ]
+            [ span [ class "StoryLine__action", onClick SendPrompt ] [ text "Continue..." ] ]
+        ]
+    )
 
 
 mapView : Manifest.WorldModel -> Html Msg

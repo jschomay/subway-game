@@ -15,6 +15,8 @@ type alias Model =
     , loadingScene : Bool
     , persistKey : String
     , story : List String
+    , playerPrompt : Maybe String
+    , freeChatID : Maybe String
     , scene : Scene
     , ruleMatchCounts : Dict RuleID Int
     , showMap : Bool
@@ -43,6 +45,10 @@ type Msg
     | Disembark
     | DisembarkStory
     | Continue
+    | StartPrompt
+    | UpdatePrompt String
+    | SendPrompt
+    | PromptResponse { id : String, response : String }
     | Achievement String
     | ToggleTranscript
     | ToggleNotebookPage NoteBookPage

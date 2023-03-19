@@ -157,6 +157,7 @@ rules =
                 SKATER_DUDE.location=offscreen
                 TRASH_DIGGER.location=EAST_MULBERRY
                 BENCH_BUM.location=EAST_MULBERRY
+                COFFEE_CART.inworld_id=snarky_coffee_girl
             """
         |> rule_______________________ "endThursday"
             """
@@ -169,6 +170,7 @@ rules =
                 BENCH_BUM.location=offscreen
                 SODA_MACHINE.-broken
                 NOTEBOOK.location=PLAYER
+                COFFEE_CART.inworld_id=none
             """
         |> rule_______________________ "fallAsleep"
             """

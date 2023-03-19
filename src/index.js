@@ -9,13 +9,14 @@ require("./styles/turnstile.css");
 require("./styles/guard-office.css");
 require("./styles/notebook.css");
 require("./styles/game.css");
+import { InworldClient } from "@inworld/web-sdk";
 
 // inject bundled Elm app
 const { Elm } = require("./Main.elm");
 const debug = location.hash === "#debug";
 const app = Elm.Main.init({
   node: document.getElementById("main"),
-  flags: { debug: debug }
+  flags: { debug: debug },
 });
 
 // get trains image (used for loading loaded) ready as soon as possible
@@ -41,7 +42,7 @@ app.ports.persistListReq.subscribe(() => {
 
 app.ports.persistLoadReq.subscribe((key) => {
   let { history } = JSON.parse(localStorage.getItem(persistPrefix + key)) || {
-    history: []
+    history: [],
   };
   if (history) setTimeout(() => app.ports.persistLoadRes.send(history), 100);
 });
@@ -72,7 +73,7 @@ let loopStart,
   currentLoop,
   nextLoop,
   dramaVolume = 0;
-const loopLengths = { "1": 80000, "2": 80000, "3": 80000, "4": 50000 };
+const loopLengths = { 1: 80000, 2: 80000, 3: 80000, 4: 50000 };
 
 function checkLoop() {
   if (Date.now() > loopStart + loopLengths[currentLoop]) {
@@ -192,13 +193,13 @@ const sounds = {
     exts: ["wav"],
     waitForLoad: true,
     loop: true,
-    volume: 0.4
+    volume: 0.4,
   },
   "sfx/subway_arrival": { exts: ["wav"], volume: 0.7 },
   "sfx/subway_arrival2": { exts: ["wav"] },
   "sfx/subway_departure": { exts: ["wav"], waitForLoad: true },
   "sfx/subway_whistle": { exts: ["wav"], waitForLoad: true, volume: 0.5 },
-  "sfx/ambience_crowd_loop": { exts: ["ogg"], loop: true, volume: 0.7 }
+  "sfx/ambience_crowd_loop": { exts: ["ogg"], loop: true, volume: 0.7 },
 };
 
 Object.entries(sounds).forEach(loadSound);
@@ -208,13 +209,82 @@ function loadSound([key, { waitForLoad, exts, loop, volume }]) {
   let sound = new Howl({
     src: exts.map((ext) => audoPrefix + key + "." + ext),
     loop: loop || false,
-    volume: volume || 1
+    volume: volume || 1,
   });
   if (waitForLoad)
     sound.once("load", assetLoaded.bind(null, { target: { src: key } }));
   // console.log("loading sound", key);
   loadedSounds[key] = sound;
 }
+
+////////////////////
+//INWORLD
+////////////////////
+
+const GENERATE_TOKEN_URL = "http://localhost:4000/get_token";
+let talkingTo = "";
+const startingScene = "workspaces/deadline/scenes/east_mulberry_subway_station";
+const charactersPrefix = "workspaces/deadline/characters/";
+
+async function generateSessionToken() {
+  // TODO find a way to be more resilient?
+  const response = await fetch(GENERATE_TOKEN_URL);
+  return response.json();
+}
+
+const inworld_client = new InworldClient()
+  .setConfiguration({
+    capabilities: { audio: false },
+  })
+  .setUser({ fullName: "Steve" })
+  .setScene(startingScene)
+  .setGenerateSessionToken(generateSessionToken)
+  .setOnError((err) => {
+    switch (err.code) {
+      // Cancelled by server due timeout inactivity.
+      case 10:
+      // Cancelled by client.
+      case 1:
+        break;
+      default:
+        console.error("inworld error", err);
+        break;
+    }
+  })
+  .setOnMessage((msg) => {
+    if (msg.isText()) {
+      app.ports.promptResponse.send({ id: talkingTo, response: msg.text.text });
+    } else if (msg.isInteractionEnd()) {
+      // Close connection.
+      // inworld.close();
+    } else console.debug("Unknown inworld message", msg);
+  });
+// .setOnReady(() => console.log("Inworld Ready!"))
+// .setOnDisconnect(() => console.log("Inworld Disconnect!"));
+
+const inworld = inworld_client.build();
+// force it to "preload" a token
+inworld.getCurrentCharacter();
+window.inworld = inworld;
+
+app.ports.sendPrompt.subscribe(async ([id, prompt]) => {
+  if (talkingTo !== id) {
+    // console.log("selecting character", id);
+
+    const characters = await inworld.getCharacters();
+    const character = characters.find(
+      (c) => c.getResourceName() === charactersPrefix + id
+    );
+
+    if (character) {
+      talkingTo = id;
+      inworld.setCurrentCharacter(character);
+    } else {
+      console.error("could not find character", charactersPrefix + id);
+    }
+  }
+  inworld.sendText(prompt);
+});
 
 ////////////////////
 //LISTENERS
@@ -225,7 +295,7 @@ document.addEventListener("keydown", function (e) {
     app.ports.keyPress.send(e.key);
   }
   if (e.key == " " || e.key === "Backspace") {
-    if (e.target.tagName != "INPUT") {
+    if (!e.target.tagName in ["INPUT", "TEXTAREA"]) {
       e.preventDefault();
     }
   }

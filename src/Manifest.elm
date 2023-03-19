@@ -103,7 +103,7 @@ entities =
         "Missing dog poster"
 
     -- EAST_MULBERRY
-    , entity "COFFEE_CART.character.location=EAST_MULBERRY"
+    , entity "COFFEE_CART.character.location=EAST_MULBERRY.inworld_id=carl"
         "Coffee cart"
     , entity "COMMUTER_1.character.location=EAST_MULBERRY"
         "Woman in a maroon jacket"
@@ -324,6 +324,10 @@ entities =
     , entity "ORANGE_LINE.line" "Orange line"
     , entity "BLUE_LINE.line" "Blue line"
     , entity "PURPLE_LINE.line" "Purple line"
+
+    -- Inworld ids (this is an ugly hack to be able to use links instead of "conversable" components, since links are easier to work with)
+    , entity "carl" "X"
+    , entity "snarky_coffee_girl" "X"
     ]
 
 
