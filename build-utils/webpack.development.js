@@ -1,6 +1,6 @@
 const path = require("path");
-const DashboardPlugin = require('webpack-dashboard/plugin');
-const webpack = require('webpack');
+const DashboardPlugin = require("webpack-dashboard/plugin");
+const webpack = require("webpack");
 
 module.exports = () => ({
   module: {
@@ -9,42 +9,47 @@ module.exports = () => ({
         test: /\.elm$/,
         exclude: [/elm-stuff/, /node_modules/],
         use: [
-          { loader: 'elm-hot-webpack-loader' },
+          { loader: "elm-hot-webpack-loader" },
           {
-            loader: 'elm-webpack-loader',
+            loader: "elm-webpack-loader",
             options: {
-              cwd: path.join(__dirname, '../'),
-              debug: true
-            }
-          }
-        ]
+              cwd: path.join(__dirname, "../"),
+              debug: true,
+            },
+          },
+        ],
       },
       {
         test: /\.s?css$/,
-        use: ['style-loader', 'css-loader', 'postcss-loader']
+        use: ["style-loader", "css-loader", "postcss-loader"],
       },
       {
-        test: /\.(eot|ttf|woff|woff2|svg)$/,
-        use: "file-loader?publicPath=../../&name=fonts/[name].[ext]"
+        test: /\.(eot|ttf|woff|woff2)$/,
+        use: "file-loader?publicPath=../../&name=fonts/[name].[ext]",
       },
       {
-        test: /\.(jpg|png)$/,
-        use: "file-loader?publicPath=../../&name=img/[name].[ext]"
-      }
-    ]
+        test: /\.(jpg|png|svg)$/,
+        use: "file-loader?publicPath=../../&name=img/[name].[ext]",
+      },
+    ],
   },
 
   plugins: [
     new webpack.HotModuleReplacementPlugin(),
 
     new DashboardPlugin(),
+
+    // config
+    new webpack.DefinePlugin({
+      SERVER_URL: JSON.stringify("http://localhost:4000/"),
+    }),
   ],
 
   devServer: {
-    contentBase: './src',
+    contentBase: "./src",
     historyApiFallback: true,
     inline: true,
-    stats: 'errors-only',
+    stats: "errors-only",
     hot: true,
-  }
+  },
 });

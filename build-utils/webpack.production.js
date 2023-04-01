@@ -1,5 +1,6 @@
 const path = require('path');
 const glob = require('glob');
+const webpack = require("webpack");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const CopyWebpackPlugin = require('copy-webpack-plugin')
 const TerserPlugin = require('terser-webpack-plugin');
@@ -33,11 +34,11 @@ module.exports = () => ({
         ],
       },
       {
-        test: /\.(eot|ttf|woff|woff2|svg)$/,
+        test: /\.(eot|ttf|woff|woff2)$/,
         use: "file-loader?publicPath=../../&name=fonts/[name].[ext]"
       },
       {
-        test: /\.(jpg|png)$/,
+        test: /\.(jpg|png|svg)$/,
         use: "file-loader?publicPath=../../&name=img/[name].[ext]"
       }
     ]
@@ -88,6 +89,12 @@ module.exports = () => ({
       cache: true,
     }),
 
-    new OptimizeCSSAssetsPlugin()
+    new OptimizeCSSAssetsPlugin(),
+
+
+    // config
+    new webpack.DefinePlugin({
+      SERVER_URL: JSON.stringify("/"),
+    }),
   ]
 });

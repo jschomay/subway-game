@@ -373,6 +373,9 @@ specialEvents rules ruleId model =
                 Cmd.none
             )
 
+        "coffeeCartWednesday" ->
+            ( model, sendTrigger "worry-about-steve" )
+
         other ->
             if List.member other [ "use_secret_passage_way", "chaseThiefAgain" ] then
                 ( { model | scene = Passageway }, Cmd.none )
@@ -875,6 +878,9 @@ port stopSound : String -> Cmd msg
 
 
 port sendPrompt : ( String, String ) -> Cmd msg
+
+
+port sendTrigger : String -> Cmd msg
 
 
 subscriptions : Model -> Sub Msg

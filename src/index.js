@@ -221,7 +221,7 @@ function loadSound([key, { waitForLoad, exts, loop, volume }]) {
 //INWORLD
 ////////////////////
 
-const GENERATE_TOKEN_URL = "http://localhost:4000/get_token";
+const GENERATE_TOKEN_URL = SERVER_URL + "get_token";
 let talkingTo = "";
 const startingScene = "workspaces/deadline/scenes/east_mulberry_subway_station";
 const charactersPrefix = "workspaces/deadline/characters/";
@@ -285,6 +285,8 @@ app.ports.sendPrompt.subscribe(async ([id, prompt]) => {
   }
   inworld.sendText(prompt);
 });
+
+app.ports.sendTrigger.subscribe(async id => inworld.sendTrigger(id))
 
 ////////////////////
 //LISTENERS
