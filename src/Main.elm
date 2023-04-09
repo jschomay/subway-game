@@ -114,7 +114,7 @@ init initialWorldModel flags =
       , currentTrack = "1"
       , playDramaTrack = False
       }
-    , Cmd.none
+    , persistSaveReq ( "Chapter 1: Beginning", [] )
     )
 
 
@@ -146,6 +146,11 @@ disembarkStoryDelay =
 passagewayDelay : Float
 passagewayDelay =
     1.6 * 1000
+
+
+autosaveKey : String
+autosaveKey =
+    "Autosave (most recent)"
 
 
 {-| "Ticks" the narrative engine, and displays the story content. Also preps changes
@@ -202,6 +207,25 @@ updateStory rules trigger model =
                      else
                         noop
                     )
+                |> updateAndThen
+                    -- don't want to persist things when playing back events in a load
+                    (if not model.loadingScene then
+                        maybeAutosaveChapter matchedRuleID
+
+                     else
+                        noop
+                    )
+
+
+maybeAutosaveChapter : String -> Model -> ( Model, Cmd Msg )
+maybeAutosaveChapter ruleID model =
+    case ruleID of
+        -- TODO ADD MORE SAVES
+        "fallAsleep" ->
+            ( model, persistSaveReq ( "Chapter 2: Falling asleep", model.history ) )
+
+        _ ->
+            ( model, Cmd.none )
 
 
 parseNarrative : Model -> RuleID -> ID -> String -> ( Narrative, Dict String Int )
@@ -479,7 +503,7 @@ update rules msg model =
                     Cmd.none
 
                   else
-                    persistLoadReq "autosave"
+                    persistLoadReq autosaveKey
                 )
 
             LoadScene history ->
@@ -608,7 +632,7 @@ update rules msg model =
                     [ playSound "sfx/subway_departure"
                     , playSound "sfx/subway_whistle"
                     , stopSound "sfx/ambience_crowd_loop"
-                    , persistSaveReq ( "autosave", model.history )
+                    , persistSaveReq ( autosaveKey, model.history )
                     ]
                 )
                     |> updateAndThen (delay rules departingDelay (Interact station))

@@ -69,6 +69,7 @@ view { worldModel, noteBookPage, persistKey, history } =
 
         savesView saves =
             saves
+                |> List.sort
                 |> List.map saveItemView
                 |> ul [ class "Notebook__content" ]
 
