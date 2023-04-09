@@ -18,6 +18,7 @@
     "webpack-dev-server": "webpack-dev-server",
     "prod": "NODE_OPTIONS=--openssl-legacy-provider npm run webpack -- --env.mode production",
     "deploy": "npm run prod && gh-pages -d dist",
+    "deploy-ai": "npm run prod && rm -rf ../inworld-server/static &&  cp -r dist/ ../inworld-server/static",
     "prod:analyze": "npm run prod -- --env.presets analyze",
     "prod:compress": "npm run prod -- --env.presets compress",
     "dev": "NODE_OPTIONS=--openssl-legacy-provider webpack-dashboard --title 'Elm Dev Server' --minimal -- npm run webpack-dev-server -- --env.mode development",
