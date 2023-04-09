@@ -221,7 +221,7 @@ function loadSound([key, { waitForLoad, exts, loop, volume }]) {
 //INWORLD
 ////////////////////
 
-const GENERATE_TOKEN_URL = SERVER_URL + "get_token";
+const GENERATE_TOKEN_URL = process.env.SERVER_URL + "get_token";
 let talkingTo = "";
 const startingScene = "workspaces/deadline/scenes/east_mulberry_subway_station";
 const charactersPrefix = "workspaces/deadline/characters/";
@@ -286,7 +286,7 @@ app.ports.sendPrompt.subscribe(async ([id, prompt]) => {
   inworld.sendText(prompt);
 });
 
-app.ports.sendTrigger.subscribe(async id => inworld.sendTrigger(id))
+app.ports.sendTrigger.subscribe(async (id) => inworld.sendTrigger(id));
 
 ////////////////////
 //LISTENERS
@@ -302,3 +302,15 @@ document.addEventListener("keydown", function (e) {
     }
   }
 });
+
+////////////////////
+// VERSION CHECK
+////////////////////
+const currentVersion = process.env.VERSION + "";
+const savedVersion = localStorage.getItem("version");
+if (currentVersion !== savedVersion) {
+  alert(
+    "Hi, thanks for playing Deadline!  Just to let you know, more content has been added since you last played.\n\nYou can use the Notebook to reload an earlier save point if you like."
+  );
+}
+localStorage.setItem("version", currentVersion);

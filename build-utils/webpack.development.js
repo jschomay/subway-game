@@ -41,7 +41,7 @@ module.exports = () => ({
 
     // config
     new webpack.DefinePlugin({
-      SERVER_URL: JSON.stringify("http://localhost:4000/"),
+      "process.env.SERVER_URL": JSON.stringify("http://localhost:4000/"),
     }),
   ],
 
