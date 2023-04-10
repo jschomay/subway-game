@@ -122,6 +122,12 @@
   padding-bottom: initial;
 }
 
+.Sign__chat-icon {
+  width: 16px;
+  height: 16px;
+  margin-left: 8px;
+}
+
 .Sign__item--list {
   list-style: circle;
   margin-left: 1em;
