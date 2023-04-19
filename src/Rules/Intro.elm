@@ -135,6 +135,7 @@ rules =
                 COFFEE.location=offscreen
                 COMMUTER_1.location=offscreen
                 LOUD_PAYPHONE_LADY.location=offscreen
+                PAYPHONE_EAST_MULBERRY.location=EAST_MULBERRY
                 TRASH_DIGGER.location=EAST_MULBERRY
             """
         |> rule_______________________ "endTuesday"
@@ -157,7 +158,6 @@ rules =
                 SKATER_DUDE.location=offscreen
                 TRASH_DIGGER.location=EAST_MULBERRY
                 BENCH_BUM.location=EAST_MULBERRY
-                COFFEE_CART.inworld_id=snarky_coffee_girl
             """
         |> rule_______________________ "endThursday"
             """
@@ -170,12 +170,12 @@ rules =
                 BENCH_BUM.location=offscreen
                 SODA_MACHINE.-broken
                 NOTEBOOK.location=PLAYER
-                COFFEE_CART.inworld_id=none
             """
+        -- TODO move feedback after adding more content
         |> rule_______________________ "fallAsleep"
             """
             ON: BROADWAY_STREET
             IF: PLAYER.day=5.chapter=0
-            DO: PLAYER.location=TWIN_BROOKS.chapter+1.present_proposal=2
+            DO: PLAYER.location=TWIN_BROOKS.chapter+1.present_proposal=2.showFeedback
                 COFFEE.location=offscreen
             """

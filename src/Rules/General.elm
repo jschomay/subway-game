@@ -72,3 +72,9 @@ rules =
             ON: *.passage_to=(*).!locked
             DO: PLAYER.location=(link $.passage_to)
             """
+        |> rule_______________________ "showFeedbackDialog"
+            """
+            ON: "disembark"
+            IF: PLAYER.showFeedback
+            DO: PLAYER.-showFeedback
+            """

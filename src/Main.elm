@@ -365,7 +365,10 @@ specialEvents rules ruleId model =
             delay rules achievementDelay (Achievement "f_the_system") model
 
         "fallAsleep" ->
-            addDrama model
+            ( { model | freeChatID = Just "jeff_the_game_designer" }
+            , changeScene "holdup_at_broadway_station"
+            )
+                |> updateAndThen addDrama
 
         "briefcaseStolen" ->
             addDrama model
@@ -396,6 +399,23 @@ specialEvents rules ruleId model =
               else
                 Cmd.none
             )
+
+        "endWednesday" ->
+            let
+                wm =
+                    model.worldModel |> Dict.update "COFFEE_CART" (Maybe.map (\e -> { e | inworldID = Just "snarky_coffee_girl" }))
+            in
+            ( { model | worldModel = wm }, Cmd.none )
+
+        "endThursday" ->
+            let
+                wm =
+                    model.worldModel
+                        |> Dict.update "COFFEE_CART" (Maybe.map (\e -> { e | inworldID = Nothing }))
+                        -- TODO put COMMUTER_1 back in after adjusting
+                        |> Dict.update "COMMUTER_1" (Maybe.map (\e -> { e | inworldID = Nothing }))
+            in
+            ( { model | worldModel = wm }, Cmd.none )
 
         "coffeeCartWednesday" ->
             ( model, sendTrigger "worry-about-steve" )
@@ -596,8 +616,9 @@ update rules msg model =
                     |> updateAndThen
                         (\m ->
                             let
+                                newAllowFreeChat : Maybe String
                                 newAllowFreeChat =
-                                    getLink interactableId "inworld_id" m.worldModel
+                                    Dict.get interactableId m.worldModel |> Maybe.andThen (\{ inworldID } -> inworldID)
                             in
                             ( { m | freeChatID = newAllowFreeChat }, Cmd.none )
                         )
@@ -905,6 +926,9 @@ port sendPrompt : ( String, String ) -> Cmd msg
 
 
 port sendTrigger : String -> Cmd msg
+
+
+port changeScene : String -> Cmd msg
 
 
 subscriptions : Model -> Sub Msg

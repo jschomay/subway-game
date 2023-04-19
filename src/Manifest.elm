@@ -12,8 +12,12 @@ type alias DisplayComponent a =
     { a | name : String }
 
 
+type alias Conversable a =
+    { a | inworldID : Maybe String }
+
+
 type alias ExtraFields =
-    DisplayComponent {}
+    DisplayComponent (Conversable {})
 
 
 type alias Entity =
@@ -36,11 +40,12 @@ initialWorldModel =
 {-| This is the `ExtendFn a` function for the parser to "merge in" the extra fields (name).
 -}
 addExtraFields : ExtraFields -> NarrativeComponent {} -> Entity
-addExtraFields { name } { tags, stats, links } =
+addExtraFields { name, inworldID } { tags, stats, links } =
     { tags = tags
     , stats = stats
     , links = links
     , name = name
+    , inworldID = inworldID
     }
 
 
@@ -48,7 +53,12 @@ addExtraFields { name } { tags, stats, links } =
 -}
 entity : String -> String -> ( String, ExtraFields )
 entity entityString name =
-    ( entityString, { name = name } )
+    ( entityString, { name = name, inworldID = Nothing } )
+
+
+withAI : String -> ( String, ExtraFields ) -> ( String, ExtraFields )
+withAI id ( entityString, extraFields ) =
+    ( entityString, { extraFields | inworldID = Just id } )
 
 
 entities : List ( String, ExtraFields )
@@ -87,10 +97,12 @@ entities =
         "Coffee"
     , entity "TRASH_DIGGER.character.location=offscreen"
         "Man digging in the trash"
+        |> withAI "trash_digger"
     , entity "SKATER_DUDE.character.location=offscreen"
         "Skater dude"
     , entity "BENCH_BUM.character.location=offscreen"
         "Guy sleeping on a bench"
+        |> withAI "beach_bum"
     , entity "MISSING_DOG_POSTER_1.item.missing_dog_poster"
         "Missing dog poster"
     , entity "MISSING_DOG_POSTER_2.item.missing_dog_poster"
@@ -101,14 +113,19 @@ entities =
         "Missing dog poster"
     , entity "MISSING_DOG_POSTER_5.item.missing_dog_poster"
         "Missing dog poster"
+    , entity "PAYPHONE_EAST_MULBERRY.item.location=offscreen"
+        "Payphone"
 
     -- EAST_MULBERRY
-    , entity "COFFEE_CART.character.location=EAST_MULBERRY.inworld_id=carl"
+    , entity "COFFEE_CART.character.location=EAST_MULBERRY"
         "Coffee cart"
+        |> withAI "carl"
     , entity "COMMUTER_1.character.location=EAST_MULBERRY"
         "Woman in a maroon jacket"
+        |> withAI "girl_in_maroon_dress"
     , entity "LOUD_PAYPHONE_LADY.character.location=EAST_MULBERRY"
         "Loud woman on payphone"
+        |> withAI "loud_payphone_lady"
     , entity "GRAFFITI_EAST_MULBERRY.item.location=EAST_MULBERRY"
         "Graffiti on the wall"
     , entity "SODA_MACHINE.item.broken.location=EAST_MULBERRY"
@@ -325,9 +342,9 @@ entities =
     , entity "BLUE_LINE.line" "Blue line"
     , entity "PURPLE_LINE.line" "Purple line"
 
-    -- Inworld ids (this is an ugly hack to be able to use links instead of "conversable" components, since links are easier to work with)
-    , entity "carl" "X"
-    , entity "snarky_coffee_girl" "X"
+    -- Other none game entities for Inworld
+    , entity "JEFF" "X"
+        |> withAI "jeff_the_game_designer"
     ]
 
 

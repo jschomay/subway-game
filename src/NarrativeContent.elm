@@ -349,7 +349,7 @@ She sure seems upset.
 ---
 Wow, you'd think people would try to take care of these matters at home. Yeesh.
 |
-I want to stay very far away from her.
+This is a bad idea...
 }
 """
         |> content__________________________________ "SODA_MACHINE" """

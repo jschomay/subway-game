@@ -26,6 +26,7 @@ content =
             "I got this from the security guard guy.  Now I can ride the Orange Line without getting caught."
         |> content__________________________________ "GRAFFITI_EAST_MULBERRY"
             "That's just vulgar.  Why do people have to mess things up?"
+        |> content__________________________________ "PAYPHONE_EAST_MULBERRY" "Huh, doesn't even work."
         |> content__________________________________ "COFFEE" """
 {PLAYER.day=1?  Carl's Coffee has been fueling me for years. Can't imagine surviving a Monday without it.}
 {PLAYER.day=2?  Mmm, that's good coffee.}
@@ -408,4 +409,16 @@ Ha ha, good one Steve!
 ---
 Why am I so fascinated with his maintenance guy?
 }
+"""
+        |> content__________________________________ "showFeedbackDialog" """
+Hello player!  I am Jeff, the game's designer and developer. 
+
+I hope you are enjoing playing so far!
+---
+I just want to let you know that you've reached the end of the content that includes AI characters that you can chat with.
+
+I will be adding more AI characters soon.  You can continue playing now if you want, but you may wish to use the Notebook to save the game here so you can return to this point later.
+---
+By the way, how do you like the game so far?  Do you have any feedback?
+
 """

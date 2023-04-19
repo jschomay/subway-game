@@ -111,6 +111,7 @@
 }
 
 .Sign__item--interactable {
+  display: flex;
   cursor: pointer;
 }
 

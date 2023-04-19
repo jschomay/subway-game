@@ -52,10 +52,10 @@ view map worldModel currentStation =
         nonInteractableItemView name =
             li [ class "Sign__item Sign__item--list" ] [ text name ]
 
-        interactableItemView wm ( id, name ) =
+        interactableItemView wm ( id, { name, inworldID } ) =
             div [ class "Sign__item Sign__item--interactable", onClick <| Interact id ]
                 [ text <| Maybe.withDefault name <| List.head <| NarrativeParser.parse config name
-                , if getLink id "inworld_id" wm /= Nothing then
+                , if inworldID /= Nothing then
                     img [ src "img/icons/chat.svg", class "Sign__chat-icon" ] []
 
                   else
@@ -67,7 +67,7 @@ view map worldModel currentStation =
                 [ div [ class "Sign__header1" ] [ text stationName ]
                 , div [ class "Sign__split" ]
                     [ div [ class "Sign__left" ] [ Connections.forStation map currentStation ]
-                    , div [ class "Sign__right" ] <| List.map (Tuple.mapSecond .name >> interactableItemView worldModel) (characters ++ items)
+                    , div [ class "Sign__right" ] <| List.map (interactableItemView worldModel) (characters ++ items)
                     ]
                 ]
     in

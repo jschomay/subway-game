@@ -222,9 +222,12 @@ function loadSound([key, { waitForLoad, exts, loop, volume }]) {
 ////////////////////
 
 const GENERATE_TOKEN_URL = process.env.SERVER_URL + "get_token";
-let talkingTo = "";
-const startingScene = "workspaces/deadline/scenes/east_mulberry_subway_station";
+const startingScene = "east_mulberry_subway_station";
+const scenePrefix = "workspaces/deadline/scenes/";
 const charactersPrefix = "workspaces/deadline/characters/";
+
+let talkingTo = "";
+let inworld;
 
 async function generateSessionToken() {
   // TODO find a way to be more resilient?
@@ -232,40 +235,47 @@ async function generateSessionToken() {
   return response.json();
 }
 
-const inworld_client = new InworldClient()
-  .setConfiguration({
-    capabilities: { audio: false },
-  })
-  .setUser({ fullName: "Steve" })
-  .setScene(startingScene)
-  .setGenerateSessionToken(generateSessionToken)
-  .setOnError((err) => {
-    switch (err.code) {
-      // Cancelled by server due timeout inactivity.
-      case 10:
-      // Cancelled by client.
-      case 1:
-        break;
-      default:
-        console.error("inworld error", err);
-        break;
-    }
-  })
-  .setOnMessage((msg) => {
-    if (msg.isText()) {
-      app.ports.promptResponse.send({ id: talkingTo, response: msg.text.text });
-    } else if (msg.isInteractionEnd()) {
-      // Close connection.
-      // inworld.close();
-    } else console.debug("Unknown inworld message", msg);
-  });
-// .setOnReady(() => console.log("Inworld Ready!"))
-// .setOnDisconnect(() => console.log("Inworld Disconnect!"));
+// scene gets set on inworld client build
+// so changing scenes requires rebuiding
+function startInworldScene(scene) {
+  const inworld_client = new InworldClient()
+    .setConfiguration({
+      capabilities: { audio: false },
+    })
+    .setUser({ fullName: "Steve" })
+    .setScene(scenePrefix + scene)
+    .setGenerateSessionToken(generateSessionToken)
+    .setOnError((err) => {
+      switch (err.code) {
+        // Cancelled by server due timeout inactivity.
+        case 10:
+        // Cancelled by client.
+        case 1:
+          break;
+        default:
+          console.error("inworld error", err);
+          break;
+      }
+    })
+    .setOnMessage((msg) => {
+      if (msg.isText()) {
+        app.ports.promptResponse.send({
+          id: talkingTo,
+          response: msg.text.text,
+        });
+      } else if (msg.isInteractionEnd()) {
+        // Close connection.
+        // inworld.close();
+      } else console.debug("Unknown inworld message", msg);
+    });
+  // .setOnReady(() => console.log("Inworld Ready!"))
+  // .setOnDisconnect(() => console.log("Inworld Disconnect!"));
 
-const inworld = inworld_client.build();
-// force it to "preload" a token
-inworld.getCurrentCharacter();
-window.inworld = inworld;
+  inworld = inworld_client.build();
+  // force it to "preload" a token
+  inworld.getCurrentCharacter();
+  window.inworld = inworld;
+}
 
 app.ports.sendPrompt.subscribe(async ([id, prompt]) => {
   if (talkingTo !== id) {
@@ -287,6 +297,12 @@ app.ports.sendPrompt.subscribe(async ([id, prompt]) => {
 });
 
 app.ports.sendTrigger.subscribe(async (id) => inworld.sendTrigger(id));
+app.ports.changeScene.subscribe(async (id) => {
+  console.log("changing scene", id);
+  startInworldScene(id);
+});
+
+startInworldScene(startingScene);
 
 ////////////////////
 //LISTENERS
