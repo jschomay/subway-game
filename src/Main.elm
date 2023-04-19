@@ -209,23 +209,30 @@ updateStory rules trigger model =
                     )
                 |> updateAndThen
                     -- don't want to persist things when playing back events in a load
-                    (if not model.loadingScene then
-                        maybeAutosaveChapter matchedRuleID
+                    -- also don't want to track events when loading
+                    (if not (model.loadingScene |> Debug.log "loading") then
+                        \m ->
+                            ( m
+                            , Cmd.batch
+                                [ maybeAutosaveChapter matchedRuleID m
+                                , trackEvent matchedRuleID
+                                ]
+                            )
 
                      else
                         noop
                     )
 
 
-maybeAutosaveChapter : String -> Model -> ( Model, Cmd Msg )
+maybeAutosaveChapter : String -> Model -> Cmd Msg
 maybeAutosaveChapter ruleID model =
     case ruleID of
         -- TODO ADD MORE SAVES
         "fallAsleep" ->
-            ( model, persistSaveReq ( "Chapter 2: Falling asleep", model.history ) )
+            persistSaveReq ( "Chapter 2: Falling asleep", model.history )
 
         _ ->
-            ( model, Cmd.none )
+            Cmd.none
 
 
 parseNarrative : Model -> RuleID -> ID -> String -> ( Narrative, Dict String Int )
@@ -531,6 +538,7 @@ update rules msg model =
                 List.foldl
                     (\id modelTuple ->
                         modelTuple
+                            |> Tuple.mapFirst (\m -> { m | loadingScene = True })
                             |> updateAndThen (update rules <| Interact id)
                             |> updateAndThen (applyPendingChanges rules)
                     )
@@ -929,6 +937,9 @@ port sendTrigger : String -> Cmd msg
 
 
 port changeScene : String -> Cmd msg
+
+
+port trackEvent : String -> Cmd msg
 
 
 subscriptions : Model -> Sub Msg
