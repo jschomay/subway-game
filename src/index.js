@@ -298,7 +298,7 @@ app.ports.sendPrompt.subscribe(async ([id, prompt]) => {
 
 app.ports.sendTrigger.subscribe(async (id) => inworld.sendTrigger(id));
 app.ports.changeScene.subscribe(async (id) => {
-  // TODO might need to debounce when loading
+  console.log("changing scene", id);
   startInworldScene(id);
 });
 
@@ -330,15 +330,3 @@ if (currentVersion !== savedVersion) {
   );
 }
 localStorage.setItem("version", currentVersion);
-
-////////////////////
-// ANALYTICS
-////////////////////
-
-app.ports.trackEvent.subscribe(async (id) => {
-  console.log("tracking", id);
-  window.goatcounter.count({
-    path: id,
-    event: true,
-  });
-});
