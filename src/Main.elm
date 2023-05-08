@@ -954,7 +954,7 @@ handleKey model key =
                 _ ->
                     False
     in
-    if not model.assetsLoaded || model.loadingScene || model.showSelectScene then
+    if not model.assetsLoaded || model.loadingScene || model.showSelectScene || model.playerPrompt /= Nothing then
         NoOp
 
     else

@@ -298,7 +298,6 @@ app.ports.sendPrompt.subscribe(async ([id, prompt]) => {
 
 app.ports.sendTrigger.subscribe(async (id) => inworld.sendTrigger(id));
 app.ports.changeScene.subscribe(async (id) => {
-  console.log("changing scene", id);
   startInworldScene(id);
 });
 
